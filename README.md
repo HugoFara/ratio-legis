@@ -25,6 +25,8 @@ Les trois livrables de la phase 0 sont produits.
 | Prototype du résolveur, jalon go/no-go | [`docs/03-prototype-resolveur.md`](docs/03-prototype-resolveur.md) |
 | Source d'annotation externe | [`docs/04-annotation-externe.md`](docs/04-annotation-externe.md) |
 | Généralisation aux 48 dossiers | [`docs/05-generalisation.md`](docs/05-generalisation.md) |
+| Modèle de données au grain du segment | [`docs/06-modele-de-donnees.md`](docs/06-modele-de-donnees.md) |
+| Schéma PostgreSQL | [`schema/001-graphe-provenance.sql`](schema/001-graphe-provenance.sql) |
 | Jeu d'annotation humaine, 100 articles | [`data/golden-set/jeu-annotation-100-prerempli.csv`](data/golden-set/jeu-annotation-100-prerempli.csv) |
 | Périmètre figé, 1 280 articles | [`data/perimetre-v1.csv`](data/perimetre-v1.csv) |
 | Golden set, données machine | [`data/golden-set/golden-set-v1.json`](data/golden-set/golden-set-v1.json) |
@@ -117,8 +119,14 @@ nommé.
 
 Résultat central : **39,8 % des articles sont repris du texte déposé entre 10 % et
 90 %** — ni gouvernementaux ni parlementaires, mais les deux selon l'alinéa. La
-partition n'a pas de sens au grain de l'article, et **la provenance doit être
-modélisée au segment**. Ce n'est plus un argument de principe, c'est une mesure.
+partition n'a pas de sens au grain de l'article.
+
+**Modélisation au segment approuvée et actée.** Au grain du segment, la part
+ambiguë tombe à 20,9 % et surtout change de nature : « alinéa retouché » est une
+catégorie nommable, là où « ni l'un ni l'autre » ne l'était pas. Le découpage en
+alinéas est fiable — 0 % de versions sans segment exploitable, à condition de
+couper sur `<br/>` autant que sur `<p>`, 26,5 % des articles n'ayant aucune
+balise `<p>`. Modèle et schéma : [`docs/06-modele-de-donnees.md`](docs/06-modele-de-donnees.md).
 
 ## Prochaine étape
 
@@ -127,10 +135,10 @@ modélisée au segment**. Ce n'est plus un argument de principe, c'est une mesur
    la meilleure source de motivation au niveau de l'article, avec **94,1 %**
    d'articles nommés contre 24,8 % pour l'étude d'impact. Tant que la validation
    humaine n'est pas faite, la phase 0 reste ouverte.
-2. **Acter la modélisation au segment** avant toute ingestion : elle conditionne
-   le schéma relationnel et la mesure la tranche.
-3. **Construire l'extracteur d'amendements AN historiques** : 387 des 449 articles
+2. **Construire l'extracteur d'amendements AN historiques** : 387 des 449 articles
    issus de la navette ne sont rattachés à aucun amendement du Sénat.
+3. **Déployer le schéma** et vérifier ses contraintes sémantiques, qui n'ont pas
+   pu l'être faute de serveur PostgreSQL dans l'environnement de mesure.
 
 ## Licence et attribution
 
