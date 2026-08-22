@@ -40,9 +40,23 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-# En-tête de commentaire : « Article 12 », « Article 1er », le suffixe pouvant
+# En-tête de commentaire : « Article 12 », « Article 1er », « Article 19 septies
+# [nouveau] », « Article additionnel après l'article 19 ». Le suffixe ordinal peut
 # être rejeté à la ligne suivante par la mise en forme d'origine.
-ENTETE = re.compile(r"^Article (\d+)\s*(?:\n(?:er|bis|ter|quater|quinquies))?\s*$", re.M)
+#
+# Le motif sert deux usages distincts : ouvrir une section, et **fermer la
+# précédente**. Ne reconnaître que « Article N » nu, comme le faisait la première
+# version, laisse une section déborder sur toutes celles dont l'en-tête porte un
+# ordinal — la moitié du corpus. Le commentaire rendu porte alors les offsets
+# d'un article et le texte de plusieurs, ce qu'un contrôle à la main de douze
+# arêtes `motive` a fait apparaître sur deux cas. L'ouverture d'une section reste
+# soumise au test de déclaration ou de titre : élargir le motif ne relâche donc
+# pas le critère, cela découpe plus finement.
+ORDINAL = r"(?:er|bis|ter|quater|quinquies|sexies|septies|octies|nonies|decies)"
+ENTETE = re.compile(
+    r"^Article (?:additionnel[^\n]{0,90}|(\d+)"
+    r"(?:\s*" + ORDINAL + r")*(?:\s*[A-H])?(?:\s*\[?\((?:nouveau|supprimé)\)\]?)?)"
+    r"\s*(?:\n\s*" + ORDINAL + r")?\s*$", re.M)
 
 ARTICLE = re.compile(r"\bL\.?\s?(\d{3})-(\d{1,3})(?:-(\d{1,3}))?")
 PLAGE = re.compile(r"L\.?\s?(\d{3})-(\d{1,3})\s+(?:à|au)\s+L\.?\s?(\d{3})-(\d{1,3})")
@@ -108,7 +122,7 @@ def commentaires(chemin: Path) -> list[dict]:
         depart = max(0, texte.find("EXAMEN DES ARTICLES"))
     corps = texte[depart:]
 
-    entetes = [(m.start(), m.group(1)) for m in ENTETE.finditer(corps)]
+    entetes = [(m.start(), m.group(1) or "") for m in ENTETE.finditer(corps)]
     sections = []
     for rang, (debut, numero) in enumerate(entetes):
         fin = entetes[rang + 1][0] if rang + 1 < len(entetes) else len(corps)
