@@ -290,6 +290,19 @@ Décision au vu de C1 sur ces 307 articles :
 - **C1 < 50 %** : repli du § 8 sur un produit centré dossier, décidé avant toute
   ingestion.
 
+> **Fait. Verdict : go, produit centré article.** Voir
+> `03-prototype-resolveur.md`. Le seuil portait sur le mauvais dénominateur :
+> **68 % des 307 articles ont une rédaction déjà présente dans le texte initial du
+> Gouvernement** et n'ont donc besoin d'aucune arête `resulte_de`. Sur les 99
+> articles issus de la navette, C1 = **29,3 %** avec les seuls amendements du
+> Sénat, l'Assemblée étant hors open data. La couverture de la motivation, toutes
+> voies confondues, atteint **77,2 %**, et 10 chaînes vont de l'article en vigueur
+> jusqu'à un amendement nommé.
+>
+> Deux conséquences : la cible C1 se mesure désormais sur la population issue de
+> la navette, et **l'extracteur d'amendements AN historiques est réactivé** — le
+> résolveur fonctionne, le goulot est redevenu la source.
+
 ### Le chemin critique n'est pas celui prévu
 
 **778 articles éligibles sur 832, soit 93 %, dépendent de législatures dont les

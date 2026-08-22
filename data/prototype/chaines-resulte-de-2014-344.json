@@ -1,0 +1,263 @@
+[
+ {
+  "article": "L224-37",
+  "article_predecesseur": "L121-84-10-1",
+  "id_legi": "LEGIARTI000032226645",
+  "amendements_senat": [
+   "517"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": true
+ },
+ {
+  "article": "L224-51",
+  "article_predecesseur": "L121-45",
+  "id_legi": "LEGIARTI000043545830",
+  "amendements_senat": [
+   "523"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": true
+ },
+ {
+  "article": "L224-52",
+  "article_predecesseur": "L121-45",
+  "id_legi": "LEGIARTI000032226611",
+  "amendements_senat": [
+   "523"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": false
+ },
+ {
+  "article": "L224-65",
+  "article_predecesseur": "L121-105",
+  "id_legi": "LEGIARTI000032226573",
+  "amendements_senat": [
+   "682"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": true
+ },
+ {
+  "article": "L312-57",
+  "article_predecesseur": "L311-16",
+  "id_legi": "LEGIARTI000032226064",
+  "amendements_senat": [
+   "376 rect. bis"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": false
+ },
+ {
+  "article": "L312-58",
+  "article_predecesseur": "L311-16",
+  "id_legi": "LEGIARTI000032226061",
+  "amendements_senat": [
+   "376 rect. bis"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": false
+ },
+ {
+  "article": "L312-60",
+  "article_predecesseur": "L311-17",
+  "id_legi": "LEGIARTI000032226055",
+  "amendements_senat": [
+   "430 rect."
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": false
+ },
+ {
+  "article": "L312-63",
+  "article_predecesseur": "L311-17",
+  "id_legi": "LEGIARTI000032226047",
+  "amendements_senat": [
+   "430 rect."
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": false
+ },
+ {
+  "article": "L312-64",
+  "article_predecesseur": "L311-16",
+  "id_legi": "LEGIARTI000035731397",
+  "amendements_senat": [
+   "376 rect. bis"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": false
+ },
+ {
+  "article": "L312-65",
+  "article_predecesseur": "L311-16",
+  "id_legi": "LEGIARTI000032226041",
+  "amendements_senat": [
+   "376 rect. bis"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": false
+ },
+ {
+  "article": "L312-66",
+  "article_predecesseur": "L311-17",
+  "id_legi": "LEGIARTI000032226039",
+  "amendements_senat": [
+   "430 rect."
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": true
+ },
+ {
+  "article": "L312-67",
+  "article_predecesseur": "L311-16",
+  "id_legi": "LEGIARTI000032226037",
+  "amendements_senat": [
+   "376 rect. bis"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": false
+ },
+ {
+  "article": "L312-68",
+  "article_predecesseur": "L311-17",
+  "id_legi": "LEGIARTI000032226033",
+  "amendements_senat": [
+   "430 rect."
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": true
+ },
+ {
+  "article": "L312-69",
+  "article_predecesseur": "L311-17",
+  "id_legi": "LEGIARTI000032226031",
+  "amendements_senat": [
+   "430 rect."
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": true
+ },
+ {
+  "article": "L312-74",
+  "article_predecesseur": "L311-16",
+  "id_legi": "LEGIARTI000032890821",
+  "amendements_senat": [
+   "376 rect. bis"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": false
+ },
+ {
+  "article": "L312-75",
+  "article_predecesseur": "L311-16",
+  "id_legi": "LEGIARTI000032226016",
+  "amendements_senat": [
+   "376 rect. bis"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": false
+ },
+ {
+  "article": "L312-76",
+  "article_predecesseur": "L311-16",
+  "id_legi": "LEGIARTI000035731386",
+  "amendements_senat": [
+   "376 rect. bis"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": false
+ },
+ {
+  "article": "L312-77",
+  "article_predecesseur": "L311-16",
+  "id_legi": "LEGIARTI000035731383",
+  "amendements_senat": [
+   "376 rect. bis"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": false
+ },
+ {
+  "article": "L312-78",
+  "article_predecesseur": "L311-16",
+  "id_legi": "LEGIARTI000034072741",
+  "amendements_senat": [
+   "376 rect. bis"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": false
+ },
+ {
+  "article": "L312-79",
+  "article_predecesseur": "L311-16",
+  "id_legi": "LEGIARTI000032226008",
+  "amendements_senat": [
+   "376 rect. bis"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": false
+ },
+ {
+  "article": "L312-80",
+  "article_predecesseur": "L311-16",
+  "id_legi": "LEGIARTI000035731380",
+  "amendements_senat": [
+   "376 rect. bis"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": false
+ },
+ {
+  "article": "L312-81",
+  "article_predecesseur": "L311-16",
+  "id_legi": "LEGIARTI000034072735",
+  "amendements_senat": [
+   "376 rect. bis"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": true
+ },
+ {
+  "article": "L312-82",
+  "article_predecesseur": "L311-16",
+  "id_legi": "LEGIARTI000032226002",
+  "amendements_senat": [
+   "376 rect. bis"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": true
+ },
+ {
+  "article": "L312-83",
+  "article_predecesseur": "L311-16",
+  "id_legi": "LEGIARTI000032226000",
+  "amendements_senat": [
+   "376 rect. bis"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": false
+ },
+ {
+  "article": "L412-5",
+  "article_predecesseur": "L112-12",
+  "id_legi": "LEGIARTI000033612911",
+  "amendements_senat": [
+   "675"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": true
+ },
+ {
+  "article": "L413-2",
+  "article_predecesseur": "L213-4",
+  "id_legi": "LEGIARTI000034072885",
+  "amendements_senat": [
+   "645 rect."
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": false
+ },
+ {
+  "article": "L451-3",
+  "article_predecesseur": "L213-4",
+  "id_legi": "LEGIARTI000032225313",
+  "amendements_senat": [
+   "645 rect."
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": false
+ },
+ {
+  "article": "L451-4",
+  "article_predecesseur": "L213-4",
+  "id_legi": "LEGIARTI000032225311",
+  "amendements_senat": [
+   "645 rect."
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": false
+ },
+ {
+  "article": "L532-3",
+  "article_predecesseur": "L218-7",
+  "id_legi": "LEGIARTI000051830405",
+  "amendements_senat": [
+   "643"
+  ],
+  "texte_subsiste_dans_la_version_en_vigueur": true
+ }
+]

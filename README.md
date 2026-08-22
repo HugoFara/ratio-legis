@@ -12,7 +12,7 @@ sans citation résoluble au niveau du passage.
 
 Spécification complète : [`ratio-legis-feuille-de-route.md`](ratio-legis-feuille-de-route.md).
 
-## État : phase 0 terminée, en attente de validation humaine
+## État : phase 0 mesurée, jalon go/no-go franchi, validation humaine en attente
 
 Aucun code de production n'est écrit, conformément au § 9 de la feuille de route.
 Les trois livrables de la phase 0 sont produits.
@@ -22,10 +22,12 @@ Les trois livrables de la phase 0 sont produits.
 | Note de cadrage et décision de périmètre | [`docs/00-note-de-cadrage.md`](docs/00-note-de-cadrage.md) |
 | Rapport de vérification des sources | [`docs/01-rapport-verification-sources.md`](docs/01-rapport-verification-sources.md) |
 | Golden set de 25 articles | [`docs/02-golden-set.md`](docs/02-golden-set.md) |
+| Prototype du résolveur, jalon go/no-go | [`docs/03-prototype-resolveur.md`](docs/03-prototype-resolveur.md) |
 | Jeu d'annotation humaine, 100 articles | [`data/golden-set/jeu-annotation-100.csv`](data/golden-set/jeu-annotation-100.csv) |
 | Périmètre figé, 1 280 articles | [`data/perimetre-v1.csv`](data/perimetre-v1.csv) |
 | Golden set, données machine | [`data/golden-set/golden-set-v1.json`](data/golden-set/golden-set-v1.json) |
-| Scripts de mesure, reproductibles | [`tools/phase0/`](tools/phase0/) |
+| Chaînes `resulte_de` produites | [`data/prototype/chaines-resulte-de-2014-344.json`](data/prototype/chaines-resulte-de-2014-344.json) |
+| Scripts de mesure et prototype | [`tools/`](tools/) |
 
 **Verticale retenue :** Code de la consommation, partie législative, 1 280
 articles en vigueur.
@@ -54,19 +56,20 @@ open data de l'Assemblée nationale.
   critique du projet est donc entièrement à écrire.
 - Les **amendements de l'Assemblée nationale** ne sont en open data que pour les
   16e et 17e législatures, dont 93 % de la population éligible du périmètre ne
-  relève pas. Mais la mesure côté Sénat, où la couverture est complète, donne
-  **0 rattachement sur 307 articles** : le goulot n'est pas la chambre, c'est le
-  résolveur manquant. L'extracteur AN est donc reporté, pas priorisé.
+  relève pas. Le prototype du résolveur montre que c'est bien la source qui
+  manque : les 70 articles issus de la navette et non rattachés sont, selon toute
+  vraisemblance, d'origine Assemblée.
 - Le § 0 suppose les ordonnances sans motivation : **90,6 % d'entre elles ont un
   rapport au Président de la République**.
 - **Atteindre le dossier n'est pas atteindre la motivation.** L'exposé des motifs
   ne nomme l'article que dans **6,4 %** des cas, l'étude d'impact dans **24,8 %**,
   l'un ou l'autre dans **42,2 %** sur les articles à documentation complète. C'est
   le plafond réel de la restitution ancrée exigée au § 4.3.
-- **L'arête `resulte_de` n'a jamais été produite.** Sur les 307 articles issus de
-  la loi consommation de 2014, **aucun** n'a encore cette loi comme texte
-  producteur de sa version en vigueur : elle est vide par construction sur un
-  corpus recodifié, sauf à l'attacher à la version historique.
+- **L'arête `resulte_de` ne peut pas s'attacher à la version en vigueur.** Sur les
+  307 articles issus de la loi consommation de 2014, **aucun** n'a encore cette loi
+  comme texte producteur de sa version en vigueur : elle est vide par construction
+  sur un corpus recodifié. Elle n'a de sens qu'attachée à la version historique
+  produite par l'amendement — c'est ainsi que le prototype la produit.
 
 ### Miroir DILA
 
@@ -75,15 +78,32 @@ Fait. Les incréments quotidiens ne remontent pas au-delà du dump global du
 `tools/phase0/miroir_dila.sh` récupère global et incréments et produit un
 manifeste horodaté avec taille et SHA-256 par fichier. À relancer quotidiennement.
 
+## Jalon go/no-go : go, produit centré article
+
+Le résolveur a été prototypé sur la loi consommation de 2014, qui produit 307 des
+832 articles éligibles ([`docs/03-prototype-resolveur.md`](docs/03-prototype-resolveur.md)).
+
+- **68 % des articles n'ont besoin d'aucune arête `resulte_de`** : leur rédaction
+  figure déjà dans le texte initial du Gouvernement, et l'exposé des motifs y
+  répond. L'arête critique n'est requise que sur les 32 % issus de la navette.
+- Le maillon « article de la loi → article du code » **n'est pas à écrire** :
+  LEGI le déclare, à 100 % sur ce pilote.
+- Ce qui manquait est le rattachement de l'amendement, obtenu par **appariement
+  textuel exact des passages cités**, avec un garde-fou de discriminance qui
+  divise le rappel par deux — le prix de la règle « précision > rappel ».
+- **C1 = 29,3 %** sur les 99 articles issus de la navette, avec une seule chambre
+  sur deux. **10 chaînes complètes** vont de l'article en vigueur jusqu'à un
+  amendement nommé et à sa justification.
+
+L'extracteur d'amendements de l'Assemblée est réactivé : le résolveur fonctionne,
+le goulot est redevenu la disponibilité de la source.
+
 ## Prochaine étape
 
-Deux travaux parallèles, avant la phase 1 :
-
-1. **Prototyper le résolveur « article du projet de loi → article du code »** sur
-   la loi consommation de 2014 — 307 des 832 articles éligibles. C'est le jalon
-   go/no-go : il détermine si le produit est centré article ou centré dossier.
-2. **Faire annoter les 100 articles** avec offsets des passages motivants. Tant
+1. **Faire annoter les 100 articles** avec offsets des passages motivants. Tant
    que ce n'est pas fait, la phase 0 reste ouverte.
+2. **Construire l'extracteur d'amendements AN historiques**, dont dépend la
+   mesure C2.
 
 ## Licence et attribution
 
