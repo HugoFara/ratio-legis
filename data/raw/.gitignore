@@ -1,0 +1,9 @@
+# Sources brutes miroitées. Volumineuses et reconstructibles depuis la DILA tant
+# que la fenêtre de rétention le permet — c'est précisément ce qui n'est pas
+# garanti. À sauvegarder hors dépôt.
+# Seuls les manifestes de hachage sont versionnés : ils suffisent à prouver
+# l'intégrité d'un miroir et à détecter une republication silencieuse.
+*
+!.gitignore
+!*/
+!*/manifeste-*.tsv

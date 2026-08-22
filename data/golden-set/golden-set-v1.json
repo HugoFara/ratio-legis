@@ -1,0 +1,1397 @@
+[
+ {
+  "rang": 1,
+  "article": "L224-3",
+  "id_legi": "LEGIARTI000046197680",
+  "date_debut": "2023-07-01",
+  "categorie": "A_loi_L16_L17",
+  "categorie_libelle": "Origine législative récente, amendements AN en open data",
+  "livre": "Livre II : FORMATION ET ÉXECUTION DES CONTRATS",
+  "extrait": "L'offre de fourniture d'électricité ou de gaz naturel précise, dans des termes clairs et compréhensibles, les informations suivantes : 1° L'identité du fournisseur, l'adresse de son siège social, son numéro unique d'identification ainsi que la mention RCS suivie du nom de la ville où se trouve le gr",
+  "chaine": {
+   "article_predecesseur": "L121-87",
+   "nb_liens_renumerotation": 1,
+   "texte_producteur_version_actuelle": {
+    "libelle": "LOI n°2022-1158 du 16 août 2022",
+    "cid": "JORFTEXT000046186723",
+    "nature": "LOI",
+    "type": "MODIFIE"
+   },
+   "texte_origine": null
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000046027237",
+   "titre": "LOI n° 2022-1158 du 16 août 2022 portant mesures d'urgence pour la protection du pouvoir d'achat",
+   "type": "LOI_PUBLIEE",
+   "legislature": "16",
+   "expose_motif_caracteres": 30495,
+   "etude_impact": [
+    "https://www.legifrance.gouv.fr/contenu/Media/files/autour-de-la-loi/legislatif-et-reglementaire/etudes-d-impact-des-lois/ei_art_39_2022/ei_ecox2217989l_cm_7.07.2022.pdf"
+   ],
+   "avis_conseil_etat": [
+    "https://www.legifrance.gouv.fr/contenu/Media/files/autour-de-la-loi/legislatif-et-reglementaire/les-avis-du-conseil-d-etat-rendus-sur-les-projets-de-loi/2022/avis_ce_ecox2217989l_cm_7.07.2022.pdf"
+   ],
+   "rapport_president_republique": false,
+   "nb_comptes_rendus": 3,
+   "dossier_an": [
+    "https://www.assemblee-nationale.fr/dyn/16/dossiers/mesures_urgence_pouvoir_achat"
+   ],
+   "dossier_senat": [
+    "https://www.senat.fr/dossier-legislatif/pjl21-817.html"
+   ]
+  },
+  "documents_de_motivation_atteints": [
+   "exposé des motifs",
+   "étude d'impact",
+   "avis du Conseil d'État",
+   "3 comptes rendus"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Un amendement du Sénat porte sur une version historique de l'article, mais la rédaction en vigueur a été produite par un texte postérieur. Aucune arête resulte_de confirmée.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": true,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": false,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "documents muets sur cet article"
+  },
+  "amendements_ecartes": [
+   {
+    "article_cible_de_l_amendement": "L121-87",
+    "via": "numérotation antérieure",
+    "dossier_amendement": "JORFDOLE000027383756",
+    "chambre": "Sénat",
+    "numero": "681",
+    "auteur": "M. FAUCONNIER",
+    "subdivision_projet": "art. add. après Article 5",
+    "url": "https://www.senat.fr/amendements/2012-2013/810/Amdt_681.html",
+    "longueur_objet": 891,
+    "porte_sur": "une version historique de l'article, pas nécessairement la version en vigueur",
+    "methode": "derivee — extraction de la cible du langage modificatif, à confirmer sur le texte promulgué",
+    "texte_producteur_de_la_version_en_vigueur": "LOI n°2022-1158 du 16 août 2022",
+    "valide_pour_la_version_en_vigueur": false,
+    "motif_d_ecartement": "L'amendement appartient au dossier de la loi du 17 mars 2014 ; la version en vigueur est produite par « LOI n°2022-1158 du 16 août 2022 ». L'arête relierait une version historique, pas la version en vigueur."
+   }
+  ]
+ },
+ {
+  "rang": 2,
+  "article": "L224-12",
+  "id_legi": "LEGIARTI000051560277",
+  "date_debut": "2025-05-03",
+  "categorie": "A_loi_L16_L17",
+  "categorie_libelle": "Origine législative récente, amendements AN en open data",
+  "livre": "Livre II : FORMATION ET ÉXECUTION DES CONTRATS",
+  "extrait": "Les factures de fourniture d'électricité et de gaz naturel sont présentées dans les conditions fixées par un arrêté du ministre chargé de la consommation et du ministre chargé de l'énergie pris après avis du Conseil national de la consommation. Tout client peut recevoir les factures et les informati",
+  "chaine": {
+   "article_predecesseur": "L121-91",
+   "nb_liens_renumerotation": 2,
+   "texte_producteur_version_actuelle": {
+    "libelle": "LOI n°2025-391 du 30 avril 2025",
+    "cid": "JORFTEXT000051538879",
+    "nature": "LOI",
+    "type": "MODIFIE"
+   },
+   "texte_origine": null
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000050427907",
+   "titre": "LOI n° 2025-391 du 30 avril 2025 portant diverses dispositions d'adaptation au droit de l'Union européenne en matière économique, financière, environnementale, énergétique, de transport, de santé et de circulation des personnes",
+   "type": "LOI_PUBLIEE",
+   "legislature": "17",
+   "expose_motif_caracteres": 72446,
+   "etude_impact": [
+    "https://www.legifrance.gouv.fr/contenu/Media/files/autour-de-la-loi/legislatif-et-reglementaire/etudes-d-impact-des-lois/ei_art_39_2024/ei_ecom2415026l_cm_31.10.2024.pdf"
+   ],
+   "avis_conseil_etat": [
+    "https://www.legifrance.gouv.fr/contenu/Media/files/autour-de-la-loi/legislatif-et-reglementaire/les-avis-du-conseil-d-etat-rendus-sur-les-projets-de-loi/2024/avis_ce_ecom2415026l_cm_31.10.2024.pdf"
+   ],
+   "rapport_president_republique": false,
+   "nb_comptes_rendus": 0,
+   "dossier_an": [
+    "https://www.assemblee-nationale.fr/dyn/17/dossiers/diverses_dispositions_adaptation_due_2024_eco_finances_environnement"
+   ],
+   "dossier_senat": [
+    "https://www.senat.fr/dossier-legislatif/pjl24-352.html"
+   ]
+  },
+  "documents_de_motivation_atteints": [
+   "exposé des motifs",
+   "étude d'impact",
+   "avis du Conseil d'État"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Un amendement du Sénat porte sur une version historique de l'article, mais la rédaction en vigueur a été produite par un texte postérieur. Aucune arête resulte_de confirmée.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": true,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": false,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "documents muets sur cet article"
+  },
+  "amendements_ecartes": [
+   {
+    "article_cible_de_l_amendement": "L121-91",
+    "via": "numérotation antérieure",
+    "dossier_amendement": "JORFDOLE000027383756",
+    "chambre": "Sénat",
+    "numero": "101",
+    "auteur": "Mme LÉTARD",
+    "subdivision_projet": "Article 9 bis",
+    "url": "https://www.senat.fr/amendements/2013-2014/283/Amdt_101.html",
+    "longueur_objet": 1547,
+    "porte_sur": "une version historique de l'article, pas nécessairement la version en vigueur",
+    "methode": "derivee — extraction de la cible du langage modificatif, à confirmer sur le texte promulgué",
+    "texte_producteur_de_la_version_en_vigueur": "LOI n°2025-391 du 30 avril 2025",
+    "valide_pour_la_version_en_vigueur": false,
+    "motif_d_ecartement": "L'amendement appartient au dossier de la loi du 17 mars 2014 ; la version en vigueur est produite par « LOI n°2025-391 du 30 avril 2025 ». L'arête relierait une version historique, pas la version en vigueur."
+   },
+   {
+    "article_cible_de_l_amendement": "L121-91",
+    "via": "numérotation antérieure",
+    "dossier_amendement": "JORFDOLE000027383756",
+    "chambre": "Sénat",
+    "numero": "167",
+    "auteur": "M. COINTAT",
+    "subdivision_projet": "Article 9 bis",
+    "url": "https://www.senat.fr/amendements/2013-2014/283/Amdt_167.html",
+    "longueur_objet": 384,
+    "porte_sur": "une version historique de l'article, pas nécessairement la version en vigueur",
+    "methode": "derivee — extraction de la cible du langage modificatif, à confirmer sur le texte promulgué",
+    "texte_producteur_de_la_version_en_vigueur": "LOI n°2025-391 du 30 avril 2025",
+    "valide_pour_la_version_en_vigueur": false,
+    "motif_d_ecartement": "L'amendement appartient au dossier de la loi du 17 mars 2014 ; la version en vigueur est produite par « LOI n°2025-391 du 30 avril 2025 ». L'arête relierait une version historique, pas la version en vigueur."
+   }
+  ]
+ },
+ {
+  "rang": 3,
+  "article": "L521-3-1",
+  "id_legi": "LEGIARTI000049571083",
+  "date_debut": "2024-02-17",
+  "categorie": "A_loi_L16_L17",
+  "categorie_libelle": "Origine législative récente, amendements AN en open data",
+  "livre": "Livre V : POUVOIRS D'ENQUÊTE ET SUITES DONNÉES AUX CONTRÔLES",
+  "extrait": "Lorsque les agents habilités constatent, avec les pouvoirs prévus au présent livre, une infraction ou un manquement aux dispositions mentionnées aux articles L. 511-5, L. 511-6 et L. 511-7 ainsi qu'aux règles relatives à la conformité et à la sécurité des produits et des services à partir d'une inte",
+  "chaine": {
+   "article_predecesseur": null,
+   "nb_liens_renumerotation": 0,
+   "texte_producteur_version_actuelle": {
+    "libelle": "LOI n°2024-449 du 21 mai 2024",
+    "cid": "JORFTEXT000049563368",
+    "nature": "LOI",
+    "type": "MODIFIE"
+   },
+   "texte_origine": null
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000047533100",
+   "titre": "LOI n° 2024-449 du 21 mai 2024 visant à sécuriser et à réguler l'espace numérique",
+   "type": "LOI_PUBLIEE",
+   "legislature": "16",
+   "expose_motif_caracteres": 28460,
+   "etude_impact": [
+    "https://www.legifrance.gouv.fr/contenu/Media/files/autour-de-la-loi/legislatif-et-reglementaire/etudes-d-impact-des-lois/ei_art_39_2023/ei_ecoi2309270l_cm_10.05.2023.pdf"
+   ],
+   "avis_conseil_etat": [
+    "https://www.legifrance.gouv.fr/contenu/Media/files/autour-de-la-loi/legislatif-et-reglementaire/les-avis-du-conseil-d-etat-rendus-sur-les-projets-de-loi/2023/avis_ce_ecoi2309270l_cm_10.05.2023.pdf"
+   ],
+   "rapport_president_republique": false,
+   "nb_comptes_rendus": 2,
+   "dossier_an": [
+    "https://www.assemblee-nationale.fr/dyn/16/dossiers/DLR5L16N47884"
+   ],
+   "dossier_senat": [
+    "http://www.senat.fr/dossier-legislatif/pjl22-593.html"
+   ]
+  },
+  "documents_de_motivation_atteints": [
+   "exposé des motifs",
+   "étude d'impact",
+   "avis du Conseil d'État",
+   "2 comptes rendus"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Amendement non rattaché ; à chercher dans l'open data AN (16e-17e), non fait à ce stade.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": true,
+   "expose_des_motifs_nomme_l_article": true,
+   "etude_impact_recuperee": false,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "nommé"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 4,
+  "article": "L132-1 A",
+  "id_legi": "LEGIARTI000051560139",
+  "date_debut": "2025-05-03",
+  "categorie": "A_loi_L16_L17",
+  "categorie_libelle": "Origine législative récente, amendements AN en open data",
+  "livre": "Livre Ier : INFORMATION DES CONSOMMATEURS ET PRATIQUES COMMERCIALES",
+  "extrait": "Sans préjudice de l'allocation de dommages et intérêts, une amende civile peut être prononcée, à la suite d'une demande d'assistance mutuelle prévue par l'article L. 511-10 portant sur une infraction de grande ampleur ou de grande ampleur à l'échelle de l'Union européenne, en application de l'articl",
+  "chaine": {
+   "article_predecesseur": null,
+   "nb_liens_renumerotation": 0,
+   "texte_producteur_version_actuelle": {
+    "libelle": "LOI n°2025-391 du 30 avril 2025",
+    "cid": "JORFTEXT000051538879",
+    "nature": "LOI",
+    "type": "MODIFIE"
+   },
+   "texte_origine": null
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000050427907",
+   "titre": "LOI n° 2025-391 du 30 avril 2025 portant diverses dispositions d'adaptation au droit de l'Union européenne en matière économique, financière, environnementale, énergétique, de transport, de santé et de circulation des personnes",
+   "type": "LOI_PUBLIEE",
+   "legislature": "17",
+   "expose_motif_caracteres": 72446,
+   "etude_impact": [
+    "https://www.legifrance.gouv.fr/contenu/Media/files/autour-de-la-loi/legislatif-et-reglementaire/etudes-d-impact-des-lois/ei_art_39_2024/ei_ecom2415026l_cm_31.10.2024.pdf"
+   ],
+   "avis_conseil_etat": [
+    "https://www.legifrance.gouv.fr/contenu/Media/files/autour-de-la-loi/legislatif-et-reglementaire/les-avis-du-conseil-d-etat-rendus-sur-les-projets-de-loi/2024/avis_ce_ecom2415026l_cm_31.10.2024.pdf"
+   ],
+   "rapport_president_republique": false,
+   "nb_comptes_rendus": 0,
+   "dossier_an": [
+    "https://www.assemblee-nationale.fr/dyn/17/dossiers/diverses_dispositions_adaptation_due_2024_eco_finances_environnement"
+   ],
+   "dossier_senat": [
+    "https://www.senat.fr/dossier-legislatif/pjl24-352.html"
+   ]
+  },
+  "documents_de_motivation_atteints": [
+   "exposé des motifs",
+   "étude d'impact",
+   "avis du Conseil d'État"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Amendement non rattaché ; à chercher dans l'open data AN (16e-17e), non fait à ce stade.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": true,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": false,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "documents muets sur cet article"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 5,
+  "article": "L412-1",
+  "id_legi": "LEGIARTI000041985019",
+  "date_debut": "2020-06-12",
+  "categorie": "B_loi_L14",
+  "categorie_libelle": "Origine 14e législature, amendements AN hors open data",
+  "livre": "Livre IV : CONFORMITÉ ET SÉCURITÉ DES PRODUITS ET SERVICES",
+  "extrait": "I.-Des décrets en Conseil d'Etat définissent les règles auxquelles doivent satisfaire les marchandises. Ils déterminent notamment : 1° Les conditions dans lesquelles l'exportation, l'offre, la vente, la distribution à titre gratuit, la détention, l'étiquetage, le conditionnement ou le mode d'utilisa",
+  "chaine": {
+   "article_predecesseur": "L214-1",
+   "nb_liens_renumerotation": 1,
+   "texte_producteur_version_actuelle": {
+    "libelle": "LOI n°2020-699 du 10 juin 2020",
+    "cid": "JORFTEXT000041982762",
+    "nature": "LOI",
+    "type": "MODIFIE"
+   },
+   "texte_origine": {
+    "libelle": "LOI n°2014-344 du 17 mars 2014",
+    "cid": "JORFTEXT000028738036",
+    "nature": "LOI",
+    "type": "MODIFIE"
+   }
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000027383756",
+   "titre": "LOI n° 2014-344 du 17 mars 2014 relative à la consommation",
+   "type": "LOI_PUBLIEE",
+   "legislature": "14",
+   "expose_motif_caracteres": 31949,
+   "etude_impact": [
+    "https://www.legifrance.gouv.fr/contenu/Media/Files/autour-de-la-loi/legislatif-et-reglementaire/etudes-d-impact-des-lois/ei_art_39_2013/ei_consommation_cm_02.05.2013.pdf.pdf"
+   ],
+   "avis_conseil_etat": [],
+   "rapport_president_republique": false,
+   "nb_comptes_rendus": 24,
+   "dossier_an": [
+    "http://www.assemblee-nationale.fr/14/dossiers/projet_de_loi_consommation.asp"
+   ],
+   "dossier_senat": [
+    "http://www.senat.fr/dossier-legislatif/pjl12-725.html"
+   ]
+  },
+  "documents_de_motivation_atteints": [
+   "exposé des motifs",
+   "étude d'impact",
+   "24 comptes rendus"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Amendement non rattaché : les amendements AN de cette législature ne sont pas en open data.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": true,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": true,
+   "etude_impact_nomme_l_article": true,
+   "verdict": "nommé"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 6,
+  "article": "L511-7",
+  "id_legi": "LEGIARTI000051558799",
+  "date_debut": "2025-05-03",
+  "categorie": "B_loi_L14",
+  "categorie_libelle": "Origine 14e législature, amendements AN hors open data",
+  "livre": "Livre V : POUVOIRS D'ENQUÊTE ET SUITES DONNÉES AUX CONTRÔLES",
+  "extrait": "Les agents sont habilités à rechercher et à constater les infractions ou les manquements aux dispositions : 1° Du règlement (UE) 2021/782 du Parlement européen et du Conseil du 29 avril 2021 sur les droits et obligations des voyageurs ferroviaires ; 2° De l'article 23 du règlement (CE) n° 1008/2008 ",
+  "chaine": {
+   "article_predecesseur": "L141-1",
+   "nb_liens_renumerotation": 1,
+   "texte_producteur_version_actuelle": {
+    "libelle": "LOI n°2025-391 du 30 avril 2025",
+    "cid": "JORFTEXT000051538879",
+    "nature": "LOI",
+    "type": "MODIFIE"
+   },
+   "texte_origine": {
+    "libelle": "LOI n°2016-41 du 26 janvier 2016",
+    "cid": "JORFTEXT000031912641",
+    "nature": "LOI",
+    "type": "MODIFIE"
+   }
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000029589477",
+   "titre": "LOI n° 2016-41 du 26 janvier 2016 de modernisation de notre système de santé",
+   "type": "LOI_PUBLIEE",
+   "legislature": "14",
+   "expose_motif_caracteres": 143458,
+   "etude_impact": [
+    "https://www.legifrance.gouv.fr/contenu/Media/Files/autour-de-la-loi/legislatif-et-reglementaire/etudes-d-impact-des-lois/ei_art_39_2014/ei_sante_cm_15.10.2014.pdf.pdf"
+   ],
+   "avis_conseil_etat": [],
+   "rapport_president_republique": false,
+   "nb_comptes_rendus": 35,
+   "dossier_an": [
+    "http://www.assemblee-nationale.fr/14/dossiers/sante.asp"
+   ],
+   "dossier_senat": [
+    "http://www.senat.fr/dossier-legislatif/pjl14-406.html"
+   ]
+  },
+  "documents_de_motivation_atteints": [
+   "exposé des motifs",
+   "étude d'impact",
+   "35 comptes rendus"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Amendement non rattaché : les amendements AN de cette législature ne sont pas en open data.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": true,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": true,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "documents muets sur cet article"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 7,
+  "article": "L221-5",
+  "id_legi": "LEGIARTI000044563141",
+  "date_debut": "2022-05-28",
+  "categorie": "B_loi_L14",
+  "categorie_libelle": "Origine 14e législature, amendements AN hors open data",
+  "livre": "Livre II : FORMATION ET ÉXECUTION DES CONTRATS",
+  "extrait": "I.-Préalablement à la conclusion d'un contrat de vente de biens ou de fourniture de services, de contenu numérique ou de services numériques, le professionnel fournit au consommateur, de manière lisible et compréhensible, les informations suivantes : 1° Les caractéristiques essentielles du bien, du ",
+  "chaine": {
+   "article_predecesseur": "L121-17",
+   "nb_liens_renumerotation": 1,
+   "texte_producteur_version_actuelle": {
+    "libelle": "Ordonnance n°2021-1734 du 22 décembre 2021",
+    "cid": "JORFTEXT000044546235",
+    "nature": "ORDONNANCE",
+    "type": "MODIFIE"
+   },
+   "texte_origine": {
+    "libelle": "LOI n°2014-344 du 17 mars 2014",
+    "cid": "JORFTEXT000028738036",
+    "nature": "LOI",
+    "type": "MODIFIE"
+   }
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000027383756",
+   "titre": "LOI n° 2014-344 du 17 mars 2014 relative à la consommation",
+   "type": "LOI_PUBLIEE",
+   "legislature": "14",
+   "expose_motif_caracteres": 31949,
+   "etude_impact": [
+    "https://www.legifrance.gouv.fr/contenu/Media/Files/autour-de-la-loi/legislatif-et-reglementaire/etudes-d-impact-des-lois/ei_art_39_2013/ei_consommation_cm_02.05.2013.pdf.pdf"
+   ],
+   "avis_conseil_etat": [],
+   "rapport_president_republique": false,
+   "nb_comptes_rendus": 24,
+   "dossier_an": [
+    "http://www.assemblee-nationale.fr/14/dossiers/projet_de_loi_consommation.asp"
+   ],
+   "dossier_senat": [
+    "http://www.senat.fr/dossier-legislatif/pjl12-725.html"
+   ]
+  },
+  "documents_de_motivation_atteints": [
+   "exposé des motifs",
+   "étude d'impact",
+   "24 comptes rendus"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Aucun : un amendement candidat est identifié par citation directe du numéro d'article.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": true,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": true,
+   "etude_impact_nomme_l_article": true,
+   "verdict": "nommé"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 8,
+  "article": "L111-4",
+  "id_legi": "LEGIARTI000044330854",
+  "date_debut": "2022-01-01",
+  "categorie": "B_loi_L14",
+  "categorie_libelle": "Origine 14e législature, amendements AN hors open data",
+  "livre": "Livre Ier : INFORMATION DES CONSOMMATEURS ET PRATIQUES COMMERCIALES",
+  "extrait": "Le fabricant ou l'importateur de biens meubles informe le vendeur professionnel de la disponibilité ou de la non-disponibilité des pièces détachées indispensables à l'utilisation des biens concernés et, le cas échéant, de la période pendant laquelle ou de la date jusqu'à laquelle ces pièces sont dis",
+  "chaine": {
+   "article_predecesseur": "L111-3",
+   "nb_liens_renumerotation": 1,
+   "texte_producteur_version_actuelle": {
+    "libelle": "LOI n°2021-1485 du 15 novembre 2021",
+    "cid": "JORFTEXT000044327272",
+    "nature": "LOI",
+    "type": "MODIFIE"
+   },
+   "texte_origine": {
+    "libelle": "LOI n° 2014-344 du 17 mars 2014",
+    "cid": "JORFTEXT000028738036",
+    "nature": "LOI",
+    "type": "MODIFIE"
+   }
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000027383756",
+   "titre": "LOI n° 2014-344 du 17 mars 2014 relative à la consommation",
+   "type": "LOI_PUBLIEE",
+   "legislature": "14",
+   "expose_motif_caracteres": 31949,
+   "etude_impact": [
+    "https://www.legifrance.gouv.fr/contenu/Media/Files/autour-de-la-loi/legislatif-et-reglementaire/etudes-d-impact-des-lois/ei_art_39_2013/ei_consommation_cm_02.05.2013.pdf.pdf"
+   ],
+   "avis_conseil_etat": [],
+   "rapport_president_republique": false,
+   "nb_comptes_rendus": 24,
+   "dossier_an": [
+    "http://www.assemblee-nationale.fr/14/dossiers/projet_de_loi_consommation.asp"
+   ],
+   "dossier_senat": [
+    "http://www.senat.fr/dossier-legislatif/pjl12-725.html"
+   ]
+  },
+  "documents_de_motivation_atteints": [
+   "exposé des motifs",
+   "étude d'impact",
+   "24 comptes rendus"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Amendement non rattaché : les amendements AN de cette législature ne sont pas en open data.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": true,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": true,
+   "etude_impact_nomme_l_article": true,
+   "verdict": "nommé"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 9,
+  "article": "L221-28",
+  "id_legi": "LEGIARTI000044563170",
+  "date_debut": "2022-05-28",
+  "categorie": "B_loi_L14",
+  "categorie_libelle": "Origine 14e législature, amendements AN hors open data",
+  "livre": "Livre II : FORMATION ET ÉXECUTION DES CONTRATS",
+  "extrait": "Le droit de rétractation ne peut être exercé pour les contrats : 1° De fourniture de services pleinement exécutés avant la fin du délai de rétractation et, si le contrat soumet le consommateur à une obligation de payer, dont l'exécution a commencé avec son accord préalable et exprès et avec la recon",
+  "chaine": {
+   "article_predecesseur": "L121-21-8",
+   "nb_liens_renumerotation": 1,
+   "texte_producteur_version_actuelle": {
+    "libelle": "Ordonnance n°2021-1734 du 22 décembre 2021",
+    "cid": "JORFTEXT000044546235",
+    "nature": "ORDONNANCE",
+    "type": "MODIFIE"
+   },
+   "texte_origine": {
+    "libelle": "LOI n°2014-344 du 17 mars 2014",
+    "cid": "JORFTEXT000028738036",
+    "nature": "LOI",
+    "type": "CREE"
+   }
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000027383756",
+   "titre": "LOI n° 2014-344 du 17 mars 2014 relative à la consommation",
+   "type": "LOI_PUBLIEE",
+   "legislature": "14",
+   "expose_motif_caracteres": 31949,
+   "etude_impact": [
+    "https://www.legifrance.gouv.fr/contenu/Media/Files/autour-de-la-loi/legislatif-et-reglementaire/etudes-d-impact-des-lois/ei_art_39_2013/ei_consommation_cm_02.05.2013.pdf.pdf"
+   ],
+   "avis_conseil_etat": [],
+   "rapport_president_republique": false,
+   "nb_comptes_rendus": 24,
+   "dossier_an": [
+    "http://www.assemblee-nationale.fr/14/dossiers/projet_de_loi_consommation.asp"
+   ],
+   "dossier_senat": [
+    "http://www.senat.fr/dossier-legislatif/pjl12-725.html"
+   ]
+  },
+  "documents_de_motivation_atteints": [
+   "exposé des motifs",
+   "étude d'impact",
+   "24 comptes rendus"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Amendement non rattaché : les amendements AN de cette législature ne sont pas en open data.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": true,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": true,
+   "etude_impact_nomme_l_article": true,
+   "verdict": "nommé"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 10,
+  "article": "L121-4",
+  "id_legi": "LEGIARTI000044563107",
+  "date_debut": "2022-05-28",
+  "categorie": "C_loi_L13",
+  "categorie_libelle": "Origine 13e législature",
+  "livre": "Livre Ier : INFORMATION DES CONSOMMATEURS ET PRATIQUES COMMERCIALES",
+  "extrait": "Sont réputées trompeuses, au sens des articles L. 121-2 et L. 121-3, les pratiques commerciales qui ont pour objet : 1° Pour un professionnel, de se prétendre signataire d'un code de conduite alors qu'il ne l'est pas ; 2° D'afficher un certificat, un label de qualité ou un équivalent sans avoir obte",
+  "chaine": {
+   "article_predecesseur": "L121-1-1",
+   "nb_liens_renumerotation": 1,
+   "texte_producteur_version_actuelle": {
+    "libelle": "Ordonnance n°2021-1734 du 22 décembre 2021",
+    "cid": "JORFTEXT000044546235",
+    "nature": "ORDONNANCE",
+    "type": "MODIFIE"
+   },
+   "texte_origine": {
+    "libelle": "LOI n°2008-776 du 4 août 2008",
+    "cid": "JORFTEXT000019283050",
+    "nature": "LOI",
+    "type": "CREE"
+   }
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000018730653",
+   "titre": "Loi n° 2008-776 du 4 août 2008 de modernisation de l'économie",
+   "type": "LOI_PUBLIEE",
+   "legislature": "13",
+   "expose_motif_caracteres": 58632,
+   "etude_impact": [],
+   "avis_conseil_etat": [],
+   "rapport_president_republique": false,
+   "nb_comptes_rendus": 29,
+   "dossier_an": [
+    "http://www.assemblee-nationale.fr/13/dossiers/modernisation_economie.asp"
+   ],
+   "dossier_senat": [
+    "http://www.senat.fr/dossierleg/pjl07-398.html"
+   ]
+  },
+  "documents_de_motivation_atteints": [
+   "exposé des motifs",
+   "29 comptes rendus"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Amendement non rattaché : les amendements AN de cette législature ne sont pas en open data.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": true,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": false,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "documents muets sur cet article"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 11,
+  "article": "L311-1",
+  "id_legi": "LEGIARTI000034072668",
+  "date_debut": "2017-02-23",
+  "categorie": "C_loi_L13",
+  "categorie_libelle": "Origine 13e législature",
+  "livre": "Livre III : CRÉDIT",
+  "extrait": "Pour l'application des dispositions du présent titre, sont considérés comme : 1° Prêteur, toute personne qui consent ou s'engage à consentir un crédit mentionné au présent titre dans le cadre de l'exercice de ses activités commerciales ou professionnelles ; 2° Emprunteur ou consommateur, toute perso",
+  "chaine": {
+   "article_predecesseur": "L311-1",
+   "nb_liens_renumerotation": 2,
+   "texte_producteur_version_actuelle": {
+    "libelle": "LOI n°2017-203 du 21 février 2017",
+    "cid": "JORFTEXT000034070801",
+    "nature": "LOI",
+    "type": "MODIFIE"
+   },
+   "texte_origine": {
+    "libelle": "LOI n°2010-737 du 1er juillet 2010",
+    "cid": "JORFTEXT000022419094",
+    "nature": "LOI",
+    "type": "MODIFIE"
+   }
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000020542090",
+   "titre": "LOI n° 2010-737 du 1er juillet 2010 portant réforme du crédit à la consommation",
+   "type": "LOI_PUBLIEE",
+   "legislature": "13",
+   "expose_motif_caracteres": 31377,
+   "etude_impact": [],
+   "avis_conseil_etat": [],
+   "rapport_president_republique": false,
+   "nb_comptes_rendus": 11,
+   "dossier_an": [
+    "http://www.assemblee-nationale.fr/13/dossiers/refor_credit_conso.asp"
+   ],
+   "dossier_senat": [
+    "http://www.senat.fr/dossierleg/pjl08-364.html"
+   ]
+  },
+  "documents_de_motivation_atteints": [
+   "exposé des motifs",
+   "11 comptes rendus"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Amendement non rattaché : les amendements AN de cette législature ne sont pas en open data.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": true,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": false,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "documents muets sur cet article"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 12,
+  "article": "L511-22",
+  "id_legi": "LEGIARTI000041985451",
+  "date_debut": "2020-06-12",
+  "categorie": "C_loi_L13",
+  "categorie_libelle": "Origine 13e législature",
+  "livre": "Livre V : POUVOIRS D'ENQUÊTE ET SUITES DONNÉES AUX CONTRÔLES",
+  "extrait": "I-Sont habilités à rechercher et à constater, dans l'exercice de leurs fonctions, les infractions aux dispositions du livre IV et les infractions et les manquements mentionnés aux articles L. 511-12 et L. 511-13, à l'article L. 521-1, à la section 2 du chapitre Ier du titre II et à la section 1 du c",
+  "chaine": {
+   "article_predecesseur": "L115-31",
+   "nb_liens_renumerotation": 3,
+   "texte_producteur_version_actuelle": {
+    "libelle": "Ordonnance n°2020-701 du 10 juin 2020",
+    "cid": "JORFTEXT000041982919",
+    "nature": "ORDONNANCE",
+    "type": "MODIFIE"
+   },
+   "texte_origine": {
+    "libelle": "LOI n°2011-525 du 17 mai 2011",
+    "cid": "JORFTEXT000024021430",
+    "nature": "LOI",
+    "type": "MODIFIE"
+   }
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000021369332",
+   "titre": "LOI n° 2011-525 du 17 mai 2011 de simplification et d'amélioration de la qualité du droit",
+   "type": "LOI_PUBLIEE",
+   "legislature": "13",
+   "expose_motif_caracteres": 0,
+   "etude_impact": [],
+   "avis_conseil_etat": [],
+   "rapport_president_republique": false,
+   "nb_comptes_rendus": 10,
+   "dossier_an": [
+    "http://www.assemblee-nationale.fr/13/dossiers/amelioration_qualite_droit.asp"
+   ],
+   "dossier_senat": [
+    "http://www.senat.fr/dossierleg/ppl09-130.html"
+   ]
+  },
+  "documents_de_motivation_atteints": [
+   "10 comptes rendus"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Amendement non rattaché : les amendements AN de cette législature ne sont pas en open data.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": false,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": false,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "aucun document récupéré"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 13,
+  "article": "L771-2",
+  "id_legi": "LEGIARTI000045178745",
+  "date_debut": "2022-02-16",
+  "categorie": "C2_loi_L15",
+  "categorie_libelle": "Origine 15e législature",
+  "livre": "Livre VII : TRAITEMENT DES SITUATIONS DE SURENDETTEMENT",
+  "extrait": "Sont applicables dans les îles Wallis et Futuna, sous réserve des adaptations prévues à l'article L. 771-3, les dispositions des articles mentionnés dans la colonne de gauche du tableau ci-après, dans leur rédaction indiquée dans la colonne de droite du même tableau : ARTICLES APPLICABLES DANS LEUR ",
+  "chaine": {
+   "article_predecesseur": null,
+   "nb_liens_renumerotation": 0,
+   "texte_producteur_version_actuelle": {
+    "libelle": "LOI n°2022-172 du 14 février 2022",
+    "cid": "JORFTEXT000045167536",
+    "nature": "LOI",
+    "type": "MODIFIE"
+   },
+   "texte_origine": null
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000044125588",
+   "titre": "LOI n° 2022-172 du 14 février 2022 en faveur de l'activité professionnelle indépendante",
+   "type": "LOI_PUBLIEE",
+   "legislature": "15",
+   "expose_motif_caracteres": 27965,
+   "etude_impact": [
+    "https://www.legifrance.gouv.fr/contenu/Media/Files/autour-de-la-loi/legislatif-et-reglementaire/etudes-d-impact-des-lois/ei_art_39_2021/ei_ecoi2122201l_cm_29.09.2021.pdf"
+   ],
+   "avis_conseil_etat": [
+    "https://www.legifrance.gouv.fr/contenu/Media/Files/autour-de-la-loi/legislatif-et-reglementaire/avis-du-ce/2021/avis_ce_ecoi2122201l_cm_29.09.2021.pdf"
+   ],
+   "rapport_president_republique": false,
+   "nb_comptes_rendus": 2,
+   "dossier_an": [
+    "https://www.assemblee-nationale.fr/dyn/15/dossiers/DLR5L15N43599"
+   ],
+   "dossier_senat": [
+    "https://www.senat.fr/dossier-legislatif/pjl20-869.html"
+   ]
+  },
+  "documents_de_motivation_atteints": [
+   "exposé des motifs",
+   "étude d'impact",
+   "avis du Conseil d'État",
+   "2 comptes rendus"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Amendement non rattaché : les amendements AN de cette législature ne sont pas en open data.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": true,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": false,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "documents muets sur cet article"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 14,
+  "article": "L714-1",
+  "id_legi": "LEGIARTI000037650242",
+  "date_debut": "2019-03-01",
+  "categorie": "C2_loi_L15",
+  "categorie_libelle": "Origine 15e législature",
+  "livre": "Livre VII : TRAITEMENT DES SITUATIONS DE SURENDETTEMENT",
+  "extrait": "I.-Lorsque le locataire a repris le paiement du loyer et des charges et que, dans le cours des délais de paiement de la dette locative accordés par une décision du juge saisi en application de l'article 24 de la loi n° 89-462 du 6 juillet 1989 tendant à améliorer les rapports locatifs et portant mod",
+  "chaine": {
+   "article_predecesseur": null,
+   "nb_liens_renumerotation": 0,
+   "texte_producteur_version_actuelle": {
+    "libelle": "LOI n°2018-1021 du 23 novembre 2018",
+    "cid": "JORFTEXT000037639478",
+    "nature": "LOI",
+    "type": "CREE"
+   },
+   "texte_origine": null
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000036769798",
+   "titre": "LOI n° 2018-1021 du 23 novembre 2018 portant évolution du logement, de l'aménagement et du numérique",
+   "type": "LOI_PUBLIEE",
+   "legislature": "15",
+   "expose_motif_caracteres": 83957,
+   "etude_impact": [
+    "https://www.legifrance.gouv.fr/contenu/Media/Files/autour-de-la-loi/legislatif-et-reglementaire/etudes-d-impact-des-lois/ei_art_39_2018/ei_pjl_evolution_logement_amenagement_numerique_elan.pdf"
+   ],
+   "avis_conseil_etat": [
+    "https://www.legifrance.gouv.fr/contenu/Media/Files/autour-de-la-loi/legislatif-et-reglementaire/avis-du-ce/2018/avis_ce_terl1805474_cm_4.04.2018.pdf"
+   ],
+   "rapport_president_republique": false,
+   "nb_comptes_rendus": 34,
+   "dossier_an": [
+    "http://www.assemblee-nationale.fr/15/dossiers/evolution_logement_amenagement_numerique.asp"
+   ],
+   "dossier_senat": [
+    "https://www.senat.fr/dossier-legislatif/pjl17-567.html"
+   ]
+  },
+  "documents_de_motivation_atteints": [
+   "exposé des motifs",
+   "étude d'impact",
+   "avis du Conseil d'État",
+   "34 comptes rendus"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Amendement non rattaché : les amendements AN de cette législature ne sont pas en open data.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": true,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": false,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "documents muets sur cet article"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 15,
+  "article": "L224-25-22",
+  "id_legi": "LEGIARTI000044133072",
+  "date_debut": "2021-10-01",
+  "categorie": "D_ord_transposition",
+  "categorie_libelle": "Ordonnance de transposition d'une directive",
+  "livre": "Livre II : FORMATION ET ÉXECUTION DES CONTRATS",
+  "extrait": "I.-Dans les cas prévus à l'article L. 224-25-20, le consommateur informe le professionnel de sa décision de résoudre le contrat. Pour les contrats mentionnés au II de l'article L. 224-25-2 et pour les offres groupées au sens de l'article L. 224-42-2, le consommateur a droit à la résolution de l'ense",
+  "chaine": {
+   "article_predecesseur": null,
+   "nb_liens_renumerotation": 0,
+   "texte_producteur_version_actuelle": {
+    "libelle": "Ordonnance n°2021-1247 du 29 septembre 2021",
+    "cid": "JORFTEXT000044125847",
+    "nature": "ORDONNANCE",
+    "type": "CREE"
+   },
+   "texte_origine": null
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000044129891",
+   "titre": "Ordonnance n° 2021-1247 du 29 septembre 2021 relative à la garantie légale de conformité pour les biens, les contenus numériques et les services numériques",
+   "type": "ORDONNANCE_PUBLIEE",
+   "legislature": "15",
+   "expose_motif_caracteres": 0,
+   "etude_impact": [],
+   "avis_conseil_etat": [],
+   "rapport_president_republique": true,
+   "nb_comptes_rendus": 0,
+   "dossier_an": [],
+   "dossier_senat": []
+  },
+  "documents_de_motivation_atteints": [
+   "rapport au Président de la République"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Aucun débat parlementaire par construction ; la motivation se limite aux documents du Gouvernement.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": false,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": false,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "aucun document récupéré"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 16,
+  "article": "L224-25-5",
+  "id_legi": "LEGIARTI000044133347",
+  "date_debut": "2021-10-01",
+  "categorie": "D_ord_transposition",
+  "categorie_libelle": "Ordonnance de transposition d'une directive",
+  "livre": "Livre II : FORMATION ET ÉXECUTION DES CONTRATS",
+  "extrait": "Tout contrat souscrit par un consommateur pour la fourniture de contenus numériques ou de services numériques comporte au moins les informations suivantes : 1° L'identité et les coordonnées du professionnel ; 2° Les informations mentionnées aux articles L. 111-1, L. 221-5 et, le cas échéant, L. 221-",
+  "chaine": {
+   "article_predecesseur": null,
+   "nb_liens_renumerotation": 0,
+   "texte_producteur_version_actuelle": {
+    "libelle": "Ordonnance n°2021-1247 du 29 septembre 2021",
+    "cid": "JORFTEXT000044125847",
+    "nature": "ORDONNANCE",
+    "type": "CREE"
+   },
+   "texte_origine": null
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000044129891",
+   "titre": "Ordonnance n° 2021-1247 du 29 septembre 2021 relative à la garantie légale de conformité pour les biens, les contenus numériques et les services numériques",
+   "type": "ORDONNANCE_PUBLIEE",
+   "legislature": "15",
+   "expose_motif_caracteres": 0,
+   "etude_impact": [],
+   "avis_conseil_etat": [],
+   "rapport_president_republique": true,
+   "nb_comptes_rendus": 0,
+   "dossier_an": [],
+   "dossier_senat": []
+  },
+  "documents_de_motivation_atteints": [
+   "rapport au Président de la République"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Aucun débat parlementaire par construction ; la motivation se limite aux documents du Gouvernement.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": false,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": false,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "aucun document récupéré"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 17,
+  "article": "L351-3",
+  "id_legi": "LEGIARTI000048527384",
+  "date_debut": "2023-12-30",
+  "categorie": "D_ord_transposition",
+  "categorie_libelle": "Ordonnance de transposition d'une directive",
+  "livre": "Livre III : CRÉDIT",
+  "extrait": "Sont applicables dans les îles Wallis et Futuna, sous réserve des adaptations prévues à l'article L. 351-4, les dispositions des articles mentionnés dans la colonne de gauche du tableau ci-après, dans leur rédaction indiquée dans la colonne de droite du même tableau : ARTICLES APPLICABLES DANS LEUR ",
+  "chaine": {
+   "article_predecesseur": null,
+   "nb_liens_renumerotation": 0,
+   "texte_producteur_version_actuelle": {
+    "libelle": "Ordonnance n°2023-1139 du 6 décembre 2023",
+    "cid": "JORFTEXT000048519109",
+    "nature": "ORDONNANCE",
+    "type": "MODIFIE"
+   },
+   "texte_origine": null
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000048532766",
+   "titre": "Ordonnance n° 2023-1139 du 6 décembre 2023 relative aux gestionnaires de crédits et aux acheteurs de crédits",
+   "type": "ORDONNANCE_PUBLIEE",
+   "legislature": "16",
+   "expose_motif_caracteres": 0,
+   "etude_impact": [],
+   "avis_conseil_etat": [],
+   "rapport_president_republique": true,
+   "nb_comptes_rendus": 0,
+   "dossier_an": [],
+   "dossier_senat": []
+  },
+  "documents_de_motivation_atteints": [
+   "rapport au Président de la République"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Aucun débat parlementaire par construction ; la motivation se limite aux documents du Gouvernement.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": false,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": false,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "aucun document récupéré"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 18,
+  "article": "L511-12",
+  "id_legi": "LEGIARTI000042623564",
+  "date_debut": "2020-12-05",
+  "categorie": "E_ord_autre",
+  "categorie_libelle": "Ordonnance antérieure à la recodification",
+  "livre": "Livre V : POUVOIRS D'ENQUÊTE ET SUITES DONNÉES AUX CONTRÔLES",
+  "extrait": "Les agents sont habilités à rechercher et à constater : 1° Les infractions aux dispositions réglementaires prises en application du II de l'article L. 231-1, des articles L. 231-5, L. 231-6, L. 236-1, L. 236-2 et L. 236-4 du code rural et de la pêche maritime, à l'exception de celles relatives à la ",
+  "chaine": {
+   "article_predecesseur": "L215-2",
+   "nb_liens_renumerotation": 3,
+   "texte_producteur_version_actuelle": {
+    "libelle": "LOI n°2020-1508 du 3 décembre 2020",
+    "cid": "JORFTEXT000042607095",
+    "nature": "LOI",
+    "type": "MODIFIE"
+   },
+   "texte_origine": {
+    "libelle": "Ordonnance n°2010-462 du 6 mai 2010",
+    "cid": "JORFTEXT000022176680",
+    "nature": "ORDONNANCE",
+    "type": "MODIFICATION"
+   }
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000022204472",
+   "titre": "Ordonnance n° 2010-462 du 6 mai 2010 créant un livre IX du code rural relatif à la pêche maritime et à l'aquaculture marine",
+   "type": "ORDONNANCE_PUBLIEE",
+   "legislature": "13",
+   "expose_motif_caracteres": 0,
+   "etude_impact": [],
+   "avis_conseil_etat": [],
+   "rapport_president_republique": true,
+   "nb_comptes_rendus": 0,
+   "dossier_an": [],
+   "dossier_senat": []
+  },
+  "documents_de_motivation_atteints": [
+   "rapport au Président de la République"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Aucun débat parlementaire par construction ; la motivation se limite aux documents du Gouvernement.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": false,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": false,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "aucun document récupéré"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 19,
+  "article": "L217-5",
+  "id_legi": "LEGIARTI000044142571",
+  "date_debut": "2021-10-01",
+  "categorie": "E_ord_autre",
+  "categorie_libelle": "Ordonnance antérieure à la recodification",
+  "livre": "Livre II : FORMATION ET ÉXECUTION DES CONTRATS",
+  "extrait": "I.-En plus des critères de conformité au contrat, le bien est conforme s'il répond aux critères suivants : 1° Il est propre à l'usage habituellement attendu d'un bien de même type, compte tenu, s'il y a lieu, de toute disposition du droit de l'Union européenne et du droit national ainsi que de toute",
+  "chaine": {
+   "article_predecesseur": "L211-5",
+   "nb_liens_renumerotation": 1,
+   "texte_producteur_version_actuelle": {
+    "libelle": "Ordonnance n°2021-1247 du 29 septembre 2021",
+    "cid": "JORFTEXT000044125847",
+    "nature": "ORDONNANCE",
+    "type": "MODIFIE"
+   },
+   "texte_origine": {
+    "libelle": "Ordonnance n°2005-136 du 17 février 2005",
+    "cid": "JORFTEXT000000257818",
+    "nature": "ORDONNANCE",
+    "type": "CREATION"
+   }
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000021979239",
+   "titre": "Ordonnance n° 2005-136 du 17 février 2005 relative à la garantie de la conformité du bien au contrat due par le vendeur au consommateur",
+   "type": "ORDONNANCE_PUBLIEE",
+   "legislature": "12",
+   "expose_motif_caracteres": 0,
+   "etude_impact": [],
+   "avis_conseil_etat": [],
+   "rapport_president_republique": true,
+   "nb_comptes_rendus": 0,
+   "dossier_an": [],
+   "dossier_senat": []
+  },
+  "documents_de_motivation_atteints": [
+   "rapport au Président de la République"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Aucun débat parlementaire par construction ; la motivation se limite aux documents du Gouvernement.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": false,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": false,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "aucun document récupéré"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 20,
+  "article": "L313-16",
+  "id_legi": "LEGIARTI000032315947",
+  "date_debut": "2016-07-01",
+  "categorie": "F_ord_sans_predecesseur",
+  "categorie_libelle": "Ordonnance, création nette sans prédécesseur",
+  "livre": "Livre III : CRÉDIT",
+  "extrait": "Le crédit n'est accordé à l'emprunteur que si le prêteur a pu vérifier que les obligations découlant du contrat de crédit seront vraisemblablement respectées conformément à ce qui est prévu par ce contrat. A cette fin, avant de conclure un contrat de crédit, le prêteur procède à une évaluation rigou",
+  "chaine": {
+   "article_predecesseur": null,
+   "nb_liens_renumerotation": 0,
+   "texte_producteur_version_actuelle": {
+    "libelle": "Ordonnance n°2016-351 du 25 mars 2016",
+    "cid": "JORFTEXT000032294277",
+    "nature": "ORDONNANCE",
+    "type": "MODIFIE"
+   },
+   "texte_origine": null
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000032302646",
+   "titre": "Ordonnance n° 2016-351 du 25 mars 2016 sur les contrats de crédit aux consommateurs relatifs aux biens immobiliers à usage d'habitation",
+   "type": "ORDONNANCE_PUBLIEE",
+   "legislature": "14",
+   "expose_motif_caracteres": 0,
+   "etude_impact": [],
+   "avis_conseil_etat": [],
+   "rapport_president_republique": true,
+   "nb_comptes_rendus": 0,
+   "dossier_an": [],
+   "dossier_senat": []
+  },
+  "documents_de_motivation_atteints": [
+   "rapport au Président de la République"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Aucun débat parlementaire par construction ; la motivation se limite aux documents du Gouvernement.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": false,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": false,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "aucun document récupéré"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 21,
+  "article": "L341-33",
+  "id_legi": "LEGIARTI000032303393",
+  "date_debut": "2016-07-01",
+  "categorie": "F_ord_sans_predecesseur",
+  "categorie_libelle": "Ordonnance, création nette sans prédécesseur",
+  "livre": "Livre III : CRÉDIT",
+  "extrait": "Les personnes physiques déclarées coupables des infractions punies par les dispositions des articles L. 341-29 à L. 341-32 encourent également à titre de peines complémentaires l'interdiction, suivant les modalités prévues à l'article 131-27 du code pénal, soit d'exercer une fonction publique ou d'e",
+  "chaine": {
+   "article_predecesseur": null,
+   "nb_liens_renumerotation": 0,
+   "texte_producteur_version_actuelle": {
+    "libelle": "Ordonnance n°2016-351 du 25 mars 2016",
+    "cid": "JORFTEXT000032294277",
+    "nature": "ORDONNANCE",
+    "type": "MODIFIE"
+   },
+   "texte_origine": null
+  },
+  "dossier": {
+   "id_dole": "JORFDOLE000032302646",
+   "titre": "Ordonnance n° 2016-351 du 25 mars 2016 sur les contrats de crédit aux consommateurs relatifs aux biens immobiliers à usage d'habitation",
+   "type": "ORDONNANCE_PUBLIEE",
+   "legislature": "14",
+   "expose_motif_caracteres": 0,
+   "etude_impact": [],
+   "avis_conseil_etat": [],
+   "rapport_president_republique": true,
+   "nb_comptes_rendus": 0,
+   "dossier_an": [],
+   "dossier_senat": []
+  },
+  "documents_de_motivation_atteints": [
+   "rapport au Président de la République"
+  ],
+  "amendements_candidats": [],
+  "maillon_manquant": "Aucun débat parlementaire par construction ; la motivation se limite aux documents du Gouvernement.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": false,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": false,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "aucun document récupéré"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 22,
+  "article": "L313-2",
+  "id_legi": "LEGIARTI000032316056",
+  "date_debut": "2016-07-01",
+  "categorie": "G_loi_hors_opendata",
+  "categorie_libelle": "Origine antérieure à l'open data parlementaire",
+  "livre": "Livre III : CRÉDIT",
+  "extrait": "Sont exclus du champ d'application du présent chapitre : 1° Les prêts consentis à des personnes morales de droit public ; 2° Ceux destinés, sous quelque forme que ce soit, à financer une activité professionnelle, notamment celle des personnes physiques ou morales qui, à titre habituel, même accessoi",
+  "chaine": {
+   "article_predecesseur": "L312-3",
+   "nb_liens_renumerotation": 1,
+   "texte_producteur_version_actuelle": {
+    "libelle": "Ordonnance n°2016-351 du 25 mars 2016",
+    "cid": "JORFTEXT000032294277",
+    "nature": "ORDONNANCE",
+    "type": "MODIFIE"
+   },
+   "texte_origine": {
+    "libelle": "Loi 93-949 1993-07-26 annexe JORF 27 juillet 1993",
+    "cid": "JORFTEXT000000529228",
+    "nature": "LOI",
+    "type": "CREATION"
+   }
+  },
+  "dossier": {
+   "id_dole": null,
+   "titre": null,
+   "type": null,
+   "legislature": null,
+   "expose_motif_caracteres": 0,
+   "etude_impact": [],
+   "avis_conseil_etat": [],
+   "rapport_president_republique": false,
+   "nb_comptes_rendus": 0,
+   "dossier_an": [],
+   "dossier_senat": []
+  },
+  "documents_de_motivation_atteints": [],
+  "amendements_candidats": [],
+  "maillon_manquant": "Texte d'origine antérieur à la couverture DOLE : aucun dossier législatif récupérable.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": false,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": false,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "aucun document récupéré"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 23,
+  "article": "L823-1",
+  "id_legi": "LEGIARTI000032224216",
+  "date_debut": "2016-07-01",
+  "categorie": "G_loi_hors_opendata",
+  "categorie_libelle": "Origine antérieure à l'open data parlementaire",
+  "livre": "Livre VIII : ASSOCIATIONS AGRÉÉES DE DÉFENSE DES CONSOMMATEURS ET INSTITUTIONS DE LA CONSOMMATION",
+  "extrait": "Le laboratoire de métrologie et d'essais est un établissement public national à caractère industriel et commercial. Le laboratoire est chargé de réaliser tous travaux d'étude, de recherche, de consultation, d'expertise, d'essai, de contrôle et toutes prestations d'assistance technique utiles à la pr",
+  "chaine": {
+   "article_predecesseur": "L561-1",
+   "nb_liens_renumerotation": 1,
+   "texte_producteur_version_actuelle": {
+    "libelle": "Ordonnance n°2016-301 du 14 mars 2016",
+    "cid": "JORFTEXT000032209352",
+    "nature": "ORDONNANCE",
+    "type": "CREE"
+   },
+   "texte_origine": {
+    "libelle": "Loi 93-949 1993-07-26 annexe JORF 27 juillet 1993",
+    "cid": "JORFTEXT000000529228",
+    "nature": "LOI",
+    "type": "CREATION"
+   }
+  },
+  "dossier": {
+   "id_dole": null,
+   "titre": null,
+   "type": null,
+   "legislature": null,
+   "expose_motif_caracteres": 0,
+   "etude_impact": [],
+   "avis_conseil_etat": [],
+   "rapport_president_republique": false,
+   "nb_comptes_rendus": 0,
+   "dossier_an": [],
+   "dossier_senat": []
+  },
+  "documents_de_motivation_atteints": [],
+  "amendements_candidats": [],
+  "maillon_manquant": "Texte d'origine antérieur à la couverture DOLE : aucun dossier législatif récupérable.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": false,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": false,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "aucun document récupéré"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 24,
+  "article": "L822-2",
+  "id_legi": "LEGIARTI000032224241",
+  "date_debut": "2016-07-01",
+  "categorie": "H_decret",
+  "categorie_libelle": "Origine réglementaire déclarée sur un article législatif",
+  "livre": "Livre VIII : ASSOCIATIONS AGRÉÉES DE DÉFENSE DES CONSOMMATEURS ET INSTITUTIONS DE LA CONSOMMATION",
+  "extrait": "L'Institut national de la consommation a pour objet de : 1° Fournir un appui technique aux associations de défense des consommateurs ; 2° Regrouper, produire, analyser et diffuser des informations, études, enquêtes et essais ; 3° Mettre en œuvre des actions et des campagnes d'information, de communi",
+  "chaine": {
+   "article_predecesseur": "R531-2",
+   "nb_liens_renumerotation": 1,
+   "texte_producteur_version_actuelle": {
+    "libelle": "Ordonnance n°2016-301 du 14 mars 2016",
+    "cid": "JORFTEXT000032209352",
+    "nature": "ORDONNANCE",
+    "type": "CREE"
+   },
+   "texte_origine": {
+    "libelle": "Décret n°2010-1221 du 18 octobre 2010",
+    "cid": "JORFTEXT000022927432",
+    "nature": "DECRET",
+    "type": "MODIFIE"
+   }
+  },
+  "dossier": {
+   "id_dole": null,
+   "titre": null,
+   "type": null,
+   "legislature": null,
+   "expose_motif_caracteres": 0,
+   "etude_impact": [],
+   "avis_conseil_etat": [],
+   "rapport_president_republique": false,
+   "nb_comptes_rendus": 0,
+   "dossier_an": [],
+   "dossier_senat": []
+  },
+  "documents_de_motivation_atteints": [],
+  "amendements_candidats": [],
+  "maillon_manquant": "Texte d'origine antérieur à la couverture DOLE : aucun dossier législatif récupérable.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": false,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": false,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "aucun document récupéré"
+  },
+  "amendements_ecartes": []
+ },
+ {
+  "rang": 25,
+  "article": "L222-17",
+  "id_legi": "LEGIARTI000034072595",
+  "date_debut": "2017-02-23",
+  "categorie": "I_sans_lien",
+  "categorie_libelle": "Aucun lien producteur dans LEGI",
+  "livre": "Livre II : FORMATION ET ÉXECUTION DES CONTRATS",
+  "extrait": "Des règles spécifiques relatives à la fourniture à distance d'opérations d'assurance un consommateur sont par ailleurs fixées par les dispositions : - du chapitre II du titre Ier du livre I du code des assurances pour les opérations pratiquées par les entreprises régies par le même code ; - du chapi",
+  "chaine": {
+   "article_predecesseur": null,
+   "nb_liens_renumerotation": 0,
+   "texte_producteur_version_actuelle": null,
+   "texte_origine": null
+  },
+  "dossier": {
+   "id_dole": null,
+   "titre": null,
+   "type": null,
+   "legislature": null,
+   "expose_motif_caracteres": 0,
+   "etude_impact": [],
+   "avis_conseil_etat": [],
+   "rapport_president_republique": false,
+   "nb_comptes_rendus": 0,
+   "dossier_an": [],
+   "dossier_senat": []
+  },
+  "documents_de_motivation_atteints": [],
+  "amendements_candidats": [],
+  "maillon_manquant": "Aucun lien producteur dans LEGI : la chaîne est interrompue dès le premier maillon.",
+  "motivation_specifique": {
+   "expose_des_motifs_recupere": false,
+   "expose_des_motifs_nomme_l_article": false,
+   "etude_impact_recuperee": false,
+   "etude_impact_nomme_l_article": false,
+   "verdict": "aucun document récupéré"
+  },
+  "amendements_ecartes": []
+ }
+]
