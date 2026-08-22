@@ -38,7 +38,11 @@ from pathlib import Path
 
 csv.field_size_limit(10 ** 9)
 
-REFERENCE = re.compile(r"L\d\dB(?:TC)?(\d+)")
+# Le marqueur `B` ou `BTC` est capturé, pas seulement toléré : le même numéro
+# d'amendement désigne deux amendements différents selon qu'il porte sur le texte
+# déposé (`B2736`) ou sur le texte issu de la commission (`BTC2736`). Les
+# confondre en écrase 2 032.
+REFERENCE = re.compile(r"L\d\d(B(?:TC)?)(\d+)")
 
 # Colonnes utiles du fichier aplati, par position : les intitulés sont des chemins
 # XML (« identifiant[1]/saisine[1]/refTexteLegislatif[1] ») et changent de forme
@@ -51,8 +55,13 @@ REFERENCE = re.compile(r"L\d\dB(?:TC)?(\d+)")
 # L'auteur n'est pas nommé non plus : les colonnes portent des références
 # (`PA…` pour l'acteur, `PO…` pour l'organe), résolues par le jeu Acteurs de
 # l'Assemblée. Elles sont conservées telles quelles, à charger séparément.
+# `organeExamen` est indispensable à l'identité : le même numéro d'amendement
+# désigne deux amendements différents sur le même texte selon qu'il est examiné en
+# commission ou en séance — 2 098 couples (texte, numéro) en double, aux
+# dispositifs et aux sorts distincts. Sans lui, 2 116 amendements disparaissent
+# silencieusement à l'insertion.
 COLONNES = {
-    "numero": 4, "ref_texte": 7, "etat": 16, "type_auteur": 19,
+    "numero": 4, "ref_texte": 7, "organe_examen": 9, "etat": 16, "type_auteur": 19,
     "acteur_ref": 20, "organe_ref": 21, "groupe_ref": 22,
     "division": 35, "dispositif": 47, "expose": 48, "sort": 70,
 }
@@ -88,19 +97,19 @@ def main() -> None:
             trouve = REFERENCE.search(ligne[COLONNES["ref_texte"]] or "")
             if not trouve:
                 continue
-            numero = trouve.group(1).lstrip("0")
+            numero = trouve.group(2).lstrip("0")
             if numero not in textes:
                 continue
             par_texte[numero] += 1
-            retenus.append([sorted(textes[numero])[0], numero]
+            retenus.append([sorted(textes[numero])[0], numero, trouve.group(1)]
                            + [ligne[i] for i in COLONNES.values()])
 
     with sortie.open("w", newline="", encoding="utf-8") as f:
         ecrivain = csv.writer(f)
-        ecrivain.writerow(["dossier", "texte"] + list(COLONNES))
+        ecrivain.writerow(["dossier", "texte", "stade"] + list(COLONNES))
         ecrivain.writerows(retenus)
 
-    sorts = collections.Counter(l[2 + list(COLONNES).index("sort")] or "(vide)"
+    sorts = collections.Counter(l[3 + list(COLONNES).index("sort")] or "(vide)"
                                 for l in retenus)
     print(f"lignes lues        : {lues}")
     print(f"amendements retenus : {len(retenus)} sur {len(par_texte)} textes")

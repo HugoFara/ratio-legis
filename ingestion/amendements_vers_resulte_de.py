@@ -81,16 +81,23 @@ def passages_inseres(dispositif: str) -> list[str]:
             gardes.append(norme)
     return gardes
 
-# Précision mesurée à la main sur 14 arêtes tirées au sort : 13/14. Borne
+# Précision mesurée à la main sur 26 arêtes tirées au sort — 14 au Sénat, 12 à
+# l'Assemblée : 23/26. Borne
 # inférieure de Wilson à 95 %. C'est la plus faible confiance du graphe, et elle
 # doit le rester tant que l'échantillon est de cette taille — voir
 # `docs/09-tranche-amendements.md` § 4.
-CONFIANCE = 0.6853
+CONFIANCE = 0.7102
 
 
 def charger_amendements(base: sqlite3.Connection, racine: Path) -> dict:
     dossiers = {d for (d,) in base.execute("SELECT id_dole FROM dossier")}
-    acteurs: dict[tuple[str, str], int] = {}
+    # Les identifiants sont attribués à la suite de ceux déjà en base : la tranche
+    # Assemblée peut avoir été chargée avant celle-ci.
+    suivant = base.execute("SELECT coalesce(max(id), 0) + 1 FROM acteur").fetchone()[0]
+    acteurs: dict[tuple[str, str], int] = {
+        (nom, groupe or ""): identifiant
+        for identifiant, nom, groupe in base.execute("SELECT id, nom, groupe FROM acteur")}
+    deja = set(acteurs.values())
     lignes, ignores = [], 0
 
     for fichier in sorted(racine.iterdir()):
@@ -108,7 +115,10 @@ def charger_amendements(base: sqlite3.Connection, racine: Path) -> dict:
         for a in jeu:
             nom = sans_balises(a.get("Auteur", "")) or "(inconnu)"
             groupe = sans_balises(a.get("Au nom de", "")) or None
-            auteur = acteurs.setdefault((nom, groupe or ""), len(acteurs) + 1)
+            if (nom, groupe or "") not in acteurs:
+                acteurs[(nom, groupe or "")] = suivant
+                suivant += 1
+            auteur = acteurs[(nom, groupe or "")]
             lignes.append((dossier, "senat", texte_discute, a.get("Numéro", ""),
                            auteur, a.get("Sort") or None,
                            sans_balises(a.get("Subdivision", "")) or None,
@@ -117,7 +127,8 @@ def charger_amendements(base: sqlite3.Connection, racine: Path) -> dict:
                            a.get("Url amendement") or None))
 
     base.executemany("INSERT INTO acteur (id, nom, groupe) VALUES (?, ?, ?)",
-                     [(i, nom, groupe or None) for (nom, groupe), i in acteurs.items()])
+                     [(i, nom, groupe or None) for (nom, groupe), i in acteurs.items()
+                      if i not in deja])
     base.executemany(
         "INSERT OR IGNORE INTO amendement (dossier_id, chambre, texte_discute, numero,"
         " auteur_id, sort, subdivision, objet, dispositif, url)"
