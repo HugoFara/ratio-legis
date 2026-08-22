@@ -22,14 +22,12 @@ chargés, elle n'avait pas été extraite.
 | | |
 |---|---:|
 | Renvois relevés | **11 656** |
-| dont résolus dans le fonds (`interne`) | 7 559 (64,9 %) |
-| vers la partie réglementaire, non ingérée | 2 133 (18,3 %) |
-| vers un autre code, nommé dans le texte | 1 749 (15,0 %) |
-| **introuvables (`non_resolue`)** | **215 (1,8 %)** |
-| Articles en vigueur citant un autre article | 1 064 (49,7 %) |
-| **Articles en vigueur cités par un autre** | **752 (35,2 %)** |
-| Médiane des citations entrantes, parmi les cités | 2 |
-| Articles cités par dix autres ou plus | 23 |
+| dont résolus dans le fonds (`interne`) | 9 568 (82,1 %) |
+| vers un autre code, nommé dans le texte | 1 812 (15,5 %) |
+| **introuvables (`non_resolue`)** | **276 (2,4 %)** |
+| Articles en vigueur citant un autre article | 1 220 (57,0 %) |
+| **Articles en vigueur cités par un autre** | **1 064 (49,7 %)** |
+| **Articles L cités par un article réglementaire** | **303 sur 1 280 (23,7 %)** |
 
 Les plus cités : L733-1 (37 articles), L412-1 (36), L733-4 (35), L733-7 (32),
 L313-1 (25). Ce sont les points de rupture d'une réforme : un amendement qui
@@ -91,20 +89,43 @@ correction qui a fait tomber les renvois introuvables de 849 à 287.
 seul laissait 287 renvois introuvables ; le chercher dans l'article les ramène à
 215. « Du même code », qui renvoie au dernier code nommé, est traité comme tel.
 
-## 5. Ce que la tranche ne fait pas
+## 5. Le chiffre qui parle au législateur
 
-**La partie réglementaire n'est pas chargée** : 2 133 renvois, 18,3 %, pointent
-vers des articles R et D du même code. Pour la question posée — qu'est-ce qui
-bouge si je modifie cet article — c'est une lacune sérieuse : un décret
-d'application est précisément ce qu'une réforme casse. Charger la partie
-réglementaire du seul code de la consommation est le prochain gain le moins cher
-du projet.
+**303 des 1 280 articles L en vigueur — 23,7 % — sont cités par un article
+réglementaire du même code.** Les modifier déplace un décret d'application.
+C'est précisément ce qu'une réforme casse sans le voir, et aucune source
+publique ne le donne aujourd'hui.
 
-**Le renvoi n'est pas qualifié.** « Par dérogation à l'article L. 221-5 » et « dans
-les conditions prévues à l'article L. 221-5 » ne créent pas le même risque en cas
-de modification. La qualification suppose une analyse de la formule
-introductive ; elle est faisable sur la même donnée et relève d'une tranche
-ultérieure.
+Ce chiffre a failli ne pas exister. Une première version classait toute cible R
+ou D en « partie réglementaire non ingérée », par supposition. Le fonds contient
+en réalité 1 241 articles R et 254 D, dont 670 et 168 en vigueur : la supposition
+écartait 2 133 renvois résolvables, soit 18 % du total. Vérifier le contenu de sa
+propre base coûtait une requête.
+
+## 6. La qualification du renvoi n'est pas soutenue par la donnée
+
+Une tranche de qualification était envisagée : distinguer « par dérogation à
+l'article L. 221-5 » de « dans les conditions prévues à l'article L. 221-5 »,
+qui ne créent pas le même risque en cas de modification. La mesure de la formule
+introductive des 9 568 renvois internes ne la soutient pas :
+
+| Formule | Renvois |
+|---|---:|
+| Désignation neutre — *prévu, mentionné, visé, défini* | 3 742 (39,1 %) |
+| En application de | 703 (7,3 %) |
+| Dans les conditions prévues | 386 (4,0 %) |
+| Sanction ou peine | 102 (1,1 %) |
+| Sans préjudice | 19 (0,2 %) |
+| **Par dérogation** | **7 (0,1 %)** |
+| Aucune formule dans la fenêtre | 4 214 (44,0 %) |
+
+La formule qui porterait le plus d'information — la dérogation — apparaît sept
+fois. Le vocabulaire légistique est massivement neutre : il désigne, il ne
+qualifie pas. Une taxonomie de risque bâtie là-dessus décrirait la rédaction, pas
+le droit. **La piste est abandonnée**, et c'est la mesure qui la ferme, pas une
+préférence.
+
+## 7. Ce que la tranche ne fait pas
 
 **Le point d'entrée reste l'article du code.** Un parlementaire part de son
 amendement. Le résolveur sait déjà aller de l'amendement vers l'article ; il n'a

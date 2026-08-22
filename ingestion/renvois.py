@@ -9,6 +9,11 @@ dans le texte des articles, elle n'avait simplement jamais été extraite.
 
 Trois précautions, chacune tirée d'une erreur déjà commise dans ce projet.
 
+**Les articles R et D sont des cibles comme les autres.** Une première version
+les écartait au motif que la partie réglementaire n'était pas ingérée : elle
+l'est, et cette supposition jetait 2 133 renvois résolvables. Or un décret
+d'application est précisément ce qu'une réforme casse.
+
 **La résolution se fait à la date de la citation, pas sur le fonds en vigueur.**
 Un numéro d'article n'est pas une identité stable : R. 531-2 a désigné deux
 dispositions différentes à deux époques (`01-rapport-verification-sources.md`
@@ -16,9 +21,8 @@ dispositions différentes à deux époques (`01-rapport-verification-sources.md`
 lien. La cible retenue est donc la version qui couvrait la date d'entrée en
 vigueur du texte citant.
 
-**Ce qu'on ne sait pas est nommé, jamais tu.** Un renvoi vers la partie
-réglementaire, vers un autre code ou vers un numéro introuvable ne devient pas un
-lien interne et ne disparaît pas non plus : il est enregistré avec sa portée.
+**Ce qu'on ne sait pas est nommé, jamais tu.** Un renvoi vers un autre code ou
+vers un numéro introuvable ne devient pas un lien interne et ne disparaît pas non plus : il est enregistré avec sa portée.
 Confondre « cité hors de ce code » et « cité et introuvable » ferait passer une
 limite de périmètre pour une incohérence du droit.
 
@@ -157,8 +161,6 @@ def main() -> None:
             if nomme.startswith("code ") and "consommation" not in nomme:
                 portee, article_id = "externe", None
                 code_cite = REPRISE.split(nomme)[0].strip()
-            elif m.group(1) in "RD":
-                portee, article_id = "reglementaire", None
             else:
                 article_id = resoudre(cle, date)
                 portee = "interne" if article_id else "non_resolue"
@@ -198,7 +200,7 @@ def main() -> None:
         "WHERE etat = 'VIGUEUR'").fetchone()[0]
 
     print(f"renvois relevés            : {len(renvois)}")
-    for portee in ("interne", "reglementaire", "externe", "non_resolue"):
+    for portee in ("interne", "externe", "non_resolue"):
         print(f"  {portee:14s}         : {compte[portee]} "
               f"({100 * compte[portee] / len(renvois):.1f} %)")
     print(f"  écartés faute de preuve  : {compte['sans_preuve']}")

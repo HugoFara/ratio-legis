@@ -11,10 +11,15 @@ PRAGMA foreign_keys = ON;
 -- Confondre « cité hors de ce code » et « cité et introuvable » ferait passer une
 -- limite de périmètre pour une incohérence du droit.
 --
---   interne        cible résolue dans le fonds chargé
---   reglementaire  partie réglementaire du même code, non ingérée
+--   interne        cible résolue dans le fonds chargé, partie réglementaire comprise
 --   externe        autre code, nommé dans le texte
 --   non_resolue    numéro de ce code sans version couvrant la date de citation
+--
+-- Il n'y a pas de classe « réglementaire ». Une première version en avait une,
+-- fondée sur la supposition que seule la partie législative était ingérée : le
+-- fonds contient en réalité 1 241 articles R et 254 D, dont 670 et 168 en
+-- vigueur. Elle écartait 2 133 renvois résolvables. La nature de la cible se lit
+-- dans `numero_cite`, elle n'a pas à être une portée.
 CREATE TABLE renvoie_a (
     id           INTEGER PRIMARY KEY,
     segment_id   TEXT NOT NULL REFERENCES segment,
@@ -22,7 +27,7 @@ CREATE TABLE renvoie_a (
     numero_cite  TEXT NOT NULL,
     code_cite    TEXT,
     portee       TEXT NOT NULL CHECK (portee IN
-                     ('interne', 'reglementaire', 'externe', 'non_resolue')),
+                     ('interne', 'externe', 'non_resolue')),
     methode      TEXT NOT NULL DEFAULT 'derivee'
                  CHECK (methode IN ('declaree', 'derivee', 'inferee')),
     confiance    REAL NOT NULL CHECK (confiance BETWEEN 0 AND 1),
