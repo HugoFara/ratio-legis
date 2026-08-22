@@ -19,7 +19,7 @@ circulaire : la topologie n'est pas ce qu'on cherche à établir ici.
 
 **§ 5.3 — précision avant rappel.** Seules les citations de la **parenthèse
 d'en-tête** produisent une arête. Un contrôle à la main d'arêtes tirées au sort
-donne 24/24 pour l'en-tête déclaré contre 5/14 pour la citation au fil du corps. Les neuf échecs ont deux causes : des
+donne 20/20 pour l'en-tête déclaré contre 5/14 pour la citation au fil du corps. Les neuf échecs ont deux causes : des
 numéros identiques dans d'autres codes — L. 221-3 du code de la route, L. 123-6
 du code de l'environnement, L. 721-5 du code de la propriété intellectuelle —
 et des sections dont la fin déborde sur l'article suivant. La corroboration par
@@ -28,8 +28,8 @@ qu'il désigne le bon code. D'où la seconde condition : la parenthèse doit nom
 le code de la consommation.
 
 **§ 5.4 — la confiance est une donnée.** La valeur écrite est la borne inférieure
-de Wilson à 95 % de la précision mesurée à la main, soit 0,862 pour 24 succès sur
-24. Écrire 1,0 serait surestimer ce que ces vérifications établissent ; la
+de Wilson à 95 % de la précision mesurée à la main sur la version courante de
+l'extraction, soit 0,839 pour 20 succès sur 20. Écrire 1,0 serait surestimer ce que ces vérifications établissent ; la
 borne inférieure se resserrera d'elle-même quand l'annotation humaine en cours
 élargira l'échantillon.
 
@@ -176,6 +176,12 @@ def main() -> None:
     for fichier in sorted(dossier_rapports.iterdir()):
         if "__" not in fichier.name:
             continue
+        if (fichier.parent / f"{fichier.stem}_mono.html").exists():
+            # Page d'index d'un rapport paginé du Sénat. Elle porte le sommaire,
+            # non le commentaire : ses « sections » sont des lignes de table des
+            # matières, qui nomment les bons articles mais n'expliquent rien. Le
+            # texte est dans la version `_mono`, chargée à côté.
+            continue
         dossier = fichier.name.split("__", 1)[0]
         if dossier not in titres:
             continue          # dossier hors périmètre : rien à motiver
@@ -230,9 +236,9 @@ def main() -> None:
     for classe in (True, False):
         groupe = [c for c in connus if c["en_tete"] is classe]
         taux[classe] = (sum(map(corrobore, groupe)) / len(groupe)) if groupe else 0.0
-    # Précision mesurée à la main sur 24 arêtes de la classe retenue : 24/24.
+    # Précision mesurée à la main sur 20 arêtes de la classe retenue : 20/20.
     # Borne inférieure de Wilson à 95 % — voir l'en-tête de module.
-    CONFIANCE = 0.862
+    CONFIANCE = 0.8389
 
     # ----------------------------------------------------------- arêtes motive
     aretes, preuves, sans_preuve = [], [], 0

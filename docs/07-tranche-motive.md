@@ -12,18 +12,21 @@ d'un document qui explique pourquoi il existe sous cette forme.
 
 | | |
 |---|---:|
-| Documents chargés | **316** (303 rapports de commission, 13 rapports au Président de la République) |
+| Documents chargés | **234** (221 rapports de commission, 13 rapports au Président de la République) |
 | Dossiers · arêtes `issu_de` | 93 · 91 |
-| Citations d'article relevées | 27 935 |
-| dont désignant un article de ce code | 11 437 |
-| **Arêtes `motive`** | **241** |
-| Articles du code directement motivés | 185 (22,2 % des 832 éligibles) |
-| **Articles en vigueur atteignant une raison** | **598 sur 2 139 (28,0 %)** |
-| dont par un ancêtre, via `renumerote_de` | 574 |
+| Citations d'article relevées | 37 413 |
+| dont désignant un article de ce code | 15 277 |
+| **Arêtes `motive`** | **519** |
+| Articles du code directement motivés | 225 (27,0 % des 832 éligibles) |
+| **Articles en vigueur atteignant une raison** | **651 sur 2 139 (30,4 %)** |
+| dont par un ancêtre, via `renumerote_de` | 625 |
+
+Base complète : 136 Mo, le texte intégral des documents compris — sans lui les
+offsets ne désignent rien.
 
 Zéro violation de clef étrangère, zéro arête dérivée sans preuve.
 
-Le second chiffre est celui qui compte : **574 des 598 articles n'atteignent leur
+Le second chiffre est celui qui compte : **625 des 651 articles n'atteignent leur
 raison qu'en remontant leur ascendance.** Un rapport de 2007 nomme L. 121-84-6 ;
 l'article en vigueur aujourd'hui s'appelle L. 224-28. Sans l'arête d'ascendance
 correctement orientée, la raison existe dans le corpus et reste inatteignable.
@@ -53,7 +56,7 @@ Contrôle à la main d'arêtes tirées au sort, en trois échantillons :
 
 | Classe | Précision mesurée |
 |---|---:|
-| **Déclarée dans la parenthèse d'en-tête** | **24 / 24** |
+| **Déclarée dans la parenthèse d'en-tête** | **20 / 20** |
 | Citée au fil du corps | 5 / 14 |
 
 Les neuf échecs de la seconde classe ont deux causes, toutes deux instructives.
@@ -76,7 +79,41 @@ plusieurs. Le motif élargi sert d'abord de **borne de fin** ; le test
 d'acceptation d'une section est inchangé, la précision n'est donc pas relâchée.
 
 Appliquer la règle § 5.3 — précision avant rappel — coûte cher : la couverture
-tombe de 50,4 % à 22,2 % des articles éligibles. C'est le prix affiché.
+tombe de 50,4 % à 27,0 % des articles éligibles. C'est le prix affiché.
+
+## 2 bis. Quatre défauts de découpage, tous silencieux
+
+Le rendement de l'extraction a doublé sans qu'une ligne de la logique de
+rattachement change. Tout venait du découpage en sections, et aucun de ces
+défauts ne levait d'erreur.
+
+**Le motif d'en-tête exigeait le début de ligne strict.** Les rapports du Sénat
+préfixent la ligne d'une espace : 221 fichiers ne rendaient que 455 sections,
+contre 7 343 pour 82 fichiers de l'Assemblée. Un rapport de 406 689 caractères en
+rendait zéro. Le déséquilibre était trop grand pour une différence de convention
+rédactionnelle — c'est ce qui a mis sur la piste.
+
+**Les pages d'index du Sénat produisaient des sections.** Un rapport paginé est
+chargé deux fois : sa page d'index et sa version `_mono`. L'index porte le
+sommaire, dont chaque ligne a exactement la forme d'un en-tête — numéro,
+parenthèse, titre. Ces sections nommaient les bons articles et n'expliquaient
+rien. La règle est celle que le script de téléchargement énonçait déjà : quand la
+version `_mono` existe, elle seule porte le texte.
+
+**L'en-tête et sa parenthèse sur une même ligne n'étaient pas reconnus.**
+« Article 22 ter (article 22-2 de la loi n° 89-462) » ne fermait pas la section
+précédente, qui atteignait 553 330 caractères. Le suffixe admis se limite à une
+parenthèse ou à un tiret de titre : « Article 22 est ainsi modifié » reste écarté,
+faute de quoi toute phrase ouvrirait une section.
+
+**Une ligne de sommaire restait indistinguable d'un commentaire.** La
+distribution des tailles la trahit : 112 sections sous 400 caractères, trois
+entre 400 et 800 — toutes des lignes de sommaire — et le premier commentaire
+véritable à 926 caractères. Le seuil de 800 est lu dans cette bimodalité, il
+n'est pas choisi. Son effet ne se voit pas dans le compte d'arêtes, qui ne perd
+que six unités, mais dans la médiane de taille des passages retenus : 3 934 →
+5 598 caractères. Pour 106 articles, le passage restitué était la ligne de
+sommaire, qui précède le vrai commentaire dans le même document.
 
 ## 3. Correction d'un chiffre de phase 0
 
@@ -84,16 +121,16 @@ tombe de 50,4 % à 22,2 % des articles éligibles. C'est le prix affiché.
 Ce chiffre comptait toute citation, y compris au fil du corps. Mesurée, cette
 classe est à 36 % de précision : elle n'est pas exploitable telle quelle.
 
-**Le chiffre honnête d'articles motivés à une précision acceptable est 22,2 %**,
-et 28,0 % rapporté aux articles en vigueur. L'écart n'est pas une régression du
+**Le chiffre honnête d'articles motivés à une précision acceptable est 27,0 %**,
+et 30,4 % rapporté aux articles en vigueur. L'écart n'est pas une régression du
 code : c'est la différence entre « un rapport mentionne cet article quelque part »
 et « ce passage explique cet article ».
 
 ## 4. La confiance est une mesure, pas un réglage
 
-`motive.confiance` vaut **0,862** : la borne inférieure de Wilson à 95 % de la
-précision mesurée à la main, 24 succès sur 24. Écrire 1,0 surestimerait ce que
-vingt-quatre vérifications établissent. La borne se resserrera d'elle-même quand
+`motive.confiance` vaut **0,839** : la borne inférieure de Wilson à 95 % de la
+précision mesurée à la main sur la version courante de l'extraction, 20 succès
+sur 20. Écrire 1,0 surestimerait ce que vingt vérifications établissent. La borne se resserrera d'elle-même quand
 l'annotation humaine en cours élargira l'échantillon — c'est le lien direct entre
 la tâche de phase 0 restée ouverte et une valeur inscrite en base.
 
@@ -122,8 +159,14 @@ produit se tait plutôt que d'afficher un passage à 36 % de fiabilité.
 texte en discussion, qui peut créer plusieurs articles du code. La restitution
 devra dire « pourquoi ce dispositif », pas « pourquoi cet alinéa ».
 
-**La convention du Sénat n'est pas exploitée.** Les rapports du Sénat font suivre
-l'en-tête d'un titre plutôt que d'une parenthèse. Ces sections sont extraites mais
-ne produisent aucune arête, faute de déclaration nommant le code. C'est la
-première piste de rappel à instruire, et elle est bornée : elle ne touche que les
-rapports du Sénat.
+**Les sections à titre seul ne produisent rien.** Quand l'en-tête est suivi d'un
+titre sans parenthèse, aucune déclaration ne nomme le code : la section est
+extraite mais ne motive aucun article. C'est la piste de rappel restante, et elle
+suppose de résoudre l'article du texte en discussion vers les articles du code
+autrement que par la citation — donc par le texte déposé, déjà chargé.
+
+**Vingt-sept sections dépassent 40 000 caractères**, jusqu'à 91 338. La médiane
+est à 5 598. Ces cas restent des commentaires authentiques d'articles qui
+modifient une quinzaine de dispositions, mais le passage restitué y est trop long
+pour être lu tel quel. Le découpage interne du commentaire est un travail de la
+couche de restitution, pas de l'ingestion.

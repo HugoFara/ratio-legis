@@ -53,10 +53,22 @@ from pathlib import Path
 # soumise au test de déclaration ou de titre : élargir le motif ne relâche donc
 # pas le critère, cela découpe plus finement.
 ORDINAL = r"(?:er|bis|ter|quater|quinquies|sexies|septies|octies|nonies|decies)"
+# `^Article` sans tolérance d'indentation ne reconnaissait aucun en-tête des
+# rapports du Sénat, qui préfixent la ligne d'une espace : 221 fichiers ne
+# rendaient que 455 sections, contre 7 343 pour 82 fichiers de l'Assemblée. Le
+# déséquilibre était trop grand pour une différence de convention rédactionnelle.
 ENTETE = re.compile(
-    r"^Article (?:additionnel[^\n]{0,90}|(\d+)"
-    r"(?:\s*" + ORDINAL + r")*(?:\s*[A-H])?(?:\s*\[?\((?:nouveau|supprimé)\)\]?)?)"
-    r"\s*(?:\n\s*" + ORDINAL + r")?\s*$", re.M)
+    r"^[ \t]*Article (?:additionnel[^\n]{0,90}|(\d+)"
+    r"(?:\s*" + ORDINAL + r")*(?:\s*[A-H])?(?:\s*\[?\((?:nouveau|supprimé)\)\]?)?"
+    # Le Sénat rend l'en-tête et sa parenthèse sur une seule ligne :
+    # « Article 22 ter (article 22-2 de la loi n° 89-462) ». Sans cette
+    # alternative, l'en-tête ne ferme pas la section précédente, qui a atteint
+    # 553 330 caractères sur un rapport du périmètre. Le suffixe admis se limite
+    # à une parenthèse ou à un tiret de titre : « Article 22 est ainsi modifié »
+    # reste écarté, faute de quoi toute phrase ouvrirait une section.
+    r"(?:[ \t]*(?:\([^\n]*|[-–—][ \t][^\n]*))?"
+    r")"
+    r"[ \t]*(?:\n[ \t]*" + ORDINAL + r")?[ \t]*$", re.M)
 
 ARTICLE = re.compile(r"\bL\.?\s?(\d{3})-(\d{1,3})(?:-(\d{1,3}))?")
 PLAGE = re.compile(r"L\.?\s?(\d{3})-(\d{1,3})\s+(?:à|au)\s+L\.?\s?(\d{3})-(\d{1,3})")
@@ -133,6 +145,14 @@ def commentaires(chemin: Path) -> list[dict]:
         # renvoi au fil du texte et ne doit pas ouvrir une section.
         declaration = re.search(r"\(([^)]{10,400})\)", tete)
         if not (declaration or est_suivi_d_un_titre(corps[debut:fin])):
+            continue
+        # Une ligne de sommaire a la même forme qu'un en-tête de commentaire : un
+        # numéro d'article, une parenthèse déclarant les dispositions visées, un
+        # titre — et rien après. Elle nomme les bons articles et n'explique rien.
+        # La distribution des tailles est franchement bimodale : 112 sections sous
+        # 400 caractères, trois entre 400 et 800, toutes des lignes de sommaire ;
+        # le premier commentaire véritable apparaît à 926 caractères.
+        if fin - debut < 800:
             continue
         sections.append({
             "rapport": chemin.name,
