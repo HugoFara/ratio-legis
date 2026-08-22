@@ -112,17 +112,23 @@ CREATE TABLE acteur (
     groupe  TEXT
 ) STRICT;
 
+-- `texte_discute` n'était pas au § 3 et la donnée l'impose : un dossier passe
+-- plusieurs textes en navette, et chacun renumérote ses amendements à partir de
+-- 1. La clef (dossier, chambre, numéro) du § 3 fait donc collisionner l'amendement
+-- n° 1 de première lecture avec celui de deuxième lecture.
 CREATE TABLE amendement (
-    id           INTEGER PRIMARY KEY,
-    dossier_id   TEXT NOT NULL REFERENCES dossier,
-    chambre      TEXT NOT NULL CHECK (chambre IN ('assemblee', 'senat')),
-    numero       TEXT NOT NULL,
-    auteur_id    INTEGER REFERENCES acteur,
-    sort         TEXT,
-    subdivision  TEXT,      -- article du PROJET de loi, jamais du code
-    objet        TEXT,
-    dispositif   TEXT,
-    UNIQUE (dossier_id, chambre, numero)
+    id             INTEGER PRIMARY KEY,
+    dossier_id     TEXT NOT NULL REFERENCES dossier,
+    chambre        TEXT NOT NULL CHECK (chambre IN ('assemblee', 'senat')),
+    texte_discute  TEXT NOT NULL,
+    numero         TEXT NOT NULL,
+    auteur_id      INTEGER REFERENCES acteur,
+    sort           TEXT,
+    subdivision    TEXT,      -- article du PROJET de loi, jamais du code
+    objet          TEXT,
+    dispositif     TEXT,
+    url            TEXT,      -- § 4.3 : toute pièce doit rester citable
+    UNIQUE (dossier_id, chambre, texte_discute, numero)
 ) STRICT;
 
 CREATE TABLE acte_ue (
