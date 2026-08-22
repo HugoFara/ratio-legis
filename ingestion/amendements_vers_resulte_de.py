@@ -153,6 +153,13 @@ def articles_nommes(dispositif: str) -> set[str]:
 
 def construire_resulte_de(base: sqlite3.Connection) -> dict:
     """Apparie chaque amendement adopté aux segments que sa propre loi a produits."""
+    # Les arêtes sont reconstruites, non complétées : sans cet effacement, une
+    # exécution ultérieure laisse en base des arêtes portant l'ancienne confiance,
+    # que `INSERT OR IGNORE` refuse de remplacer. Le graphe affichait ainsi
+    # 0,685 là où le code disait 0,710.
+    base.execute("DELETE FROM preuve WHERE methode = 'appariement_exact' AND id IN "
+                 "(SELECT preuve_id FROM resulte_de WHERE preuve_id IS NOT NULL)")
+    base.execute("DELETE FROM resulte_de")
     prochaine_preuve = base.execute(
         "SELECT coalesce(max(id), 0) + 1 FROM preuve").fetchone()[0]
 

@@ -163,3 +163,19 @@ disparaissent, remplacés par FTS5 et, pour le rappel vectoriel, un index extern
 Code sous [AGPL-3.0](LICENSE). Les données amont sont sous Licence Ouverte /
 Etalab 2.0 et leur attribution est obligatoire : voir
 [`ATTRIBUTION.md`](ATTRIBUTION.md).
+
+## Voir le graphe
+
+`restitution/graphe.py` interroge la base et restitue, pour un article en vigueur,
+tout ce que le graphe sait dire de lui : les passages qui le motivent, la
+provenance de chaque alinéa jusqu'à l'amendement qui l'a écrit, ce qui le cite, et
+ce qui a été tenté sur lui sans aboutir.
+
+```
+python3 restitution/graphe.py base.sqlite L224-43
+python3 restitution/graphe.py base.sqlite L111-1 --html sortie.html
+```
+
+Deux rendus versionnés dans `restitution/exemples/`. La restitution n'ajoute
+aucune donnée : elle applique les règles § 5.1 (provenance ou silence), § 5.4 (la
+confiance est une donnée) et § 4.3 (toute phrase produite est citable).
