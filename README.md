@@ -26,7 +26,8 @@ Les trois livrables de la phase 0 sont produits.
 | Source d'annotation externe | [`docs/04-annotation-externe.md`](docs/04-annotation-externe.md) |
 | Généralisation aux 48 dossiers | [`docs/05-generalisation.md`](docs/05-generalisation.md) |
 | Modèle de données au grain du segment | [`docs/06-modele-de-donnees.md`](docs/06-modele-de-donnees.md) |
-| Schéma PostgreSQL | [`schema/001-graphe-provenance.sql`](schema/001-graphe-provenance.sql) |
+| Schéma SQLite | [`schema/001-graphe-provenance.sql`](schema/001-graphe-provenance.sql) |
+| Ingestion, première tranche | [`ingestion/legi_vers_graphe.py`](ingestion/legi_vers_graphe.py) |
 | Jeu d'annotation humaine, 100 articles | [`data/golden-set/jeu-annotation-100-prerempli.csv`](data/golden-set/jeu-annotation-100-prerempli.csv) |
 | Périmètre figé, 1 280 articles | [`data/perimetre-v1.csv`](data/perimetre-v1.csv) |
 | Golden set, données machine | [`data/golden-set/golden-set-v1.json`](data/golden-set/golden-set-v1.json) |
@@ -128,6 +129,23 @@ alinéas est fiable — 0 % de versions sans segment exploitable, à condition d
 couper sur `<br/>` autant que sur `<p>`, 26,5 % des articles n'ayant aucune
 balise `<p>`. Modèle et schéma : [`docs/06-modele-de-donnees.md`](docs/06-modele-de-donnees.md).
 
+## Phase 1, première tranche : chargée
+
+LEGI → articles, versions, **segments**, et l'arête `repris_de` qui porte la
+continuité d'un alinéa à travers une recodification. 3,5 secondes, 26 Mo, zéro
+violation d'intégrité :
+
+| | |
+|---|---:|
+| Segments | 26 524 |
+| Arêtes `produite_par` / `renumerote_de` | 7 809 / 3 849 |
+| **Arêtes `repris_de`** | **9 830** — dont 4 891 intégrales, 4 500 retouchées |
+
+Base SQLite plutôt que PostgreSQL : le volume ne justifie pas un serveur, et les
+contraintes du schéma ont pu être **réellement testées** — chacune en essayant de
+la violer. Contrepartie à trancher avant la phase 3 : `pg_trgm` et `pgvector`
+disparaissent, remplacés par FTS5 et, pour le rappel vectoriel, un index externe.
+
 ## Prochaine étape
 
 1. **Faire valider les 100 articles** du jeu d'annotation. 66 d'entre eux portent
@@ -137,8 +155,8 @@ balise `<p>`. Modèle et schéma : [`docs/06-modele-de-donnees.md`](docs/06-mode
    humaine n'est pas faite, la phase 0 reste ouverte.
 2. **Construire l'extracteur d'amendements AN historiques** : 387 des 449 articles
    issus de la navette ne sont rattachés à aucun amendement du Sénat.
-3. **Déployer le schéma** et vérifier ses contraintes sémantiques, qui n'ont pas
-   pu l'être faute de serveur PostgreSQL dans l'environnement de mesure.
+3. **Charger les documents et les amendements**, puis produire `resulte_de` sur
+   les segments, la tranche `repris_de` en étant la dépendance.
 
 ## Licence et attribution
 

@@ -3,10 +3,18 @@
 **Objet :** remplacer le modèle du § 3 de la feuille de route, dont l'unité est
 l'article, par un modèle dont l'unité de provenance est le segment.
 **Date : 22 août 2026.** **Décision de modélisation approuvée.**
-**Schéma :** `schema/001-graphe-provenance.sql` — 17 tables, 3 types, 11
-contraintes. Syntaxe validée par analyseur ; **aucun serveur PostgreSQL n'était
-disponible dans cet environnement**, les contraintes sémantiques (`num_nonnulls`,
-`gin_trgm_ops`, types énumérés) restent donc à vérifier au premier déploiement.
+**Schéma :** `schema/001-graphe-provenance.sql` — 17 tables en mode `STRICT`,
+appliqué et vérifié sur SQLite ; chaque contrainte a été testée en essayant de la
+violer.
+
+**SQLite plutôt que PostgreSQL.** Le § 6 de la feuille de route recommandait
+PostgreSQL 16 avec `pg_trgm` et `pgvector`. Le volume ne le justifie pas : le
+périmètre complet tient en 26 Mo et se construit en 3,5 secondes. La contrepartie
+est réelle et doit être tranchée avant la phase 3 — l'alignement par trigrammes
+passe par FTS5, et le rappel vectoriel du § 4.3 devra s'appuyer sur un index
+externe. Les tables `STRICT` ne sont pas un détail : sans elles SQLite accepte
+n'importe quel type dans n'importe quelle colonne et toutes les contraintes de ce
+fichier deviennent décoratives.
 
 ---
 
@@ -158,7 +166,46 @@ dans plus de deux numéros d'articles est du texte type. Le seuil de deux n'est 
 arbitraire : 84 % des fenêtres à deux numéros désignent le même article sous ses
 numérotations d'avant et d'après 2016.
 
-## 6. Ce qui reste ouvert
+## 6. Première tranche chargée
+
+`ingestion/legi_vers_graphe.py` peuple le schéma depuis le fonds LEGI et
+construit l'arête `repris_de`. Sur le Code de la consommation, 3,5 secondes :
+
+| | |
+|---|---:|
+| Versions d'articles | 6 131 |
+| Articles distincts | 3 428 |
+| Segments | 26 524 (4,3 par version) |
+| dont non appariables, moins de 60 caractères | 4 429 |
+| Arêtes `produite_par` | 7 809 |
+| Arêtes `renumerote_de` | 3 849 |
+| **Arêtes `repris_de`** | **9 830** |
+| dont reprises intégrales (≥ 0,9) | 4 891 |
+| dont retouchées (0,1–0,9) | 4 500 |
+
+Zéro violation de clef étrangère, zéro arête dérivée sans preuve.
+
+Le cas de référence vérifié à la main en phase 0 se retrouve tel quel :
+
+```
+L224-65 (en vigueur depuis le 01/07/2016)
+  --repris_de (part 0,745, preuve textuelle)--> L121-105
+  --produite_par (CREE)--> ordonnance n° 2016-301
+```
+
+La part de 0,745 classe l'alinéa en « retouché », ce qui est exact : la version en
+vigueur ajoute « qui éteint toute action contre le voiturier » au texte issu de
+l'amendement. Un modèle au grain de l'article aurait rendu « repris » ou
+« nouveau », les deux étant faux.
+
+Ce cas a servi deux fois. À la première exécution, l'ingestion ne trouvait que 40
+reprises intégrales pour 4 017 retouchées — incompatible avec une codification à
+droit constant. La cause était le piège d'offsets déjà rencontré en phase 0 :
+indexer le prédécesseur par échantillonnage et l'interroger à toutes les
+positions fait ressortir un alinéa identique à 10 % de reprise. Sans cas de
+référence, le chiffre serait passé.
+
+## 7. Ce qui reste ouvert
 
 **La granularité de `motive` pour les documents non découpés.** Un commentaire de
 rapport porte sur l'article du texte en discussion, qui peut créer plusieurs
