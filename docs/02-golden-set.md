@@ -182,6 +182,15 @@ Deux colonnes d'indices pré-calculés — `indice_expose_nomme_article` et
 `indice_etude_impact_nomme_article` — signalent où chercher. Elles ne préjugent
 pas du verdict : l'annotateur doit pouvoir conclure « nommé mais non motivé ».
 
+**Le jeu est désormais pré-rempli depuis une source externe.** Les rapports de
+commission commentent le texte article par article et nomment l'article dans
+94,1 % des cas sur la loi consommation, contre 6,4 % pour l'exposé des motifs et
+24,8 % pour l'étude d'impact. `data/golden-set/jeu-annotation-100-prerempli.csv`
+propose un passage et ses offsets pour **66 des 100 articles**, le travail humain
+devenant une validation plutôt qu'une recherche. La colonne `ANNOT_verdict` reste
+vide et le grain du rattachement est explicite. Détail et limites dans
+`04-annotation-externe.md`.
+
 ## 7. Méthode de reconstruction automatique
 
 1. Version en vigueur dans LEGI (`ETAT = VIGUEUR`), identifiant `LEGIARTI`.

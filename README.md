@@ -23,7 +23,8 @@ Les trois livrables de la phase 0 sont produits.
 | Rapport de vérification des sources | [`docs/01-rapport-verification-sources.md`](docs/01-rapport-verification-sources.md) |
 | Golden set de 25 articles | [`docs/02-golden-set.md`](docs/02-golden-set.md) |
 | Prototype du résolveur, jalon go/no-go | [`docs/03-prototype-resolveur.md`](docs/03-prototype-resolveur.md) |
-| Jeu d'annotation humaine, 100 articles | [`data/golden-set/jeu-annotation-100.csv`](data/golden-set/jeu-annotation-100.csv) |
+| Source d'annotation externe | [`docs/04-annotation-externe.md`](docs/04-annotation-externe.md) |
+| Jeu d'annotation humaine, 100 articles | [`data/golden-set/jeu-annotation-100-prerempli.csv`](data/golden-set/jeu-annotation-100-prerempli.csv) |
 | Périmètre figé, 1 280 articles | [`data/perimetre-v1.csv`](data/perimetre-v1.csv) |
 | Golden set, données machine | [`data/golden-set/golden-set-v1.json`](data/golden-set/golden-set-v1.json) |
 | Chaînes `resulte_de` produites | [`data/prototype/chaines-resulte-de-2014-344.json`](data/prototype/chaines-resulte-de-2014-344.json) |
@@ -100,8 +101,11 @@ le goulot est redevenu la disponibilité de la source.
 
 ## Prochaine étape
 
-1. **Faire annoter les 100 articles** avec offsets des passages motivants. Tant
-   que ce n'est pas fait, la phase 0 reste ouverte.
+1. **Faire valider les 100 articles** du jeu d'annotation. 66 d'entre eux portent
+   déjà un passage proposé et ses offsets, extraits des rapports de commission —
+   la meilleure source de motivation au niveau de l'article, avec **94,1 %**
+   d'articles nommés contre 24,8 % pour l'étude d'impact. Tant que la validation
+   humaine n'est pas faite, la phase 0 reste ouverte.
 2. **Construire l'extracteur d'amendements AN historiques**, dont dépend la
    mesure C2.
 
