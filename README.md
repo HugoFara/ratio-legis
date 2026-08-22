@@ -24,6 +24,7 @@ Les trois livrables de la phase 0 sont produits.
 | Golden set de 25 articles | [`docs/02-golden-set.md`](docs/02-golden-set.md) |
 | Prototype du résolveur, jalon go/no-go | [`docs/03-prototype-resolveur.md`](docs/03-prototype-resolveur.md) |
 | Source d'annotation externe | [`docs/04-annotation-externe.md`](docs/04-annotation-externe.md) |
+| Généralisation aux 48 dossiers | [`docs/05-generalisation.md`](docs/05-generalisation.md) |
 | Jeu d'annotation humaine, 100 articles | [`data/golden-set/jeu-annotation-100-prerempli.csv`](data/golden-set/jeu-annotation-100-prerempli.csv) |
 | Périmètre figé, 1 280 articles | [`data/perimetre-v1.csv`](data/perimetre-v1.csv) |
 | Golden set, données machine | [`data/golden-set/golden-set-v1.json`](data/golden-set/golden-set-v1.json) |
@@ -99,6 +100,26 @@ Le résolveur a été prototypé sur la loi consommation de 2014, qui produit 30
 L'extracteur d'amendements de l'Assemblée est réactivé : le résolveur fonctionne,
 le goulot est redevenu la disponibilité de la source.
 
+## Généralisation : le pilote était optimiste
+
+Les chiffres du prototype reposaient sur une seule loi, 37 % du périmètre. Repris
+sur les 48 dossiers ([`docs/05-generalisation.md`](docs/05-generalisation.md)) :
+
+| Mesure | Pilote | Périmètre |
+|---|---:|---:|
+| Ancrage par un commentaire de rapport | 94,1 % | **79,1 %** |
+| Part issue de la navette | 32 % | **59,2 %** |
+| C1 — rattachement à un amendement du Sénat | 29,3 % | **13,8 %** |
+
+La population qui a besoin de l'arête critique double. **39 articles portent
+aujourd'hui une chaîne complète** de l'article en vigueur jusqu'à un amendement
+nommé.
+
+Résultat central : **39,8 % des articles sont repris du texte déposé entre 10 % et
+90 %** — ni gouvernementaux ni parlementaires, mais les deux selon l'alinéa. La
+partition n'a pas de sens au grain de l'article, et **la provenance doit être
+modélisée au segment**. Ce n'est plus un argument de principe, c'est une mesure.
+
 ## Prochaine étape
 
 1. **Faire valider les 100 articles** du jeu d'annotation. 66 d'entre eux portent
@@ -106,8 +127,10 @@ le goulot est redevenu la disponibilité de la source.
    la meilleure source de motivation au niveau de l'article, avec **94,1 %**
    d'articles nommés contre 24,8 % pour l'étude d'impact. Tant que la validation
    humaine n'est pas faite, la phase 0 reste ouverte.
-2. **Construire l'extracteur d'amendements AN historiques**, dont dépend la
-   mesure C2.
+2. **Acter la modélisation au segment** avant toute ingestion : elle conditionne
+   le schéma relationnel et la mesure la tranche.
+3. **Construire l'extracteur d'amendements AN historiques** : 387 des 449 articles
+   issus de la navette ne sont rattachés à aucun amendement du Sénat.
 
 ## Licence et attribution
 
