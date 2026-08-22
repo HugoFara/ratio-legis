@@ -80,29 +80,62 @@ dispositif — le contexte est porté par l'article du projet de loi, pas par
 l'amendement. Le résoudre suppose de rattacher l'amendement à l'article du texte
 en discussion, donc de charger les textes déposés — déjà récupérés en phase 0.
 
-## 4. La XIVe législature n'a pas de source d'amendements à l'Assemblée
+## 4. Correction : la XIVe législature est disponible
 
-Constat vérifié ce jour, et il conditionne tout le rappel restant.
+**La conclusion précédente de cette note était fausse et est retirée.** Elle
+affirmait que les amendements de l'Assemblée pour la XIVe législature étaient
+inaccessibles. Ils sont servis en clair, à cette adresse :
 
-**513 des 832 articles éligibles — 62 % — proviennent de la XIVe législature**,
-loi Hamon comprise. Or :
+```
+/static/openData/repository/14/loi/amendements_legis_XIV/Amendements_XIV.csv.zip
+```
 
-| Législature | Articles éligibles | Amendements AN |
-|---|---:|---|
-| XIV | 513 | **absent** — l'open data renvoie 404, la page d'archive pointe vers un hôte `data-preprod` qui ne résout pas |
-| XIII | 216 | **absent** — aucune archive publiée |
-| XV | 49 | disponible (`Amendements_XV.json.zip`, 648 Mo) |
-| XVI | 32 | disponible (363 Mo) |
-| XVII | 22 | disponible (297 Mo) |
+L'erreur avait deux causes, et la seconde est la plus instructive. Le chemin
+essayé — `amendements_legis/` — était faux d'un suffixe. Et la page d'archives de
+l'Assemblée, seule source consultée pour le corriger, publie des URL pointant vers
+un hôte `data-preprod` qui ne résout pas : **une page institutionnelle périmée a
+été prise pour une preuve d'absence**. Le bon chemin a été retrouvé par l'index
+CDX de la Wayback Machine, qui archive l'arborescence du dépôt.
 
-Les anciennes URL du site (`/14/amendements/1015/AN/liste.asp`) rendent 404 ; le
-schéma actuel `/dyn/` sert les textes mais pas les listes d'amendements, et
-l'API de recherche `query_amendements` rend une liste vide quels que soient les
-paramètres essayés.
+La règle qui en sort : un 404 sur une URL recopiée prouve que l'URL est fausse,
+jamais que la donnée est absente.
 
-**Conséquence :** l'extracteur AN, présenté depuis la phase 0 comme le premier
-gain de rappel, ne couvrirait que 103 articles sur 832 pour 1,3 Go de
-téléchargement. Le gisement principal — les XIIIe et XIVe législatures — n'est pas
-accessible par les voies ouvertes. Deux options subsistent, et le choix n'est pas
-technique : écrire à l'Assemblée pour obtenir les archives, ou se contenter du
-Sénat sur cette période et l'afficher comme une limite du produit.
+**Extraction réalisée** — `tools/an/extraire_amendements_an.py`, lecture en flux
+du CSV de 420 Mo et 624 colonnes sans décompression sur disque :
+
+| | |
+|---|---:|
+| Lignes lues | 167 420 |
+| **Amendements retenus, 24 textes du périmètre** | **11 117** |
+| Rejetés · adoptés | 3 280 · 2 677 |
+| Non soutenus · retirés · tombés | 2 436 · 1 191 · 382 |
+
+Le corpus d'amendements passe de 19 078 à 30 195, et il couvre enfin la chambre
+de dépôt de la XIVe législature, d'où proviennent **513 des 832 articles
+éligibles**.
+
+Deux pièges de format relevés au passage. Les références de texte ont deux
+formes — `L14B1015` pour le texte déposé, `L14BTC2442` pour le texte de
+commission — et n'en reconnaître qu'une fait perdre la moitié du corpus : 2 195
+amendements au lieu de 11 117. Et le sort n'est pas dans la colonne `sort[1]`,
+vide sur toute la législature, mais dans `sort[1]/sortEnSeance[1]` ; la colonne
+`etat[1]` ne porte que l'état procédural, et la prendre pour le sort ferait
+disparaître 3 280 rejets derrière un « Discuté » uniforme.
+
+## 5. Ce qui reste réellement manquant
+
+**La XIIIe législature — 216 articles éligibles — n'a jamais été publiée en open
+data.** L'index CDX confirme que le dépôt ne contient que les législatures 14 à
+17. En revanche, la Wayback Machine archive les pages d'amendement individuelles
+du site de l'époque, sous la forme
+`assemblee-nationale.fr/13/amendements/<texte>/<texte><numéro>.asp`. La voie est
+donc une reconstitution par archive, page par page, et non un fichier à charger.
+
+**Les auteurs ne sont pas nommés** dans le fichier des amendements : les colonnes
+portent des références `PA…` et `PO…`, résolues par le jeu Acteurs de
+l'Assemblée. Sans ce chargement complémentaire, les 11 117 amendements ont un
+sort mais pas de signataire.
+
+**Le chargement en base reste à faire.** Cette tranche produit l'extraction et
+l'outil ; l'alimentation de `amendement`, `resulte_de` et `vise` côté Assemblée
+est la tranche suivante.
