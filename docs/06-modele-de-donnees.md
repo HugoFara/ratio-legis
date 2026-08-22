@@ -178,10 +178,10 @@ construit l'arête `repris_de`. Sur le Code de la consommation, 3,5 secondes :
 | Segments | 26 524 (4,3 par version) |
 | dont non appariables, moins de 60 caractères | 4 429 |
 | Arêtes `produite_par` | 7 809 |
-| Arêtes `renumerote_de` | 3 849 |
-| **Arêtes `repris_de`** | **9 830** |
-| dont reprises intégrales (≥ 0,9) | 4 891 |
-| dont retouchées (0,1–0,9) | 4 500 |
+| Arêtes `renumerote_de` | 1 877 |
+| **Arêtes `repris_de`** | **5 775** |
+| dont reprises intégrales (≥ 0,9) | 2 814 |
+| dont retouchées (0,1–0,9) | 2 712 |
 
 Zéro violation de clef étrangère, zéro arête dérivée sans preuve.
 
@@ -198,7 +198,24 @@ vigueur ajoute « qui éteint toute action contre le voiturier » au texte issu 
 l'amendement. Un modèle au grain de l'article aurait rendu « repris » ou
 « nouveau », les deux étant faux.
 
-Ce cas a servi deux fois. À la première exécution, l'ingestion ne trouvait que 40
+Ce cas a servi trois fois. La troisième a révélé que **le graphe n'était pas
+orientable** : remonter l'ascendance de L224-65 bouclait indéfiniment entre cet
+article et L121-105. LEGI déclare le lien de renumérotation sur les *deux*
+versions concernées, et `sens`, qui devrait les départager, est inexploitable.
+Ignorer `sens` — décision correcte — laissait donc une relation symétrique là où
+le modèle suppose une ascendance : 3 848 des 3 849 arêtes `renumerote_de` avaient
+leur réciproque, et 36 % des arêtes `repris_de` désignaient comme source une
+version *postérieure* à leur cible.
+
+Le sens est rétabli par la chronologie, qui est un fait observable dans le fonds
+et non une déclaration. Les 48 paires à date de début identique sont abandonnées
+plutôt que devinées. Après correction : plus aucune arête `repris_de` symétrique,
+ascendance de profondeur 3 au maximum, et acyclicité garantie par construction
+puisque chaque arête décroît strictement en date. Les compteurs ci-dessus sont
+ceux d'après correction ; ils sont environ deux fois plus bas parce que chaque
+arête n'était comptée qu'une fois de trop.
+
+Ce cas a aussi servi deux fois auparavant. À la première exécution, l'ingestion ne trouvait que 40
 reprises intégrales pour 4 017 retouchées — incompatible avec une codification à
 droit constant. La cause était le piège d'offsets déjà rencontré en phase 0 :
 indexer le prédécesseur par échantillonnage et l'interroger à toutes les

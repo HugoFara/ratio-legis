@@ -169,6 +169,28 @@ def charger_versions(racine: Path) -> dict[str, Version]:
     return versions
 
 
+def anterieurs(version: Version, versions: dict[str, Version]) -> list[Version]:
+    """Prédécesseurs d'une version, restreints à ceux qui la précèdent dans le temps.
+
+    LEGI déclare le lien de renumérotation sur les deux versions concernées, et
+    l'attribut `sens` qui devrait les départager est inexploitable (voir
+    `docs/01-rapport-verification-sources.md` § 2.3 bis). Pris tels quels, ces
+    liens forment une relation symétrique et non une ascendance : 3 848 des 3 849
+    arêtes `renumerote_de` avaient leur réciproque, et remonter la chaîne d'un
+    article bouclait indéfiniment entre L224-65 et L121-105.
+
+    Le sens est donc rétabli par la chronologie, qui est un fait observable dans le
+    fonds et non une déclaration. À date de début égale, la direction n'est pas
+    décidable : l'arête est abandonnée plutôt que devinée (règle § 5.1).
+    """
+    retenus = []
+    for identifiant in version.predecesseurs:
+        precedent = versions.get(identifiant)
+        if precedent is not None and precedent.date_debut < version.date_debut:
+            retenus.append(precedent)
+    return retenus
+
+
 def inserer_noeuds(base: sqlite3.Connection, versions: dict[str, Version]) -> dict:
     articles: dict[tuple[str, str], int] = {}
     for version in versions.values():
@@ -214,10 +236,7 @@ def inserer_aretes_declarees(base: sqlite3.Connection, versions: dict[str, Versi
     renumerote = set()
     for version in versions.values():
         cible = articles[(version.code, version.numero)]
-        for identifiant in version.predecesseurs:
-            precedent = versions.get(identifiant)
-            if precedent is None:
-                continue
+        for precedent in anterieurs(version, versions):
             source = articles[(precedent.code, precedent.numero)]
             if source != cible:
                 renumerote.add((cible, source))
@@ -238,10 +257,7 @@ def construire_repris_de(base: sqlite3.Connection, versions: dict[str, Version])
     """
     aretes, preuves = [], []
     for version in versions.values():
-        for identifiant in version.predecesseurs:
-            precedent = versions.get(identifiant)
-            if precedent is None:
-                continue
+        for precedent in anterieurs(version, versions):
             # Le prédécesseur est indexé à toutes les positions, et non par
             # échantillonnage : sinon les grilles d'offsets des deux côtés ne
             # coïncident pas et un alinéa repris à l'identique ressort à 10 % de
