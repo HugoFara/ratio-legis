@@ -1,0 +1,13 @@
+[Unit]
+Description=Ratio Legis — déclenche la réincrémentation quotidienne
+
+[Timer]
+# La DILA publie ses incréments en fin de journée, vers 21 h ou 22 h UTC+2. On
+# passe après, et `Persistent` rattrape les jours où la machine était éteinte —
+# sans quoi un fonds « quotidien » se retrouve avec un trou muet.
+OnCalendar=*-*-* 06:30:00
+Persistent=true
+RandomizedDelaySec=1800
+
+[Install]
+WantedBy=timers.target

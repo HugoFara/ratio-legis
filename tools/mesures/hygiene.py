@@ -69,12 +69,12 @@ def mesures(base: sqlite3.Connection, perimetre: Path) -> list[tuple]:
         "JOIN article a ON a.id = v.article_id AND a.numero LIKE 'L%' "
         "JOIN produite_par p ON p.version_id = v.id_legi "
         "JOIN texte_normatif t ON t.id_jorf = p.texte_id "
-        "WHERE v.etat = 'VIGUEUR' GROUP BY 1"))
+        "GROUP BY 1"))
     articles_l = un("SELECT count(*) FROM verdict WHERE partie = 'L'")[0]
     reelle = un("""
         WITH RECURSIVE ascendance(cible, ancetre) AS (
             SELECT a.id, a.id FROM article a
-            JOIN version_article v ON v.article_id = a.id AND v.etat = 'VIGUEUR'
+            JOIN version_en_vigueur v ON v.article_id = a.id
             UNION SELECT x.cible, r.ancien_id
             FROM renumerote_de r JOIN ascendance x ON r.article_id = x.ancetre)
         SELECT count(DISTINCT x.cible) FROM ascendance x

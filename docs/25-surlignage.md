@@ -43,22 +43,22 @@ Les liens d'abrogation sont donc exclus. L. 224-43 est alors rendu à la loi du
 | **la trame** | l'alinéa a été retouché depuis son introduction (`part_reprise` < 1) |
 | **la marque** | l'amendement qui l'a écrit, avec son auteur et son sort |
 
-**La couleur ne dit pas qui a voulu l'alinéa.** 139 alinéas sur 7 496 seulement
+**La couleur ne dit pas qui a voulu l'alinéa.** 145 alinéas sur 7 504 seulement
 remontent à un amendement nommé. Confondre les deux ferait passer une ordonnance
 de recodification pour un auteur, ce qui serait faux et flatteur. Les trois plans
 sont distincts à l'écran comme dans les données.
 
 ## 4. Couverture
 
-Sur les 2 139 articles en vigueur et leurs 7 496 alinéas :
+Sur les 2 104 articles en vigueur et leurs 7 504 alinéas :
 
 | | |
 |---|---:|
-| Alinéas avec un texte introducteur | **7 424 (99,0 %)** |
-| Alinéas sans origine documentée | 72 (1,0 %) |
-| Alinéas retouchés depuis leur introduction | 1 806 (24,1 %) |
-| Alinéas remontant à un amendement | 139 |
-| Articles composites (deux textes introducteurs ou plus) | 362 |
+| Alinéas avec un texte introducteur | **7 437 (99,1 %)** |
+| Alinéas sans origine documentée | 67 (0,9 %) |
+| Alinéas retouchés depuis leur introduction | 1 766 (23,5 %) |
+| Alinéas remontant à un amendement | 145 |
+| Articles composites (deux textes introducteurs ou plus) | 357 (17,0 %) |
 
 Médiane 8,7 ms par article, 95ᵉ centile 11 ms.
 

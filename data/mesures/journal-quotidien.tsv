@@ -1,0 +1,24 @@
+course	etape	etat	secondes	detail
+20260823T181238Z	miroir	OK	14	1398
+20260823T181238Z	increments	OK	1	fonds à jour au 20260822-211810 — journal : data/corpus/increments-appliques.tsv
+20260823T181238Z	reconstruction	OK	309	essai : python3 restitution/graphe.py travail/ratio-legis.sqlite L224-43
+20260823T181238Z	dump	OK	3	  manifeste       : data/diffusion/MANIFESTE.tsv
+20260823T181238Z	articles_entres	INFO	0	21 : D221-5, D222-2, D312-36, L221-16, L222-16-1, L222-16-2, L222-16-3, L222-5-1
+20260823T181238Z	articles_sortis	INFO	0	243 : Annexe à l'article R312-14, Annexe à l'article R312-32, Annexe à l'article R312-5, Annexe à l'article R312-9, Annexe à l'article R314-3, D312-8, D314-22, D314-23
+20260823T181238Z	verdict_change	INFO	0	L221-21 : motivation_du_texte → raison_non_documentee
+20260823T181238Z	verdict_change	INFO	0	L222-15 : motivation_du_texte → raison_non_documentee
+20260823T181238Z	verdict_change	INFO	0	L222-5 : motivation_du_texte → raison_non_documentee
+20260823T181238Z	verdict_change	INFO	0	L232-4 : motivation_du_texte → raison_non_documentee
+20260823T181238Z	verdict_change	INFO	0	L242-37 : motivation_du_texte → raison_non_documentee
+20260823T181238Z	verdict_change	INFO	0	L242-6 : motivation_du_texte → raison_non_documentee
+20260823T181238Z	verdict_change	INFO	0	L314-20 : motivation_du_texte → raison_non_documentee
+20260823T181238Z	verdict_change	INFO	0	R223-1 : raison_non_documentee → motivation_du_texte
+20260823T181238Z	compte_article	INFO	0	3428 → 3464 (+36)
+20260823T181238Z	compte_version_article	INFO	0	6131 → 6362 (+231)
+20260823T181238Z	compte_segment	INFO	0	26524 → 28294 (+1770)
+20260823T181238Z	compte_texte_normatif	INFO	0	442 → 469 (+27)
+20260823T181238Z	compte_repris_de	INFO	0	5766 → 6137 (+371)
+20260823T181238Z	compte_renumerote_de	INFO	0	1877 → 1882 (+5)
+20260823T181238Z	compte_verdict	INFO	0	2139 → 1917 (-222)
+20260823T181238Z	rapport	OK	0	état écrit : data/mesures/etat-du-fonds.json
+20260823T181238Z	course	TERMINEE	0	fonds plus récent que la base : reconstruit

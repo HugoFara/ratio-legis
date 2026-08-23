@@ -196,8 +196,7 @@ def main() -> None:
         "SELECT count(DISTINCT article_cite), count(DISTINCT article_citant) "
         "FROM renvois_entrants").fetchone()
     en_vigueur = base.execute(
-        "SELECT count(DISTINCT article_id) FROM version_article "
-        "WHERE etat = 'VIGUEUR'").fetchone()[0]
+        "SELECT count(DISTINCT article_id) FROM version_en_vigueur").fetchone()[0]
 
     print(f"renvois relevés            : {len(renvois)}")
     for portee in ("interne", "externe", "non_resolue"):

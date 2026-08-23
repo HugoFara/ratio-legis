@@ -1,22 +1,22 @@
 famille	mesure	valeur	sur	part_pourcent	note
-verdict	partie D — articles en vigueur	176			
-verdict	partie D — un passage les motive	0	176	0.0	
-verdict	partie D — origine située seulement	0	176	0.0	
-verdict	partie D — motivation du texte seule	11	176	6.2	
-verdict	partie D — RAISON NON DOCUMENTÉE	165	176	93.8	
-verdict	partie L — articles en vigueur	1281			
-verdict	partie L — un passage les motive	680	1281	53.1	
-verdict	partie L — origine située seulement	183	1281	14.3	
-verdict	partie L — motivation du texte seule	412	1281	32.2	
-verdict	partie L — RAISON NON DOCUMENTÉE	6	1281	0.5	
-verdict	partie R — articles en vigueur	682			
-verdict	partie R — un passage les motive	42	682	6.2	
-verdict	partie R — origine située seulement	19	682	2.8	
-verdict	partie R — motivation du texte seule	46	682	6.7	
-verdict	partie R — RAISON NON DOCUMENTÉE	575	682	84.3	
-origine	articles L dont la version en vigueur vient d'une ordonnance	1003	1281	78.3	origine apparente
-origine	articles L dont la version en vigueur vient d'une loi	266	1281	20.8	origine apparente
-origine	articles L ayant une loi dans leur ascendance	1072	1281	83.7	origine réelle, chaîne de renumérotation remontée
+verdict	partie D — articles en vigueur	179			
+verdict	partie D — un passage les motive	0	179	0.0	
+verdict	partie D — origine située seulement	0	179	0.0	
+verdict	partie D — motivation du texte seule	11	179	6.1	
+verdict	partie D — RAISON NON DOCUMENTÉE	168	179	93.9	
+verdict	partie L — articles en vigueur	1293			
+verdict	partie L — un passage les motive	693	1293	53.6	
+verdict	partie L — origine située seulement	179	1293	13.8	
+verdict	partie L — motivation du texte seule	416	1293	32.2	
+verdict	partie L — RAISON NON DOCUMENTÉE	5	1293	0.4	
+verdict	partie R — articles en vigueur	632			
+verdict	partie R — un passage les motive	41	632	6.5	
+verdict	partie R — origine située seulement	16	632	2.5	
+verdict	partie R — motivation du texte seule	47	632	7.4	
+verdict	partie R — RAISON NON DOCUMENTÉE	528	632	83.5	
+origine	articles L dont la version en vigueur vient d'une ordonnance	1822	1293	140.9	origine apparente
+origine	articles L dont la version en vigueur vient d'une loi	1013	1293	78.3	origine apparente
+origine	articles L ayant une loi dans leur ascendance	1080	1293	83.5	origine réelle, chaîne de renumérotation remontée
 amendements	assemblee — déposés	11115			
 amendements	assemblee — adoptés	2677	11115	24.1	
 amendements	assemblee — sans objet publié	0	11115	0.0	surtout des amendements retirés avant séance ou irrecevables
@@ -41,7 +41,7 @@ sources	actes de l'Union	284
 sources	considérants	7674			
 sources	textes en discussion	355			
 renvois	articles citant L733-1	37			
-renvois	articles citant L412-1	36			
+renvois	articles citant L412-1	37			
 renvois	articles citant L733-4	35			
 renvois	articles citant L733-7	32			
 renvois	articles citant L313-1	25			

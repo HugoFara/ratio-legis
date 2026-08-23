@@ -48,6 +48,11 @@ else
   echo "   déjà extrait"
 fi
 
+# L'archive globale date du 13 juillet 2025 ; la DILA publie un incrément par jour
+# ouvré. Sans cette étape, le fonds extrait avait un an de retard sur le miroir et
+# rien ne le disait — 200 des 406 incréments publiés depuis touchent ce code.
+python3 "$RACINE/tools/dila/increments.py" "$MIROIR" "$TRAVAIL/conso" "$CODE"
+
 # ------------------------------------------------------- 2. rapports et textes
 etape "2. Rapports de commission"
 if [ "$(ls "$TRAVAIL/corpus/rapports" | wc -l)" -lt 200 ]; then

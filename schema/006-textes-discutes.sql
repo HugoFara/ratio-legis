@@ -93,4 +93,4 @@ CREATE VIEW articles_du_texte AS
     JOIN descendance d     ON d.origine = p.article_id
     JOIN article a         ON a.id = d.courant
     JOIN texte_discute t   ON t.id = p.texte_id
-    JOIN version_article v ON v.article_id = a.id AND v.etat = 'VIGUEUR';
+    JOIN version_en_vigueur v ON v.article_id = a.id;

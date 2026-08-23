@@ -169,7 +169,7 @@ def main() -> None:
         GROUP BY am.sort ORDER BY 2 DESC LIMIT 6""").fetchall()
     en_vigueur = base.execute("""
         SELECT count(DISTINCT a.id) FROM vise v JOIN article a ON a.id = v.article_id
-        JOIN version_article ver ON ver.article_id = a.id WHERE ver.etat = 'VIGUEUR'
+        JOIN version_en_vigueur ver ON ver.article_id = a.id
     """).fetchone()[0]
     violations = base.execute("PRAGMA foreign_key_check").fetchall()
 

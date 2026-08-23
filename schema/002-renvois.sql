@@ -51,6 +51,5 @@ CREATE VIEW renvois_entrants AS
     FROM renvoie_a r
     JOIN article cible          ON cible.id = r.article_id
     JOIN segment s              ON s.id = r.segment_id
-    JOIN version_article v      ON v.id_legi = s.version_id
-    JOIN article citant         ON citant.id = v.article_id
-    WHERE v.etat = 'VIGUEUR';
+    JOIN version_en_vigueur v   ON v.id_legi = s.version_id
+    JOIN article citant         ON citant.id = v.article_id;

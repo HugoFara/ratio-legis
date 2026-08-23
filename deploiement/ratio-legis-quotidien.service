@@ -1,0 +1,37 @@
+# Unité systemd « utilisateur » — aucune installation à la racine, aucun démon.
+#
+# La feuille de route recommandait Dagster ou Prefect. Le pipeline est une
+# séquence linéaire de huit étapes, sans branchement ni parallélisme ; ce qu'il
+# lui faut, c'est un déclencheur, un journal et l'idempotence. Un ordonnanceur
+# distribué apporterait une centaine de paquets et un démon pour un besoin que
+# systemd couvre déjà. L'écart est écrit au § 6 bis de la feuille de route.
+#
+# Installation :
+#   mkdir -p ~/.config/systemd/user
+#   cp deploiement/ratio-legis-quotidien.{service,timer} ~/.config/systemd/user/
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now ratio-legis-quotidien.timer
+#   systemctl --user list-timers ratio-legis-quotidien.timer
+#   journalctl --user -u ratio-legis-quotidien -f
+#
+# Pour que le minuteur tourne sans session ouverte :
+#   loginctl enable-linger "$USER"
+
+[Unit]
+Description=Ratio Legis — réincrémentation quotidienne du graphe
+Documentation=file:@RACINE@/docs/26-quotidien.md
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=@RACINE@
+ExecStart=@RACINE@/quotidien.sh
+# La DILA publie en fin de journée ouvrée ; le miroir peut être lent, et une
+# reconstruction complète prend quelques minutes. Deux heures est large, et une
+# course bloquée doit s'arrêter plutôt que d'empiéter sur la suivante.
+TimeoutStartSec=7200
+Nice=10
+IOSchedulingClass=idle
+
+[Install]
+WantedBy=default.target

@@ -311,8 +311,7 @@ def main() -> None:
     violations = base.execute("PRAGMA foreign_key_check").fetchall()
     couverts, en_vigueur = base.execute(
         "SELECT (SELECT count(DISTINCT article) FROM articles_du_texte), "
-        "(SELECT count(DISTINCT article_id) FROM version_article "
-        " WHERE etat = 'VIGUEUR')").fetchone()
+        "(SELECT count(DISTINCT article_id) FROM version_en_vigueur)").fetchone()
 
     print(f"textes chargés             : {len(textes)}")
     print(f"  absents du corpus        : {compte['absents']}")

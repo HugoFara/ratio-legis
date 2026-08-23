@@ -139,9 +139,9 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
     base.row_factory = sqlite3.Row
     q = lambda s, *a: [dict(r) for r in base.execute(s, a)]  # noqa: E731
 
-    version = q("""SELECT v.id_legi, v.date_debut FROM version_article v
+    version = q("""SELECT v.id_legi, v.date_debut FROM version_en_vigueur v
                    JOIN article a ON a.id = v.article_id
-                   WHERE a.numero = ? AND v.etat = 'VIGUEUR'
+                   WHERE a.numero = ?
                    ORDER BY v.date_debut DESC, v.id_legi""", numero)
     if not version:
         return {}
@@ -289,8 +289,7 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
                            JOIN produite_par pp ON pp.texte_id = tr.texte_id
                            JOIN version_article vv ON vv.id_legi = pp.version_id
                            JOIN article aa ON aa.id = vv.article_id
-                           WHERE tr.celex = u.celex AND aa.numero = ?
-                             AND vv.etat = 'VIGUEUR')) AS transposee
+                           WHERE tr.celex = u.celex AND aa.numero = ?)) AS transposee
         FROM acte_ue u
         LEFT JOIN considerant c ON c.celex = u.celex
         WHERE u.celex IN (SELECT celex FROM union_par_article WHERE article = ?)
@@ -298,7 +297,7 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
                       JOIN produite_par pp ON pp.texte_id = tr.texte_id
                       JOIN version_article vv ON vv.id_legi = pp.version_id
                       JOIN article aa ON aa.id = vv.article_id
-                      WHERE tr.celex = u.celex AND aa.numero = ? AND vv.etat = 'VIGUEUR')
+                      WHERE tr.celex = u.celex AND aa.numero = ?)
         GROUP BY u.celex ORDER BY transposee DESC, u.celex""",
         numero, numero, numero)
     d["considerants"] = {

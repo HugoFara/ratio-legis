@@ -216,7 +216,7 @@ qu'ils soient des décisions et non des dérives.
 |---|---|---|
 | Python 3.12 | **Python 3.14**, déclaré dans `pyproject.toml` et vérifié par `pipeline.sh` | 3.12 n'est plus en support actif ; le pipeline tourne sur 3.14 sans adaptation |
 | PostgreSQL 16 | **SQLite**, en tables `STRICT` | portabilité : la base est un fichier, donc le dump open data du § 4.4 *est* la base. `pg_trgm` n'a pas servi — aucune arête ne repose sur une similarité floue (§ 5.5) |
-| Dagster ou Prefect | **`pipeline.sh`** | l'orchestration n'est pas un critère de sortie ; la réincrémentation quotidienne du § 4.1 reste à faire et sera reposée en phase 4 |
+| Dagster ou Prefect | **`quotidien.sh` + minuteur systemd utilisateur** | le pipeline est une séquence linéaire de huit étapes, sans branchement ni parallélisme : il lui faut un déclencheur, un journal et l'idempotence, non un ordonnanceur distribué et sa centaine de paquets. La réincrémentation quotidienne du § 4.1 est faite (`docs/26`) |
 | lxml pour LEGI | expressions régulières sur le XML | les fonds DILA sont volumineux et de forme stable ; aucun besoin d'arbre |
 | pdfplumber | **pymupdf** | conserve les offsets exigés par le § 4.3, sans OCR sur ce corpus |
 

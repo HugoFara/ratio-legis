@@ -188,7 +188,7 @@ def main() -> None:
         SELECT count(DISTINCT a.numero) FROM motive m
         JOIN descendance d ON d.origine = m.article_id
         JOIN article a ON a.id = d.courant
-        JOIN version_article v ON v.article_id = a.id AND v.etat = 'VIGUEUR'
+        JOIN version_en_vigueur v ON v.article_id = a.id
         """).fetchone()[0]
 
     print(f"couples (dossier, article du texte) exploitables : {compte['retenus']}")

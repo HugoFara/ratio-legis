@@ -14,10 +14,9 @@ déclarées par LEGI, et `repris_de` porte sa fenêtre de preuve.
 
 Couverture mesurée sur les 7 496 alinéas en vigueur du corpus :
 
-    7 424 (99,0 %) ont un texte introducteur
-    1 806 (24,1 %) ont été retouchés depuis leur introduction
-    2 929 (39,1 %) viennent d'une version antérieure — les autres sont nés là
-      139          remontent jusqu'à un amendement nommé
+    7 437 (99,1 %) ont un texte introducteur
+    1 766 (23,5 %) ont été retouchés depuis leur introduction
+      145          remontent jusqu'à un amendement nommé
 
 **Ce que la couleur dit, et ne dit pas.** Elle dit quel texte a introduit
 l'alinéa, pas qui l'a voulu : 139 alinéas seulement remontent à un amendement.
@@ -51,9 +50,9 @@ def surligner(base: sqlite3.Connection, numero: str) -> dict:
     base.row_factory = sqlite3.Row
     q = lambda s, *a: [dict(r) for r in base.execute(s, a)]  # noqa: E731
 
-    version = q("""SELECT v.id_legi, v.date_debut, v.texte FROM version_article v
+    version = q("""SELECT v.id_legi, v.date_debut, v.texte FROM version_en_vigueur v
                    JOIN article a ON a.id = v.article_id
-                   WHERE a.numero = ? AND v.etat = 'VIGUEUR'
+                   WHERE a.numero = ?
                    ORDER BY v.date_debut DESC, v.id_legi""", numero)
     if not version:
         return {}

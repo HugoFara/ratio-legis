@@ -309,6 +309,9 @@ def main() -> None:
         chemin_base.unlink()
     base = sqlite3.connect(chemin_base)
     base.executescript(schema.read_text(encoding="utf-8"))
+    # Une seule définition de « en vigueur aujourd'hui », au lieu de dix-sept
+    # tests éparpillés — voir l'en-tête de `schema/009-en-vigueur.sql`.
+    base.executescript((schema.parent / "009-en-vigueur.sql").read_text(encoding="utf-8"))
     base.execute("PRAGMA foreign_keys = ON")
 
     versions = charger_versions(racine)

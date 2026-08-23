@@ -70,8 +70,7 @@ VOIES = {
         SELECT DISTINCT v.article_id FROM version_article v
         JOIN segment g ON g.version_id = v.id_legi
         JOIN suite s ON s.origine = g.id
-        JOIN resulte_de rd ON rd.segment_id = s.courant
-        WHERE v.etat = 'VIGUEUR'""",
+        JOIN resulte_de rd ON rd.segment_id = s.courant""",
     # Sous quel article de quel texte il a été discuté.
     "a_article_du_texte": """
         SELECT DISTINCT a.id FROM articles_du_texte x
@@ -82,8 +81,7 @@ VOIES = {
         SELECT DISTINCT v.article_id FROM version_article v
         JOIN produite_par p ON p.version_id = v.id_legi
         JOIN issu_de i ON i.texte_id = p.texte_id
-        JOIN document d ON d.dossier_id = i.dossier_id
-        WHERE v.etat = 'VIGUEUR'""",
+        JOIN document d ON d.dossier_id = i.dossier_id""",
     # Un acte de l'Union cité par l'article, ou transposé par son texte.
     "a_acte_ue": """
         SELECT DISTINCT a.id FROM union_par_article u
@@ -91,8 +89,7 @@ VOIES = {
         UNION
         SELECT DISTINCT v.article_id FROM version_article v
         JOIN produite_par p ON p.version_id = v.id_legi
-        JOIN transpose t ON t.texte_id = p.texte_id
-        WHERE v.etat = 'VIGUEUR'""",
+        JOIN transpose t ON t.texte_id = p.texte_id""",
 }
 
 
@@ -115,7 +112,7 @@ def main() -> None:
 
     en_vigueur = {i: n for i, n in base.execute(
         "SELECT DISTINCT a.id, a.numero FROM article a "
-        "JOIN version_article v ON v.article_id = a.id AND v.etat = 'VIGUEUR'")}
+        "JOIN version_en_vigueur v ON v.article_id = a.id")}
     atteints = {voie: {i for (i,) in base.execute(requete)}
                 for voie, requete in VOIES.items()}
 

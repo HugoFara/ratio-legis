@@ -358,7 +358,7 @@ def main() -> None:
     atteints = base.execute("""
         WITH RECURSIVE remonte(depart, courant) AS (
             SELECT s.id, s.id FROM segment s
-            JOIN version_article v ON v.id_legi = s.version_id WHERE v.etat = 'VIGUEUR'
+            JOIN version_en_vigueur v ON v.id_legi = s.version_id
             UNION
             SELECT remonte.depart, r.segment_source_id
             FROM repris_de r JOIN remonte ON r.segment_id = remonte.courant)

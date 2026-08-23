@@ -102,6 +102,5 @@ CREATE VIEW union_par_article AS
     FROM cite_acte_ue c
     JOIN acte_ue u          ON u.celex = c.celex
     JOIN segment s          ON s.id = c.segment_id
-    JOIN version_article v  ON v.id_legi = s.version_id
-    JOIN article a          ON a.id = v.article_id
-    WHERE v.etat = 'VIGUEUR';
+    JOIN version_en_vigueur v ON v.id_legi = s.version_id
+    JOIN article a          ON a.id = v.article_id;

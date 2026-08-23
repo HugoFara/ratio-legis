@@ -20,7 +20,7 @@ jamais été fait :
 
 | Critère § 4.2 | Seuil | Mesuré | |
 |---|---:|---:|---|
-| couverture `produite_par` | > 95 % | 2 113 / 2 139 — **98,8 %** | atteint |
+| couverture `produite_par` | > 95 % | 2 081 / 2 104 — **98,9 %** | atteint |
 | couverture `issu_de` | > 90 % | 68 / 68 lois et ordonnances utiles — **100 %** | atteint, [`docs/20`](docs/20-dossiers-des-textes.md) |
 | couverture `resulte_de` | > 60 % | 79 / 832 — **9,5 %** | **non atteint**, décision go du § 8 rendue |
 | **précision `resulte_de`** | **> 95 %** | 168 / 179 hors-échantillon — **93,9 %** | **non atteint**, et mesuré |
@@ -53,11 +53,11 @@ Reconstruite d'une commande depuis le miroir et les plans versionnés
 
 | Nœuds | | Arêtes | |
 |---|---:|---|---:|
-| Articles (dont **2 139 en vigueur**) | 3 428 | `produite_par` — quel texte a produit la version | 7 809 |
-| Versions d'articles | 6 131 | `repris_de` — continuité d'un alinéa par-delà la recodification | 5 766 |
-| **Segments (alinéas)** | **26 524** | `renumerote_de` | 1 877 |
-| Documents (rapports, exposés, études d'impact, avis) | 337 | `motive` — un passage qui motive, avec offsets | 519 |
-| Amendements (20 342 Sénat, 11 115 Assemblée) | 31 457 | `renvoie_a` — le graphe de renvois | 11 656 |
+| Articles (dont **2 104 en vigueur**) | 3 464 | `produite_par` — quel texte a produit la version | 8 145 |
+| Versions d'articles | 6 362 | `repris_de` — continuité d'un alinéa par-delà la recodification | 6 137 |
+| **Segments (alinéas)** | **28 294** | `renumerote_de` | 1 882 |
+| Documents (rapports, exposés, études d'impact, avis) | 337 | `motive` — un passage qui motive, avec offsets | 624 |
+| Amendements (20 342 Sénat, 11 115 Assemblée) | 31 457 | `renvoie_a` — le graphe de renvois | 12 534 |
 | Acteurs | 1 419 | `resulte_de` — l'amendement qui a écrit l'alinéa | 279 |
 | **Actes de l'Union** | **284** | `cite_acte_ue` / `transpose` | 1 478 / 8 |
 | **Considérants de l'Union** | **7 674** | `article_acte_ue` — articles d'actes déclarés | 6 237 |
@@ -69,18 +69,18 @@ compte pour le produit :
 ### Le verdict
 
 Pour chaque article en vigueur, le graphe rend un verdict — y compris, et surtout,
-quand il est négatif. Le taux global de 34,9 % d'articles sans raison documentée
+quand il est négatif. Le taux global de 33,3 % d'articles sans raison documentée
 ne veut rien dire : il faut séparer les parties, parce qu'un décret n'a ni exposé
 des motifs, ni débat, ni amendement.
 
 | partie | articles | un passage les motive | origine située | motivation du texte | **raison non documentée** |
 |---|---:|---:|---:|---:|---:|
-| **L** | 1 281 | 680 (53,1 %) | 183 | 412 | **6 (0,5 %)** |
-| **R** | 682 | 42 | 19 | 46 | **575 (84,3 %)** |
-| **D** | 176 | 0 | 0 | 11 | **165 (93,8 %)** |
+| **L** | 1 293 | 693 (53,6 %) | 179 | 416 | **5 (0,4 %)** |
+| **R** | 632 | 41 | 16 | 47 | **528 (83,5 %)** |
+| **D** | 179 | 0 | 0 | 11 | **168 (93,9 %)** |
 
-**La partie législative du code de la consommation est documentée à 99 %. La
-partie réglementaire l'est à 15 %** — et c'est elle qui porte la masse des
+**La partie législative du code de la consommation est documentée à 99,6 %. La
+partie réglementaire l'est à 16,5 %** — et c'est elle qui porte la masse des
 obligations que rencontre un consommateur.
 
 Détail et mises en garde : [`docs/18`](docs/18-verdict-et-hygiene.md). Toutes les
@@ -139,6 +139,28 @@ numéro d'aujourd'hui, et 695 dès qu'on remonte aux numéros d'avant 2016.
 | 17. Dump ouvert | republier le graphe, sans rediffuser ce qu'on n'a pas le droit de rediffuser | [`docs/23`](docs/23-dump-ouvert.md) |
 | 18. API de lecture | interroger le graphe en 12 ms, avec l'attribution qui voyage avec la donnée | [`docs/24`](docs/24-api.md) |
 | 19. Surlignage par étape | quel texte a introduit chaque alinéa, malgré la recodification | [`docs/25`](docs/25-surlignage.md) |
+| 20. Réincrémentation quotidienne | le fonds avait un an de retard ; l'orchestration le maintient à jour | [`docs/26`](docs/26-quotidien.md) |
+
+### Tenir à jour
+
+```
+./quotidien.sh                # miroir → incréments → reconstruction → dump → rapport
+```
+
+`pipeline.sh` n'extrayait le code que de l'archive **globale** de la DILA, datée
+du 13 juillet 2025, alors que le miroir recevait un incrément par jour ouvré : le
+fonds avait **un an de retard**, et rien ne le disait. 200 des 406 incréments en
+attente touchaient ce code.
+
+`quotidien.sh` enchaîne miroir, incréments, reconstruction, dump et rapport de
+différences, journalise chaque étape et s'arrête tôt quand rien n'a bougé.
+Déclenché par un minuteur systemd utilisateur ([`deploiement/`](deploiement/)) —
+pas par Dagster : le pipeline est une séquence linéaire de huit étapes, et ce
+qu'il lui faut est un déclencheur, un journal et l'idempotence.
+
+L'incrément porte sur la **source** ; le graphe, lui, est reconstruit en entier.
+Une base servie un mardi est donc exactement celle qu'on obtiendrait en repartant
+de zéro.
 
 ### Reconstruire
 
@@ -306,7 +328,7 @@ disparaissent, remplacés par FTS5 et, pour le rappel vectoriel, un index extern
 
 **La note est écrite, l'évaluation ne l'est pas.** `restitution/note.py` produit
 la note « pourquoi cet article » sous le contrat du § 4.3 : 11 666 constats sur
-les 2 139 articles, zéro phrase écartée faute de citation, aucune note vide
+les 2 104 articles, zéro phrase écartée faute de citation, aucune note vide
 ([`docs/19`](docs/19-note-phase-3.md)). Le critère de sortie de la phase 3 est en
 revanche une **évaluation humaine en aveugle** sur le golden set, qui suppose le
 jeu d'annotation validé.
@@ -384,7 +406,7 @@ python3 restitution/surlignage.py base.sqlite L111-1 --html sortie.html
 
 Sur le texte d'un article, la **couleur** donne le texte qui a introduit l'alinéa,
 la **trame** signale qu'il a été retouché depuis, la **marque** nomme l'amendement
-quand la chaîne y mène. 99,0 % des 7 496 alinéas en vigueur ont un texte
+quand la chaîne y mène. 99,1 % des 7 504 alinéas en vigueur ont un texte
 introducteur ; **un article sur six est composite**, écrit par deux textes ou plus.
 Exemples dans [`restitution/exemples/surlignage/`](restitution/exemples/surlignage/).
 

@@ -320,8 +320,7 @@ def main() -> None:
     violations = base.execute("PRAGMA foreign_key_check").fetchall()
     articles, en_vigueur = base.execute(
         "SELECT (SELECT count(DISTINCT article) FROM union_par_article), "
-        "(SELECT count(DISTINCT article_id) FROM version_article "
-        " WHERE etat = 'VIGUEUR')").fetchone()
+        "(SELECT count(DISTINCT article_id) FROM version_en_vigueur)").fetchone()
 
     print(f"actes de l'Union vérifiés  : {len(actes)}")
     for type_acte in ("directive", "reglement", "decision"):
