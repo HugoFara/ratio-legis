@@ -145,12 +145,13 @@ mesurer.
 Les jeux de données de `data.senat.fr` sont sous licence ouverte reprenant les
 termes de data.gouv.fr, et ceux de `data.assemblee-nationale.fr` sous Licence
 Ouverte. **Les rapports parlementaires publiés sur les sites institutionnels ne
-relèvent pas explicitement de ces licences** : ils sont des informations publiques
-réutilisables au titre du régime général de la loi du 17 juillet 1978, mais aucune
-page consultée ne l'affirme pour ces documents précis.
+relèvent pas de ces licences** : les portails n'ouvrent que les informations
+descriptives, le corps restant sous les conditions du site de chaque chambre. Le
+régime général de la loi du 17 juillet 1978 ne s'y applique pas non plus —
+l'article L300-2 du CRPA exclut les documents parlementaires.
 
 Cela n'empêche pas l'usage interne fait ici — mesure et annotation — mais la
-rediffusion des extraits dans le dump open data prévu au § 4 phase 4 doit être
-tranchée avant, au besoin en interrogeant les services des deux assemblées. En
+rediffusion des extraits reste bornée par les conditions de chaque chambre,
+détaillées dans `ATTRIBUTION.md`. En
 attendant, le dépôt ne versionne **aucun texte de rapport** : seulement les
 offsets et un extrait de 400 caractères à fin de contrôle.

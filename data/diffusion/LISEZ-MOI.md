@@ -12,12 +12,14 @@ Données sous **Licence Ouverte / Etalab 2.0**, code sous **AGPL-3.0-or-later**.
 - Source : Assemblée nationale — open data, Licence Ouverte / Etalab
 - Source : Sénat — data.senat.fr, licence ouverte reprenant les termes de data.gouv.fr
 - © Union européenne, https://eur-lex.europa.eu, 1998-2026 — réutilisation autorisée, décision 2011/833/UE
-- Rapports de commission : informations publiques (loi du 17 juillet 1978), régime de réutilisation non confirmé — texte non rediffusé
+- Rapports de commission : hors du régime du CRPA (art. L300-2, assemblées régies par l'ordonnance n° 58-1100). Métadonnées sous Licence Ouverte ; corps soumis aux conditions propres à chaque chambre — texte non rediffusé, voir la table regime_de_reutilisation
 
 ## Ce que ce dump ne contient pas
 
 Le **texte** des rapports de commission n'est pas rediffusé : leur régime de réutilisation n'est pas confirmé par les assemblées. Leur URL, leur hachage et les offsets des passages restent présents, ce qui suffit à refaire le lien depuis la source. Les fenêtres de preuve qui en viennent sont ramenées aux soixante caractères que le schéma exige au minimum.
 
+- `documents_dont_le_texte_est_retire_senat` : 109
+- `documents_dont_le_texte_est_retire_assemblee` : 112
 - `documents_dont_le_texte_est_retire` : 221
 - `fenetres_de_preuve_ramenees_a_60_caracteres` : 624
 
@@ -49,7 +51,8 @@ Le **texte** des rapports de commission n'est pas rediffusé : leur régime de r
 | `cite_acte_ue` | 1572 | segment → acte de l'Union qu'il nomme |
 | `transpose` | 8 | texte → acte de l'Union dont il déclare la transposition |
 | `verdict` | 2104 | pour chaque article en vigueur, ce que le graphe sait en dire |
-| `diffusion` | 16 | licence, attributions et provenance de ce dump |
+| `diffusion` | 18 | licence, attributions et provenance de ce dump |
+| `regime_de_reutilisation` | 2 | ce qu'une chambre autorise sur le corps de ses rapports, et à quelles conditions |
 
 ## Comment lire une arête
 

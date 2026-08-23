@@ -21,13 +21,24 @@ qu'on n'a pas le droit de republier.
 
 ## 2. Le seul obstacle réel : les rapports de commission
 
-`ATTRIBUTION.md` le signalait depuis la phase 0. Aucune page des deux assemblées
-n'affirme que leurs rapports relèvent de la Licence Ouverte, contrairement aux
-jeux de `data.senat.fr` et `data.assemblee-nationale.fr`. Ce sont des informations
-publiques réutilisables au titre du régime général de la loi du 17 juillet 1978,
-sans licence explicite. Toutes les autres sources — LEGI, JORF, DOLE, les
-amendements des deux chambres, les considérants d'EUR-Lex — portent une licence
-de réutilisation explicite et ne posent aucune question.
+Vérification faite aux sources en août 2026, le fondement invoqué jusque-là était
+faux : **l'article L300-2 du CRPA exclut les documents parlementaires** du régime
+général — ils relèvent de l'ordonnance n° 58-1100 — et la CADA se déclare
+incompétente. Invoquer « la loi du 17 juillet 1978 » n'autorisait rien et
+n'interdisait rien.
+
+Ce que les portails publient sous Licence Ouverte, ce sont les *informations
+descriptives* d'un rapport : titre, numéro, commission, rapporteur, dates, URL.
+Le corps reste sur le site de la chambre, sous les conditions du site — et ces
+conditions, publiées par chacune, **sont incompatibles avec la Licence Ouverte du
+dump** : l'Assemblée interdit l'usage commercial, le Sénat exige la gratuité de la
+diffusion, quand la Licence Ouverte autorise l'exploitation commerciale. L'écart
+entre les deux chambres est désormais porté par la table
+`regime_de_reutilisation` du dump. Voir `ATTRIBUTION.md`.
+
+Toutes les autres sources — LEGI, JORF, DOLE, les amendements des deux chambres,
+les considérants d'EUR-Lex — portent une licence de réutilisation explicite et ne
+posent aucune question.
 
 Les rapports pèsent **107 des 240 Mo** de la base, et ce sont eux qui portent la
 meilleure motivation au grain de l'article.

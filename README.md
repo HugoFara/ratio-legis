@@ -416,8 +416,15 @@ arbitrage à rendre entre le coût et un trou déclaré. Les textes déposés, d
 l'absence laisse subsister le dernier mode d'échec de `resulte_de`. Les débats en
 séance : le graphe sait ce que le Parlement a **fait**, pas ce qu'il a **dit**.
 
-**La licence de réutilisation des rapports parlementaires** n'est toujours pas
-confirmée auprès des deux chambres. Elle conditionne toute publication.
+**Le régime de réutilisation des rapports parlementaires est établi** — il n'est
+plus un préalable. Vérification faite aux sources en août 2026 : le CRPA exclut
+les documents parlementaires (art. L300-2), et chaque chambre a publié ses
+conditions. Elles diffèrent, et aucune ne permet de replacer le corps d'un rapport
+sous Licence Ouverte : l'Assemblée interdit l'usage commercial, le Sénat exige la
+gratuité de la diffusion. Le corps reste donc hors du dépôt et hors du dump, dont
+la table `regime_de_reutilisation` porte l'écart entre les deux chambres. Reste
+utile, sans bloquer : leur écrire pour lever le doute sur les extraits de 400
+caractères, au regard de la condition d'intégrité du Sénat.
 
 **Phases 3 et 4 non commencées.** `restitution/graphe.py` montre le graphe ; il ne
 produit pas la note « pourquoi cet article » avec son contrat strict et son verdict
@@ -471,7 +478,13 @@ parce qu'une API se consomme sans lire ce fichier.
 ## Licence et attribution
 
 Code sous [AGPL-3.0](LICENSE). Les données amont sont sous Licence Ouverte /
-Etalab 2.0 et leur attribution est obligatoire : voir
+Etalab 2.0 et leur attribution est obligatoire.
+
+**Une exception, et elle est documentée** : le corps des rapports de commission ne
+relève ni du CRPA — l'article L300-2 en exclut les documents parlementaires — ni
+de la Licence Ouverte des portails, qui n'ouvrent que les métadonnées. Il obéit
+aux conditions propres à chaque chambre, incompatibles avec une rediffusion sous
+Licence Ouverte. Il n'est donc ni versionné, ni rediffusé : voir
 [`ATTRIBUTION.md`](ATTRIBUTION.md).
 
 ## Voir le graphe

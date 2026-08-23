@@ -104,8 +104,10 @@ Deux interdits, qui ont déjà été enfreints par inadvertance :
 - **`travail/` n'est jamais versionné.** C'est un cache reconstructible ; il a
   porté 775 Mo dans l'historique, dont le texte intégral de 419 rapports.
 - **Aucun corps de rapport de commission dans le dépôt**, et aucun extrait
-  au-delà de `PLAFOND_EXTRAIT` (400 caractères), tant que les deux chambres n'ont
-  pas confirmé le régime de réutilisation. Le plafond est une constante nommée
+  au-delà de `PLAFOND_EXTRAIT` (400 caractères). Les deux chambres autorisent la
+  reproduction de leurs travaux, mais à des conditions — gratuité, attribution,
+  intégrité côté Sénat, interdiction de l'usage commercial côté Assemblée — qui
+  ne se transmettent pas sous Licence Ouverte. Le plafond est une constante nommée
   dans [`restitution/graphe.py`](restitution/graphe.py) — utilisez-la plutôt que
   d'écrire le nombre.
 

@@ -12,14 +12,21 @@ les attributions obligatoires, l'horodatage et le commit du code qui l'a produit
 — un dump dont on ne peut pas dire quel code l'a écrit n'est pas auditable. Les
 tables d'arêtes sont en outre exportées en TSV, pour qui ne veut pas de SQLite.
 
-**Ce qu'il ne contient pas, et pourquoi.** `ATTRIBUTION.md` suspend la
-rediffusion du texte des rapports de commission : aucune page des deux assemblées
-n'affirme qu'ils relèvent de la Licence Ouverte, contrairement aux jeux de
-`data.senat.fr` et `data.assemblee-nationale.fr`. Ce sont des informations
-publiques réutilisables au titre du régime général de la loi du 17 juillet 1978,
-sans licence explicite. Les 107 Mo de texte de rapport sont donc remplacés par un
-avis ; **l'URL, le hachage et les offsets restent**, ce qui suffit à quiconque
-veut refaire le lien depuis la source.
+**Ce qu'il ne contient pas, et pourquoi.** Le corps des rapports de commission.
+Les portails open data des deux chambres ne publient sous Licence Ouverte que les
+*informations descriptives* d'un rapport — titre, numéro, commission, rapporteur,
+dates ; le texte intégral reste sur le site de la chambre, sous les conditions du
+site. Or ces conditions, publiées par chacune dans ses mentions légales, sont
+**incompatibles avec la Licence Ouverte de ce dump** : l'Assemblée interdit
+l'usage commercial, le Sénat exige la gratuité de la diffusion, quand la Licence
+Ouverte autorise expressément l'exploitation commerciale. Rediffuser sous Licence
+Ouverte transmettrait à l'aval des droits que l'amont n'accorde pas.
+
+Les 107 Mo de texte de rapport sont donc remplacés par un avis **qui nomme le
+régime de la chambre concernée** ; **l'URL, le hachage et les offsets restent**,
+ce qui suffit à quiconque veut refaire le lien depuis la source. Le dump porte en
+outre une table `regime_de_reutilisation` : l'écart entre les deux chambres est
+une donnée, pas une note de bas de page.
 
 Restent les fenêtres de preuve. Les retirer rendrait les arêtes inauditables, ce
 qu'interdit le § 5.1 — provenance ou silence. Celles qui viennent d'un rapport
@@ -50,9 +57,38 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-AVIS = ("Texte non rediffusé : régime de réutilisation des rapports de commission "
-        "non confirmé par les assemblées (voir ATTRIBUTION.md). "
-        "L'URL, le hachage et les offsets de ce document sont conservés.")
+# Chaque chambre a publié ses conditions ; elles diffèrent, et la différence
+# décide de ce qui peut être republié. La porter dans la donnée plutôt que dans un
+# commentaire est la seule manière qu'un réutilisateur la voie.
+#   marqueur d'URL, producteur, source, principe, conditions
+REGIMES = [
+    ("senat", "senat.fr", "Sénat",
+     "https://www.senat.fr/mentions-legales.html",
+     "Les travaux parlementaires ne sont couverts par aucun droit d'auteur.",
+     "diffusion gratuite ; intégrité du document, ni modification ni altération ; "
+     "mention de www.senat.fr comme source, avec lien"),
+    ("assemblee", "assemblee-nationale.fr", "Assemblée nationale",
+     "https://www.assemblee-nationale.fr/dyn/info-site",
+     "Les documents publics ou officiels ne sont couverts par aucun droit d'auteur.",
+     "diffusion gratuite ; usage personnel, associatif ou professionnel — toute "
+     "utilisation commerciale ou publicitaire interdite ; mention de l'auteur et "
+     "de la source, avec lien vers le document"),
+]
+
+
+def avis(producteur: str, conditions: str) -> str:
+    """L'avis qui remplace un corps de rapport, nommant le régime qui l'impose."""
+    return (f"Texte non rediffusé — corps d'un rapport de commission ({producteur}). "
+            f"Conditions posées par la chambre : {conditions}. Elles sont "
+            f"incompatibles avec la Licence Ouverte de ce dump, qui autorise "
+            f"l'exploitation commerciale. L'URL, le hachage et les offsets de ce "
+            f"document sont conservés (voir ATTRIBUTION.md).")
+
+
+AVIS_AUTRE = ("Texte non rediffusé — corps d'un rapport de commission dont la chambre "
+              "n'a pas pu être déterminée depuis l'URL. Par prudence, le régime le "
+              "plus restrictif des deux s'applique. L'URL, le hachage et les offsets "
+              "de ce document sont conservés (voir ATTRIBUTION.md).")
 
 # Les arêtes et leurs clefs, sans aucun texte long : le format universel, pour
 # qui ne veut pas ouvrir un fichier SQLite.
@@ -68,8 +104,10 @@ ATTRIBUTIONS = [
               "de data.gouv.fr"),
     ("union", "© Union européenne, https://eur-lex.europa.eu, 1998-2026 — "
               "réutilisation autorisée, décision 2011/833/UE"),
-    ("rapports", "Rapports de commission : informations publiques (loi du 17 juillet "
-                 "1978), régime de réutilisation non confirmé — texte non rediffusé"),
+    ("rapports", "Rapports de commission : hors du régime du CRPA (art. L300-2, "
+                 "assemblées régies par l'ordonnance n° 58-1100). Métadonnées sous "
+                 "Licence Ouverte ; corps soumis aux conditions propres à chaque "
+                 "chambre — texte non rediffusé, voir la table regime_de_reutilisation"),
 ]
 
 
@@ -98,9 +136,25 @@ def retirer_les_rapports(base: sqlite3.Connection, strict: bool) -> dict[str, in
     """Applique la suspension d'ATTRIBUTION.md, dans l'une des deux lectures."""
     compte = {}
     if not strict:
-        compte["documents_dont_le_texte_est_retire"] = base.execute(
-            "UPDATE document SET texte = ? WHERE type = 'rapport_commission'",
-            (AVIS,)).rowcount
+        # Un avis par chambre : dire « non rediffusé » sans dire de quel régime
+        # cela découle laisse le réutilisateur devant un mur, alors que les deux
+        # chambres ont publié leurs conditions et qu'elles ne sont pas les mêmes.
+        retires = 0
+        for clef, marqueur, producteur, _source, _principe, conditions in REGIMES:
+            n = base.execute(
+                "UPDATE document SET texte = ? WHERE type = 'rapport_commission'"
+                " AND url LIKE ?", (avis(producteur, conditions), f"%{marqueur}%")
+            ).rowcount
+            compte[f"documents_dont_le_texte_est_retire_{clef}"] = n
+            retires += n
+        # Une URL qu'aucun marqueur ne reconnaît ne doit pas passer au travers :
+        # le filet est le régime le plus restrictif, jamais la rediffusion.
+        orphelins = base.execute(
+            "UPDATE document SET texte = ? WHERE type = 'rapport_commission'"
+            " AND texte NOT LIKE 'Texte non rediffusé%'", (AVIS_AUTRE,)).rowcount
+        if orphelins:
+            compte["documents_dont_le_texte_est_retire_chambre_inconnue"] = orphelins
+        compte["documents_dont_le_texte_est_retire"] = retires + orphelins
         # `CHECK (length(fenetre) >= 60)` : soixante est le plancher du schéma,
         # donc la preuve irréductible. Tout ce qui dépasse est de l'extrait.
         compte["fenetres_de_preuve_ramenees_a_60_caracteres"] = base.execute(
@@ -120,6 +174,31 @@ def retirer_les_rapports(base: sqlite3.Connection, strict: bool) -> dict[str, in
     compte["documents_retires"] = base.execute(
         "DELETE FROM document WHERE type = 'rapport_commission'").rowcount
     return compte
+
+
+def table_regimes(base: sqlite3.Connection) -> None:
+    """Le régime de réutilisation de chaque chambre, lisible par une requête.
+
+    Sans elle, un réutilisateur qui reprend le graphe ne sait pas que les
+    conditions diffèrent selon la chambre qui a produit le rapport — et il n'a
+    aucun moyen de l'apprendre depuis le dump.
+    """
+    base.execute("DROP TABLE IF EXISTS regime_de_reutilisation")
+    base.execute("""CREATE TABLE regime_de_reutilisation (
+        chambre        TEXT PRIMARY KEY,
+        producteur     TEXT NOT NULL,
+        source         TEXT NOT NULL,
+        principe       TEXT NOT NULL,
+        conditions     TEXT NOT NULL,
+        corps_rediffuse INTEGER NOT NULL CHECK (corps_rediffuse IN (0, 1)),
+        metadonnees    TEXT NOT NULL
+    ) STRICT""")
+    base.executemany(
+        "INSERT INTO regime_de_reutilisation VALUES (?, ?, ?, ?, ?, 0, ?)",
+        [(clef, producteur, source, principe, conditions,
+          "Licence Ouverte / Etalab 2.0 — titre, numéro, commission, rapporteur, "
+          "dates et URL sont librement rediffusables")
+         for clef, _marqueur, producteur, source, principe, conditions in REGIMES])
 
 
 def table_diffusion(base: sqlite3.Connection, source: Path, strict: bool,
@@ -172,6 +251,8 @@ DICTIONNAIRE = {
     "transpose": "texte → acte de l'Union dont il déclare la transposition",
     "verdict": "pour chaque article en vigueur, ce que le graphe sait en dire",
     "diffusion": "licence, attributions et provenance de ce dump",
+    "regime_de_reutilisation": "ce qu'une chambre autorise sur le corps de ses "
+                               "rapports, et à quelles conditions",
 }
 
 
@@ -280,6 +361,7 @@ def main() -> None:
         compte["verdict_recalcule_articles_muets"] = base.execute(
             "SELECT COUNT(*) FROM verdict WHERE verdict = 'raison_non_documentee'"
         ).fetchone()[0]
+    table_regimes(base)
     table_diffusion(base, source, strict, compte)
     base.commit()
     violations = list(base.execute("PRAGMA foreign_key_check"))
