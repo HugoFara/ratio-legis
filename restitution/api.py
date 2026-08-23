@@ -32,7 +32,7 @@ Usage :
 
 from __future__ import annotations
 
-import dataclasses
+from dataclasses import asdict, is_dataclass
 import os
 import sqlite3
 import sys
@@ -46,6 +46,7 @@ from starlette.requests import Request
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import graphe  # noqa: E402
 import note  # noqa: E402
+import retentissement  # noqa: E402
 import surlignage  # noqa: E402
 
 BASE = Path(os.environ.get("RATIO_LEGIS_BASE", "travail/ratio-legis.sqlite"))
@@ -112,7 +113,14 @@ def enveloppe(charge: dict[str, Any]) -> dict[str, Any]:
 
 
 def sans_ensembles(valeur: Any) -> Any:
-    """`interroger` rend un `set` ; JSON n'en connaît pas, et l'ordre doit être stable."""
+    """`interroger` rend un `set` ; JSON n'en connaît pas, et l'ordre doit être stable.
+
+    Il rend aussi des `Passage` — les extraits classés par `proximite.py`. Un
+    `dataclass` n'est pas non plus du JSON, et le sérialiser à la main ailleurs
+    ferait diverger la sortie de l'API de celle des autres rendus.
+    """
+    if is_dataclass(valeur) and not isinstance(valeur, type):
+        return sans_ensembles(asdict(valeur))
     if isinstance(valeur, set):
         return sorted(map(str, valeur))
     if isinstance(valeur, dict):
@@ -135,6 +143,9 @@ def racine() -> dict:
                                        "contrat du § 4.3",
             "/articles/{numero}/surlignage": "chaque alinéa, et le texte qui l'a "
                                              "introduit",
+            "/articles/{numero}/retentissement": "si je modifie cet article, "
+                                                 "qu'est-ce qui bouge",
+            "/renvois/sommet": "les articles que le plus d'autres articles citent",
             "/mesures": "métriques d'hygiène législative",
             "/attribution": "les mentions obligatoires, en entier",
             "/sante": "état de la base servie",
@@ -216,7 +227,7 @@ def note_article(numero: str, base: sqlite3.Connection = Depends(connexion)) -> 
     return enveloppe({
         "numero": numero,
         "verdict": donnees.get("verdict"),
-        "constats": [dataclasses.asdict(p) for p in retenus],
+        "constats": [asdict(p) for p in retenus],
         "etat_du_dossier": etat,
         "ecartees_faute_de_citation": len(ecartees),
         "contrat": "Toute phrase affirmative porte une citation résoluble "
@@ -261,6 +272,45 @@ def surlignage_html(numero: str,
     if not donnees:
         raise HTTPException(404, f"aucun article {numero} en vigueur dans ce fonds")
     return surlignage.en_html(donnees)
+
+
+# --------------------------------------------------------- ce qui retentit
+# La question du légiste, et non celle du chercheur : `graphe.py` remonte à
+# l'origine, celui-ci descend aux conséquences. Voir `retentissement.py`.
+@app.get("/articles/{numero}/retentissement",
+         summary="Si je modifie cet article, qu'est-ce qui bouge")
+def retentissement_article(
+        numero: str, base: sqlite3.Connection = Depends(connexion),
+        profondeur: int = Query(retentissement.PROFONDEUR, ge=1, le=6)) -> dict:
+    donnees = retentissement.retentir(base, numero, profondeur)
+    if not donnees:
+        raise HTTPException(404, f"aucun article {numero} en vigueur dans ce fonds")
+    return enveloppe({**donnees, "ce_que_l_onde_dit":
+                      "Le rang 1 cite cet article ; le rang n cite un article du "
+                      "rang n-1. Arête renvoie_a, dérivée du texte des articles et "
+                      "munie de sa fenêtre de preuve. La liste dit ce qu'il faudrait "
+                      "relire, jamais ce qu'il faudrait y écrire."})
+
+
+@app.get("/articles/{numero}/retentissement.html", response_class=HTMLResponse,
+         summary="Le même retentissement, à lire")
+def retentissement_html(
+        numero: str, base: sqlite3.Connection = Depends(connexion),
+        profondeur: int = Query(retentissement.PROFONDEUR, ge=1, le=6)) -> str:
+    donnees = retentissement.retentir(base, numero, profondeur)
+    if not donnees:
+        raise HTTPException(404, f"aucun article {numero} en vigueur dans ce fonds")
+    return retentissement.en_html(donnees)
+
+
+@app.get("/renvois/sommet", summary="Les articles que le plus d'autres articles citent")
+def renvois_sommet(base: sqlite3.Connection = Depends(connexion),
+                   limite: int = Query(retentissement.SOMMET, ge=1, le=500)) -> dict:
+    return enveloppe({"mesure": "nombre d'articles en vigueur qui renvoient à "
+                                "celui-ci, au rang 1. Mesure de structure : elle ne "
+                                "dit pas qu'un article compte, elle dit combien "
+                                "d'autres le nomment.",
+                      "articles": retentissement.sommet(base, limite)})
 
 
 @app.get("/articles/{numero}/graphe.txt", response_class=PlainTextResponse,
