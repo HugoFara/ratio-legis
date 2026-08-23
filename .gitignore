@@ -1,2 +1,7 @@
 __pycache__/
 *.pyc
+
+# PDF des études d'impact et avis du Conseil d'État. Volumineux et retéléchargeables
+# depuis `data/corpus/plan-impacts.tsv`, qui est versionné — même raison que pour le
+# miroir DILA. Le texte extrait, lui, est suivi avec les autres documents du corpus.
+travail/corpus/impacts/*.pdf

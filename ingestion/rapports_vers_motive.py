@@ -38,7 +38,8 @@ fenêtre plus étroite où l'article est nommé. Les deux sont nécessaires : la
 première sert la restitution, la seconde sert le contrôle.
 
 Usage :
-    rapports_vers_motive.py <corpus/rapports> <perimetre.csv> <plan.tsv> <base.sqlite>
+    rapports_vers_motive.py <corpus/rapports> <perimetre.csv> <plan.tsv>
+                            <base.sqlite> [plan-impacts.tsv]
 """
 
 from __future__ import annotations
@@ -84,9 +85,18 @@ def fenetre_preuve(texte: str, debut: int, fin: int) -> str | None:
     return extrait if len(extrait) >= FENETRE_MINI else None
 
 
+MARQUEURS = (("expose-motifs", "expose_des_motifs"),
+             ("etude-impact", "etude_impact"),
+             ("avis-ce", "avis_conseil_etat"),
+             ("rapport-pr", "rapport_president_republique"))
+
+
 def type_document(nom: str) -> str:
-    return ("rapport_president_republique" if "rapport-pr" in nom
-            else "rapport_commission")
+    """Le type se lit dans le nom du fichier, posé par l'outil qui l'a écrit."""
+    for marqueur, type_document in MARQUEURS:
+        if marqueur in nom:
+            return type_document
+    return "rapport_commission"
 
 
 def urls_du_plan(plan: Path) -> dict[str, str]:
@@ -123,6 +133,35 @@ def url_rapport_pr(nom: str) -> str | None:
             if trouve and "rapport-pr" in nom else None)
 
 
+def urls_des_impacts(plan: Path | None) -> dict[str, str]:
+    """Nom de fichier local → URL du PDF, pour les études d'impact et avis.
+
+    Ces documents n'ont pas de page propre : leur seule adresse est celle du PDF
+    servi par le chemin média de Légifrance. Sans elle, ils entreraient sans
+    citation résoluble, et le § 4.3 les écarterait.
+    """
+    if plan is None or not plan.exists():
+        return {}
+    noms = {"etude_impact": "etude-impact", "avis_conseil_etat": "avis-ce"}
+    liens = {}
+    for ligne in csv.DictReader(plan.open(encoding="utf-8"), delimiter="\t"):
+        liens[f"{ligne['dossier']}__{noms[ligne['type']]}-{ligne['rang']}.txt"] = \
+            ligne["url"]
+    return liens
+
+
+def url_dossier(nom: str) -> str | None:
+    """URL d'un exposé des motifs, qui n'a pas d'adresse propre.
+
+    L'exposé n'est pas un document publié à part : il est une balise du dossier
+    DOLE. Sa citation résout donc sur la page du dossier — et celle-ci n'est plus
+    sur Légifrance, qui redirige les dossiers législatifs vers vie-publique.fr.
+    """
+    trouve = re.search(r"(JORFDOLE\d+)", nom)
+    return (f"https://www.vie-publique.fr/dossierlegislatif/{trouve.group(1)}"
+            if trouve and "expose-motifs" in nom else None)
+
+
 def rattachements_legi(perimetre: Path) -> tuple[dict[str, set[str]], dict[str, str],
                                                  dict[str, int | None]]:
     """Ce que LEGI déclare : article → dossiers, dossier → titre du texte.
@@ -147,12 +186,13 @@ def rattachements_legi(perimetre: Path) -> tuple[dict[str, set[str]], dict[str, 
 
 
 def main() -> None:
-    if len(sys.argv) != 5:
+    if not 5 <= len(sys.argv) <= 6:
         sys.exit(__doc__)
-    dossier_rapports, perimetre, plan, chemin_base = (Path(a) for a in sys.argv[1:])
+    dossier_rapports, perimetre, plan, chemin_base = (Path(a) for a in sys.argv[1:5])
+    plan_impacts = Path(sys.argv[5]) if len(sys.argv) == 6 else None
 
     legi, titres, legislatures = rattachements_legi(perimetre)
-    liens = urls_du_plan(plan)
+    liens = urls_du_plan(plan) | urls_des_impacts(plan_impacts)
 
     base = sqlite3.connect(chemin_base)
     base.execute("PRAGMA foreign_keys = ON")
@@ -196,7 +236,8 @@ def main() -> None:
         dossier = fichier.name.split("__", 1)[0]
         if dossier not in titres:
             continue          # dossier hors périmètre : rien à motiver
-        url = liens.get(fichier.name) or url_rapport_pr(fichier.name)
+        url = (liens.get(fichier.name) or url_rapport_pr(fichier.name)
+               or url_dossier(fichier.name))
         if not url:
             sans_url += 1
             continue          # § 4.3 : pas de citation résoluble, pas de document

@@ -12,7 +12,7 @@ sans citation résoluble au niveau du passage.
 
 Spécification complète : [`ratio-legis-feuille-de-route.md`](ratio-legis-feuille-de-route.md).
 
-## État : neuf tranches en base, validation humaine de la phase 0 toujours ouverte
+## État : dix tranches en base, validation humaine de la phase 0 toujours ouverte
 
 Le graphe est chargé et interrogeable article par article. Ce qu'il ne peut pas
 encore faire, c'est se déclarer conforme : le critère de sortie de la phase 2
@@ -32,7 +32,7 @@ Reconstruite d'une commande depuis le miroir et les plans versionnés
 | Articles (dont **2 139 en vigueur**) | 3 428 | `produite_par` — quel texte a produit la version | 7 809 |
 | Versions d'articles | 6 131 | `repris_de` — continuité d'un alinéa par-delà la recodification | 5 766 |
 | **Segments (alinéas)** | **26 524** | `renumerote_de` | 1 877 |
-| Documents parlementaires | 258 | `motive` — un passage qui motive, avec offsets | 519 |
+| Documents (rapports, exposés, études d'impact, avis) | 337 | `motive` — un passage qui motive, avec offsets | 519 |
 | Amendements (20 342 Sénat, 11 115 Assemblée) | 31 457 | `renvoie_a` — le graphe de renvois | 11 656 |
 | Acteurs | 1 419 | `resulte_de` — l'amendement qui a écrit l'alinéa | 286 |
 | **Actes de l'Union** | **284** | `cite_acte_ue` / `transpose` | 1 478 / 8 |
@@ -44,7 +44,11 @@ compte pour le produit :
 | | |
 |---|---:|
 | Articles cités par un autre article du fonds | **1 064 (49,7 %)** |
-| Articles atteignant un rapport au Président — grain : le texte entier | 997 |
+| **Articles atteignant un document motivant le texte** — grain : le texte entier | **1 160** |
+| dont par un rapport au Président | 997 |
+| dont par un exposé des motifs | 147 |
+| dont par une étude d'impact | 125 |
+| dont par un avis du Conseil d'État | 125 |
 | Articles nommant un acte de l'Union | 113 |
 | Articles atteignant un considérant européen — grain : l'acte entier | 113 |
 | Articles atteignant une transposition déclarée — grain : le texte entier | 63 |
@@ -70,7 +74,8 @@ l'autre.
 | 6. Assemblée nationale | la XIVe législature, les deux chambres chargées | [`docs/11`](docs/11-tranche-assemblee.md) |
 | 7. But déclaré et rapports au Président | l'objet de l'amendement, la motivation des ordonnances | [`docs/12`](docs/12-but-declare.md) |
 | 8. Couche européenne | l'acte de l'Union que l'article cite, la transposition déclarée | [`docs/13`](docs/13-couche-europeenne.md) |
-| 9. **Considérants** | le motif que l'Union écrit elle-même, et l'article visé de l'acte | [`docs/14`](docs/14-considerants.md) |
+| 9. Considérants | le motif que l'Union écrit elle-même, et l'article visé de l'acte | [`docs/14`](docs/14-considerants.md) |
+| 10. **Motivation gouvernementale** | exposé des motifs, étude d'impact, avis du Conseil d'État | [`docs/15`](docs/15-motivation-gouvernementale.md) |
 
 ### Reconstruire
 
@@ -240,15 +245,19 @@ aucune mesure de précision du projet n'est autre chose qu'une auto-évaluation.
    113 articles atteints ([`docs/14`](docs/14-considerants.md)). Reste ouvert le
    seul chemin connu vers un lien au grain de l'article : les tableaux de
    concordance annexés aux textes de transposition.
-2. **Les études d'impact.** Obligatoires depuis 2009 pour tout projet de loi,
-   elles chiffrent ce que le législateur croyait faire. Les confronter au texte
-   adopté est le seul endroit du projet où l'on pourra montrer un écart entre
-   l'intention annoncée et le dispositif voté — c'est-à-dire le second but du
-   produit. Coût réel : ce sont des PDF, et les offsets doivent survivre.
-3. **Les avis du Conseil d'État**, publics depuis 2015. Le § 4.3 impose de
-   distinguer ce que le Conseil d'État a **objecté** ; cette colonne est vide. Un
-   article adopté malgré une objection est un fait qui n'existe nulle part
-   ailleurs.
+2. ~~Les études d'impact.~~ ~~Les avis du Conseil d'État.~~ **Chargés** : 25
+   études, 15 avis, 39 exposés des motifs, 125 à 147 articles atteints chacun
+   ([`docs/15`](docs/15-motivation-gouvernementale.md)). Mais **au grain du texte
+   seulement** : aucune de ces trois sources n'emploie la convention de citation
+   en en-tête qui produit une arête au grain de l'article, et le rapprochement par
+   le numéro d'article du projet est faux, les articles étant renumérotés à chaque
+   lecture. Confronter l'impact annoncé au dispositif voté — le second but du
+   produit — suppose d'abord de charger les textes déposés.
+
+**Ce qui reste, pour descendre au grain de l'article.** Les textes déposés :
+c'est la pièce qui manque à trois chantiers à la fois — le dernier mode d'échec de
+`resulte_de`, le rapprochement de l'étude d'impact, et les tableaux de concordance
+qui apparient un article de directive à un article du code.
 
 **Trous de couverture dans ce qui existe.** Les amendements de l'Assemblée pour
 les législatures XV à XVII (103 articles éligibles, mécanique). La XIIIe, jamais
@@ -284,11 +293,12 @@ python3 restitution/graphe.py base.sqlite L224-43
 python3 restitution/graphe.py base.sqlite L111-1 --html sortie.html
 ```
 
-Quatre rendus versionnés dans `restitution/exemples/`, choisis pour ce qu'ils
+Cinq rendus versionnés dans `restitution/exemples/`, choisis pour ce qu'ils
 montrent : **L224-43** une chaîne complète jusqu'à l'amendement et son but déclaré,
 **L111-1** un article très cité, **L511-7** un article que le droit de l'Union
 sature, **L112-1-1** un article sans aucune motivation parlementaire dont la seule
-raison connue est une directive.
+raison connue est une directive, **L122-23** les quatre paroles du § 4.3 côte à
+côte — Gouvernement, chiffrage, Conseil d'État, Parlement.
 
 La restitution n'ajoute aucune donnée : elle applique les règles § 5.1 (provenance
 ou silence), § 5.4 (la confiance est une donnée) et § 4.3 (toute phrase produite

@@ -22,7 +22,7 @@ CODE=LEGITEXT000006069565          # code de la consommation
 
 etape() { printf '\n\033[1m== %s\033[0m\n' "$*"; }
 
-mkdir -p "$TRAVAIL"/{conso,corpus/rapports,corpus/ameli,an}
+mkdir -p "$TRAVAIL"/{conso,corpus/rapports,corpus/ameli,corpus/impacts,an}
 
 # --------------------------------------------------------------- 1. fonds LEGI
 etape "1. Extraction du code depuis le miroir LEGI"
@@ -56,6 +56,25 @@ if [ "$(ls "$TRAVAIL/corpus/rapports" | grep -c rapport-pr)" -lt 30 ]; then
 else
   echo "   $(ls "$TRAVAIL/corpus/rapports" | grep -c rapport-pr) rapports au Président déjà présents"
 fi
+
+# L'exposé des motifs est dans le XML DOLE lui-même, sous <EXPOSE_MOTIF> : ni
+# téléchargement, ni PDF, ni OCR. C'est la colonne « ce que le Gouvernement a
+# déclaré vouloir » du § 4.3.
+if [ "$(ls "$TRAVAIL/corpus/rapports" | grep -c expose-motifs)" -lt 30 ]; then
+  python3 "$RACINE/tools/dila/exposes_motifs.py" "$MIROIR" \
+          "$RACINE/data/perimetre-v1.csv" "$TRAVAIL/corpus/rapports"
+else
+  echo "   $(ls "$TRAVAIL/corpus/rapports" | grep -c expose-motifs) exposés déjà présents"
+fi
+
+etape "2 bis. Études d'impact et avis du Conseil d'État"
+# Les seuls documents du corpus qui n'existent qu'en PDF. DOLE n'en porte que le
+# lien ; le plan est versionné pour retélécharger sans retraverser l'archive.
+IMPACTS="$RACINE/data/corpus/plan-impacts.tsv"
+[ -s "$IMPACTS" ] || python3 "$RACINE/tools/dila/plan_impacts.py" "$MIROIR" \
+        "$RACINE/data/perimetre-v1.csv" "$IMPACTS"
+python3 "$RACINE/tools/dila/telecharger_impacts.py" "$IMPACTS" \
+        "$TRAVAIL/corpus/impacts" "$TRAVAIL/corpus/rapports"
 
 # ------------------------------------------------------- 3. amendements Sénat
 etape "3. Jeux d'amendements Améli (Sénat)"
@@ -100,7 +119,8 @@ etape "5. Ingestion"
 rm -f "$BASE"
 python3 "$RACINE/ingestion/legi_vers_graphe.py" "$TRAVAIL/conso" "$BASE"
 python3 "$RACINE/ingestion/rapports_vers_motive.py" "$TRAVAIL/corpus/rapports" \
-        "$RACINE/data/perimetre-v1.csv" "$RACINE/data/corpus/plan-rapports.tsv" "$BASE"
+        "$RACINE/data/perimetre-v1.csv" "$RACINE/data/corpus/plan-rapports.tsv" \
+        "$BASE" "$IMPACTS"
 python3 "$RACINE/ingestion/renvois.py" "$BASE"
 python3 "$RACINE/ingestion/an_vers_amendements.py" "$TRAVAIL/an/amendements_14.csv" \
         "$TRAVAIL/an/acteurs_historique.json.zip" "$BASE"

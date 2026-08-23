@@ -62,6 +62,22 @@ SUBDIVISION = re.compile(r"art(?:icle)?\.?\s*(?:add\.?\s*)?(?:apr[èe]s\s*)?"
 
 MOT_TYPE = {"directive": "directive", "reglement": "règlement",
             "decision": "décision"}
+# Le § 4.3 impose de distinguer à l'écran qui parle. Ces deux documents motivent
+# le texte entier et sont tous deux la parole du Gouvernement, mais l'un précède
+# le débat et l'autre le remplace : un projet de loi expose ses motifs devant le
+# Parlement, une ordonnance rend compte au Président.
+LIBELLE_DOCUMENT = {
+    "expose_des_motifs": "exposé des motifs du Gouvernement",
+    "etude_impact": "étude d'impact",
+    "avis_conseil_etat": "avis du Conseil d'État",
+    "rapport_president_republique": "rapport au Président de la République",
+}
+# L'ordre d'affichage suit celui de la procédure, non celui de la base : ce que
+# le Gouvernement a voulu, ce qu'il a chiffré, ce que le Conseil d'État a
+# objecté — et, pour une ordonnance, le rapport qui remplace tout cela.
+ORDRE_DOCUMENT = {t: r for r, t in enumerate(
+    ("expose_des_motifs", "etude_impact", "avis_conseil_etat",
+     "rapport_president_republique"))}
 
 
 def nommer(acte) -> str:
@@ -178,7 +194,7 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
     # restitution doit le dire, sous peine de laisser croire que ce passage
     # explique cet article-là.
     d["motivation_du_texte"] = q("""
-        SELECT DISTINCT t.titre, doc.url,
+        SELECT DISTINCT t.titre, doc.url, doc.type,
                replace(replace(substr(doc.texte, 1, 900), char(10), ' '), char(13), '')
                AS extrait, length(doc.texte) AS taille
         FROM version_article v JOIN article a ON a.id = v.article_id
@@ -186,7 +202,10 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
         JOIN texte_normatif t ON t.id_jorf = p.texte_id
         JOIN issu_de i ON i.texte_id = t.id_jorf
         JOIN document doc ON doc.dossier_id = i.dossier_id
-        WHERE a.numero = ? AND doc.type = 'rapport_president_republique'""", numero)
+        WHERE a.numero = ? AND doc.type IN ('rapport_president_republique',
+                                            'expose_des_motifs', 'etude_impact',
+                                            'avis_conseil_etat')""", numero)
+    d["motivation_du_texte"].sort(key=lambda m: ORDRE_DOCUMENT[m["type"]])
 
     # La transposition n'est retenue que si le texte français la déclare dans son
     # intitulé au Journal officiel. Elle porte sur le texte entier, comme le
@@ -263,11 +282,13 @@ def en_texte(d: dict) -> str:
         L.append(f"    « {r['extrait'][:600].strip()}… »")
 
     for m in d["motivation_du_texte"]:
-        L.append(f"\n  [rapport au Président de la République] lien déclaré, "
+        L.append(f"\n  [{LIBELLE_DOCUMENT[m['type']]}] lien déclaré, "
                  f"{m['taille']} caractères")
         L.append(f"  {m['url']}")
         L.append(f"  ⚠ porte sur « {m['titre']} » dans son entier, non sur cet article")
-        L.append(f"    « {m['extrait'][:500].strip()}… »")
+        # Début du document, et rien d'autre : aucun passage n'est désigné comme
+        # motivant cet article-ci, et en choisir un serait le prétendre.
+        L.append(f"    début du document : « {m['extrait'][:500].strip()}… »")
 
     for tr in d["transposition"]:
         L.append(f"\n  [transposition déclarée] {nommer(tr)}")
@@ -413,11 +434,12 @@ font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-seri
                  f'<a href="{e(r["url"])}">document</a></div></div>')
 
     for m in d["motivation_du_texte"]:
-        p.append(f'<div class="raison"><div class="meta"><span>rapport au Président '
-                 f'de la République</span><span>lien déclaré</span>'
+        p.append(f'<div class="raison"><div class="meta">'
+                 f'<span>{e(LIBELLE_DOCUMENT[m["type"]])}</span><span>lien déclaré</span>'
                  f'<a href="{e(m["url"])}">document</a></div>'
-                 f'<p class="silence">Ce passage motive « {e(m["titre"])} » dans son '
-                 f'entier, et non cet article en particulier.</p>'
+                 f'<p class="silence">Ce document motive « {e(m["titre"])} » dans '
+                 f'son entier, et non cet article en particulier. Rien n\'y désigne '
+                 f'le passage qui le concerne ; voici son début.</p>'
                  f'<div>« {e(m["extrait"][:700].strip())}… »</div></div>')
 
     for tr in d["transposition"]:
