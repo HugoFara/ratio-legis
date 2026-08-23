@@ -147,6 +147,75 @@ jumeaux. La borne d'index corrigée, la mesure passe à 57/59, soit 96,6 %.
 ajustée sur l'échantillon qui l'a produite ; la première ne l'est pas. Le § 5.4
 demande une donnée, pas le meilleur chiffre disponible.
 
+## 6 bis. Recensement complet : 93,9 %, et le seuil n'est pas atteint
+
+Soixante arêtes laissaient encore ±5,5 points d'incertitude. Un troisième
+tirage a donc pris **toutes les arêtes restantes** — 120, disjointes des deux
+premiers. Les 277 arêtes du graphe sont désormais examinées une à une : **il n'en
+reste aucune d'inconnue.**
+
+| | Tirage 1 | Tirage 2 | Recensement | **Hors-échantillon (2 + 3)** |
+|---|---:|---:|---:|---:|
+| Arêtes | 120 | 60 | 120 | **179** |
+| Justes | 100 | 57 | 111 | **168** |
+| Fausses | 19 | 2 | 7 | 8 |
+| Douteuses | 1 | 1 | 2 | 3 |
+| Précision | 83,3 % | 95,0 % | 92,5 % | **93,9 %** |
+| Borne de Wilson | 0,7565 | 0,8630 | — | **0,8933** |
+
+**Les 95,0 % du second tirage étaient une fluctuation de petit échantillon.** La
+mesure sur 179 arêtes hors-échantillon donne 93,9 %, et l'intervalle ne monte
+plus jusqu'à 95 %. Le seuil du § 4.2 n'est pas atteint — c'est maintenant une
+conclusion, non une incertitude. C'est 0,8933 qui est écrite dans le graphe.
+
+Le recensement complet du graphe corrigé donne 94,6 % (262/277). Ce chiffre porte
+sur les arêtes qui ont servi à corriger les gardes ; il décrit ce graphe-ci, il
+ne prédit rien.
+
+### Deux défauts de garde, révélés et corrigés
+
+Le recensement a montré que la garde sur le texte hôte laissait passer deux
+formes :
+
+- **le trait d'union insécable.** Les dispositifs du Sénat écrivent « loi
+  n° 78‑17 » avec U+2011. La classe de caractères ne reconnaissait que le tiret
+  ASCII, et un amendement à la loi Informatique et Libertés se rattachait à
+  L. 218-1 du code de la consommation ;
+- **la mention d'hôte à l'intérieur du passage cité.** Quand le dispositif ouvre
+  un guillemet sur un paragraphe entier — « III. – L'article L. 44 du code des
+  postes … est ainsi modifié : « … » — regarder ce qui précède le guillemet ne
+  suffit pas. La marque décisive n'est pas la mention seule, car un texte inséré
+  cite couramment un autre code sans le modifier, mais la mention **suivie d'une
+  formule modificative**.
+
+Les deux corrections retirent exactement les deux arêtes visées et une troisième
+juste, sur 282 → 277.
+
+### Ce qui reste faux, et pourquoi
+
+Quinze arêtes sur 277 sont fausses ou douteuses, en quatre familles :
+
+| Famille | Arêtes | Exemple |
+|---|---:|---|
+| **Dispositions jumelles** | 5 | quatre amendements portant la même phrase sur la téléphonie et sur l'électricité rattachent tous L. 121-91-1 à la version téléphonie |
+| **Formule passe-partout dans un autre article du même code** | 5 | « … sont recherchés et constatés dans les conditions prévues au … » |
+| **Rédaction proposée non retenue** | 4 | l'amendement écrit « assorti d'un **programme** ouvrant droit à des avantages » ; le texte adopté dit « d'une **carte** » |
+| **Droit existant reproduit comme contexte** | 1 | L. 115-16 rendu applicable à Wallis en recopiant son texte |
+
+La quatrième famille est nouvelle et n'était pas visible sur 120 arêtes : un
+amendement **adopté** n'est pas forcément adopté *verbatim*. La fenêtre commune
+est alors le préfixe partagé entre ce qu'il proposait et ce qui a été voté.
+
+**Le correctif identifié pour la deuxième famille** est l'en-tête d'article que
+le dispositif déclare lui-même : « Art. L. 731-4. – … » dit où va le texte, et un
+segment de L. 121-49 ne peut pas en venir. C'est le principe déjà retenu pour
+`articles_nommes` — la déclaration prime — appliqué à l'intérieur du passage
+cité, ce qui suppose de découper celui-ci à chaque en-tête plutôt que de le
+traiter d'un bloc. Il retirerait trois des cinq arêtes de cette famille. Il n'est
+pas écrit ici : **il ne reste plus une seule arête non examinée pour le mesurer
+sur pièces neuves.** Sa validation attend les législatures XV à XVII de
+l'Assemblée.
+
 ## 7. La décision go/no-go du § 8
 
 Le § 8 prévoit une décision explicite en fin de phase 2 si la couverture de
@@ -186,11 +255,11 @@ d'amélioration prioritaire, sans être une condition de survie.
    des sources de la phase 0 ([`docs/01`](01-rapport-verification-sources.md)
    § 3.2). La cascade est donc amputée de son échelon le plus fiable, non par
    défaut d'implémentation mais faute d'objet ;
-2. **le seuil de précision de 95 % est atteint en estimation ponctuelle et non
-   démontré.** 57/60 donne 95,0 %, mais l'intervalle à 95 % descend à 0,863 :
-   avec soixante arêtes, on ne peut pas *établir* qu'on dépasse 95 %. Le démontrer
-   demande environ 200 arêtes examinées sans erreur. C'est un travail
-   d'échantillon, plus un travail de code.
+2. **le seuil de précision de 95 % n'est pas atteint** — 93,9 % sur 179 arêtes
+   hors-échantillon, borne de Wilson 0,8933 (§ 6 bis). Le graphe est intégralement
+   recensé : ce n'est plus une incertitude d'échantillon, c'est un écart mesuré de
+   l'ordre d'un point. Le combler demande des gardes supplémentaires, dont une est
+   identifiée, et un corpus neuf pour les valider.
 
 ## 8. Coût en rappel des gardes
 

@@ -29,9 +29,9 @@ navette	dossiers ayant au moins deux états datés	53
 navette	durée médiane, en jours	147			
 navette	durée la plus courte, en jours	1			
 navette	durée la plus longue, en jours	693			
-chambres	segments écrits par un amendement — assemblee	102			dénominateur faible : voir docs/09
+chambres	segments écrits par un amendement — assemblee	99			dénominateur faible : voir docs/09
 chambres	segments écrits par un amendement — senat	143			dénominateur faible : voir docs/09
-chambres	articles dont un alinéa est tracé jusqu'à un amendement	110			sans remonter la chaîne des segments
+chambres	articles dont un alinéa est tracé jusqu'à un amendement	109			sans remonter la chaîne des segments
 sources	documents — avis_conseil_etat	15			
 sources	documents — etude_impact	25			
 sources	documents — expose_des_motifs	39			

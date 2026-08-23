@@ -88,9 +88,23 @@ AVANT_SORTANT = re.compile(
 # que celui du segment. On retient la dernière mention de texte hôte qui précède
 # le guillemet ; l'absence de mention vaut « le même code », par convention
 # légistique.
+# Les tirets des numéros de loi ne sont pas tous des `-` : les dispositifs du
+# Sénat emploient le trait d'union insécable U+2011. « loi n° 78‑17 » échappait
+# ainsi à la reconnaissance de l'hôte, et un amendement à la loi Informatique et
+# Libertés se rattachait à L. 218-1 du code de la consommation.
+TIRETS = "\\u002d\\u2010-\\u2015"
 HOTE = re.compile(r"code\s+(?:de\s+la\s+|de\s+l'|du\s+|des\s+|d')?[a-zà-ÿ'’\s]{3,45}"
-                  r"|loi\s+n[°º]\s*[\d\s-]{4,12}"
-                  r"|ordonnance\s+n[°º]\s*[\d\s-]{4,12}", re.I)
+                  r"|loi\s+n[°º]\s*[\d\s" + TIRETS + r"]{4,12}"
+                  r"|ordonnance\s+n[°º]\s*[\d\s" + TIRETS + r"]{4,12}", re.I)
+
+# Un dispositif peut placer la mention de l'hôte **dans** le passage cité, quand
+# il ouvre un guillemet sur un paragraphe entier : « III. – L'article L. 44 du
+# code des postes … est ainsi modifié : « … ». Regarder ce qui précède le
+# guillemet ne suffit alors pas. La marque décisive n'est pas la mention seule —
+# un texte inséré cite couramment un autre code sans le modifier — mais la
+# mention **suivie d'une formule modificative**.
+MODIFICATIF = re.compile(r"\b(?:est|sont)\s+ainsi\s+(?:modifi|r[ée]dig|complét|rétabli)"
+                         r"|\b(?:est|sont)\s+(?:abrog|supprim|remplac)", re.I)
 
 
 def passages_inseres(dispositif: str) -> list[str]:
@@ -113,22 +127,29 @@ def passages_inseres(dispositif: str) -> list[str]:
         precedents = [nom for depart, nom in hotes if depart < m.start()]
         if precedents and "consommation" not in precedents[-1]:
             continue
+        cite = m.group(1)
+        if any("consommation" not in normalise(interne.group(0))
+               and MODIFICATIF.search(cite[interne.end():interne.end() + 60])
+               for interne in HOTE.finditer(cite)):
+            continue
         if len(norme := normalise(m.group(1))) >= FENETRE:
             gardes.append(norme)
     return gardes
 
-# Précision mesurée sur un tirage reproductible de 120 arêtes examinées une à une
-# (`data/mesures/precision-resulte-de.tsv`) : 100 justes, 19 fausses, 1 douteuse,
-# soit 83,3 %. Les quatre causes d'erreur relevées là ont donné les gardes
-# ci-dessus, puis un **second tirage, disjoint du premier**, les a mesurées sur
-# pièces neuves : 57 justes sur 60, 95,0 %.
+# Les 277 arêtes du graphe ont été examinées une à une, en trois tirages
+# reproductibles et disjoints (`data/mesures/precision-resulte-de*.tsv`). Le
+# premier, sur le code d'avant les gardes ci-dessus, a servi à les concevoir ;
+# les deux suivants les mesurent sur pièces neuves : **168 justes sur 179, soit
+# 93,9 %**, borne inférieure de Wilson à 95 % de 0,8933.
 #
-# La valeur écrite est la borne inférieure de Wilson à 95 % de ce second tirage,
-# et non celle du code d'aujourd'hui : la mesure de 96,6 % obtenue après
-# correction d'une borne d'index que ce tirage a révélée est, elle, ajustée sur
-# l'échantillon qui l'a produite. On écrit la mesure non ajustée.
-# Voir `docs/21-precision-resulte-de.md`.
-CONFIANCE = 0.8630
+# C'est cette borne non ajustée qui est écrite, et non les 94,6 % du
+# recensement complet du graphe corrigé : ce dernier chiffre porte sur les
+# arêtes mêmes qui ont servi à corriger deux défauts de garde.
+#
+# Le seuil de 95 % du § 4.2 n'est donc **pas atteint**, et l'échantillon est
+# désormais assez grand pour que ce soit une conclusion et non une incertitude.
+# Voir `docs/21-precision-resulte-de.md` § 6 bis.
+CONFIANCE = 0.8933
 
 
 def charger_amendements(base: sqlite3.Connection, racine: Path) -> dict:
