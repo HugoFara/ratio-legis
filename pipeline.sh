@@ -107,6 +107,22 @@ python3 "$RACINE/ingestion/an_vers_amendements.py" "$TRAVAIL/an/amendements_14.c
 python3 "$RACINE/ingestion/amendements_vers_resulte_de.py" "$TRAVAIL/corpus/ameli" "$BASE"
 python3 "$RACINE/ingestion/visees.py" "$BASE"
 
+# ------------------------------------------------------- 6. couche européenne
+etape "6. Droit de l'Union"
+# L'intitulé complet d'un texte est au Journal officiel, pas dans LEGI : c'est
+# lui qui déclare une transposition. Le plan est versionné, donc régénéré
+# seulement s'il manque — l'extraction traverse une archive de 1,6 Go.
+TITRES="$RACINE/data/corpus/titres-jorf.tsv"
+[ -s "$TITRES" ] || python3 "$RACINE/tools/dila/titres_jorf.py" "$MIROIR" "$BASE" "$TITRES"
+
+# Les CELEX sont construits depuis le texte français, donc vérifiés un à un
+# auprès de Cellar. Seule étape du projet qui demande le réseau ; son résultat
+# est versionné pour que tout le reste reste rejouable hors ligne.
+CELEX="$RACINE/data/corpus/celex-verifies.tsv"
+[ -s "$CELEX" ] || python3 "$RACINE/tools/ue/verifier_celex.py" "$BASE" "$CELEX"
+
+python3 "$RACINE/ingestion/union_europeenne.py" "$BASE" "$CELEX" "$TITRES"
+
 etape "Terminé"
 echo "base : $BASE ($(du -h "$BASE" | cut -f1))"
 echo "essai : python3 restitution/graphe.py $BASE L224-43"

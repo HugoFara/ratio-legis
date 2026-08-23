@@ -36,6 +36,9 @@ from pathlib import Path
 
 import re
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "ingestion"))
+from union_europeenne import ANCRE  # noqa: E402
+
 SEUIL_APPARIEMENT = 60          # sous ce seuil, aucune preuve textuelle ne discrimine
 
 # Numéro de l'article du PROJET de loi, tel que l'amendement et le commentaire de
@@ -54,6 +57,24 @@ SEUIL_APPARIEMENT = 60          # sous ce seuil, aucune preuve textuelle ne disc
 # retiré (docs/12 § 3).
 SUBDIVISION = re.compile(r"art(?:icle)?\.?\s*(?:add\.?\s*)?(?:apr[èe]s\s*)?"
                          r"(?:art(?:icle)?\.?\s*)?(\d+)", re.I)
+
+
+MOT_TYPE = {"directive": "directive", "reglement": "règlement",
+            "decision": "décision"}
+
+
+def nommer(acte) -> str:
+    """Désignation lisible d'un acte de l'Union.
+
+    `denomination` est la forme littéralement écrite dans le code, et une
+    citation en énumération ne porte pas son mot-type : « les règlements (CE)
+    n° 1184/2006 et n° 1224/2009 » ne laisse, pour le second, que
+    « n° 1224/2009 ». Le mot manquant n'est pas inventé — il vient du pluriel qui
+    gouverne l'énumération, et c'est lui qui a fixé `type_acte` à l'ingestion.
+    """
+    mot = MOT_TYPE[acte["type_acte"]]
+    return acte["denomination"] if ANCRE.match(acte["denomination"]) \
+        else f"{mot} {acte['denomination']}"
 
 
 def article_du_projet(subdivision: str | None) -> str | None:
@@ -107,7 +128,14 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
             GROUP BY am.id""", segment["id"])
         renvois = q("""SELECT numero_cite, portee, code_cite FROM renvoie_a
                        WHERE segment_id = ? ORDER BY numero_cite""", segment["id"])
+        # « cite » et rien de plus : voir schema/004-union.sql. Un alinéa peut
+        # nommer une directive pour l'écarter ; la qualification du lien n'est
+        # pas dans les données, elle n'est donc pas affichée.
+        actes = q("""SELECT u.celex, u.denomination, u.url, u.type_acte
+                     FROM cite_acte_ue c JOIN acte_ue u ON u.celex = c.celex
+                     WHERE c.segment_id = ? ORDER BY c.offset_debut""", segment["id"])
         d["alineas"].append({**segment, "amendements": amendements, "renvois": renvois,
+                             "actes_ue": actes,
                              "appariable": len(segment["texte"]) >= SEUIL_APPARIEMENT})
 
     d["raisons"] = q("""
@@ -155,6 +183,20 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
         JOIN document doc ON doc.dossier_id = i.dossier_id
         WHERE a.numero = ? AND doc.type = 'rapport_president_republique'""", numero)
 
+    # La transposition n'est retenue que si le texte français la déclare dans son
+    # intitulé au Journal officiel. Elle porte sur le texte entier, comme le
+    # rapport au Président : l'avertissement est le même.
+    d["transposition"] = q("""
+        SELECT DISTINCT u.denomination, u.type_acte, u.url, t.titre, p.fenetre
+        FROM version_article v
+        JOIN article a          ON a.id = v.article_id
+        JOIN produite_par pp    ON pp.version_id = v.id_legi
+        JOIN texte_normatif t   ON t.id_jorf = pp.texte_id
+        JOIN transpose tr       ON tr.texte_id = t.id_jorf
+        JOIN acte_ue u          ON u.celex = tr.celex
+        LEFT JOIN preuve p      ON p.id = tr.preuve_id
+        WHERE a.numero = ?""", numero)
+
     d["cite_par"] = q("""SELECT article_citant,
                                 min((SELECT fenetre FROM preuve WHERE id = preuve_id)) AS extrait
                          FROM renvois_entrants WHERE article_cite = ?
@@ -194,6 +236,12 @@ def en_texte(d: dict) -> str:
         L.append(f"  ⚠ porte sur « {m['titre']} » dans son entier, non sur cet article")
         L.append(f"    « {m['extrait'][:500].strip()}… »")
 
+    for tr in d["transposition"]:
+        L.append(f"\n  [transposition déclarée] {nommer(tr)}")
+        L.append(f"  {tr['url']}")
+        L.append(f"  déclarée par l'intitulé de « {tr['titre']} », "
+                 "qui porte sur le texte entier, non sur cet article")
+
     L.append(f"\nALINÉAS ({len(d['alineas'])})")
     for a in d["alineas"]:
         L.append(f"\n  [{a['ordre']}] {a['texte'][:150]}{'…' if len(a['texte']) > 150 else ''}")
@@ -218,6 +266,9 @@ def en_texte(d: dict) -> str:
             L.append("        renvoie à : " + ", ".join(
                 f"{r['numero_cite']}" + (f" [{r['code_cite']}]" if r["code_cite"] else "")
                 for r in a["renvois"]))
+        for u in a["actes_ue"]:
+            L.append(f"        cite {nommer(u)}")
+            L.append(f"          {u['url']}")
 
     L.append(f"\nCE QUI CITE CET ARTICLE ({len(d['cite_par'])})")
     L.append("  " + ", ".join(c["article_citant"] for c in d["cite_par"]) if d["cite_par"]
@@ -311,6 +362,15 @@ font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-seri
                  f'entier, et non cet article en particulier.</p>'
                  f'<div>« {e(m["extrait"][:700].strip())}… »</div></div>')
 
+    for tr in d["transposition"]:
+        p.append(f'<div class="raison"><div class="meta">'
+                 f'<span>transposition déclarée</span>'
+                 f'<span class="conf">confiance 1.000</span><span>declaree</span>'
+                 f'<a href="{e(tr["url"])}">acte de l\'Union</a></div>'
+                 f'<div>{e(nommer(tr))}</div>'
+                 f'<p class="silence">Déclarée par l\'intitulé de « {e(tr["titre"])} », '
+                 f'qui porte sur le texte entier, non sur cet article.</p></div>')
+
     p.append(f"<h2>Alinéas et provenance ({len(d['alineas'])})</h2>")
     for a in d["alineas"]:
         p.append(f'<div class="al{" tracee" if a["amendements"] else ""}">'
@@ -341,6 +401,10 @@ font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-seri
                 f'<span>{e(r["numero_cite"])}'
                 + (f' · {e(r["code_cite"])}' if r["code_cite"] else "") + "</span>"
                 for r in a["renvois"]) + "</div>")
+        if a["actes_ue"]:
+            p.append('<div class="puces">cite&nbsp;' + "".join(
+                f'<span><a href="{e(u["url"])}">{e(nommer(u))}</a></span>'
+                for u in a["actes_ue"]) + "</div>")
         p.append("</div>")
 
     p.append(f"<h2>Ce qui cite cet article ({len(d['cite_par'])})</h2>")
