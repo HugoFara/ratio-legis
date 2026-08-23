@@ -211,6 +211,7 @@ def main() -> None:
             for numero, md, mf in mentions(corps):
                 candidats.append({
                     "document": identifiant, "dossier": dossier, "numero": numero,
+                    "article_du_texte": section["article_du_texte"],
                     "offset_debut": debut, "offset_fin": fin,
                     "mention": (debut + md, debut + mf),
                     "en_tete": numero in {n for n, _, _ in mentions(declaration)},
@@ -257,16 +258,18 @@ def main() -> None:
         vus.add((c["document"], article_id))
         preuves.append((prochaine_preuve, "citation_dans_un_rapport", extrait,
                         c["mention"][0], None))
-        aretes.append((c["document"], article_id, c["offset_debut"], c["offset_fin"],
-                       "derivee", CONFIANCE, prochaine_preuve))
+        aretes.append((c["document"], article_id, c["article_du_texte"],
+                       c["offset_debut"], c["offset_fin"], "derivee", CONFIANCE,
+                       prochaine_preuve))
         prochaine_preuve += 1
 
     base.executemany(
         "INSERT INTO preuve (id, methode, fenetre, source_offset, cible_offset) "
         "VALUES (?, ?, ?, ?, ?)", preuves)
     base.executemany(
-        "INSERT INTO motive (document_id, article_id, offset_debut, offset_fin, "
-        "methode, confiance, preuve_id) VALUES (?, ?, ?, ?, ?, ?, ?)", aretes)
+        "INSERT INTO motive (document_id, article_id, article_du_texte, offset_debut,"
+        " offset_fin, methode, confiance, preuve_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        aretes)
     base.commit()
 
     violations = base.execute("PRAGMA foreign_key_check").fetchall()

@@ -223,8 +223,12 @@ CREATE TABLE repris_de (
 -- République ne nomme l'article que dans 2 cas sur 25, il motive l'ordonnance
 -- entière et la restitution doit le dire.
 CREATE TABLE motive (
-    id            INTEGER PRIMARY KEY,
-    document_id   INTEGER NOT NULL REFERENCES document,
+    id                INTEGER PRIMARY KEY,
+    document_id       INTEGER NOT NULL REFERENCES document,
+    -- Article du TEXTE en discussion que commente la section, jamais du code.
+    -- Sans lui, impossible de confronter un amendement au commentaire censé le
+    -- motiver : c'est la seule clef structurelle commune aux deux.
+    article_du_texte  TEXT,
     segment_id    TEXT REFERENCES segment,
     article_id    INTEGER REFERENCES article,
     offset_debut  INTEGER NOT NULL,

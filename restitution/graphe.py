@@ -34,7 +34,31 @@ import sqlite3
 import sys
 from pathlib import Path
 
+import re
+
 SEUIL_APPARIEMENT = 60          # sous ce seuil, aucune preuve textuelle ne discrimine
+
+# Numéro de l'article du PROJET de loi, tel que l'amendement et le commentaire de
+# rapport le désignent chacun dans leur convention : « ART. 72 BIS », « APRÈS
+# ART. 72 », « art. add. après Article 5 ».
+#
+# Il a été essayé comme contrôle de cohérence — un amendement rattaché à un alinéa
+# dont le commentaire porte sur un autre article du projet serait suspect — et le
+# contrôle ne tient pas. Mesuré : 27,1 % des arêtes confrontables sont
+# « incohérentes », pour une précision mesurée à 23/26. La raison est structurelle :
+# **l'article du projet est renuméroté à chaque lecture**. L'amendement 639 vise
+# l'article 55 du texte de commission de l'Assemblée ; le rapport du Sénat commente
+# la même disposition sous l'article 72. Le désaccord ne dit rien tant que les deux
+# côtés ne sont pas ramenés à la même lecture du même texte — ce que la base ne sait
+# pas encore faire. La fonction reste, elle sert l'affichage ; le verdict a été
+# retiré (docs/12 § 3).
+SUBDIVISION = re.compile(r"art(?:icle)?\.?\s*(?:add\.?\s*)?(?:apr[èe]s\s*)?"
+                         r"(?:art(?:icle)?\.?\s*)?(\d+)", re.I)
+
+
+def article_du_projet(subdivision: str | None) -> str | None:
+    trouve = SUBDIVISION.search(subdivision or "")
+    return trouve.group(1) if trouve else None
 
 
 def interroger(base: sqlite3.Connection, numero: str) -> dict:
@@ -71,7 +95,8 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
             WITH RECURSIVE seg(cur) AS (
                 SELECT ? UNION SELECT r.segment_source_id FROM repris_de r
                 JOIN seg ON r.segment_id = seg.cur)
-            SELECT am.numero, am.chambre, am.sort, am.texte_discute, ac.nom, ac.groupe,
+            SELECT am.numero, am.chambre, am.sort, am.texte_discute, am.subdivision,
+                   am.objet, ac.nom, ac.groupe,
                    t.titre AS loi, rd.confiance, rd.methode, p.fenetre
             FROM seg JOIN resulte_de rd ON rd.segment_id = seg.cur
             JOIN amendement am ON am.id = rd.amendement_id
@@ -89,7 +114,8 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
         WITH RECURSIVE asc_a(anc) AS (
             SELECT id FROM article WHERE numero = ?
             UNION SELECT r.ancien_id FROM renumerote_de r JOIN asc_a ON r.article_id = asc_a.anc)
-        SELECT doc.type, doc.url, m.confiance, m.methode, m.offset_debut, m.offset_fin,
+        SELECT doc.type, doc.url, m.article_du_texte, m.confiance, m.methode,
+               m.offset_debut, m.offset_fin,
                replace(replace(substr(doc.texte, m.offset_debut, 900), char(10), ' '),
                        char(13), '') AS extrait,
                (SELECT fenetre FROM preuve WHERE id = m.preuve_id) AS preuve
@@ -97,10 +123,21 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
         JOIN document doc ON doc.id = m.document_id
         GROUP BY m.id ORDER BY m.offset_fin - m.offset_debut""", numero)
 
-    d["cite_par"] = q("""SELECT DISTINCT article_citant,
-                                (SELECT fenetre FROM preuve WHERE id = preuve_id) AS extrait
+    # Contrôle de cohérence structurelle : les articles du projet de loi que les
+    # commentaires retenus disent motiver cet article du code.
+    d["articles_commentes"] = {r["article_du_texte"] for r in d["raisons"]
+                               if r["article_du_texte"]}
+    for alinea in d["alineas"]:
+        for m in alinea["amendements"]:
+            m["article_vise"] = article_du_projet(m["subdivision"])
+
+    # Groupé sur l'article citant, non sur le couple avec sa preuve : un même
+    # article cite souvent la cible depuis plusieurs alinéas, et la liste
+    # affichait alors deux fois le même numéro.
+    d["cite_par"] = q("""SELECT article_citant,
+                                min((SELECT fenetre FROM preuve WHERE id = preuve_id)) AS extrait
                          FROM renvois_entrants WHERE article_cite = ?
-                         ORDER BY article_citant""", numero)
+                         GROUP BY article_citant ORDER BY article_citant""", numero)
 
     d["tentatives"] = q("""SELECT amendement, sort, auteur, groupe, loi, formule, objet
                            FROM historique_article WHERE article = ?
@@ -138,6 +175,12 @@ def en_texte(d: dict) -> str:
                 L.append(f"      ← amdt {m['numero']} ({m['chambre']}, {m['sort']}) — {qui}")
                 L.append(f"        {m['loi'] or 'loi non résolue'} · confiance {m['confiance']:.3f}")
                 L.append(f"        preuve : « …{m['fenetre'][:90].strip()}… »")
+                if m["objet"]:
+                    L.append("        but déclaré : « "
+                             + m["objet"][:230].strip().replace("\n", " ") + "… »")
+                if m["article_vise"]:
+                    L.append(f"        déposé sur l'article {m['article_vise']} du texte "
+                             f"{m['texte_discute']}")
         elif not a["appariable"]:
             L.append(f"      · moins de {SEUIL_APPARIEMENT} caractères : "
                      "provenance non déterminable par la méthode")
@@ -195,6 +238,9 @@ padding:.65rem .8rem;margin:.5rem 0;font-size:.9rem}}
 .meta{{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.75rem;color:var(--doux);
 display:flex;gap:.9rem;flex-wrap:wrap;margin-top:.35rem}}
 .conf{{font-variant-numeric:tabular-nums}}
+.but{{margin-top:.55rem;font-size:.88rem;border-top:1px solid var(--trait);padding-top:.5rem}}
+.alerte{{margin-top:.5rem;font-size:.82rem;color:var(--acc);
+font-family:ui-sans-serif,system-ui,sans-serif}}
 .preuve{{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.76rem;
 color:var(--doux);margin-top:.4rem;overflow-x:auto;white-space:pre-wrap}}
 .silence{{color:var(--doux);font-style:italic;font-size:.87rem;margin:.4rem 0}}
@@ -242,7 +288,13 @@ font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-seri
                      f'<span>{e(m["sort"])}</span><span>{e(m["loi"] or "loi non résolue")}</span>'
                      f'<span class="conf">confiance {m["confiance"]:.3f}</span>'
                      f'<span>{e(m["methode"])}</span></div>'
-                     f'<div class="preuve">preuve : …{e(m["fenetre"][:140].strip())}…</div></div>')
+                     f'<div class="preuve">preuve : …{e(m["fenetre"][:140].strip())}…</div>'
+                     + (f'<div class="but"><b>But déclaré par l\'auteur.</b> '
+                        f'{e(m["objet"][:520].strip())}…</div>' if m["objet"] else "")
+                     + (f'<div class="alerte">Déposé sur l\'article '
+                        f'{e(m["article_vise"])} du texte {e(m["texte_discute"])}.</div>'
+                        if m["article_vise"] else "")
+                     + "</div>")
         if not a["amendements"]:
             p.append('<p class="silence">' + (
                 f"Moins de {SEUIL_APPARIEMENT} caractères : provenance non déterminable "
