@@ -47,6 +47,16 @@ else
   echo "   $(ls "$TRAVAIL/corpus/rapports" | wc -l) rapports déjà présents"
 fi
 
+# Une ordonnance n'a ni exposé des motifs, ni rapport de commission : sa seule
+# motivation publiée est le rapport au Président de la République. Il est au
+# Journal officiel, donc dans le miroir — aucun accès réseau.
+if [ "$(ls "$TRAVAIL/corpus/rapports" | grep -c rapport-pr)" -lt 30 ]; then
+  python3 "$RACINE/tools/dila/rapports_president.py" "$MIROIR" \
+          "$RACINE/data/perimetre-v1.csv" "$TRAVAIL/corpus/rapports"
+else
+  echo "   $(ls "$TRAVAIL/corpus/rapports" | grep -c rapport-pr) rapports au Président déjà présents"
+fi
+
 # ------------------------------------------------------- 3. amendements Sénat
 etape "3. Jeux d'amendements Améli (Sénat)"
 if [ "$(ls "$TRAVAIL/corpus/ameli" | wc -l)" -lt 50 ]; then

@@ -156,6 +156,17 @@ def main() -> None:
 
     base = sqlite3.connect(chemin_base)
     base.execute("PRAGMA foreign_keys = ON")
+    # Reconstruction, non complément : les documents portent des identifiants
+    # explicites et une seconde exécution entrait sinon en collision. Le même
+    # défaut avait laissé en base des arêtes `resulte_de` à l'ancienne confiance.
+    # L'ordre compte : les preuves sont référencées par les arêtes, et les arêtes
+    # par les documents. La clef étrangère refuse l'inverse — c'est elle qui l'a
+    # signalé, et c'est ce qu'on lui demande.
+    anciennes = [i for (i,) in base.execute(
+        "SELECT preuve_id FROM motive WHERE preuve_id IS NOT NULL")]
+    base.execute("DELETE FROM motive")
+    base.execute("DELETE FROM document")
+    base.executemany("DELETE FROM preuve WHERE id = ?", [(i,) for i in anciennes])
     ids_articles = {n: i for i, n in base.execute("SELECT id, numero FROM article")}
     par_titre = {t: c for c, t in base.execute(
         "SELECT id_jorf, titre FROM texte_normatif")}

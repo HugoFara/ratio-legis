@@ -134,6 +134,27 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
     # Groupé sur l'article citant, non sur le couple avec sa preuve : un même
     # article cite souvent la cible depuis plusieurs alinéas, et la liste
     # affichait alors deux fois le même numéro.
+    # Motivation d'une ordonnance. Elle ne passe pas par `motive` : le rapport au
+    # Président ne nomme pas les articles du code, il n'a donc pas d'en-tête
+    # déclaratif et l'extraction n'en tire aucune arête. Le lien existe pourtant, et
+    # il est **déclaré** de bout en bout — LEGI dit quel texte a produit la version,
+    # DOLE dit quel dossier a produit le texte, et le dossier porte son rapport.
+    # Aucune inférence, donc aucune preuve textuelle à exiger.
+    #
+    # Le grain est celui de l'ordonnance entière, jamais de l'article : la
+    # restitution doit le dire, sous peine de laisser croire que ce passage
+    # explique cet article-là.
+    d["motivation_du_texte"] = q("""
+        SELECT DISTINCT t.titre, doc.url,
+               replace(replace(substr(doc.texte, 1, 900), char(10), ' '), char(13), '')
+               AS extrait, length(doc.texte) AS taille
+        FROM version_article v JOIN article a ON a.id = v.article_id
+        JOIN produite_par p ON p.version_id = v.id_legi
+        JOIN texte_normatif t ON t.id_jorf = p.texte_id
+        JOIN issu_de i ON i.texte_id = t.id_jorf
+        JOIN document doc ON doc.dossier_id = i.dossier_id
+        WHERE a.numero = ? AND doc.type = 'rapport_president_republique'""", numero)
+
     d["cite_par"] = q("""SELECT article_citant,
                                 min((SELECT fenetre FROM preuve WHERE id = preuve_id)) AS extrait
                          FROM renvois_entrants WHERE article_cite = ?
@@ -165,6 +186,13 @@ def en_texte(d: dict) -> str:
         L.append(f"  [{r['type']}] confiance {r['confiance']:.3f} ({r['methode']})")
         L.append(f"  {r['url']}  offsets {r['offset_debut']}–{r['offset_fin']}")
         L.append(f"    « {r['extrait'][:600].strip()}… »")
+
+    for m in d["motivation_du_texte"]:
+        L.append(f"\n  [rapport au Président de la République] lien déclaré, "
+                 f"{m['taille']} caractères")
+        L.append(f"  {m['url']}")
+        L.append(f"  ⚠ porte sur « {m['titre']} » dans son entier, non sur cet article")
+        L.append(f"    « {m['extrait'][:500].strip()}… »")
 
     L.append(f"\nALINÉAS ({len(d['alineas'])})")
     for a in d["alineas"]:
@@ -274,6 +302,14 @@ font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-seri
                  f'<span>{e(r["methode"])}</span>'
                  f'<span>offsets {r["offset_debut"]}–{r["offset_fin"]}</span>'
                  f'<a href="{e(r["url"])}">document</a></div></div>')
+
+    for m in d["motivation_du_texte"]:
+        p.append(f'<div class="raison"><div class="meta"><span>rapport au Président '
+                 f'de la République</span><span>lien déclaré</span>'
+                 f'<a href="{e(m["url"])}">document</a></div>'
+                 f'<p class="silence">Ce passage motive « {e(m["titre"])} » dans son '
+                 f'entier, et non cet article en particulier.</p>'
+                 f'<div>« {e(m["extrait"][:700].strip())}… »</div></div>')
 
     p.append(f"<h2>Alinéas et provenance ({len(d['alineas'])})</h2>")
     for a in d["alineas"]:
