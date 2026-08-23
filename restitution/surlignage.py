@@ -118,7 +118,10 @@ def surligner(base: sqlite3.Connection, numero: str) -> dict:
         # Retouche : un maillon repris partiellement, donc modifié en chemin.
         retouches = [r for r in chaine if r["part"] is not None and r["part"] < 1]
         trouves = [a for r in chaine for a in amendements.get(r["courant"], [])]
+        # `ordre` compte depuis zéro parce qu'il sert de clef ; l'alinéa se
+        # compte depuis un en droit français. Voir `graphe.py`.
         resultat.append({**alinea,
+                         "rang": alinea["ordre"] + 1,
                          "ancetres": len(chaine) - 1,
                          "introduit_par": origine,
                          "date_introduction": chaine[0]["date_debut"] if chaine else None,
@@ -159,7 +162,7 @@ def en_texte(d: dict) -> str:
     L.append("")
     for a in d["alineas"]:
         titres = ", ".join(t["titre"] for t in a["introduit_par"]) or "origine non documentée"
-        L.append(f"[{a['ordre']}] {a['texte'][:300]}")
+        L.append(f"[alinéa {a['rang']}] {a['texte'][:300]}")
         marques = []
         if a["ancetres"]:
             marques.append(f"{a['ancetres']} version(s) antérieure(s)")

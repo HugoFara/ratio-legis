@@ -37,10 +37,17 @@ from pathlib import Path
 import re
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "ingestion"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from union_europeenne import ANCRE  # noqa: E402
+from citation import ABSENT, PLAFOND_EXTRAIT, cite  # noqa: E402
+import proximite  # noqa: E402
 
-PLAFOND_CONSIDERANTS = 25          # au-delà, la page devient illisible
 PLAFOND_TEXTES = 8                 # en texte seulement : le HTML les rend tous
+# Le repli des considérants est borné, et la borne est **dite**. Elle ne coûte
+# plus la pertinence : les mieux classés sont hors du repli, donc toujours
+# visibles. Sans borne, la fiche de L511-7 — que le droit de l'Union sature —
+# pèse 1,1 Mo de considérants dont le lecteur ne lira pas le centième.
+PLAFOND_CONSIDERANTS = 25
 SEUIL_APPARIEMENT = 60          # sous ce seuil, aucune preuve textuelle ne discrimine
 
 # Numéro de l'article du PROJET de loi, tel que l'amendement et le commentaire de
@@ -84,8 +91,9 @@ VERDICT = {
 }
 COMPLEMENT_REGLEMENTAIRE = (
     "Pour un article de la partie réglementaire, c'est l'état ordinaire : un "
-    "décret n'a ni exposé des motifs, ni débat, ni amendement. 84 % des articles "
-    "R et 94 % des articles D du code sont dans ce cas, contre 1 % des articles L.")
+    "décret n'a ni exposé des motifs, ni débat, ni amendement. 83 % des articles "
+    "R et 93 % des articles D du code sont dans ce cas, contre moins de 1 % des "
+    "articles L.")
 # Le § 4.3 impose de distinguer à l'écran qui parle. Ces deux documents motivent
 # le texte entier et sont tous deux la parole du Gouvernement, mais l'un précède
 # le débat et l'autre le remplace : un projet de loi expose ses motifs devant le
@@ -102,26 +110,6 @@ LIBELLE_DOCUMENT = {
 ORDRE_DOCUMENT = {t: r for r, t in enumerate(
     ("expose_des_motifs", "etude_impact", "avis_conseil_etat",
      "rapport_president_republique"))}
-
-
-# Un dump ouvert peut légitimement ne pas rediffuser le texte d'un document —
-# voir `tools/diffusion/dump.py`. La citation devient alors vide, et des
-# guillemets vides affirment sans montrer : exactement ce que le § 4.3 interdit.
-# On dit ce qui manque et où le retrouver, plutôt que de laisser un blanc.
-ABSENT = "texte non rediffusé dans cette base — le document reste à son URL"
-
-
-# `ATTRIBUTION.md` n'autorise, faute de régime de réutilisation confirmé par les
-# deux chambres, que « les offsets et un extrait de 400 caractères à fin de
-# contrôle ». `note.py` le respectait ; ce module non, et il citait jusqu'à 700
-# caractères — 772 se sont retrouvés dans les exemples versionnés. Le plafond est
-# nommé une fois pour qu'il n'y ait plus quatre nombres à tenir d'accord.
-PLAFOND_EXTRAIT = 400
-
-
-def cite(extrait: str, limite: int = PLAFOND_EXTRAIT) -> str:
-    court = (extrait or "").strip()[:limite]
-    return f"« {court}… »" if court else f"[{ABSENT}]"
 
 
 def nommer(acte) -> str:
@@ -200,9 +188,20 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
                      LEFT JOIN article_acte_ue aa ON aa.celex = c.celex
                                                  AND aa.numero = c.article_cite
                      WHERE c.segment_id = ? ORDER BY c.offset_debut""", segment["id"])
-        d["alineas"].append({**segment, "amendements": amendements, "renvois": renvois,
+        # `ordre` est une position dans une liste, comptée depuis zéro, et elle
+        # sert de clef (`<id_legi>:<ordre>`). `rang` est le numéro de l'alinéa au
+        # sens du droit français, compté depuis un. Les confondre affichait
+        # « alinéa 0 », et surtout mettait « par exception au deuxième alinéa »
+        # en face d'un alinéa numéroté 1 — sur un produit dont l'argument est
+        # l'ancrage exact, un décalage d'indice visible à l'écran disqualifie.
+        d["alineas"].append({**segment, "rang": segment["ordre"] + 1,
+                             "amendements": amendements, "renvois": renvois,
                              "actes_ue": actes,
                              "appariable": len(segment["texte"]) >= SEUIL_APPARIEMENT})
+
+    # Le texte de l'article, tel qu'il sert de référence au classement lexical
+    # des documents qui ne motivent que le texte entier. Voir `proximite.py`.
+    reference = "\n".join(a["texte"] for a in d["alineas"])
 
     # Le verdict est rendu avant tout le reste, y compris — surtout — quand il est
     # négatif : le § 4.3 en fait un résultat de premier ordre. Se taire n'est pas
@@ -254,9 +253,8 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
     # restitution doit le dire, sous peine de laisser croire que ce passage
     # explique cet article-là.
     d["motivation_du_texte"] = q("""
-        SELECT DISTINCT t.titre, doc.url, doc.type,
-               replace(replace(substr(doc.texte, 1, 900), char(10), ' '), char(13), '')
-               AS extrait, length(doc.texte) AS taille
+        SELECT DISTINCT t.titre, doc.url, doc.type, doc.texte AS corps,
+               length(doc.texte) AS taille
         FROM version_article v JOIN article a ON a.id = v.article_id
         JOIN produite_par p ON p.version_id = v.id_legi
         JOIN texte_normatif t ON t.id_jorf = p.texte_id
@@ -271,12 +269,24 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
     # index n'est pas reproductible, et la reproductibilité est ce que ce projet
     # vend (§ 5.2).
     d["motivation_du_texte"].sort(key=lambda m: (ORDRE_DOCUMENT[m["type"]], m["url"]))
+    # Le document motive le texte entier ; aucune arête ne désigne le passage qui
+    # concerne cet article-ci, et il n'en est créé aucune. Mais afficher le
+    # document depuis l'offset 0 — l'adresse au Président, la formule d'ouverture
+    # — n'était pas s'abstenir de choisir : c'était choisir l'ordre du document,
+    # qui est le pire des ordres pour la question posée. Les passages sont
+    # classés par recouvrement lexical, étiquetés comme tels, et le corps est
+    # relâché aussitôt : il pèse jusqu'à 600 Ko et n'a rien à faire en sortie.
+    for m in d["motivation_du_texte"]:
+        corps = m.pop("corps")
+        m["passages"] = proximite.classer_fenetres(reference, corps)
+        m["extrait"] = corps[:PLAFOND_EXTRAIT]
 
     # La transposition n'est retenue que si le texte français la déclare dans son
     # intitulé au Journal officiel. Elle porte sur le texte entier, comme le
     # rapport au Président : l'avertissement est le même.
     d["transposition"] = q("""
-        SELECT DISTINCT u.denomination, u.type_acte, u.url, t.titre, p.fenetre
+        SELECT DISTINCT u.denomination, u.type_acte, u.url, t.titre, p.fenetre,
+               tr.methode, tr.confiance
         FROM version_article v
         JOIN article a          ON a.id = v.article_id
         JOIN produite_par pp    ON pp.version_id = v.id_legi
@@ -312,6 +322,17 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
         a["celex"]: q("""SELECT rang, numero, texte, url FROM considerant
                          WHERE celex = ? ORDER BY rang""", a["celex"])
         for a in d["actes_motivants"]}
+    # Même geste que pour les documents français, et même réserve : le classement
+    # ordonne, il n'attribue pas. Deux méthodes pour **affirmer** quel considérant
+    # motive l'article ont été mesurées et écartées (docs/14 § 5) ; celle-ci
+    # n'affirme rien, elle remplace l'ordre de publication — sans rapport avec la
+    # question — par un ordre qui en a un, et montre les termes qui l'ont produit
+    # pour que le lecteur juge le classement lui-même.
+    d["considerants_classes"] = {
+        celex: [{**liste[i], "score": score, "termes": list(termes)}
+                for i, score, termes in proximite.classer_unites(
+                    reference, [c["texte"] for c in liste])]
+        for celex, liste in d["considerants"].items()}
 
     # Sous quel article du texte en discussion cet article a-t-il été débattu.
     # `direct` distingue la cible nommée telle quelle de celle atteinte par la
@@ -371,19 +392,33 @@ def en_texte(d: dict) -> str:
                  f"{m['taille']} caractères")
         L.append(f"  {m['url']}")
         L.append(f"  ⚠ porte sur « {m['titre']} » dans son entier, non sur cet article")
-        # Début du document, et rien d'autre : aucun passage n'est désigné comme
-        # motivant cet article-ci, et en choisir un serait le prétendre.
-        L.append("    début du document : " + cite(m["extrait"]))
+        if m["passages"]:
+            L.append(f"    {len(m['passages'])} passage(s) — {proximite.ETIQUETTE}")
+            for x in m["passages"]:
+                L.append(f"    · offsets {x.debut}–{x.fin} · termes communs : "
+                         + ", ".join(x.termes[:8]))
+                L.append("      " + cite(x.texte))
+        else:
+            L.append(f"    {proximite.RIEN}")
+            L.append("      " + cite(m["extrait"]))
 
     for tr in d["transposition"]:
         L.append(f"\n  [transposition déclarée] {nommer(tr)}")
         L.append(f"  {tr['url']}")
         L.append(f"  déclarée par l'intitulé de « {tr['titre']} », "
                  "qui porte sur le texte entier, non sur cet article")
+        # La confiance porte sur la proposition mesurée, et sur aucune autre. La
+        # mesure dit « ce texte transpose cet acte », pas « cet article vient de
+        # cet acte » ; afficher le nombre seul, à côté d'un avertissement disant
+        # l'inverse, faisait porter la confiance de la première à la seconde.
+        L.append(f"  confiance {tr['confiance']:.3f} sur la proposition « ce texte "
+                 "transpose cet acte » ; aucune mesure ne porte sur le lien entre "
+                 "cet article-ci et l'acte")
 
     L.append(f"\nALINÉAS ({len(d['alineas'])})")
     for a in d["alineas"]:
-        L.append(f"\n  [{a['ordre']}] {a['texte'][:150]}{'…' if len(a['texte']) > 150 else ''}")
+        L.append(f"\n  [alinéa {a['rang']}] {a['texte'][:150]}"
+                 f"{'…' if len(a['texte']) > 150 else ''}")
         if a["amendements"]:
             for m in a["amendements"]:
                 qui = m["nom"] or "auteur non résolu"
@@ -421,12 +456,22 @@ def en_texte(d: dict) -> str:
             marque = " [transposition déclarée]" if u["transposee"] else ""
             L.append(f"\n  {nommer(u)}{marque} — {u['considerants']} considérant(s)")
             L.append(f"  {u['url']}")
-            if u["considerants"]:
-                L.append("    les deux premiers, dans l'ordre du texte :")
-            for c in d["considerants"][u["celex"]][:2]:
-                rang = f"({c['numero']})" if c["numero"] else f"[{c['rang']}e, non numéroté]"
-                L.append(f"    {rang} {c['texte'][:220].strip()}…")
-            reste = max(0, u["considerants"] - 2)
+            classes = d["considerants_classes"].get(u["celex"], [])
+            montres = classes or d["considerants"][u["celex"]][:2]
+            if classes:
+                L.append(f"    {len(classes)} sur {u['considerants']} — "
+                         f"{proximite.ETIQUETTE} :")
+            elif u["considerants"]:
+                L.append("    aucun ne partage assez de vocabulaire avec l'article "
+                         "pour être classé ; les deux premiers du texte :")
+            for c in montres:
+                rang = (f"({c['numero']})" if c["numero"]
+                        else f"[{c['rang']}e, non numéroté]")
+                communs = (" · termes communs : " + ", ".join(c["termes"][:6])
+                           if c.get("termes") else "")
+                L.append(f"    {rang}{communs}")
+                L.append(f"      {c['texte'][:220].strip()}…")
+            reste = max(0, u["considerants"] - len(montres))
             if reste:
                 L.append(f"    … et {reste} autre(s), sur EUR-Lex")
 
@@ -456,6 +501,23 @@ def en_texte(d: dict) -> str:
 
 def e(x) -> str:
     return html.escape(str(x if x is not None else ""))
+
+
+# Le considérant, avec son ancre et son numéro imprimé. Il était rendu tronqué à
+# 1 200 caractères sans le dire : une phrase coupée net, dans un projet qui vend
+# le verbatim, se lit comme une citation fautive et non comme une coupe.
+PLAFOND_CONSIDERANT = 1200
+
+
+def considerant_html(c: dict) -> str:
+    rang = (f"({c['numero']})" if c["numero"]
+            else f"[{c['rang']}<sup>e</sup>, non numéroté]")
+    texte = c["texte"]
+    coupe = len(texte) > PLAFOND_CONSIDERANT
+    return (f'<a href="{e(c["url"])}">{rang}</a> '
+            + e(texte[:PLAFOND_CONSIDERANT].rstrip())
+            + ('… <span class="num">coupé, la suite sur EUR-Lex</span>'
+               if coupe else ""))
 
 
 def en_html(d: dict) -> str:
@@ -499,6 +561,11 @@ background:var(--carte);padding:.8rem 1rem;margin:1.4rem 0}}
 .verdict b{{font-size:1.05rem}}
 .cons{{font-size:.85rem;margin:.5rem 0;padding-left:.8rem;
 border-left:1px solid var(--trait)}}
+.etiquette{{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.74rem;
+letter-spacing:.04em;color:var(--doux);margin:.7rem 0 .3rem;
+border-top:1px dashed var(--trait);padding-top:.5rem}}
+.passage{{background:var(--fond);border:1px solid var(--trait);border-radius:2px;
+padding:.6rem .75rem;margin:.45rem 0;font-size:.9rem}}
 details summary{{cursor:pointer;font-size:.82rem;color:var(--acc);margin-top:.5rem;
 font-family:ui-sans-serif,system-ui,sans-serif}}
 .raison{{background:var(--carte);border:1px solid var(--trait);border-left:3px solid var(--vert);
@@ -551,25 +618,43 @@ font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-seri
     for m in d["motivation_du_texte"]:
         p.append(f'<div class="raison"><div class="meta">'
                  f'<span>{e(LIBELLE_DOCUMENT[m["type"]])}</span><span>lien déclaré</span>'
+                 f'<span>{m["taille"]} caractères</span>'
                  f'<a href="{e(m["url"])}">document</a></div>'
                  f'<p class="silence">Ce document motive « {e(m["titre"])} » dans '
-                 f'son entier, et non cet article en particulier. Rien n\'y désigne '
-                 f'le passage qui le concerne ; voici son début.</p>'
-                 f'<div>{e(cite(m["extrait"]))}</div></div>')
+                 "son entier, et non cet article en particulier. Rien n'y désigne "
+                 "le passage qui le concerne.</p>")
+        if m["passages"]:
+            p.append(f'<p class="etiquette">{e(proximite.ETIQUETTE)}</p>')
+            for x in m["passages"]:
+                p.append(f'<div class="passage">{e(cite(x.texte))}'
+                         f'<div class="meta"><span>offsets {x.debut}–{x.fin}</span>'
+                         f'<span>termes communs&nbsp;: '
+                         f'{e(", ".join(x.termes[:8]))}</span></div></div>')
+        else:
+            p.append(f'<p class="etiquette">{e(proximite.RIEN)}</p>'
+                     f'<div class="passage">{e(cite(m["extrait"]))}</div>')
+        p.append("</div>")
 
     for tr in d["transposition"]:
+        # La confiance porte sur la proposition mesurée, et sur aucune autre :
+        # « ce texte transpose cet acte », non « cet article vient de cet acte ».
+        # Le nombre était affiché nu, juste à côté de l'avertissement qui dit
+        # l'inverse ; il porte désormais sa proposition dans la même phrase.
         p.append(f'<div class="raison"><div class="meta">'
                  f'<span>transposition déclarée</span>'
-                 f'<span class="conf">confiance 1.000</span><span>declaree</span>'
+                 f'<span>{e(tr["methode"])}</span>'
                  f'<a href="{e(tr["url"])}">acte de l\'Union</a></div>'
                  f'<div>{e(nommer(tr))}</div>'
                  f'<p class="silence">Déclarée par l\'intitulé de « {e(tr["titre"])} », '
-                 f'qui porte sur le texte entier, non sur cet article.</p></div>')
+                 "qui porte sur le texte entier, non sur cet article. "
+                 f'<b class="conf">Confiance {tr["confiance"]:.3f}</b> sur la seule '
+                 "proposition « ce texte transpose cet acte » : aucune mesure ne "
+                 "porte sur le lien entre cet article-ci et l\'acte.</p></div>")
 
     p.append(f"<h2>Alinéas et provenance ({len(d['alineas'])})</h2>")
     for a in d["alineas"]:
         p.append(f'<div class="al{" tracee" if a["amendements"] else ""}">'
-                 f'<div class="num">alinéa {a["ordre"]}</div>'
+                 f'<div class="num">alinéa {a["rang"]}</div>'
                  f'<div class="tx">{e(a["texte"])}</div>')
         for m in a["amendements"]:
             p.append(f'<div class="arete">résulte de l\'<b>amendement {e(m["numero"])}</b> '
@@ -608,27 +693,37 @@ font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-seri
         p.append(f"<h2>Ce que l'Union en dit ({len(d['actes_motivants'])})</h2>")
         p.append('<p class="silence">Un considérant motive l\'acte entier. Rien '
                  "ne dit lequel motive cet article-ci : l'acte ne l'écrit nulle "
-                 "part, et deux méthodes pour le deviner ont été essayées, "
-                 "mesurées, et écartées.</p>")
+                 "part, et deux méthodes pour l'<b>affirmer</b> ont été essayées, "
+                 "mesurées, et écartées. Ceux qui suivent sont donc "
+                 "<b>classés</b>, non attribués — l'ordre remplace celui de la "
+                 "publication, qui n'a aucun rapport avec la question posée.</p>")
         for u in d["actes_motivants"]:
             liste = d["considerants"][u["celex"]]
-            montres = liste[:PLAFOND_CONSIDERANTS]
+            classes = d["considerants_classes"].get(u["celex"], [])
             p.append(f'<div class="raison"><div class="meta">'
                      + ('<span>transposition déclarée</span>' if u["transposee"] else
                         '<span>cité par cet article</span>')
                      + f'<span>{len(liste)} considérant(s)</span>'
                      f'<a href="{e(u["url"])}">acte de l\'Union</a></div>'
                      f'<div><b>{e(nommer(u))}</b></div>')
+            if classes:
+                p.append(f'<p class="etiquette">{e(proximite.ETIQUETTE)}</p>')
+                for c in classes:
+                    p.append(f'<div class="passage">{considerant_html(c)}'
+                             f'<div class="meta"><span>termes communs&nbsp;: '
+                             f'{e(", ".join(c["termes"][:8]))}</span></div></div>')
+            elif liste:
+                p.append(f'<p class="etiquette">{e(proximite.RIEN)}</p>')
+            montres = liste[:PLAFOND_CONSIDERANTS]
             if montres:
-                p.append("<details><summary>lire les considérants</summary>")
+                p.append(f"<details><summary>lire les considérants dans l'ordre "
+                         f"de l'acte ({len(montres)} sur {len(liste)})</summary>")
                 for c in montres:
-                    rang = (f"({c['numero']})" if c["numero"]
-                            else f"[{c['rang']}<sup>e</sup>, non numéroté]")
-                    p.append(f'<p class="cons"><a href="{e(c["url"])}">{rang}</a> '
-                             f'{e(c["texte"][:1200])}</p>')
+                    p.append(f'<p class="cons">{considerant_html(c)}</p>')
                 if len(liste) > len(montres):
                     p.append(f'<p class="silence">{len(montres)} premiers sur '
-                             f'{len(liste)} — la suite sur EUR-Lex.</p>')
+                             f'{len(liste)} — la suite sur EUR-Lex. Les mieux '
+                             "classés ci-dessus ne sont pas soumis à cette borne.</p>")
                 p.append("</details>")
             p.append("</div>")
 

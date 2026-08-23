@@ -49,6 +49,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from graphe import interroger, nommer  # noqa: E402
+from citation import ABSENT, PLAFOND_EXTRAIT, extrait  # noqa: E402
+import proximite  # noqa: E402
 
 # Les quatre voix que le § 4.3 impose de distinguer à l'écran, plus le fonds
 # lui-même, qui n'est la voix de personne.
@@ -105,20 +107,6 @@ def en_date(iso: str) -> str:
     return f"{int(jour)}{'er' if jour == '01' else ''} {MOIS[int(mois) - 1]} {annee}"
 
 
-# Une base diffusée peut légitimement ne pas rediffuser le texte d'un document —
-# voir `tools/diffusion/dump.py`. La citation au sens du § 4.3 reste résoluble,
-# puisqu'elle est le couple (document, offsets) ; c'est l'extrait de confort qui
-# manque. Le taire laisserait croire à un oubli.
-ABSENT = "texte non rediffusé dans cette base — le document reste à son URL"
-
-
-def extrait(texte: str, limite: int = 400, sinon: str = "") -> str:
-    propre = " ".join((texte or "").split())
-    if not propre:
-        return sinon
-    return propre[:limite] + ("…" if len(propre) > limite else "")
-
-
 def composer(d: dict) -> tuple[list[Phrase], list[str], list[Phrase]]:
     """Rend (constats retenus, état du dossier, phrases écartées faute de citation)."""
     numero, version = d["numero"], d["version"]
@@ -172,7 +160,7 @@ def composer(d: dict) -> tuple[list[Phrase], list[str], list[Phrase]]:
         for m in alinea["amendements"]:
             cle = (m["numero"], m["chambre"])
             entree = par_amendement.setdefault(cle, {"m": m, "alineas": []})
-            entree["alineas"].append(alinea["ordre"] + 1)
+            entree["alineas"].append(alinea["rang"])
     for (numero_amdt, chambre), entree in par_amendement.items():
         m = entree["m"]
         rangs = entree["alineas"]
@@ -200,12 +188,30 @@ def composer(d: dict) -> tuple[list[Phrase], list[str], list[Phrase]]:
 
     # ----------------------------------------------- le Gouvernement, le Conseil
     for m in d["motivation_du_texte"]:
+        # Le document porte sur le texte entier ; la note ne peut donc pas dire
+        # qu'un de ses passages explique cet article. Elle peut dire lequel lui
+        # ressemble le plus, à condition de dire que c'est tout ce qu'elle dit —
+        # ce que porte la phrase elle-même, et non une étiquette à côté.
+        meilleur = m["passages"][0] if m["passages"] else None
+        if meilleur is None:
+            constat(VOIX_DOCUMENT.get(m["type"], "gouvernement"),
+                    f"Le texte qui a produit cet article — « {m['titre']} » — est "
+                    f"accompagné d'un {LIBELLE[m['type']]}. Ce document porte sur le "
+                    "texte entier, non sur cet article, et aucun de ses passages ne "
+                    "partage assez de vocabulaire avec lui pour être distingué.",
+                    source=LIBELLE[m["type"]], reference=m["url"], nature="web",
+                    citation=extrait(m["extrait"], sinon=ABSENT))
+            continue
         constat(VOIX_DOCUMENT.get(m["type"], "gouvernement"),
                 f"Le texte qui a produit cet article — « {m['titre']} » — est "
                 f"accompagné d'un {LIBELLE[m['type']]}. Ce document porte sur le "
-                "texte entier, non sur cet article.",
+                "texte entier, non sur cet article ; le passage ci-dessous est "
+                "celui dont le vocabulaire recouvre le plus celui de l'article "
+                f"({', '.join(meilleur.termes[:6])}). C'est un classement, non un "
+                "rattachement : aucune arête ne les relie.",
                 source=LIBELLE[m["type"]], reference=m["url"], nature="web",
-                citation=extrait(m["extrait"], 300, sinon=ABSENT))
+                offsets=(meilleur.debut, meilleur.fin),
+                citation=extrait(meilleur.texte, sinon=ABSENT))
 
     # ------------------------------------------------------------------- l'Union
     # Deux liens très différents mènent au même acte : le texte français **déclare**
@@ -225,8 +231,11 @@ def composer(d: dict) -> tuple[list[Phrase], list[str], list[Phrase]]:
         else:
             texte = (f"Cet article nomme dans son texte "
                      f"{ARTICLE_DEFINI[u['type_acte']]} {nommer(u)}{considerants}.")
-        constat("union", texte, source="EUR-Lex", reference=u["url"], nature="web",
-                confiance=1.0 if u["transposee"] else None)
+        # Aucune confiance n'est portée ici. Celle de `transpose` mesure « ce
+        # texte transpose cet acte » ; l'accrocher à une phrase qui parle de
+        # l'article ferait porter la mesure d'une proposition sur une autre. Elle
+        # est rendue par `graphe.py`, avec la proposition qu'elle mesure.
+        constat("union", texte, source="EUR-Lex", reference=u["url"], nature="web")
 
     # ------------------------------------------------ ce que l'article déplace
     if d["cite_par"]:
