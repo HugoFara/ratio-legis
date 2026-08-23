@@ -12,6 +12,51 @@ sans citation résoluble au niveau du passage.
 
 Spécification complète : [`ratio-legis-feuille-de-route.md`](ratio-legis-feuille-de-route.md).
 
+## Cloner et lancer
+
+**Pour voir ce que ça produit, rien à installer** : les rendus sont versionnés
+dans [`restitution/exemples/`](restitution/exemples/) — le graphe d'un article,
+la note sous contrat, le surlignage alinéa par alinéa. Ouvrez un `.html`.
+
+Pour faire tourner le projet, il faut le construire. Le dépôt ne contient **que
+du code, des plans de récupération et des mesures** : ni le fonds, ni les
+corpus, ni la base. C'est délibéré — `travail/` est un cache reconstructible, et
+les rapports de commission qu'il contient n'ont pas de régime de réutilisation
+confirmé ([`ATTRIBUTION.md`](ATTRIBUTION.md)).
+
+```bash
+git clone <dépôt> ratio-legis && cd ratio-legis
+python3 -m venv .venv && . .venv/bin/activate
+pip install -e .              # pymupdf, la seule dépendance
+pip install -e ".[api]"       # + fastapi et uvicorn, si vous servez l'API
+
+bash tools/phase0/miroir_dila.sh data/raw/dila   # 6,4 Go — long, une seule fois
+./pipeline.sh                                     # miroir + plans → base complète
+
+python3 restitution/graphe.py travail/ratio-legis.sqlite L224-43
+```
+
+**Prérequis** : Python ≥ 3.14 (`pipeline.sh` refuse de démarrer en deçà), plus
+`curl`, `tar` et `git`. Rien d'autre : une seule dépendance hors bibliothèque
+standard, `pymupdf`, et elle ne sert qu'à lire les PDF des études d'impact et
+des avis du Conseil d'État.
+
+**Ce que ça coûte.** Le miroir DILA pèse 6,4 Go et sa première récupération est
+longue ; ensuite elle est incrémentale et prend quelques secondes. Les corpus
+téléchargés par le pipeline — rapports, amendements, textes en discussion —
+ajoutent environ 740 Mo. L'ingestion elle-même, une fois tout sur le disque,
+prend **environ cinq minutes** ; c'est elle que rejoue `quotidien.sh` chaque
+matin. Comptez 8 Go de disque au total.
+
+**Si quelque chose manque**, le pipeline le dit et s'arrête plutôt que de
+produire une base incomplète en silence. Chaque étape est idempotente : la
+relancer ne refait que ce qui manque.
+
+Pour tenir la base à jour ensuite, voir [Tenir à jour](#tenir-à-jour) — un
+minuteur systemd utilisateur, décrit dans [`docs/26-quotidien.md`](docs/26-quotidien.md).
+
+Contribuer : [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
 ## État : phase 2 close avec deux dérogations écrites, phase 4 entamée, validation humaine de la phase 0 toujours ouverte
 
 Le graphe est chargé et interrogeable article par article. Les quatre critères de
@@ -327,7 +372,7 @@ disparaissent, remplacés par FTS5 et, pour le rappel vectoriel, un index extern
 ## Ce qui reste à faire
 
 **La note est écrite, l'évaluation ne l'est pas.** `restitution/note.py` produit
-la note « pourquoi cet article » sous le contrat du § 4.3 : 11 666 constats sur
+la note « pourquoi cet article » sous le contrat du § 4.3 : 11 638 constats sur
 les 2 104 articles, zéro phrase écartée faute de citation, aucune note vide
 ([`docs/19`](docs/19-note-phase-3.md)). Le critère de sortie de la phase 3 est en
 revanche une **évaluation humaine en aveugle** sur le golden set, qui suppose le

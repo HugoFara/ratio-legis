@@ -1,5 +1,7 @@
 __pycache__/
 *.pyc
+*.egg-info/
+.venv/
 
 # `travail/` est un cache de construction, pas une source. Il est reconstruit en
 # entier par `pipeline.sh` : le fonds LEGI depuis le miroir DILA, les rapports

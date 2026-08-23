@@ -5,6 +5,18 @@
 # si l'interpréteur qui le rejoue n'est écrit nulle part. Ce fichier ne sert pas
 # à publier un paquet, il sert à dire de quoi le pipeline a besoin.
 
+# Ce projet n'expose aucun module importable : ses points d'entrée sont des
+# scripts, lancés par chemin. Sans le dire, l'installation échoue — setuptools
+# tente de deviner des paquets dans une arborescence à plat et s'arrête. On le
+# dit donc explicitement, pour que `pip install -e .` n'installe que ce que la
+# section [project] déclare : les dépendances, et rien d'autre.
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = []
+
 [project]
 name = "ratio-legis"
 version = "0.15.0"

@@ -44,22 +44,22 @@ la tranche publie.
 
 ## 3. Le chiffre qu'il ne faut pas publier seul
 
-Sur les 2 139 articles en vigueur, **753 (35,2 %) sont sans raison documentée**.
+Sur les 2 104 articles en vigueur, **701 (33,3 %) sont sans raison documentée**.
 Ce chiffre ne décrit rien, et le publier tel quel serait une faute.
 
 | partie | articles | un passage les motive | origine située | motivation du texte | **raison non documentée** |
 |---|---:|---:|---:|---:|---:|
-| **L** | 1 281 | 677 (52,8 %) | 184 | 407 | **13 (1,0 %)** |
-| **R** | 682 | 42 (6,2 %) | 19 | 46 | **575 (84,3 %)** |
-| **D** | 176 | 0 | 0 | 11 | **165 (93,8 %)** |
+| **L** | 1 293 | 693 (53,6 %) | 179 | 416 | **5 (0,4 %)** |
+| **R** | 632 | 41 (6,5 %) | 16 | 47 | **528 (83,5 %)** |
+| **D** | 179 | 0 | 0 | 11 | **168 (93,9 %)** |
 
 Un décret n'a ni exposé des motifs, ni débat, ni amendement : son silence est
 **structurel**, celui d'un article de loi ne l'est pas. Séparés, les deux chiffres
 disent deux choses vraies et différentes :
 
-- **la partie législative du code de la consommation est documentée à 99 %** — 13
-  articles sur 1 281 échappent à toute source ;
-- **la partie réglementaire l'est à 15 %** — et c'est elle qui porte la masse des
+- **la partie législative du code de la consommation est documentée à 99,6 %** — 5
+  articles sur 1 293 échappent à toute source ;
+- **la partie réglementaire l'est à 16,5 %** — et c'est elle qui porte la masse des
   obligations que rencontre un consommateur.
 
 Le § 7 de la feuille de route l'annonçait : « Documenter leur absence de

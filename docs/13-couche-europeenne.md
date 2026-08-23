@@ -40,7 +40,7 @@ modification, pas d'une transposition.
 | Citations rattachées à un alinéa, avec offsets | **1 478** |
 | écartées faute de preuve exploitable | 0 |
 | Actes atteignant au moins un article en vigueur | 165 |
-| **Articles en vigueur nommant un acte de l'Union** | **113 sur 2 139 (5,3 %)** |
+| **Articles en vigueur nommant un acte de l'Union** | **117 sur 2 104 (5,6 %)** |
 | Transpositions déclarées dans un intitulé au JO | 8, sur 8 textes |
 | **Articles en vigueur atteignant une transposition déclarée** | **63** |
 
