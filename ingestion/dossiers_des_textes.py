@@ -47,7 +47,12 @@ from collections import defaultdict
 from pathlib import Path
 
 TITRE = re.compile(r"<TITRE>(.*?)</TITRE>", re.S)
-LEGISLATURE = re.compile(r"<LEGISLATURE>(\d+)</LEGISLATURE>")
+# `<LEGISLATURE>` est un conteneur, pas une valeur : il porte `<NUMERO>` et
+# `<DATE_DEBUT>`. Une première version lisait `<LEGISLATURE>13</LEGISLATURE>`,
+# forme qui n'existe pas dans le fonds — l'extraction n'a **jamais** rien rendu,
+# et la colonne était en réalité remplie par `rapports_vers_motive.py` depuis le
+# périmètre. L'échec ne s'est vu qu'en inversant l'ordre des deux étapes.
+LEGISLATURE = re.compile(r"<LEGISLATURE>\s*<NUMERO>(\d+)</NUMERO>", re.S)
 ID_TEXTE = re.compile(r"<ID_TEXTE_\d+>(JORFTEXT\d+)</ID_TEXTE_\d+>")
 # Le numéro du texte dont le dossier traite : celui qui suit immédiatement la
 # nature, en tête de titre. Un titre de loi de ratification en cite plusieurs
