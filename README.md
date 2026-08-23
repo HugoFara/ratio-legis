@@ -137,6 +137,7 @@ numéro d'aujourd'hui, et 695 dès qu'on remonte aux numéros d'avant 2016.
 | 15. Précision de `resulte_de` | les 277 arêtes examinées une à une, six gardes, la décision go/no-go | [`docs/21`](docs/21-precision-resulte-de.md) |
 | 16. Lecture et performance | 425 ms → 9 ms par article, et une restitution redevenue reproductible | [`docs/22`](docs/22-lecture-et-performance.md) |
 | 17. Dump ouvert | republier le graphe, sans rediffuser ce qu'on n'a pas le droit de rediffuser | [`docs/23`](docs/23-dump-ouvert.md) |
+| 18. API de lecture | interroger le graphe en 12 ms, avec l'attribution qui voyage avec la donnée | [`docs/24`](docs/24-api.md) |
 
 ### Reconstruire
 
@@ -373,6 +374,19 @@ inverse et recalcule le verdict pour que la base reste cohérente avec elle-mêm
 
 Le dump n'est pas versionné : il se refait d'une commande, et seuls son manifeste
 et sa notice le sont — comme pour les miroirs.
+
+## L'API
+
+```
+pip install '.[api]'
+RATIO_LEGIS_BASE=data/diffusion/ratio-legis.sqlite uvicorn restitution.api:app
+```
+
+`GET /articles/{numero}` rend la fiche de provenance, `/note` la note sous
+contrat, `/mesures` les métriques, `/docs` la documentation OpenAPI. **12 ms de
+médiane, 21 ms au 95ᵉ centile**, bout en bout. Chaque réponse porte l'attribution
+et l'avertissement de non-interprétation — en en-tête et dans la charge utile,
+parce qu'une API se consomme sans lire ce fichier.
 
 ## Licence et attribution
 

@@ -82,9 +82,14 @@ def empreinte(chemin: Path) -> str:
 
 
 def commit_courant() -> str:
+    """Le commit, et s'il ment : un arbre modifié ne correspond à aucun commit."""
     try:
-        return subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True,
+        commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True,
+                                text=True, check=True).stdout.strip()
+        sale = subprocess.run(["git", "status", "--porcelain"], capture_output=True,
                               text=True, check=True).stdout.strip()
+        return commit + (" (arbre modifié : ce dump ne correspond exactement à "
+                         "aucun commit)" if sale else "")
     except Exception:
         return "(hors dépôt git)"
 
