@@ -82,6 +82,16 @@ TRANSPOSITION = re.compile(r"transpos", re.I)
 RUPTURE = re.compile(r"\b(?:modifiant|abrogeant|complétant|remplaçant)\b"
                      r"|\bet\s+(?:mesures|relati\w+|adaptation|diverses)", re.I)
 
+# Un article de l'acte n'est retenu que s'il est **seul** dans la fenêtre qui
+# précède : « De l'article 23 du règlement (CE) n° 1008/2008 ». Les énumérations
+# — « des articles 5 ter, 8, 9 et 16 » — ne sont pas découpées : une première
+# version qui s'y essayait attribuait à un acte les articles de celui cité juste
+# avant, et perdait les suffixes (« 5 ter » lu « 5 »). 150 citations sur 1 478
+# sont dans le cas simple ; pour les autres le champ reste nul plutôt que faux.
+BORNE = re.compile(r"(?<![LRD])(?<!art)(?<!n°)[.;:]")
+ARTICLE_SEUL = re.compile(r"\bl['’]article\s+(\d{1,3})\s+d[ue]s?\s*$", re.I)
+MOT_ARTICLE = re.compile(r"\barticles?\b", re.I)
+
 TYPE = {"L": "directive", "R": "reglement", "D": "decision"}
 URL = "https://eur-lex.europa.eu/legal-content/FR/TXT/?uri=CELEX:{}"
 
@@ -168,6 +178,22 @@ def designation(formes: Counter) -> str:
     return (nommees or formes).most_common(1)[0][0]
 
 
+def article_de_l_acte(texte: str, depart: int, debut: int) -> str | None:
+    """Numéro de l'article de l'acte cité, si et seulement s'il est sans ambiguïté.
+
+    La fenêtre part de la citation précédente ou de la dernière borne de phrase,
+    selon la plus tardive : sans cette borne basse, l'énumération d'un acte est
+    lue comme celle du suivant.
+    """
+    bornes = [m.end() for m in BORNE.finditer(texte, depart, debut)]
+    fenetre_amont = re.sub(r"\s+", " ",
+                           texte[max(bornes[-1] if bornes else 0, depart):debut]).rstrip()
+    trouve = ARTICLE_SEUL.search(fenetre_amont)
+    if trouve and len(MOT_ARTICLE.findall(fenetre_amont)) == 1:
+        return trouve.group(1)
+    return None
+
+
 def fenetre(texte: str, debut: int, fin: int) -> str | None:
     marge = max(0, (200 - (fin - debut)) // 2)
     extrait = re.sub(r"\s+", " ", texte[max(0, debut - marge):fin + marge]).strip()
@@ -209,7 +235,10 @@ def main() -> None:
     trouvees, compte = [], Counter()
     for segment_id, texte, decalage in base.execute(
             "SELECT id, texte, offset_debut FROM segment"):
+        precedente = 0
         for identifiant, denomination, debut, fin in citations(texte):
+            article = article_de_l_acte(texte, precedente, debut)
+            precedente = fin
             if identifiant not in verifies:
                 compte["non_verifie"] += 1
                 continue
@@ -217,8 +246,9 @@ def main() -> None:
             if extrait is None:
                 compte["sans_preuve"] += 1
                 continue
+            compte["avec_article"] += article is not None
             formes[identifiant][denomination] += 1
-            trouvees.append((segment_id, identifiant, decalage + debut,
+            trouvees.append((segment_id, identifiant, article, decalage + debut,
                              decalage + fin, extrait))
 
     # 2. Transpositions déclarées dans l'intitulé complet du texte français.
@@ -253,12 +283,12 @@ def main() -> None:
     preuves, aretes = [], []
     suivant = prochain_identifiant(base)
     vus = set()
-    for segment_id, identifiant, debut, fin, extrait in trouvees:
+    for segment_id, identifiant, article, debut, fin, extrait in trouvees:
         if (segment_id, identifiant, debut) in vus:
             continue
         vus.add((segment_id, identifiant, debut))
         preuves.append((suivant, "citation_acte_ue", extrait, debut))
-        aretes.append((segment_id, identifiant, debut, fin, "derivee",
+        aretes.append((segment_id, identifiant, article, debut, fin, "derivee",
                        CONFIANCE, suivant))
         suivant += 1
 
@@ -273,8 +303,9 @@ def main() -> None:
         "INSERT INTO preuve (id, methode, fenetre, source_offset) "
         "VALUES (?, ?, ?, ?)", preuves)
     base.executemany(
-        "INSERT INTO cite_acte_ue (segment_id, celex, offset_debut, offset_fin, "
-        "methode, confiance, preuve_id) VALUES (?, ?, ?, ?, ?, ?, ?)", aretes)
+        "INSERT INTO cite_acte_ue (segment_id, celex, article_cite, offset_debut, "
+        "offset_fin, methode, confiance, preuve_id) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)", aretes)
 
     for texte_id, identifiant, debut, extrait in declarations:
         base.execute("INSERT INTO preuve (id, methode, fenetre, source_offset) "
@@ -297,6 +328,7 @@ def main() -> None:
         n = sum(1 for a in actes if a[1] == type_acte)
         print(f"  {type_acte:12s}           : {n}")
     print(f"citations retenues         : {len(aretes)}")
+    print(f"  nommant un article précis : {compte['avec_article']}")
     print(f"  CELEX non vérifié        : {compte['non_verifie']}")
     print(f"  écartées faute de preuve : {compte['sans_preuve']}")
     print(f"transpositions déclarées   : {len(declarations)} "

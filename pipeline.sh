@@ -123,6 +123,13 @@ CELEX="$RACINE/data/corpus/celex-verifies.tsv"
 
 python3 "$RACINE/ingestion/union_europeenne.py" "$BASE" "$CELEX" "$TITRES"
 
+# Le « pourquoi » du droit de l'Union est dans ses considérants, publiés avec
+# l'acte. EUR-Lex les rend en HTML structuré selon ELI ; le miroir est hors dépôt
+# comme celui de la DILA, seul son manifeste est versionné.
+EURLEX="$RACINE/data/raw/eurlex"
+python3 "$RACINE/tools/ue/recuperer_actes.py" "$BASE" "$EURLEX"
+python3 "$RACINE/ingestion/considerants.py" "$BASE" "$EURLEX"
+
 etape "Terminé"
 echo "base : $BASE ($(du -h "$BASE" | cut -f1))"
 echo "essai : python3 restitution/graphe.py $BASE L224-43"

@@ -12,7 +12,7 @@ sans citation résoluble au niveau du passage.
 
 Spécification complète : [`ratio-legis-feuille-de-route.md`](ratio-legis-feuille-de-route.md).
 
-## État : huit tranches en base, validation humaine de la phase 0 toujours ouverte
+## État : neuf tranches en base, validation humaine de la phase 0 toujours ouverte
 
 Le graphe est chargé et interrogeable article par article. Ce qu'il ne peut pas
 encore faire, c'est se déclarer conforme : le critère de sortie de la phase 2
@@ -36,6 +36,7 @@ Reconstruite d'une commande depuis le miroir et les plans versionnés
 | Amendements (20 342 Sénat, 11 115 Assemblée) | 31 457 | `renvoie_a` — le graphe de renvois | 11 656 |
 | Acteurs | 1 419 | `resulte_de` — l'amendement qui a écrit l'alinéa | 286 |
 | **Actes de l'Union** | **284** | `cite_acte_ue` / `transpose` | 1 478 / 8 |
+| **Considérants de l'Union** | **7 674** | `article_acte_ue` — articles d'actes déclarés | 6 237 |
 
 Ce que cela donne au grain de l'article en vigueur, qui est le seul grain qui
 compte pour le produit :
@@ -45,6 +46,7 @@ compte pour le produit :
 | Articles cités par un autre article du fonds | **1 064 (49,7 %)** |
 | Articles atteignant un rapport au Président — grain : le texte entier | 997 |
 | Articles nommant un acte de l'Union | 113 |
+| Articles atteignant un considérant européen — grain : l'acte entier | 113 |
 | Articles atteignant une transposition déclarée — grain : le texte entier | 63 |
 | **Articles remontant à un amendement identifié** | **82** |
 | **Articles remontant à un passage qui les nomme** | **65** |
@@ -67,7 +69,8 @@ l'autre.
 | 5. Amendements non adoptés | ce qui a été tenté sans aboutir | [`docs/10`](docs/10-amendements-non-adoptes.md) |
 | 6. Assemblée nationale | la XIVe législature, les deux chambres chargées | [`docs/11`](docs/11-tranche-assemblee.md) |
 | 7. But déclaré et rapports au Président | l'objet de l'amendement, la motivation des ordonnances | [`docs/12`](docs/12-but-declare.md) |
-| 8. **Couche européenne** | l'acte de l'Union que l'article cite, la transposition déclarée | [`docs/13`](docs/13-couche-europeenne.md) |
+| 8. Couche européenne | l'acte de l'Union que l'article cite, la transposition déclarée | [`docs/13`](docs/13-couche-europeenne.md) |
+| 9. **Considérants** | le motif que l'Union écrit elle-même, et l'article visé de l'acte | [`docs/14`](docs/14-considerants.md) |
 
 ### Reconstruire
 
@@ -81,9 +84,10 @@ Tout est reconstructible depuis ce qui est versionné : le miroir DILA
 dérivés** dans un vidage de `/tmp` : la règle « la donnée brute est sacrée » du
 § 5.2 ne vaut que si l'on sait aussi la retrouver.
 
-Une seule étape demande le réseau au-delà des téléchargements de sources : la
-vérification des identifiants CELEX auprès de Cellar. Son résultat est versionné,
-donc le reste rejoue hors ligne.
+Deux étapes demandent le réseau au-delà des téléchargements de sources : la
+vérification des identifiants CELEX auprès de Cellar, dont le résultat est
+versionné, et le miroir EUR-Lex des 284 actes de l'Union (153 Mo), stocké hors
+dépôt comme celui de la DILA, avec son manifeste horodaté.
 
 ## Phase 0
 
@@ -232,10 +236,10 @@ aucune mesure de précision du projet n'est autre chose qu'une auto-évaluation.
 
 **Trois couches de motivation ne sont pas construites.**
 
-1. **Les considérants européens.** `acte_ue.considerants` est vide. C'est pourtant
-   là qu'est le « pourquoi » du droit de l'Union : un considérant de directive est
-   l'exposé des motifs que le droit français n'a pas. Suite naturelle de la
-   huitième tranche, et la moins chère des trois.
+1. ~~Les considérants européens.~~ **Faite** : 7 674 considérants chargés,
+   113 articles atteints ([`docs/14`](docs/14-considerants.md)). Reste ouvert le
+   seul chemin connu vers un lien au grain de l'article : les tableaux de
+   concordance annexés aux textes de transposition.
 2. **Les études d'impact.** Obligatoires depuis 2009 pour tout projet de loi,
    elles chiffrent ce que le législateur croyait faire. Les confronter au texte
    adopté est le seul endroit du projet où l'on pourra montrer un écart entre

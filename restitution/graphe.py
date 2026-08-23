@@ -39,6 +39,7 @@ import re
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "ingestion"))
 from union_europeenne import ANCRE  # noqa: E402
 
+PLAFOND_CONSIDERANTS = 25          # au-delà, la page devient illisible
 SEUIL_APPARIEMENT = 60          # sous ce seuil, aucune preuve textuelle ne discrimine
 
 # Numéro de l'article du PROJET de loi, tel que l'amendement et le commentaire de
@@ -131,8 +132,12 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
         # « cite » et rien de plus : voir schema/004-union.sql. Un alinéa peut
         # nommer une directive pour l'écarter ; la qualification du lien n'est
         # pas dans les données, elle n'est donc pas affichée.
-        actes = q("""SELECT u.celex, u.denomination, u.url, u.type_acte
+        actes = q("""SELECT u.celex, u.denomination, u.url, u.type_acte,
+                            c.article_cite, aa.intitule AS article_intitule,
+                            aa.url AS article_url
                      FROM cite_acte_ue c JOIN acte_ue u ON u.celex = c.celex
+                     LEFT JOIN article_acte_ue aa ON aa.celex = c.celex
+                                                 AND aa.numero = c.article_cite
                      WHERE c.segment_id = ? ORDER BY c.offset_debut""", segment["id"])
         d["alineas"].append({**segment, "amendements": amendements, "renvois": renvois,
                              "actes_ue": actes,
@@ -196,6 +201,34 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
         JOIN acte_ue u          ON u.celex = tr.celex
         LEFT JOIN preuve p      ON p.id = tr.preuve_id
         WHERE a.numero = ?""", numero)
+
+    # Les considérants motivent l'acte, jamais l'article français : rien ne les
+    # relie l'un à l'autre, et deux tentatives de sélection ont été mesurées puis
+    # abandonnées (docs/14 § 5). Le nombre et le lien sont donc rendus au grain de
+    # l'acte, sans prétendre désigner celui qui explique cet article-ci.
+    d["actes_motivants"] = q("""
+        SELECT u.celex, u.denomination, u.type_acte, u.url,
+               count(c.rang) AS considerants,
+               max(EXISTS (SELECT 1 FROM transpose tr
+                           JOIN produite_par pp ON pp.texte_id = tr.texte_id
+                           JOIN version_article vv ON vv.id_legi = pp.version_id
+                           JOIN article aa ON aa.id = vv.article_id
+                           WHERE tr.celex = u.celex AND aa.numero = ?
+                             AND vv.etat = 'VIGUEUR')) AS transposee
+        FROM acte_ue u
+        LEFT JOIN considerant c ON c.celex = u.celex
+        WHERE u.celex IN (SELECT celex FROM union_par_article WHERE article = ?)
+           OR EXISTS (SELECT 1 FROM transpose tr
+                      JOIN produite_par pp ON pp.texte_id = tr.texte_id
+                      JOIN version_article vv ON vv.id_legi = pp.version_id
+                      JOIN article aa ON aa.id = vv.article_id
+                      WHERE tr.celex = u.celex AND aa.numero = ? AND vv.etat = 'VIGUEUR')
+        GROUP BY u.celex ORDER BY transposee DESC, u.celex""",
+        numero, numero, numero)
+    d["considerants"] = {
+        a["celex"]: q("""SELECT rang, numero, texte, url FROM considerant
+                         WHERE celex = ? ORDER BY rang""", a["celex"])
+        for a in d["actes_motivants"]}
 
     d["cite_par"] = q("""SELECT article_citant,
                                 min((SELECT fenetre FROM preuve WHERE id = preuve_id)) AS extrait
@@ -267,8 +300,29 @@ def en_texte(d: dict) -> str:
                 f"{r['numero_cite']}" + (f" [{r['code_cite']}]" if r["code_cite"] else "")
                 for r in a["renvois"]))
         for u in a["actes_ue"]:
-            L.append(f"        cite {nommer(u)}")
-            L.append(f"          {u['url']}")
+            precision = ""
+            if u["article_cite"]:
+                precision = f", article {u['article_cite']}" + (
+                    f" — {u['article_intitule']}" if u["article_intitule"] else "")
+            L.append(f"        cite {nommer(u)}{precision}")
+            L.append(f"          {u['article_url'] or u['url']}")
+
+    if d["actes_motivants"]:
+        L.append(f"\nCE QUE L'UNION EN DIT ({len(d['actes_motivants'])} acte(s))")
+        L.append("  Un considérant motive l'acte entier. Rien ne dit lequel motive")
+        L.append("  cet article-ci : l'acte ne l'écrit pas, et nous ne le devinons pas.")
+        for u in d["actes_motivants"]:
+            marque = " [transposition déclarée]" if u["transposee"] else ""
+            L.append(f"\n  {nommer(u)}{marque} — {u['considerants']} considérant(s)")
+            L.append(f"  {u['url']}")
+            if u["considerants"]:
+                L.append("    les deux premiers, dans l'ordre du texte :")
+            for c in d["considerants"][u["celex"]][:2]:
+                rang = f"({c['numero']})" if c["numero"] else f"[{c['rang']}e, non numéroté]"
+                L.append(f"    {rang} {c['texte'][:220].strip()}…")
+            reste = max(0, u["considerants"] - 2)
+            if reste:
+                L.append(f"    … et {reste} autre(s), sur EUR-Lex")
 
     L.append(f"\nCE QUI CITE CET ARTICLE ({len(d['cite_par'])})")
     L.append("  " + ", ".join(c["article_citant"] for c in d["cite_par"]) if d["cite_par"]
@@ -323,6 +377,10 @@ font-family:ui-sans-serif,system-ui,sans-serif}}
 .preuve{{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.76rem;
 color:var(--doux);margin-top:.4rem;overflow-x:auto;white-space:pre-wrap}}
 .silence{{color:var(--doux);font-style:italic;font-size:.87rem;margin:.4rem 0}}
+.cons{{font-size:.85rem;margin:.5rem 0;padding-left:.8rem;
+border-left:1px solid var(--trait)}}
+details summary{{cursor:pointer;font-size:.82rem;color:var(--acc);margin-top:.5rem;
+font-family:ui-sans-serif,system-ui,sans-serif}}
 .raison{{background:var(--carte);border:1px solid var(--trait);border-left:3px solid var(--vert);
 padding:.9rem 1rem;margin:.8rem 0}}
 .puces{{display:flex;flex-wrap:wrap;gap:.35rem;font-family:ui-monospace,monospace;font-size:.8rem}}
@@ -403,9 +461,39 @@ font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-seri
                 for r in a["renvois"]) + "</div>")
         if a["actes_ue"]:
             p.append('<div class="puces">cite&nbsp;' + "".join(
-                f'<span><a href="{e(u["url"])}">{e(nommer(u))}</a></span>'
-                for u in a["actes_ue"]) + "</div>")
+                f'<span><a href="{e(u["article_url"] or u["url"])}">{e(nommer(u))}'
+                + (f' · art. {e(u["article_cite"])}' if u["article_cite"] else "")
+                + (f' — {e(u["article_intitule"])}' if u["article_intitule"] else "")
+                + "</a></span>" for u in a["actes_ue"]) + "</div>")
         p.append("</div>")
+
+    if d["actes_motivants"]:
+        p.append(f"<h2>Ce que l'Union en dit ({len(d['actes_motivants'])})</h2>")
+        p.append('<p class="silence">Un considérant motive l\'acte entier. Rien '
+                 "ne dit lequel motive cet article-ci : l'acte ne l'écrit nulle "
+                 "part, et deux méthodes pour le deviner ont été essayées, "
+                 "mesurées, et écartées.</p>")
+        for u in d["actes_motivants"]:
+            liste = d["considerants"][u["celex"]]
+            montres = liste[:PLAFOND_CONSIDERANTS]
+            p.append(f'<div class="raison"><div class="meta">'
+                     + ('<span>transposition déclarée</span>' if u["transposee"] else
+                        '<span>cité par cet article</span>')
+                     + f'<span>{len(liste)} considérant(s)</span>'
+                     f'<a href="{e(u["url"])}">acte de l\'Union</a></div>'
+                     f'<div><b>{e(nommer(u))}</b></div>')
+            if montres:
+                p.append("<details><summary>lire les considérants</summary>")
+                for c in montres:
+                    rang = (f"({c['numero']})" if c["numero"]
+                            else f"[{c['rang']}<sup>e</sup>, non numéroté]")
+                    p.append(f'<p class="cons"><a href="{e(c["url"])}">{rang}</a> '
+                             f'{e(c["texte"][:1200])}</p>')
+                if len(liste) > len(montres):
+                    p.append(f'<p class="silence">{len(montres)} premiers sur '
+                             f'{len(liste)} — la suite sur EUR-Lex.</p>')
+                p.append("</details>")
+            p.append("</div>")
 
     p.append(f"<h2>Ce qui cite cet article ({len(d['cite_par'])})</h2>")
     p.append('<div class="puces">' + "".join(

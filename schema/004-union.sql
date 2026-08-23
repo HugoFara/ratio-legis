@@ -63,10 +63,18 @@ CREATE TABLE transpose (
 -- tout autant. Cette table dit seulement : *le texte de cet alinéa nomme cet
 -- acte, à cet endroit*. C'est un fait vérifiable ; la qualification du lien ne
 -- l'est pas, et n'est donc pas inventée. La restitution doit tenir ce mot.
+--
+-- `article_cite` n'est renseigné que lorsque la fenêtre qui précède l'acte nomme
+-- **un seul** article, sans énumération : « De l'article 23 du règlement (CE)
+-- n° 1008/2008 ». 150 citations sur 1 478 sont dans ce cas. Les autres en nomment
+-- souvent plusieurs, par plages et par suffixes (« des articles 5 ter, 8, 9 et
+-- 16 »), et une première version qui tentait de les découper attribuait à un acte
+-- les articles de l'acte cité juste avant. Le champ reste nul plutôt que faux.
 CREATE TABLE cite_acte_ue (
     id            INTEGER PRIMARY KEY,
     segment_id    TEXT NOT NULL REFERENCES segment,
     celex         TEXT NOT NULL REFERENCES acte_ue,
+    article_cite  TEXT,
     offset_debut  INTEGER NOT NULL,
     offset_fin    INTEGER NOT NULL,
     methode       TEXT NOT NULL DEFAULT 'derivee'
@@ -85,6 +93,7 @@ CREATE INDEX cite_acte_ue_par_acte ON cite_acte_ue (celex);
 CREATE VIEW union_par_article AS
     SELECT a.numero        AS article,
            c.celex         AS celex,
+           c.article_cite  AS article_cite,
            u.denomination  AS denomination,
            u.type_acte     AS type_acte,
            u.url           AS url,
