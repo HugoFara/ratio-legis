@@ -138,6 +138,7 @@ numéro d'aujourd'hui, et 695 dès qu'on remonte aux numéros d'avant 2016.
 | 16. Lecture et performance | 425 ms → 9 ms par article, et une restitution redevenue reproductible | [`docs/22`](docs/22-lecture-et-performance.md) |
 | 17. Dump ouvert | republier le graphe, sans rediffuser ce qu'on n'a pas le droit de rediffuser | [`docs/23`](docs/23-dump-ouvert.md) |
 | 18. API de lecture | interroger le graphe en 12 ms, avec l'attribution qui voyage avec la donnée | [`docs/24`](docs/24-api.md) |
+| 19. Surlignage par étape | quel texte a introduit chaque alinéa, malgré la recodification | [`docs/25`](docs/25-surlignage.md) |
 
 ### Reconstruire
 
@@ -374,6 +375,18 @@ inverse et recalcule le verdict pour que la base reste cohérente avec elle-mêm
 
 Le dump n'est pas versionné : il se refait d'une commande, et seuls son manifeste
 et sa notice le sont — comme pour les miroirs.
+
+## Le surlignage
+
+```
+python3 restitution/surlignage.py base.sqlite L111-1 --html sortie.html
+```
+
+Sur le texte d'un article, la **couleur** donne le texte qui a introduit l'alinéa,
+la **trame** signale qu'il a été retouché depuis, la **marque** nomme l'amendement
+quand la chaîne y mène. 99,0 % des 7 496 alinéas en vigueur ont un texte
+introducteur ; **un article sur six est composite**, écrit par deux textes ou plus.
+Exemples dans [`restitution/exemples/surlignage/`](restitution/exemples/surlignage/).
 
 ## L'API
 

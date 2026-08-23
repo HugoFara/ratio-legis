@@ -46,6 +46,7 @@ from starlette.requests import Request
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import graphe  # noqa: E402
 import note  # noqa: E402
+import surlignage  # noqa: E402
 
 BASE = Path(os.environ.get("RATIO_LEGIS_BASE", "travail/ratio-legis.sqlite"))
 
@@ -132,6 +133,8 @@ def racine() -> dict:
             "/articles/{numero}": "fiche de provenance complète",
             "/articles/{numero}/note": "la note « pourquoi cet article », sous le "
                                        "contrat du § 4.3",
+            "/articles/{numero}/surlignage": "chaque alinéa, et le texte qui l'a "
+                                             "introduit",
             "/mesures": "métriques d'hygiène législative",
             "/attribution": "les mentions obligatoires, en entier",
             "/sante": "état de la base servie",
@@ -233,6 +236,31 @@ def note_html(numero: str, base: sqlite3.Connection = Depends(connexion)) -> str
     if not donnees:
         raise HTTPException(404, f"aucun article {numero} en vigueur dans ce fonds")
     return note.en_html(donnees)
+
+
+@app.get("/articles/{numero}/surlignage",
+         summary="Chaque alinéa, et le texte qui l'a introduit")
+def surlignage_article(numero: str,
+                       base: sqlite3.Connection = Depends(connexion)) -> dict:
+    donnees = surlignage.surligner(base, numero)
+    if not donnees:
+        raise HTTPException(404, f"aucun article {numero} en vigueur dans ce fonds")
+    return enveloppe({**donnees, "ce_que_la_couleur_dit":
+                      "Le texte qui a introduit l'alinéa, jamais qui l'a voulu. "
+                      "Les deux arêtes utilisées — produite_par et repris_de — sont "
+                      "déclarées par LEGI ou portent leur fenêtre de preuve ; les "
+                      "liens d'abrogation en sont exclus, un texte qui supprime un "
+                      "article ne l'a pas écrit."})
+
+
+@app.get("/articles/{numero}/surlignage.html", response_class=HTMLResponse,
+         summary="Le même surlignage, à lire")
+def surlignage_html(numero: str,
+                    base: sqlite3.Connection = Depends(connexion)) -> str:
+    donnees = surlignage.surligner(base, numero)
+    if not donnees:
+        raise HTTPException(404, f"aucun article {numero} en vigueur dans ce fonds")
+    return surlignage.en_html(donnees)
 
 
 @app.get("/articles/{numero}/graphe.txt", response_class=PlainTextResponse,
