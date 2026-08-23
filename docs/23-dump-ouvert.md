@@ -53,7 +53,7 @@ affirmation nue.
 
 L'arbitrage est écrit dans `ATTRIBUTION.md` plutôt que subi :
 
-- le **texte** des 221 rapports n'est pas rediffusé — URL, hachage et offsets
+- le **texte** des 252 rapports n'est pas rediffusé — URL, hachage et offsets
   restent, ce qui suffit à refaire le lien depuis la source ;
 - les fenêtres de preuve sont **ramenées à soixante caractères**, le plancher que
   le schéma exige. Soixante caractères sont la preuve irréductible ; quatre cents
@@ -79,7 +79,7 @@ vient.
 |---|---:|
 | Base SQLite, compactée | **126 Mo** (source 240 Mo) |
 | Tables exportées aussi en TSV | 17 |
-| Documents dont le texte est retiré | 221 |
+| Documents dont le texte est retiré | 252 |
 | Fenêtres de preuve tronquées | 624 |
 | Violations d'intégrité | **0** |
 

@@ -22,7 +22,7 @@ l'usage commercial, le Sénat exige la gratuité de la diffusion, quand la Licen
 Ouverte autorise expressément l'exploitation commerciale. Rediffuser sous Licence
 Ouverte transmettrait à l'aval des droits que l'amont n'accorde pas.
 
-Les 107 Mo de texte de rapport sont donc remplacés par un avis **qui nomme le
+Les 122 Mo de texte de rapport sont donc remplacés par un avis **qui nomme le
 régime de la chambre concernée** ; **l'URL, le hachage et les offsets restent**,
 ce qui suffit à quiconque veut refaire le lien depuis la source. Le dump porte en
 outre une table `regime_de_reutilisation` : l'écart entre les deux chambres est
@@ -275,17 +275,20 @@ def lisez_moi(base: sqlite3.Connection, destination: Path, strict: bool,
     lignes += ["", "## Ce que ce dump ne contient pas", ""]
     if strict:
         lignes += ["Les rapports de commission et les arêtes `motive` qui en "
-                   "dépendent en ont été **retirés**, leur régime de réutilisation "
-                   "n'étant pas confirmé par les assemblées. Le verdict a été "
-                   "recalculé en conséquence : cette base est cohérente avec "
-                   "elle-même, non avec celle dont elle vient."]
+                   "dépendent en ont été **retirés**, les conditions posées par "
+                   "chaque chambre étant incompatibles avec la Licence Ouverte de "
+                   "ce dump. Le verdict a été recalculé en conséquence : cette base "
+                   "est cohérente avec elle-même, non avec celle dont elle vient."]
     else:
         lignes += ["Le **texte** des rapports de commission n'est pas rediffusé : "
-                   "leur régime de réutilisation n'est pas confirmé par les "
-                   "assemblées. Leur URL, leur hachage et les offsets des passages "
-                   "restent présents, ce qui suffit à refaire le lien depuis la "
-                   "source. Les fenêtres de preuve qui en viennent sont ramenées aux "
-                   "soixante caractères que le schéma exige au minimum."]
+                   "les conditions publiées par chaque chambre sont incompatibles "
+                   "avec la Licence Ouverte de ce dump, qui autorise l'exploitation "
+                   "commerciale — voir la table `regime_de_reutilisation`, qui porte "
+                   "l'écart entre les deux. Leur URL, leur hachage et les offsets "
+                   "des passages restent présents, ce qui suffit à refaire le lien "
+                   "depuis la source. Les fenêtres de preuve qui en viennent sont "
+                   "ramenées aux soixante caractères que le schéma exige au "
+                   "minimum."]
     lignes += [""] + [f"- `{c}` : {v}" for c, v in compte.items()]
     lignes += ["", "## Tables", "", "| Table | Lignes | Contenu |", "|---|---:|---|"]
     for nom, description in DICTIONNAIRE.items():

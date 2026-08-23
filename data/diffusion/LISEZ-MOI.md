@@ -16,12 +16,12 @@ Données sous **Licence Ouverte / Etalab 2.0**, code sous **AGPL-3.0-or-later**.
 
 ## Ce que ce dump ne contient pas
 
-Le **texte** des rapports de commission n'est pas rediffusé : leur régime de réutilisation n'est pas confirmé par les assemblées. Leur URL, leur hachage et les offsets des passages restent présents, ce qui suffit à refaire le lien depuis la source. Les fenêtres de preuve qui en viennent sont ramenées aux soixante caractères que le schéma exige au minimum.
+Le **texte** des rapports de commission n'est pas rediffusé : les conditions publiées par chaque chambre sont incompatibles avec la Licence Ouverte de ce dump, qui autorise l'exploitation commerciale — voir la table `regime_de_reutilisation`, qui porte l'écart entre les deux. Leur URL, leur hachage et les offsets des passages restent présents, ce qui suffit à refaire le lien depuis la source. Les fenêtres de preuve qui en viennent sont ramenées aux soixante caractères que le schéma exige au minimum.
 
-- `documents_dont_le_texte_est_retire_senat` : 109
-- `documents_dont_le_texte_est_retire_assemblee` : 112
-- `documents_dont_le_texte_est_retire` : 221
-- `fenetres_de_preuve_ramenees_a_60_caracteres` : 624
+- `documents_dont_le_texte_est_retire_senat` : 122
+- `documents_dont_le_texte_est_retire_assemblee` : 130
+- `documents_dont_le_texte_est_retire` : 252
+- `fenetres_de_preuve_ramenees_a_60_caracteres` : 639
 
 ## Tables
 
@@ -32,21 +32,21 @@ Le **texte** des rapports de commission n'est pas rediffusé : leur régime de r
 | `segment` | 28294 | un alinéa d'une version, avec ses offsets dans le texte |
 | `texte_normatif` | 469 | une loi, une ordonnance, un décret ou un arrêté |
 | `dossier` | 199 | un dossier législatif (DOLE) |
-| `document` | 337 | un document de motivation : exposé des motifs, étude d'impact, avis du Conseil d'État, rapport de commission, rapport au Président |
-| `amendement` | 31457 | un amendement déposé, adopté ou non, avec son auteur et son sort |
-| `acteur` | 1419 | un parlementaire ou un groupe, tel que les chambres le nomment |
+| `document` | 372 | un document de motivation : exposé des motifs, étude d'impact, avis du Conseil d'État, rapport de commission, rapport au Président |
+| `amendement` | 33217 | un amendement déposé, adopté ou non, avec son auteur et son sort |
+| `acteur` | 1478 | un parlementaire ou un groupe, tel que les chambres le nomment |
 | `acte_ue` | 284 | un acte de l'Union identifié par son CELEX |
 | `considerant` | 7674 | un considérant d'un acte de l'Union, dans l'ordre de publication |
-| `texte_discute` | 355 | un texte déposé ou transmis, à un stade de la navette |
-| `preuve` | 48575 | la fenêtre textuelle qui fonde une arête dérivée |
+| `texte_discute` | 371 | un texte déposé ou transmis, à un stade de la navette |
+| `preuve` | 51515 | la fenêtre textuelle qui fonde une arête dérivée |
 | `produite_par` | 8145 | version d'article → texte qui l'a produite (LEGI, déclarée) |
 | `issu_de` | 200 | texte → dossier législatif (DOLE, déclarée) |
 | `renumerote_de` | 1882 | article → article dont il reprend la disposition |
 | `repris_de` | 6137 | segment → segment antérieur dont il reprend le texte |
 | `resulte_de` | 279 | segment → amendement qui l'a écrit — l'arête critique du projet |
-| `motive` | 624 | document → article ou segment que l'un de ses passages explique |
-| `porte_sur` | 27412 | article d'un texte discuté → article du code qu'il modifie |
-| `vise` | 242 | amendement → article du code que son dispositif désigne |
+| `motive` | 639 | document → article ou segment que l'un de ses passages explique |
+| `porte_sur` | 30337 | article d'un texte discuté → article du code qu'il modifie |
+| `vise` | 276 | amendement → article du code que son dispositif désigne |
 | `renvoie_a` | 12534 | segment → article cité, interne ou externe au code |
 | `cite_acte_ue` | 1572 | segment → acte de l'Union qu'il nomme |
 | `transpose` | 8 | texte → acte de l'Union dont il déclare la transposition |
