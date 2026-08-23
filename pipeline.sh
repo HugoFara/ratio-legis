@@ -15,6 +15,16 @@
 # Usage : pipeline.sh [répertoire de travail] [base.sqlite]
 set -uo pipefail
 RACINE="$(cd "$(dirname "$0")" && pwd)"
+
+# L'interpréteur fait partie de ce qu'il faut pour rejouer le pipeline, au même
+# titre que le miroir et les plans. Le laisser implicite, c'est accepter que
+# « rejouable » veuille dire « rejouable ici » — l'inverse de la règle § 5.2.
+python3 - <<'FIN' || exit 1
+import sys
+if sys.version_info < (3, 14):
+    sys.exit(f"Python 3.14 est requis (voir pyproject.toml) ; "
+             f"celui-ci est {'.'.join(map(str, sys.version_info[:3]))}.")
+FIN
 TRAVAIL="${1:-$RACINE/travail}"
 BASE="${2:-$TRAVAIL/ratio-legis.sqlite}"
 MIROIR="$RACINE/data/raw/dila"

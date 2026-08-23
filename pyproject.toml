@@ -1,0 +1,19 @@
+# Ratio Legis — déclaration de l'environnement d'exécution.
+#
+# Le projet n'était installable ni vérifiable : `pipeline.sh` appelait `python3`,
+# quel qu'il soit. La règle § 5.2 — « le pipeline est rejouable » — ne tient pas
+# si l'interpréteur qui le rejoue n'est écrit nulle part. Ce fichier ne sert pas
+# à publier un paquet, il sert à dire de quoi le pipeline a besoin.
+
+[project]
+name = "ratio-legis"
+version = "0.15.0"
+description = "Graphe de provenance normative du droit français"
+readme = "README.md"
+license = "AGPL-3.0-or-later"
+requires-python = ">=3.14"
+
+# Seule dépendance hors bibliothèque standard, et une seule chose lui est
+# demandée : extraire le texte des études d'impact et des avis du Conseil d'État,
+# qui n'existent qu'en PDF, en conservant les offsets exigés par le § 4.3.
+dependencies = ["pymupdf>=1.24"]

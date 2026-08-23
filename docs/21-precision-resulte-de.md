@@ -179,10 +179,13 @@ d'amélioration prioritaire, sans être une condition de survie.
 **Décision : go.** Avec deux conséquences écrites :
 
 1. **le seuil de couverture de 60 % du § 4.2 est déclaré non atteint et non
-   atteignable** sur ce corpus dans l'état des sources — les amendements de
-   l'Assemblée n'existent en open data que depuis la XIVe législature, et le
-   tableau synoptique du Sénat (§ 3, étape 1 de la cascade, `declaree`) n'est pas
-   exploité ;
+   atteignable** sur ce corpus dans l'état des sources. Les amendements de
+   l'Assemblée n'existent en open data que depuis la XIVe législature ; et le
+   premier échelon de la cascade du § 3 — le tableau synoptique du Sénat, seule
+   voie `declaree` prévue — **n'existe pas**, ce qu'avait établi la vérification
+   des sources de la phase 0 ([`docs/01`](01-rapport-verification-sources.md)
+   § 3.2). La cascade est donc amputée de son échelon le plus fiable, non par
+   défaut d'implémentation mais faute d'objet ;
 2. **le seuil de précision de 95 % est atteint en estimation ponctuelle et non
    démontré.** 57/60 donne 95,0 %, mais l'intervalle à 95 % descend à 0,863 :
    avec soixante arêtes, on ne peut pas *établir* qu'on dépasse 95 %. Le démontrer

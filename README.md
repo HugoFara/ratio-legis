@@ -130,6 +130,13 @@ numéro d'aujourd'hui, et 695 dès qu'on remonte aux numéros d'avant 2016.
 
 ### Reconstruire
 
+**Prérequis : Python ≥ 3.14 et `pymupdf`**, déclarés dans `pyproject.toml` — la
+seule dépendance hors bibliothèque standard, et elle ne sert qu'à extraire le
+texte des études d'impact et des avis du Conseil d'État, qui n'existent qu'en
+PDF. `pipeline.sh` refuse de démarrer sur un interpréteur plus ancien : un
+pipeline dont l'interpréteur n'est écrit nulle part n'est rejouable que là où il
+a été écrit.
+
 ```
 ./pipeline.sh                 # miroir DILA + plans versionnés → base complète
 ```
