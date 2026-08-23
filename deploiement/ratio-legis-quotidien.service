@@ -6,9 +6,14 @@
 # distribué apporterait une centaine de paquets et un démon pour un besoin que
 # systemd couvre déjà. L'écart est écrit au § 6 bis de la feuille de route.
 #
-# Installation :
+# Le chemin du dépôt n'est pas écrit en dur : il était celui d'une machine, ce
+# qui casse pour quiconque clone ailleurs. Il est substitué à l'installation.
+#
+# Installation, depuis la racine du dépôt :
 #   mkdir -p ~/.config/systemd/user
-#   cp deploiement/ratio-legis-quotidien.{service,timer} ~/.config/systemd/user/
+#   sed "s|@RACINE@|$PWD|g" deploiement/ratio-legis-quotidien.service \
+#       > ~/.config/systemd/user/ratio-legis-quotidien.service
+#   cp deploiement/ratio-legis-quotidien.timer ~/.config/systemd/user/
 #   systemctl --user daemon-reload
 #   systemctl --user enable --now ratio-legis-quotidien.timer
 #   systemctl --user list-timers ratio-legis-quotidien.timer
