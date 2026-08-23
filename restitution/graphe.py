@@ -168,10 +168,18 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
                m.offset_debut, m.offset_fin,
                replace(replace(substr(doc.texte, m.offset_debut, 900), char(10), ' '),
                        char(13), '') AS extrait,
-               (SELECT fenetre FROM preuve WHERE id = m.preuve_id) AS preuve
+               (SELECT fenetre FROM preuve WHERE id = m.preuve_id) AS preuve,
+               (SELECT methode FROM preuve WHERE id = m.preuve_id) AS voie
         FROM asc_a JOIN motive m ON m.article_id = asc_a.anc
         JOIN document doc ON doc.id = m.document_id
-        GROUP BY m.id ORDER BY m.offset_fin - m.offset_debut""", numero)
+        -- Un même passage peut motiver l'article et l'un de ses ancêtres : sans
+        -- ce regroupement, la remontée de la chaîne l'affiche deux fois.
+        GROUP BY doc.id, m.offset_debut, m.offset_fin
+        -- La déclaration en en-tête passe avant : elle nomme l'article dans le
+        -- commentaire même, là où le rattachement par l'article du texte est
+        -- structurel et ne se lit pas dans le passage montré.
+        ORDER BY (voie = 'section_appariee'), m.offset_fin - m.offset_debut""",
+        numero)
 
     # Contrôle de cohérence structurelle : les articles du projet de loi que les
     # commentaires retenus disent motiver cet article du code.
@@ -288,6 +296,11 @@ def en_texte(d: dict) -> str:
     for r in d["raisons"][:2]:
         L.append(f"  [{r['type']}] confiance {r['confiance']:.3f} ({r['methode']})")
         L.append(f"  {r['url']}  offsets {r['offset_debut']}–{r['offset_fin']}")
+        if r["voie"] == "section_appariee":
+            L.append(f"  ⚠ rattaché parce que cette section commente l'article "
+                     f"{r['article_du_texte']} du texte, qui modifie cet article du "
+                     "code. Le lien est structurel : le passage ci-dessous ne le "
+                     "nomme pas forcément.")
         L.append(f"    « {r['extrait'][:600].strip()}… »")
 
     for m in d["motivation_du_texte"]:
@@ -445,7 +458,13 @@ font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-seri
                  "article. Ce n'est pas une absence de motivation : c'est une absence "
                  "dans les sources dépouillées.</p>")
     for r in d["raisons"][:2]:
-        p.append(f'<div class="raison"><div>« {e(r["extrait"][:700].strip())}… »</div>'
+        p.append(f'<div class="raison">'
+                 + (f'<p class="alerte">Rattaché parce que cette section commente '
+                    f'l\'article {e(r["article_du_texte"])} du texte, qui modifie cet '
+                    "article du code. Le lien est structurel : le passage ci-dessous "
+                    "ne le nomme pas forcément.</p>"
+                    if r["voie"] == "section_appariee" else "")
+                 + f'<div>« {e(r["extrait"][:700].strip())}… »</div>'
                  f'<div class="meta"><span>{e(r["type"])}</span>'
                  f'<span class="conf">confiance {r["confiance"]:.3f}</span>'
                  f'<span>{e(r["methode"])}</span>'

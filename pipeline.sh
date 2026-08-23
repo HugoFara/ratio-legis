@@ -136,6 +136,10 @@ python3 "$RACINE/ingestion/an_vers_amendements.py" "$TRAVAIL/an/amendements_14.c
 python3 "$RACINE/ingestion/amendements_vers_resulte_de.py" "$TRAVAIL/corpus/ameli" "$BASE"
 python3 "$RACINE/ingestion/visees.py" "$BASE"
 python3 "$RACINE/ingestion/textes_deposes.py" "$TRAVAIL/corpus/textes" "$TEXTES" "$BASE"
+# Doit suivre les deux précédents : il lui faut les documents et `porte_sur`.
+python3 "$RACINE/ingestion/sections_vers_motive.py" "$TRAVAIL/corpus/rapports" \
+        "$RACINE/data/perimetre-v1.csv" "$RACINE/data/corpus/plan-rapports.tsv" \
+        "$BASE" "$IMPACTS"
 
 # ------------------------------------------------------- 6. couche européenne
 etape "6. Droit de l'Union"

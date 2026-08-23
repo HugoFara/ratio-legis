@@ -12,7 +12,7 @@ sans citation résoluble au niveau du passage.
 
 Spécification complète : [`ratio-legis-feuille-de-route.md`](ratio-legis-feuille-de-route.md).
 
-## État : onze tranches en base, validation humaine de la phase 0 toujours ouverte
+## État : douze tranches en base, validation humaine de la phase 0 toujours ouverte
 
 Le graphe est chargé et interrogeable article par article. Ce qu'il ne peut pas
 encore faire, c'est se déclarer conforme : le critère de sortie de la phase 2
@@ -42,27 +42,34 @@ Reconstruite d'une commande depuis le miroir et les plans versionnés
 Ce que cela donne au grain de l'article en vigueur, qui est le seul grain qui
 compte pour le produit :
 
+**Au grain de l'article** — ce qui répond à « pourquoi *cet article* dit ceci » :
+
 | | |
 |---|---:|
-| Articles cités par un autre article du fonds | **1 064 (49,7 %)** |
-| **Articles reliés à un article de texte en discussion** | **807 (37,7 %)** |
-| **Articles atteignant un document motivant le texte** — grain : le texte entier | **1 160** |
+| **Articles remontant à un passage qui les motive** | **695 (32,5 %)** |
+| Articles reliés à un article de texte en discussion | 807 (37,7 %) |
+| Articles nommant un acte de l'Union | 113 |
+| Articles remontant à un amendement identifié | 82 |
+| Articles cités par un autre article du fonds | 1 064 (49,7 %) |
+
+**Au grain du texte** — ce qui répond à « pourquoi ce *texte* existe ». Un rapport
+au Président motive une ordonnance de plusieurs centaines d'articles, pas l'alinéa
+qu'on lit ; la restitution affiche l'avertissement chaque fois qu'elle sert l'un
+faute de l'autre :
+
+| | |
+|---|---:|
+| **Articles atteignant un document motivant le texte** | **1 160 (54,2 %)** |
 | dont par un rapport au Président | 997 |
 | dont par un exposé des motifs | 147 |
 | dont par une étude d'impact | 125 |
 | dont par un avis du Conseil d'État | 125 |
-| Articles nommant un acte de l'Union | 113 |
-| Articles atteignant un considérant européen — grain : l'acte entier | 113 |
-| Articles atteignant une transposition déclarée — grain : le texte entier | 63 |
-| **Articles remontant à un amendement identifié** | **82** |
-| **Articles remontant à un passage qui les nomme** | **65** |
+| Articles atteignant un considérant européen | 113 |
+| Articles atteignant une transposition déclarée | 63 |
 
-Seules les deux dernières lignes répondent à « pourquoi **cet article** dit
-ceci ». Les autres répondent à « pourquoi ce **texte** existe » — un rapport au
-Président motive une ordonnance de plusieurs centaines d'articles, pas l'alinéa
-qu'on lit. Ce n'est pas la même question, et la restitution refuse de les
-confondre : elle affiche l'avertissement chaque fois qu'elle sert l'un faute de
-l'autre.
+Tous ces comptes suivent la **chaîne de renumérotation**. Un compteur qui ne le
+dit pas est ininterprétable sur ce corpus : `motive` couvre 77 articles par leur
+numéro d'aujourd'hui, et 695 dès qu'on remonte aux numéros d'avant 2016.
 
 ### Les tranches
 
@@ -78,7 +85,8 @@ l'autre.
 | 8. Couche européenne | l'acte de l'Union que l'article cite, la transposition déclarée | [`docs/13`](docs/13-couche-europeenne.md) |
 | 9. Considérants | le motif que l'Union écrit elle-même, et l'article visé de l'acte | [`docs/14`](docs/14-considerants.md) |
 | 10. Motivation gouvernementale | exposé des motifs, étude d'impact, avis du Conseil d'État | [`docs/15`](docs/15-motivation-gouvernementale.md) |
-| 11. **Textes en discussion** | sous quel article du texte l'article du code a été débattu | [`docs/16`](docs/16-textes-discutes.md) |
+| 11. Textes en discussion | sous quel article du texte l'article du code a été débattu | [`docs/16`](docs/16-textes-discutes.md) |
+| 12. **Sections appariées** | les commentaires de rapport que rien ne rattachait | [`docs/17`](docs/17-sections-appariees.md) |
 
 ### Reconstruire
 
@@ -308,7 +316,9 @@ montrent : **L224-43** une chaîne complète jusqu'à l'amendement et son but d�
 sature, **L112-1-1** un article sans aucune motivation parlementaire dont la seule
 raison connue est une directive, **L122-23** les quatre paroles du § 4.3 côte à
 côte — Gouvernement, chiffrage, Conseil d'État, Parlement —, **L521-2** un article
-suivi à travers la navette et la recodification.
+suivi à travers la navette et la recodification, **L722-10** un article dont la
+seule motivation vient d'une section que rien ne rattachait avant la douzième
+tranche.
 
 La restitution n'ajoute aucune donnée : elle applique les règles § 5.1 (provenance
 ou silence), § 5.4 (la confiance est une donnée) et § 4.3 (toute phrase produite

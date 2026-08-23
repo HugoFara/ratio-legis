@@ -58,8 +58,15 @@ ORDINAL = r"(?:er|bis|ter|quater|quinquies|sexies|septies|octies|nonies|decies)"
 # rendaient que 455 sections, contre 7 343 pour 82 fichiers de l'Assemblée. Le
 # déséquilibre était trop grand pour une différence de convention rédactionnelle.
 ENTETE = re.compile(
-    r"^[ \t]*Article (?:additionnel[^\n]{0,90}|(\d+)"
-    r"(?:\s*" + ORDINAL + r")*(?:\s*[A-H])?(?:\s*\[?\((?:nouveau|supprimé)\)\]?)?"
+    # La capture couvre l'ordinal et la lettre, non le seul nombre : « Article 18
+    # bis » rendait « 18 », donc le même identifiant que l'article 18. Tant que
+    # `article_du_texte` n'était qu'une donnée d'affichage, la confusion restait
+    # sans effet ; elle en a un dès qu'on s'en sert pour rattacher une section à
+    # un article du code (`docs/17`), où elle attribuait à l'article 18 ce qui
+    # commentait l'article 18 bis.
+    r"^[ \t]*Article (?:additionnel[^\n]{0,90}|(\d+"
+    r"(?:\s*" + ORDINAL + r")*(?:\s*[A-H]{1,2})?)"
+    r"(?:\s*\[?\((?:nouveau|supprimé)\)\]?)?"
     # Le Sénat rend l'en-tête et sa parenthèse sur une seule ligne :
     # « Article 22 ter (article 22-2 de la loi n° 89-462) ». Sans cette
     # alternative, l'en-tête ne ferme pas la section précédente, qui a atteint
@@ -134,7 +141,11 @@ def commentaires(chemin: Path) -> list[dict]:
         depart = max(0, texte.find("EXAMEN DES ARTICLES"))
     corps = texte[depart:]
 
-    entetes = [(m.start(), m.group(1) or "") for m in ENTETE.finditer(corps)]
+    # Le texte brut met chaque balise sur sa ligne : « Article 1<sup>er</sup> »
+    # rend « 1\n \n er ». L'espacement est réduit pour que le numéro soit
+    # comparable d'un rapport à l'autre.
+    entetes = [(m.start(), re.sub(r"\s+", " ", m.group(1) or "").strip())
+               for m in ENTETE.finditer(corps)]
     sections = []
     for rang, (debut, numero) in enumerate(entetes):
         fin = entetes[rang + 1][0] if rang + 1 < len(entetes) else len(corps)
