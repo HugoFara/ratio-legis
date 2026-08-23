@@ -1,13 +1,16 @@
 __pycache__/
 *.pyc
 
-# PDF des études d'impact et avis du Conseil d'État. Volumineux et retéléchargeables
-# depuis `data/corpus/plan-impacts.tsv`, qui est versionné — même raison que pour le
-# miroir DILA. Le texte extrait, lui, est suivi avec les autres documents du corpus.
-travail/corpus/impacts/*.pdf
-# Textes en discussion : 355 pages HTML et PDF des deux chambres, retéléchargeables
-# depuis `data/corpus/plan-textes.tsv`.
-travail/corpus/textes/
+# `travail/` est un cache de construction, pas une source. Il est reconstruit en
+# entier par `pipeline.sh` : le fonds LEGI depuis le miroir DILA, les rapports
+# depuis `data/corpus/plan-rapports.tsv`, la base depuis les deux. Rien de ce
+# qu'il contient n'est un original.
+#
+# Le versionner avait deux conséquences, l'une gênante et l'autre inacceptable :
+# 775,8 Mo sur 777,4 Mo de dépôt pour du dérivé, et surtout la rediffusion des
+# 419 fichiers de rapports parlementaires que `ATTRIBUTION.md` déclare ne pas
+# versionner, faute de régime de réutilisation confirmé par les deux chambres.
+travail/
 
 # Le dump ouvert est un artefact reproductible : `tools/diffusion/dump.py` le
 # refait d'une commande. Seuls son manifeste haché et sa notice sont versionnés,

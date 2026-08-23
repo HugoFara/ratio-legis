@@ -57,6 +57,26 @@ Le dump produit par `tools/diffusion/dump.py` :
 Cette précision tombe si les assemblées confirment le régime de réutilisation :
 le dump reprendra alors les textes, et l'option n'aura plus d'objet.
 
+### Correction d'août 2026, avant publication du dépôt
+
+La première des deux puces ci-dessus était fausse. Le dépôt versionnait **419
+fichiers de rapports — 345,9 Mo de HTML intégral** — et la base de travail en
+portait 112,5 Mo de plus dans la table `document`. La règle avait été appliquée
+à l'artefact, `dump.py` retirant consciencieusement les corps, et oubliée sur la
+source qui l'alimente.
+
+Rien ne pouvait le signaler : aucune vérification ne confrontait la phrase au
+contenu du dépôt. L'écart est apparu au moment où la publication a été
+envisagée, c'est-à-dire au dernier moment où il restait réparable. Un `git push`
+publie l'historique, et supprimer des fichiers dans un commit ultérieur ne les
+retire pas des douze commits qui les portaient.
+
+`travail/` a donc été retiré de l'intégralité de l'historique et ajouté au
+`.gitignore`. Le répertoire est un cache de construction : `pipeline.sh` le
+reconstruit en entier depuis `data/corpus/plan-rapports.tsv`, le miroir DILA et
+le fonds LEGI. Aucun original n'y résidait. La puce ci-dessus est désormais
+vraie, et le restera tant que `travail/` reste ignoré.
+
 ## Ce que l'attribution ne couvre pas
 
 La Licence Ouverte n'autorise pas à laisser croire que le producteur cautionne la

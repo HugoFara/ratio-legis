@@ -44,7 +44,14 @@ etape() {  # etape <nom> <commande…> : chronomètre, journalise, propage l'éc
   local debut; debut=$(date +%s)
   local sortie; sortie=$("$@" 2>&1); local code=$?
   local duree=$(( $(date +%s) - debut ))
-  local resume; resume=$(printf '%s' "$sortie" | tail -1 | tr '\t\n' '  ' | cut -c1-160)
+  # Le journal est versionné. Il ne doit donc pas emporter l'arborescence de la
+  # machine qui l'a écrit : les chemins sont ramenés à la racine du dépôt, et ce
+  # qui reste de $HOME à un tilde. Sans cela un dépôt public publie un nom
+  # d'utilisateur et un plan de disque, chaque matin, sans que personne le relise.
+  local resume; resume=$(printf '%s' "$sortie" | tail -1 | tr '\t\n' '  ')
+  resume=${resume//"$RACINE"\//}
+  resume=${resume//"$HOME"/\~}
+  resume=$(printf '%s' "$resume" | cut -c1-160)
   if [ $code -ne 0 ]; then
     noter "$nom" ECHEC "$duree" "$resume"
     printf '%s\n' "$sortie" | tail -20
