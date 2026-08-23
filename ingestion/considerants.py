@@ -61,8 +61,20 @@ SANS_ANCRE = "https://eur-lex.europa.eu/legal-content/FR/TXT/HTML/?uri=CELEX:{}"
 
 
 def en_texte(fragment: str) -> str:
+    # Une balise ouverte que le fragment ne referme pas n'est pas une balise pour
+    # `<[^>]+>` : elle traverse le filtre et se retrouve dans le texte cité. Elle
+    # est donc retirée d'abord, aux deux bouts — c'est une coupe de fragment,
+    # jamais du contenu, puisqu'un « < » de contenu est échappé en `&lt;` dans le
+    # HTML d'EUR-Lex.
+    fragment = re.sub(r"<[^>]*$", " ", re.sub(r"^[^<]*?>", " ", fragment, count=1))
     texte = html.unescape(re.sub(r"<[^>]+>", " ", fragment))
     return re.sub(r"\s+", " ", texte).strip()
+
+
+def debut_de_balise(brut: str, position: int) -> int:
+    """Le « < » qui ouvre la balise contenant `position`, ou `position` à défaut."""
+    ouvrant = brut.rfind("<", max(0, position - 400), position)
+    return ouvrant if ouvrant != -1 else position
 
 
 def considerants(celex: str, brut: str) -> list[tuple]:
@@ -76,7 +88,12 @@ def considerants(celex: str, brut: str) -> list[tuple]:
         limite = fin.start() if fin else len(brut)
         releves = []
         for rang, ancre in enumerate(ancres, 1):
-            borne = ancres[rang].start() if rang < len(ancres) else limite
+            # La borne est le **début de la balise** qui porte l'ancre suivante,
+            # non l'ancre elle-même : `id="rct_2"` est un attribut, et couper là
+            # laissait `<div class="eli-subdivision"` en queue du considérant
+            # précédent. 7 111 des 7 674 considérants en portaient la trace.
+            borne = (debut_de_balise(brut, ancres[rang].start())
+                     if rang < len(ancres) else limite)
             # `ancre.end()` tombe **dans** la balise ouvrante : le `>` qui la
             # ferme se retrouve en tête du texte si on ne le saute pas.
             ouverture = brut.find(">", ancre.end())
