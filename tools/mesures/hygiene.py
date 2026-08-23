@@ -64,8 +64,15 @@ def mesures(base: sqlite3.Connection, perimetre: Path) -> list[tuple]:
         ajouter("verdict", f"partie {partie} — RAISON NON DOCUMENTÉE", muets, articles)
 
     # 2. Origine apparente et origine réelle.
+    # `version_en_vigueur`, et non `version_article` : la mesure porte sur le
+    # droit en vigueur, et son libellé le dit. Sur toutes les versions jamais
+    # écrites, elle rendait 1 822 articles L d'origine ordonnantielle pour un
+    # dénominateur de 1 293 — 140,9 %, ce qui aurait dû suffire à la faire
+    # relire. Les deux natures se recouvrent encore un peu : treize versions en
+    # vigueur portent deux textes producteurs de natures différentes, et un
+    # article compté deux fois vaut mieux qu'un article attribué à tort.
     apparente = dict(base.execute(
-        "SELECT t.nature, count(DISTINCT a.id) FROM version_article v "
+        "SELECT t.nature, count(DISTINCT a.id) FROM version_en_vigueur v "
         "JOIN article a ON a.id = v.article_id AND a.numero LIKE 'L%' "
         "JOIN produite_par p ON p.version_id = v.id_legi "
         "JOIN texte_normatif t ON t.id_jorf = p.texte_id "
