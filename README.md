@@ -12,7 +12,7 @@ sans citation résoluble au niveau du passage.
 
 Spécification complète : [`ratio-legis-feuille-de-route.md`](ratio-legis-feuille-de-route.md).
 
-## État : treize tranches en base, validation humaine de la phase 0 toujours ouverte
+## État : treize tranches en base, phase 3 rendue, validation humaine de la phase 0 toujours ouverte
 
 Le graphe est chargé et interrogeable article par article. Ce qu'il ne peut pas
 encore faire, c'est se déclarer conforme : le critère de sortie de la phase 2
@@ -107,7 +107,8 @@ numéro d'aujourd'hui, et 695 dès qu'on remonte aux numéros d'avant 2016.
 | 10. Motivation gouvernementale | exposé des motifs, étude d'impact, avis du Conseil d'État | [`docs/15`](docs/15-motivation-gouvernementale.md) |
 | 11. Textes en discussion | sous quel article du texte l'article du code a été débattu | [`docs/16`](docs/16-textes-discutes.md) |
 | 12. Sections appariées | les commentaires de rapport que rien ne rattachait | [`docs/17`](docs/17-sections-appariees.md) |
-| 13. **Verdict et hygiène** | `raison non documentée`, et les métriques publiables | [`docs/18`](docs/18-verdict-et-hygiene.md) |
+| 13. Verdict et hygiène | `raison non documentée`, et les métriques publiables | [`docs/18`](docs/18-verdict-et-hygiene.md) |
+| **Phase 3** | **la note « pourquoi cet article », sous contrat** | [`docs/19`](docs/19-note-phase-3.md) |
 
 ### Reconstruire
 
@@ -266,11 +267,12 @@ disparaissent, remplacés par FTS5 et, pour le rappel vectoriel, un index extern
 
 ## Ce qui reste à faire
 
-**Le verdict est rendu, la note ne l'est pas.** La phase 3 demande une note
-« pourquoi cet article » en langue naturelle, dont chaque phrase affirmative porte
-une citation résoluble au niveau du passage, plus l'étiquetage IA de l'article 50
-du règlement (UE) 2024/1689. `restitution/graphe.py` montre le graphe et rend le
-verdict ; il ne rédige pas.
+**La note est écrite, l'évaluation ne l'est pas.** `restitution/note.py` produit
+la note « pourquoi cet article » sous le contrat du § 4.3 : 11 666 constats sur
+les 2 139 articles, zéro phrase écartée faute de citation, aucune note vide
+([`docs/19`](docs/19-note-phase-3.md)). Le critère de sortie de la phase 3 est en
+revanche une **évaluation humaine en aveugle** sur le golden set, qui suppose le
+jeu d'annotation validé.
 
 **Bloquant, et hors de portée du code.** Faire valider à la main les 100 articles
 du jeu d'annotation. 66 d'entre eux portent déjà un passage proposé et ses
@@ -333,9 +335,18 @@ provenance de chaque alinéa jusqu'à l'amendement qui l'a écrit, ce qui le cit
 ce qui a été tenté sur lui sans aboutir.
 
 ```
-python3 restitution/graphe.py base.sqlite L224-43
-python3 restitution/graphe.py base.sqlite L111-1 --html sortie.html
+python3 restitution/graphe.py base.sqlite L224-43              # le graphe, arête par arête
+python3 restitution/note.py   base.sqlite L224-43              # la note, sous contrat § 4.3
+python3 restitution/note.py   base.sqlite --contrat            # éprouver le contrat
+python3 restitution/graphe.py base.sqlite L111-1 --html out.html
 ```
+
+Cinq notes versionnées dans `restitution/exemples/notes/`. **Aucun modèle de
+langue n'intervient** : la note est composée par assemblage de gabarits
+déterministes, les passages cités sont verbatim. L'article 50 du règlement (UE)
+2024/1689 vise le contenu synthétique produit par un système d'IA ; il ne trouve
+pas à s'appliquer, et la note l'écrit plutôt que d'afficher une étiquette
+trompeuse.
 
 Cinq rendus versionnés dans `restitution/exemples/`, choisis pour ce qu'ils
 montrent : **L224-43** une chaîne complète jusqu'à l'amendement et son but déclaré,
