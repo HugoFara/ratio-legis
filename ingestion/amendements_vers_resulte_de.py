@@ -44,6 +44,7 @@ from __future__ import annotations
 import re
 import sqlite3
 import sys
+from bisect import bisect_right
 from collections import defaultdict
 from pathlib import Path
 
@@ -60,9 +61,36 @@ from resolveur import (FENETRE, fenetres, lire_ameli,  # noqa: E402
 # introduit l'ancien et le nouveau de la même façon.
 ARTICLE_CITE = re.compile(r"\b([LRD])\.?\s?(\d{3})-(\d{1,3})(?:-(\d{1,3}))?")
 
+# Intitulé d'un texte cité. `règlement` en est volontairement absent : un article
+# qui reprend mot pour mot la référence à un règlement de l'Union le fait parce
+# que l'amendement l'y a écrite, et l'échantillon en donne un cas juste.
+CITATION = re.compile(r"\b(?:loi|ordonnance|d[ée]cret)\s+n[°º]\s*\d")
+PORTEE_TITRE = 80
+
 SORTANT = re.compile(
     r"\s*[,;]?\s*(?:sont|est|seront|sera)\s+(?:remplac|supprim|abrog|ins[ée]r)"
     r"|\s*[,;]\s*(?:il est|ins[ée]rer|ajouter|r[ée]diger)", re.I)
+
+# La convention du Sénat inverse l'ordre : « substituer aux mots : X les mots : Y »
+# met le texte sortant AVANT sa marque, là où la rédaction ordinaire le met après.
+# `SORTANT`, qui ne lit que l'aval du guillemet fermant, prenait donc la rédaction
+# supprimée pour une insertion. Une arête vérifiée sur 120 venait de là.
+AVANT_SORTANT = re.compile(
+    r"(?:substituer\s+aux?\s+mots|remplacer\s+les\s+mots"
+    r"|supprimer\s+les\s+mots)\s*:\s*$", re.I)
+
+# Le texte que l'amendement modifie n'est pas toujours ce code. Un amendement au
+# projet de loi consommation insère aussi dans le code de commerce, le code
+# monétaire et financier, le code de l'environnement ou une loi non codifiée — et
+# les formules de sanction ou de renvoi y sont les mêmes mot pour mot. Huit des
+# dix-neuf arêtes fausses de l'échantillon venaient de cette confusion : la
+# fenêtre était bien du texte inséré par l'amendement, mais dans un autre texte
+# que celui du segment. On retient la dernière mention de texte hôte qui précède
+# le guillemet ; l'absence de mention vaut « le même code », par convention
+# légistique.
+HOTE = re.compile(r"code\s+(?:de\s+la\s+|de\s+l'|du\s+|des\s+|d')?[a-zà-ÿ'’\s]{3,45}"
+                  r"|loi\s+n[°º]\s*[\d\s-]{4,12}"
+                  r"|ordonnance\s+n[°º]\s*[\d\s-]{4,12}", re.I)
 
 
 def passages_inseres(dispositif: str) -> list[str]:
@@ -70,23 +98,37 @@ def passages_inseres(dispositif: str) -> list[str]:
 
     Un passage suivi de « sont remplacés », « est supprimé » ou « il est inséré »
     n'est pas du texte nouveau : c'est la rédaction visée, ou un simple repère de
-    position dans l'article.
+    position dans l'article. Un passage précédé de « substituer aux mots : » ne
+    l'est pas davantage, et un passage inséré dans un autre texte que ce code ne
+    peut pas expliquer un segment de ce code.
     """
     texte = sans_balises(dispositif)
+    hotes = [(m.start(), normalise(m.group(0))) for m in HOTE.finditer(texte)]
     gardes = []
     for m in re.finditer(r"«(.+?)»", texte, re.S):
         if SORTANT.match(texte[m.end():m.end() + 60]):
+            continue
+        if AVANT_SORTANT.search(texte[max(0, m.start() - 40):m.start()]):
+            continue
+        precedents = [nom for depart, nom in hotes if depart < m.start()]
+        if precedents and "consommation" not in precedents[-1]:
             continue
         if len(norme := normalise(m.group(1))) >= FENETRE:
             gardes.append(norme)
     return gardes
 
-# Précision mesurée à la main sur 26 arêtes tirées au sort — 14 au Sénat, 12 à
-# l'Assemblée : 23/26. Borne
-# inférieure de Wilson à 95 %. C'est la plus faible confiance du graphe, et elle
-# doit le rester tant que l'échantillon est de cette taille — voir
-# `docs/09-tranche-amendements.md` § 4.
-CONFIANCE = 0.7102
+# Précision mesurée sur un tirage reproductible de 120 arêtes examinées une à une
+# (`data/mesures/precision-resulte-de.tsv`) : 100 justes, 19 fausses, 1 douteuse,
+# soit 83,3 %. Les quatre causes d'erreur relevées là ont donné les gardes
+# ci-dessus, puis un **second tirage, disjoint du premier**, les a mesurées sur
+# pièces neuves : 57 justes sur 60, 95,0 %.
+#
+# La valeur écrite est la borne inférieure de Wilson à 95 % de ce second tirage,
+# et non celle du code d'aujourd'hui : la mesure de 96,6 % obtenue après
+# correction d'une borne d'index que ce tirage a révélée est, elle, ajustée sur
+# l'échantillon qui l'a produite. On écrit la mesure non ajustée.
+# Voir `docs/21-precision-resulte-de.md`.
+CONFIANCE = 0.8630
 
 
 def charger_amendements(base: sqlite3.Connection, racine: Path) -> dict:
@@ -157,14 +199,20 @@ def construire_resulte_de(base: sqlite3.Connection) -> dict:
     # exécution ultérieure laisse en base des arêtes portant l'ancienne confiance,
     # que `INSERT OR IGNORE` refuse de remplacer. Le graphe affichait ainsi
     # 0,685 là où le code disait 0,710.
-    base.execute("DELETE FROM preuve WHERE methode = 'appariement_exact' AND id IN "
-                 "(SELECT preuve_id FROM resulte_de WHERE preuve_id IS NOT NULL)")
+    # L'ordre compte : la preuve est référencée par l'arête. L'effacer d'abord
+    # fait échouer la clef étrangère, ce que la première rédaction ne voyait pas
+    # parce qu'elle n'avait jamais tourné deux fois sur la même base.
+    anciennes = [i for (i,) in base.execute(
+        "SELECT preuve_id FROM resulte_de WHERE preuve_id IS NOT NULL")]
     base.execute("DELETE FROM resulte_de")
+    base.executemany("DELETE FROM preuve WHERE id = ? AND methode = 'appariement_exact'",
+                     [(i,) for i in anciennes])
     prochaine_preuve = base.execute(
         "SELECT coalesce(max(id), 0) + 1 FROM preuve").fetchone()[0]
 
     # Segments candidats, par dossier : ceux des versions d'articles produites par
     # un texte lui-même issu de ce dossier.
+    compte: dict[str, int] = defaultdict(int)
     candidats: dict[str, list[tuple[str, str, str]]] = defaultdict(list)
     for dossier, segment_id, numero, texte in base.execute("""
             SELECT i.dossier_id, s.id, a.numero, s.texte
@@ -172,7 +220,14 @@ def construire_resulte_de(base: sqlite3.Connection) -> dict:
             JOIN produite_par p ON p.texte_id = i.texte_id
             JOIN version_article v ON v.id_legi = p.version_id
             JOIN article a ON a.id = v.article_id
-            JOIN segment s ON s.version_id = v.id_legi"""):
+            JOIN segment s ON s.version_id = v.id_legi
+            -- Un amendement à un projet de loi n'écrit pas un article
+            -- réglementaire : le pouvoir réglementaire ne se discute pas au
+            -- Parlement. La partie R du code porte pourtant les mêmes formules de
+            -- sanction et de renvoi que la partie L, et une arête de
+            -- l'échantillon rattachait ainsi R311-5 à un amendement.
+            WHERE a.numero GLOB 'L*' OR a.numero GLOB 'Annexe*L*'
+               OR a.numero = 'liminaire'"""):
         candidats[dossier].append((segment_id, numero, texte))
 
     # Classes de renumérotation : deux numéros d'articles reliés par une
@@ -193,7 +248,6 @@ def construire_resulte_de(base: sqlite3.Connection) -> dict:
             racine[rc] = ra
 
     aretes, preuves = [], []
-    compte: dict[str, int] = defaultdict(int)
     for dossier, segments in candidats.items():
         # Index construit au pas de 1 : c'est le côté dont les offsets doivent être
         # indépendants de ceux de l'autre.
@@ -202,7 +256,22 @@ def construire_resulte_de(base: sqlite3.Connection) -> dict:
         for segment_id, numero, texte in segments:
             numero_du_segment[segment_id] = numero
             propre = normalise(texte)
+            # Un article de code cite couramment le titre complet d'une loi. Ces
+            # titres sont longs, identiques d'un code à l'autre, et un amendement
+            # qui cite la même loi produit la même fenêtre sans avoir rien écrit :
+            # six des dix-neuf arêtes fausses de l'échantillon étaient des titres
+            # de loi. Les fenêtres qui commencent dans un intitulé ne sont pas
+            # indexées — elles ne prouvent rien, dans aucun sens.
+            titres = [m.start() for m in CITATION.finditer(propre)]
             for depart in range(0, max(1, len(propre) - FENETRE + 1)):
+                # `bisect_right`, non `bisect_left` : un intitulé qui commence
+                # exactement à la fenêtre doit compter. La première rédaction
+                # laissait passer « loi n° 90-449 du 31 mai 1990 visant à… », qui
+                # ouvrait la fenêtre sur son premier caractère.
+                place = bisect_right(titres, depart)
+                if place and depart - titres[place - 1] <= PORTEE_TITRE:
+                    compte["fenetres_dans_un_titre"] += 1
+                    continue
                 index[propre[depart:depart + FENETRE]].add(segment_id)
 
         connus = set(numero_du_segment.values())
@@ -291,6 +360,8 @@ def main() -> None:
           f"{aretes['fenetres_non_discriminantes']}")
     print(f"  fenêtres écartées, cible non déclarée  : "
           f"{aretes['cible_non_declaree']}")
+    print(f"  fenêtres non indexées, prises dans un intitulé : "
+          f"{aretes['fenetres_dans_un_titre']}")
     print(f"\narticles en vigueur remontant à un amendement : {atteints}")
     print(f"intégrité : {len(violations)} violation(s) de clef étrangère")
     base.close()

@@ -12,15 +12,31 @@ sans citation résoluble au niveau du passage.
 
 Spécification complète : [`ratio-legis-feuille-de-route.md`](ratio-legis-feuille-de-route.md).
 
-## État : treize tranches en base, phase 3 rendue, validation humaine de la phase 0 toujours ouverte
+## État : quinze tranches en base, phase 2 mesurée contre ses seuils, validation humaine de la phase 0 toujours ouverte
 
-Le graphe est chargé et interrogeable article par article. Ce qu'il ne peut pas
-encore faire, c'est se déclarer conforme : le critère de sortie de la phase 2
-(**précision de `resulte_de` > 95 %**) et celui de la phase 3 (évaluation humaine
-en aveugle) supposent tous deux un jugement extérieur. Les confiances portées par
-les arêtes sont des bornes de Wilson calculées sur mes propres échantillons ; tant
-que les 100 articles du jeu d'annotation ne sont pas validés à la main, **aucune
-phase n'est close**, quoi qu'affichent les compteurs.
+Le graphe est chargé et interrogeable article par article. Les quatre critères de
+sortie de la phase 2 ont été **mesurés contre leurs seuils**, ce qui n'avait
+jamais été fait :
+
+| Critère § 4.2 | Seuil | Mesuré | |
+|---|---:|---:|---|
+| couverture `produite_par` | > 95 % | 2 113 / 2 139 — **98,8 %** | atteint |
+| couverture `issu_de` | > 90 % | 68 / 68 lois et ordonnances utiles — **100 %** | atteint, [`docs/20`](docs/20-dossiers-des-textes.md) |
+| couverture `resulte_de` | > 60 % | 79 / 832 — **9,5 %** | **non atteint**, décision go du § 8 rendue |
+| **précision `resulte_de`** | **> 95 %** | 57 / 60 sur tirage disjoint — **95,0 %** | atteint en estimation, non démontré |
+
+La décision go/no-go du § 8, restée ouverte, est rendue dans
+[`docs/21`](docs/21-precision-resulte-de.md) § 7 : **go**, parce que le grain de
+l'article est tenu par le commentaire de rapport (695 articles) et par le texte
+discuté (807), non par l'amendement (79) — l'hypothèse du § 8 sur le chemin était
+fausse, pas le produit.
+
+Ce que le projet ne peut toujours pas faire, c'est se déclarer conforme : les
+confiances portées par les arêtes sont des bornes de Wilson calculées sur mes
+propres échantillons, et le critère de la phase 3 (évaluation humaine en aveugle)
+suppose un jugement extérieur. Tant que les 100 articles du jeu d'annotation ne
+sont pas validés à la main, **la phase 0 reste ouverte**, quoi qu'affichent les
+compteurs.
 
 ### Ce que la base contient
 
@@ -34,7 +50,7 @@ Reconstruite d'une commande depuis le miroir et les plans versionnés
 | **Segments (alinéas)** | **26 524** | `renumerote_de` | 1 877 |
 | Documents (rapports, exposés, études d'impact, avis) | 337 | `motive` — un passage qui motive, avec offsets | 519 |
 | Amendements (20 342 Sénat, 11 115 Assemblée) | 31 457 | `renvoie_a` — le graphe de renvois | 11 656 |
-| Acteurs | 1 419 | `resulte_de` — l'amendement qui a écrit l'alinéa | 286 |
+| Acteurs | 1 419 | `resulte_de` — l'amendement qui a écrit l'alinéa | 282 |
 | **Actes de l'Union** | **284** | `cite_acte_ue` / `transpose` | 1 478 / 8 |
 | **Considérants de l'Union** | **7 674** | `article_acte_ue` — articles d'actes déclarés | 6 237 |
 | **Textes en discussion** | **355** | **`porte_sur`** — l'article du texte → l'article du code | **27 412** |
@@ -45,13 +61,13 @@ compte pour le produit :
 ### Le verdict
 
 Pour chaque article en vigueur, le graphe rend un verdict — y compris, et surtout,
-quand il est négatif. Le taux global de 35,2 % d'articles sans raison documentée
+quand il est négatif. Le taux global de 34,9 % d'articles sans raison documentée
 ne veut rien dire : il faut séparer les parties, parce qu'un décret n'a ni exposé
 des motifs, ni débat, ni amendement.
 
 | partie | articles | un passage les motive | origine située | motivation du texte | **raison non documentée** |
 |---|---:|---:|---:|---:|---:|
-| **L** | 1 281 | 677 (52,8 %) | 184 | 407 | **13 (1,0 %)** |
+| **L** | 1 281 | 680 (53,1 %) | 183 | 412 | **6 (0,5 %)** |
 | **R** | 682 | 42 | 19 | 46 | **575 (84,3 %)** |
 | **D** | 176 | 0 | 0 | 11 | **165 (93,8 %)** |
 
@@ -109,6 +125,8 @@ numéro d'aujourd'hui, et 695 dès qu'on remonte aux numéros d'avant 2016.
 | 12. Sections appariées | les commentaires de rapport que rien ne rattachait | [`docs/17`](docs/17-sections-appariees.md) |
 | 13. Verdict et hygiène | `raison non documentée`, et les métriques publiables | [`docs/18`](docs/18-verdict-et-hygiene.md) |
 | **Phase 3** | **la note « pourquoi cet article », sous contrat** | [`docs/19`](docs/19-note-phase-3.md) |
+| 14. Dossiers des textes | le dossier législatif de chaque texte, déclaré par DOLE | [`docs/20`](docs/20-dossiers-des-textes.md) |
+| 15. Précision de `resulte_de` | 180 arêtes examinées, quatre gardes, la décision go/no-go | [`docs/21`](docs/21-precision-resulte-de.md) |
 
 ### Reconstruire
 

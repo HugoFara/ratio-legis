@@ -130,6 +130,10 @@ python3 "$RACINE/ingestion/legi_vers_graphe.py" "$TRAVAIL/conso" "$BASE"
 python3 "$RACINE/ingestion/rapports_vers_motive.py" "$TRAVAIL/corpus/rapports" \
         "$RACINE/data/perimetre-v1.csv" "$RACINE/data/corpus/plan-rapports.tsv" \
         "$BASE" "$IMPACTS"
+# Le dossier législatif de chaque texte, déclaré par DOLE. Doit précéder les
+# amendements et les visées : tous deux ne considèrent que les dossiers ayant
+# produit un article du code, et cette liste dépend de `issu_de`.
+python3 "$RACINE/ingestion/dossiers_des_textes.py" "$MIROIR" "$BASE"
 python3 "$RACINE/ingestion/renvois.py" "$BASE"
 python3 "$RACINE/ingestion/an_vers_amendements.py" "$TRAVAIL/an/amendements_14.csv" \
         "$TRAVAIL/an/acteurs_historique.json.zip" "$BASE"

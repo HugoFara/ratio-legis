@@ -5,10 +5,10 @@ verdict	partie D — origine située seulement	0	176	0.0
 verdict	partie D — motivation du texte seule	11	176	6.2	
 verdict	partie D — RAISON NON DOCUMENTÉE	165	176	93.8	
 verdict	partie L — articles en vigueur	1281			
-verdict	partie L — un passage les motive	677	1281	52.8	
-verdict	partie L — origine située seulement	184	1281	14.4	
-verdict	partie L — motivation du texte seule	407	1281	31.8	
-verdict	partie L — RAISON NON DOCUMENTÉE	13	1281	1.0	
+verdict	partie L — un passage les motive	680	1281	53.1	
+verdict	partie L — origine située seulement	183	1281	14.3	
+verdict	partie L — motivation du texte seule	412	1281	32.2	
+verdict	partie L — RAISON NON DOCUMENTÉE	6	1281	0.5	
 verdict	partie R — articles en vigueur	682			
 verdict	partie R — un passage les motive	42	682	6.2	
 verdict	partie R — origine située seulement	19	682	2.8	
@@ -29,8 +29,8 @@ navette	dossiers ayant au moins deux états datés	53
 navette	durée médiane, en jours	147			
 navette	durée la plus courte, en jours	1			
 navette	durée la plus longue, en jours	693			
-chambres	segments écrits par un amendement — assemblee	98			dénominateur faible : voir docs/09
-chambres	segments écrits par un amendement — senat	147			dénominateur faible : voir docs/09
+chambres	segments écrits par un amendement — assemblee	102			dénominateur faible : voir docs/09
+chambres	segments écrits par un amendement — senat	143			dénominateur faible : voir docs/09
 chambres	articles dont un alinéa est tracé jusqu'à un amendement	110			sans remonter la chaîne des segments
 sources	documents — avis_conseil_etat	15			
 sources	documents — etude_impact	25			
