@@ -85,7 +85,7 @@ ses `CHECK`. Les contraintes sont la documentation qui ne ment pas.
 python3 restitution/note.py travail/ratio-legis.sqlite --contrat
 python3 ingestion/verdict.py travail/ratio-legis.sqlite
 python3 tools/mesures/hygiene.py travail/ratio-legis.sqlite \
-        data/perimetre-v1.csv data/mesures/hygiene.tsv
+        data/perimetre-v2.csv data/mesures/hygiene.tsv
 ```
 
 Le contrat du § 4.3 doit rester à **zéro phrase écartée faute de citation**, et

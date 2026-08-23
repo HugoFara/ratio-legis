@@ -25,6 +25,14 @@ Exclus du périmètre V1, et pourquoi :
 |---|---:|---|
 | Partie réglementaire (articles R) | 670 | Aucun dossier législatif : rattachement à DOLE mesuré à 0 % |
 | Partie réglementaire (articles D) | 168 | Idem |
+
+> **Révisé le 23 août 2026 par [`docs/27`](27-parties-r-et-d.md).** Le motif porté
+> aux deux premières lignes est faux. La mesure avait été faite sur le
+> rattachement **direct** d'un décret à DOLE, qui est bien nul, sans remonter la
+> chaîne de renumérotation : **64 des 811 articles réglementaires en vigueur ont
+> un dossier législatif dans leur ascendance**. Le périmètre couvre désormais les
+> trois parties du code, dans `data/perimetre-v2.csv`, et il est dérivé du fonds
+> au lieu d'être figé.
 | Versions d'articles non en vigueur, tout le code | 3 992 | Le produit répond sur le droit en vigueur ; l'historique reste ingéré — il porte la chaîne — mais n'est pas une cible de restitution |
 
 Le périmètre est donc de 1 280 articles, dans la fourchette N ≈ 2 000–5 000
@@ -362,6 +370,12 @@ seul livrable qui teste le contrat de génération du § 4.3. Protocole dans
 **Verticale retenue : Code de la consommation, partie législative, 1 280 articles
 en vigueur.** Périmètre figé dans `data/perimetre-v1.csv`. Tout élargissement
 passe par une nouvelle note de cadrage (§ 8).
+
+> **Élargi le 23 août 2026.** La note de cadrage exigée est
+> [`docs/27`](27-parties-r-et-d.md) : le périmètre couvre les trois parties du
+> code, 2 091 articles, et il est recalculé par `tools/phase0/perimetre.py` à
+> chaque exécution du pipeline. Les 1 280 lignes de la partie L sont reprises
+> telles quelles.
 
 | Condition posée en révision 1 | État |
 |---|---|
