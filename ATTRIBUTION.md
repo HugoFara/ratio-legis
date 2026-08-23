@@ -149,6 +149,41 @@ conditions dans ses mentions légales.
 La conclusion pratique ne change pas — le corps des rapports ne peut pas passer
 sous Licence Ouverte, il reste hors du dépôt et hors du dump — mais elle repose
 désormais sur le bon texte, et l'écart entre les deux chambres est enfin porté
-dans la donnée. Écrire aux assemblées reste utile pour lever le doute sur le
-statut des **extraits de 400 caractères**, notamment au regard de la condition
-d'intégrité du Sénat. Ce n'est plus un préalable au projet.
+dans la donnée.
+
+### Le cas des extraits de 400 caractères est réglé
+
+Une version antérieure de cette page réservait un doute sur les extraits. Ce doute
+était mal placé : **les extraits sont la partie sûre**, et ils le sont par deux
+chemins indépendants.
+
+L'exclusion des actes officiels du droit d'auteur est, en droit français, une
+règle **coutumière et non écrite** : le CPI ne la formule nulle part. Son critère
+est la **force obligatoire** — s'impose au citoyen la Constitution, la loi, le
+décret, l'arrêté, la circulaire. La doctrine en tire que les documents seulement
+*indicatifs* de l'administration — rapports, notes, avis, recommandations — ne
+sont pas exclus du droit d'auteur. Un rapport de commission relève de cette
+seconde catégorie, quand les deux chambres le rangent, elles, dans la première.
+Aucune décision de justice ni aucun avis formel ne tranche le cas précis d'un
+rapport de commission ; les mentions légales des chambres sont la seule prise de
+position autorisée qui existe.
+
+Or **les deux branches mènent au même résultat pour un extrait** :
+
+- si le rapport n'est pas protégé — position des deux chambres —, sa reproduction
+  est libre, et la question ne se pose pas ;
+- s'il l'est, l'**exception de courte citation** (CPI art. L122-5, 3°, a)
+  s'applique sans difficulté : quatre cents caractères prélevés sur un document de
+  plusieurs mégaoctets, incorporés à une restitution de caractère informatif et
+  scientifique, avec le nom de l'auteur et la source clairement indiqués — c'est
+  précisément le cas d'école de l'exception.
+
+La condition d'intégrité posée par le Sénat ne s'y oppose pas non plus. S'il n'y a
+pas de droit d'auteur, il n'y a pas de droit moral, et l'intégrité n'est qu'une
+condition d'usage du site ; s'il y en a un, le respect du droit moral interdit de
+**déformer la pensée de l'auteur**, ce que ne fait pas un extrait annoncé comme
+tel, borné par ses offsets et résolvable vers son original.
+
+Le doute réel porte sur l'inverse — la rediffusion en masse des corps entiers — et
+c'est exactement ce que le projet refuse déjà. Écrire aux assemblées garde un
+intérêt documentaire ; ce n'est un préalable ni au projet, ni aux extraits.

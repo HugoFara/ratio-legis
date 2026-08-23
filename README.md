@@ -422,9 +422,10 @@ les documents parlementaires (art. L300-2), et chaque chambre a publié ses
 conditions. Elles diffèrent, et aucune ne permet de replacer le corps d'un rapport
 sous Licence Ouverte : l'Assemblée interdit l'usage commercial, le Sénat exige la
 gratuité de la diffusion. Le corps reste donc hors du dépôt et hors du dump, dont
-la table `regime_de_reutilisation` porte l'écart entre les deux chambres. Reste
-utile, sans bloquer : leur écrire pour lever le doute sur les extraits de 400
-caractères, au regard de la condition d'intégrité du Sénat.
+la table `regime_de_reutilisation` porte l'écart entre les deux chambres. Les
+extraits de 400 caractères, eux, sont couverts deux fois plutôt qu'une : soit le
+rapport n'est pas protégé — position des deux chambres —, soit il l'est et
+l'exception de courte citation s'applique.
 
 **Phases 3 et 4 non commencées.** `restitution/graphe.py` montre le graphe ; il ne
 produit pas la note « pourquoi cet article » avec son contrat strict et son verdict
