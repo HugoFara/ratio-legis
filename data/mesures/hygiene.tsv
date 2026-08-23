@@ -1,0 +1,48 @@
+famille	mesure	valeur	sur	part_pourcent	note
+verdict	partie D — articles en vigueur	176			
+verdict	partie D — un passage les motive	0	176	0.0	
+verdict	partie D — origine située seulement	0	176	0.0	
+verdict	partie D — motivation du texte seule	11	176	6.2	
+verdict	partie D — RAISON NON DOCUMENTÉE	165	176	93.8	
+verdict	partie L — articles en vigueur	1281			
+verdict	partie L — un passage les motive	677	1281	52.8	
+verdict	partie L — origine située seulement	184	1281	14.4	
+verdict	partie L — motivation du texte seule	407	1281	31.8	
+verdict	partie L — RAISON NON DOCUMENTÉE	13	1281	1.0	
+verdict	partie R — articles en vigueur	682			
+verdict	partie R — un passage les motive	42	682	6.2	
+verdict	partie R — origine située seulement	19	682	2.8	
+verdict	partie R — motivation du texte seule	46	682	6.7	
+verdict	partie R — RAISON NON DOCUMENTÉE	575	682	84.3	
+origine	articles L dont la version en vigueur vient d'une ordonnance	1003	1281	78.3	origine apparente
+origine	articles L dont la version en vigueur vient d'une loi	266	1281	20.8	origine apparente
+origine	articles L ayant une loi dans leur ascendance	1072	1281	83.7	origine réelle, chaîne de renumérotation remontée
+amendements	assemblee — déposés	11115			
+amendements	assemblee — adoptés	2677	11115	24.1	
+amendements	assemblee — sans objet publié	0	11115	0.0	surtout des amendements retirés avant séance ou irrecevables
+amendements	assemblee — adoptés sans objet publié	0	2677	0.0	dispositif adopté sans justification publiée
+amendements	senat — déposés	20342			
+amendements	senat — adoptés	4686	20342	23.0	
+amendements	senat — sans objet publié	2338	20342	11.5	surtout des amendements retirés avant séance ou irrecevables
+amendements	senat — adoptés sans objet publié	15	4686	0.3	dispositif adopté sans justification publiée
+navette	dossiers ayant au moins deux états datés	53			
+navette	durée médiane, en jours	147			
+navette	durée la plus courte, en jours	1			
+navette	durée la plus longue, en jours	693			
+chambres	segments écrits par un amendement — assemblee	98			dénominateur faible : voir docs/09
+chambres	segments écrits par un amendement — senat	147			dénominateur faible : voir docs/09
+chambres	articles dont un alinéa est tracé jusqu'à un amendement	110			sans remonter la chaîne des segments
+sources	documents — avis_conseil_etat	15			
+sources	documents — etude_impact	25			
+sources	documents — expose_des_motifs	39			
+sources	documents — rapport_commission	221			
+sources	documents — rapport_president_republique	37			
+sources	actes de l'Union	284			
+sources	considérants	7674			
+sources	textes en discussion	355			
+renvois	articles citant L733-1	37			
+renvois	articles citant L412-1	36			
+renvois	articles citant L733-4	35			
+renvois	articles citant L733-7	32			
+renvois	articles citant L313-1	25			
+perimetre	articles éligibles à resulte_de	832			

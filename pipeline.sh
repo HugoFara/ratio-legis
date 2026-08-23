@@ -164,6 +164,12 @@ EURLEX="$RACINE/data/raw/eurlex"
 python3 "$RACINE/tools/ue/recuperer_actes.py" "$BASE" "$EURLEX"
 python3 "$RACINE/ingestion/considerants.py" "$BASE" "$EURLEX"
 
+# --------------------------------------------------- 7. verdict et métriques
+etape "7. Verdict et métriques d'hygiène"
+python3 "$RACINE/ingestion/verdict.py" "$BASE"
+python3 "$RACINE/tools/mesures/hygiene.py" "$BASE" "$RACINE/data/perimetre-v1.csv" \
+        "$RACINE/data/mesures/hygiene.tsv"
+
 etape "Terminé"
 echo "base : $BASE ($(du -h "$BASE" | cut -f1))"
 echo "essai : python3 restitution/graphe.py $BASE L224-43"

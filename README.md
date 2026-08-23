@@ -12,7 +12,7 @@ sans citation résoluble au niveau du passage.
 
 Spécification complète : [`ratio-legis-feuille-de-route.md`](ratio-legis-feuille-de-route.md).
 
-## État : douze tranches en base, validation humaine de la phase 0 toujours ouverte
+## État : treize tranches en base, validation humaine de la phase 0 toujours ouverte
 
 Le graphe est chargé et interrogeable article par article. Ce qu'il ne peut pas
 encore faire, c'est se déclarer conforme : le critère de sortie de la phase 2
@@ -41,6 +41,26 @@ Reconstruite d'une commande depuis le miroir et les plans versionnés
 
 Ce que cela donne au grain de l'article en vigueur, qui est le seul grain qui
 compte pour le produit :
+
+### Le verdict
+
+Pour chaque article en vigueur, le graphe rend un verdict — y compris, et surtout,
+quand il est négatif. Le taux global de 35,2 % d'articles sans raison documentée
+ne veut rien dire : il faut séparer les parties, parce qu'un décret n'a ni exposé
+des motifs, ni débat, ni amendement.
+
+| partie | articles | un passage les motive | origine située | motivation du texte | **raison non documentée** |
+|---|---:|---:|---:|---:|---:|
+| **L** | 1 281 | 677 (52,8 %) | 184 | 407 | **13 (1,0 %)** |
+| **R** | 682 | 42 | 19 | 46 | **575 (84,3 %)** |
+| **D** | 176 | 0 | 0 | 11 | **165 (93,8 %)** |
+
+**La partie législative du code de la consommation est documentée à 99 %. La
+partie réglementaire l'est à 15 %** — et c'est elle qui porte la masse des
+obligations que rencontre un consommateur.
+
+Détail et mises en garde : [`docs/18`](docs/18-verdict-et-hygiene.md). Toutes les
+métriques : [`data/mesures/hygiene.tsv`](data/mesures/hygiene.tsv).
 
 **Au grain de l'article** — ce qui répond à « pourquoi *cet article* dit ceci » :
 
@@ -86,7 +106,8 @@ numéro d'aujourd'hui, et 695 dès qu'on remonte aux numéros d'avant 2016.
 | 9. Considérants | le motif que l'Union écrit elle-même, et l'article visé de l'acte | [`docs/14`](docs/14-considerants.md) |
 | 10. Motivation gouvernementale | exposé des motifs, étude d'impact, avis du Conseil d'État | [`docs/15`](docs/15-motivation-gouvernementale.md) |
 | 11. Textes en discussion | sous quel article du texte l'article du code a été débattu | [`docs/16`](docs/16-textes-discutes.md) |
-| 12. **Sections appariées** | les commentaires de rapport que rien ne rattachait | [`docs/17`](docs/17-sections-appariees.md) |
+| 12. Sections appariées | les commentaires de rapport que rien ne rattachait | [`docs/17`](docs/17-sections-appariees.md) |
+| 13. **Verdict et hygiène** | `raison non documentée`, et les métriques publiables | [`docs/18`](docs/18-verdict-et-hygiene.md) |
 
 ### Reconstruire
 
@@ -245,6 +266,12 @@ disparaissent, remplacés par FTS5 et, pour le rappel vectoriel, un index extern
 
 ## Ce qui reste à faire
 
+**Le verdict est rendu, la note ne l'est pas.** La phase 3 demande une note
+« pourquoi cet article » en langue naturelle, dont chaque phrase affirmative porte
+une citation résoluble au niveau du passage, plus l'étiquetage IA de l'article 50
+du règlement (UE) 2024/1689. `restitution/graphe.py` montre le graphe et rend le
+verdict ; il ne rédige pas.
+
 **Bloquant, et hors de portée du code.** Faire valider à la main les 100 articles
 du jeu d'annotation. 66 d'entre eux portent déjà un passage proposé et ses
 offsets. Tant que cette validation n'est pas faite, la phase 0 reste ouverte et
@@ -318,7 +345,8 @@ raison connue est une directive, **L122-23** les quatre paroles du § 4.3 côte 
 côte — Gouvernement, chiffrage, Conseil d'État, Parlement —, **L521-2** un article
 suivi à travers la navette et la recodification, **L722-10** un article dont la
 seule motivation vient d'une section que rien ne rattachait avant la douzième
-tranche.
+tranche, **L224-109** l'un des treize articles de la partie législative dont le
+verdict est *raison non documentée*.
 
 La restitution n'ajoute aucune donnée : elle applique les règles § 5.1 (provenance
 ou silence), § 5.4 (la confiance est une donnée) et § 4.3 (toute phrase produite

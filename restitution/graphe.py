@@ -63,6 +63,29 @@ SUBDIVISION = re.compile(r"art(?:icle)?\.?\s*(?:add\.?\s*)?(?:apr[èe]s\s*)?"
 
 MOT_TYPE = {"directive": "directive", "reglement": "règlement",
             "decision": "décision"}
+# Ce que chaque verdict veut dire, en clair. Le dernier est le seul que la feuille
+# de route nomme, et c'est le plus important des quatre.
+VERDICT = {
+    "passage_motivant":
+        ("un passage des travaux préparatoires explique cet article",
+         "Il est cité ci-dessous, avec sa source et ses offsets."),
+    "origine_situee":
+        ("aucun passage n'explique cet article",
+         "On sait seulement sous quel article de quel texte il a été discuté."),
+    "motivation_du_texte":
+        ("aucun passage n'explique cet article",
+         "Seul le texte qui l'a produit est motivé, dans son entier — ce qui "
+         "peut représenter plusieurs centaines d'articles."),
+    "raison_non_documentee":
+        ("raison non documentée",
+         "Aucune des sources dépouillées n'explique cet article, à aucun grain. "
+         "Ce n'est pas un échec de la méthode : c'est un état du fonds "
+         "documentaire, et c'est un résultat."),
+}
+COMPLEMENT_REGLEMENTAIRE = (
+    "Pour un article de la partie réglementaire, c'est l'état ordinaire : un "
+    "décret n'a ni exposé des motifs, ni débat, ni amendement. 84 % des articles "
+    "R et 94 % des articles D du code sont dans ce cas, contre 1 % des articles L.")
 # Le § 4.3 impose de distinguer à l'écran qui parle. Ces deux documents motivent
 # le texte entier et sont tous deux la parole du Gouvernement, mais l'un précède
 # le débat et l'autre le remplace : un projet de loi expose ses motifs devant le
@@ -159,6 +182,13 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
         d["alineas"].append({**segment, "amendements": amendements, "renvois": renvois,
                              "actes_ue": actes,
                              "appariable": len(segment["texte"]) >= SEUIL_APPARIEMENT})
+
+    # Le verdict est rendu avant tout le reste, y compris — surtout — quand il est
+    # négatif : le § 4.3 en fait un résultat de premier ordre. Se taire n'est pas
+    # la même chose que dire qu'on a cherché et qu'il n'y a rien.
+    verdict = q("SELECT verdict, partie FROM verdict v JOIN article a "
+                "ON a.id = v.article_id WHERE a.numero = ?", numero)
+    d["verdict"] = verdict[0] if verdict else None
 
     d["raisons"] = q("""
         WITH RECURSIVE asc_a(anc) AS (
@@ -288,6 +318,14 @@ def en_texte(d: dict) -> str:
     L.append(f"  {len(d['textes'])} texte(s) modificateur(s), du "
              f"{d['textes'][0]['date_texte']} au {d['textes'][-1]['date_texte']}"
              if d["textes"] else "  aucun texte producteur déclaré")
+
+    if d["verdict"]:
+        titre, glose = VERDICT[d["verdict"]["verdict"]]
+        L.append(f"\nVERDICT : {titre.upper()}")
+        L.append(f"  {glose}")
+        if (d["verdict"]["verdict"] == "raison_non_documentee"
+                and d["verdict"]["partie"] in ("R", "D")):
+            L.append("  " + COMPLEMENT_REGLEMENTAIRE)
 
     L.append("\nPOURQUOI CET ARTICLE EXISTE")
     if not d["raisons"]:
@@ -430,6 +468,10 @@ font-family:ui-sans-serif,system-ui,sans-serif}}
 .preuve{{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.76rem;
 color:var(--doux);margin-top:.4rem;overflow-x:auto;white-space:pre-wrap}}
 .silence{{color:var(--doux);font-style:italic;font-size:.87rem;margin:.4rem 0}}
+.verdict{{border:1px solid var(--trait);border-left:3px solid var(--vert);
+background:var(--carte);padding:.8rem 1rem;margin:1.4rem 0}}
+.verdict.muet{{border-left-color:var(--acc)}}
+.verdict b{{font-size:1.05rem}}
 .cons{{font-size:.85rem;margin:.5rem 0;padding-left:.8rem;
 border-left:1px solid var(--trait)}}
 details summary{{cursor:pointer;font-size:.82rem;color:var(--acc);margin-top:.5rem;
@@ -451,6 +493,16 @@ font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-seri
     if d["anciens"]:
         p.append(f" · anciennement {e(', '.join(d['anciens']))}")
     p.append(f" · {len(d['textes'])} texte(s) modificateur(s)</p>")
+
+    if d["verdict"]:
+        titre, glose = VERDICT[d["verdict"]["verdict"]]
+        muet = d["verdict"]["verdict"] == "raison_non_documentee"
+        p.append(f'<div class="verdict{" muet" if muet else ""}">'
+                 f'<div class="num">verdict</div><b>{e(titre)}</b>'
+                 f'<p class="silence">{e(glose)}'
+                 + ("<br>" + e(COMPLEMENT_REGLEMENTAIRE)
+                    if muet and d["verdict"]["partie"] in ("R", "D") else "")
+                 + "</p></div>")
 
     p.append("<h2>Pourquoi cet article existe</h2>")
     if not d["raisons"]:
