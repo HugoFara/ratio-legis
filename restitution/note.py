@@ -105,8 +105,17 @@ def en_date(iso: str) -> str:
     return f"{int(jour)}{'er' if jour == '01' else ''} {MOIS[int(mois) - 1]} {annee}"
 
 
-def extrait(texte: str, limite: int = 400) -> str:
-    propre = " ".join(texte.split())
+# Une base diffusée peut légitimement ne pas rediffuser le texte d'un document —
+# voir `tools/diffusion/dump.py`. La citation au sens du § 4.3 reste résoluble,
+# puisqu'elle est le couple (document, offsets) ; c'est l'extrait de confort qui
+# manque. Le taire laisserait croire à un oubli.
+ABSENT = "texte non rediffusé dans cette base — le document reste à son URL"
+
+
+def extrait(texte: str, limite: int = 400, sinon: str = "") -> str:
+    propre = " ".join((texte or "").split())
+    if not propre:
+        return sinon
     return propre[:limite] + ("…" if len(propre) > limite else "")
 
 
@@ -152,7 +161,8 @@ def composer(d: dict) -> tuple[list[Phrase], list[str], list[Phrase]]:
                 f"article.".replace("  ", " ") + precision,
                 source=LIBELLE.get(r["type"], r["type"]), reference=r["url"],
                 nature="web", offsets=(r["offset_debut"], r["offset_fin"]),
-                confiance=r["confiance"], citation=extrait(r["extrait"]))
+                confiance=r["confiance"],
+                citation=extrait(r["extrait"], sinon=ABSENT))
 
     # Un même amendement écrit souvent plusieurs alinéas : le répéter à chacun
     # donnerait quatre fois la même justification. Il est nommé une fois, avec la
@@ -195,7 +205,7 @@ def composer(d: dict) -> tuple[list[Phrase], list[str], list[Phrase]]:
                 f"accompagné d'un {LIBELLE[m['type']]}. Ce document porte sur le "
                 "texte entier, non sur cet article.",
                 source=LIBELLE[m["type"]], reference=m["url"], nature="web",
-                citation=extrait(m["extrait"], 300))
+                citation=extrait(m["extrait"], 300, sinon=ABSENT))
 
     # ------------------------------------------------------------------- l'Union
     # Deux liens très différents mènent au même acte : le texte français **déclare**

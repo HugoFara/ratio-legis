@@ -33,7 +33,29 @@ En conséquence, et jusqu'à confirmation par les services des deux assemblées 
 
 - le dépôt ne versionne **aucun texte de rapport** — seulement des offsets et un
   extrait de 400 caractères à fin de contrôle ;
-- la rediffusion d'extraits dans le dump open data du § 4 phase 4 est **suspendue**.
+- la rediffusion du **texte** des rapports dans le dump ouvert est **suspendue**.
+
+### Précision d'août 2026, à la construction du dump
+
+La suspension telle qu'écrite visait « la rediffusion d'extraits ». Appliquée à la
+lettre, elle retirait aussi les **fenêtres de preuve**, sans lesquelles 624 arêtes
+`motive` deviennent inauditables — ce qu'interdit la règle § 5.1, *provenance ou
+silence*. Deux règles du projet se contredisaient ; l'arbitrage est écrit plutôt
+que subi.
+
+Le dump produit par `tools/diffusion/dump.py` :
+
+- **ne rediffuse aucun texte de rapport** : les 221 documents gardent leur URL,
+  leur hachage et leurs offsets, leur corps est remplacé par un avis ;
+- **conserve les fenêtres de preuve, ramenées à soixante caractères** — le
+  plancher que le schéma exige. Soixante caractères sont la preuve irréductible ;
+  quatre cents sont de l'extrait. 624 fenêtres ont été tronquées ;
+- offre l'arbitrage inverse sous l'option `--strict`, qui retire du dump les
+  rapports **et** les 624 arêtes qui en dépendent, puis recalcule le verdict pour
+  que la base reste cohérente avec elle-même.
+
+Cette précision tombe si les assemblées confirment le régime de réutilisation :
+le dump reprendra alors les textes, et l'option n'aura plus d'objet.
 
 ## Ce que l'attribution ne couvre pas
 

@@ -1,0 +1,59 @@
+# Ratio Legis — dump ouvert du graphe de provenance
+
+Graphe de provenance normative du **code de la consommation** en vigueur : pour un article, les matériaux qui expliquent pourquoi il existe sous cette forme.
+
+**Ce dump ne fait pas foi.** Le droit en vigueur est celui publié par Légifrance. Le graphe documente la provenance des textes ; il ne produit ni interprétation juridique, ni conseil.
+
+## Licence
+
+Données sous **Licence Ouverte / Etalab 2.0**, code sous **AGPL-3.0-or-later**. Les mentions ci-dessous sont obligatoires en cas de réutilisation.
+
+- Source : DILA — Légifrance (fonds LEGI, JORF, DOLE), Licence Ouverte / Etalab 2.0
+- Source : Assemblée nationale — open data, Licence Ouverte / Etalab
+- Source : Sénat — data.senat.fr, licence ouverte reprenant les termes de data.gouv.fr
+- © Union européenne, https://eur-lex.europa.eu, 1998-2026 — réutilisation autorisée, décision 2011/833/UE
+- Rapports de commission : informations publiques (loi du 17 juillet 1978), régime de réutilisation non confirmé — texte non rediffusé
+
+## Ce que ce dump ne contient pas
+
+Le **texte** des rapports de commission n'est pas rediffusé : leur régime de réutilisation n'est pas confirmé par les assemblées. Leur URL, leur hachage et les offsets des passages restent présents, ce qui suffit à refaire le lien depuis la source. Les fenêtres de preuve qui en viennent sont ramenées aux soixante caractères que le schéma exige au minimum.
+
+- `documents_dont_le_texte_est_retire` : 221
+- `fenetres_de_preuve_ramenees_a_60_caracteres` : 624
+
+## Tables
+
+| Table | Lignes | Contenu |
+|---|---:|---|
+| `article` | 3428 | un article de code, identifié par son numéro |
+| `version_article` | 6131 | une rédaction datée d'un article, telle que LEGI la publie |
+| `segment` | 26524 | un alinéa d'une version, avec ses offsets dans le texte |
+| `texte_normatif` | 442 | une loi, une ordonnance, un décret ou un arrêté |
+| `dossier` | 199 | un dossier législatif (DOLE) |
+| `document` | 337 | un document de motivation : exposé des motifs, étude d'impact, avis du Conseil d'État, rapport de commission, rapport au Président |
+| `amendement` | 31457 | un amendement déposé, adopté ou non, avec son auteur et son sort |
+| `acteur` | 1419 | un parlementaire ou un groupe, tel que les chambres le nomment |
+| `acte_ue` | 284 | un acte de l'Union identifié par son CELEX |
+| `considerant` | 7674 | un considérant d'un acte de l'Union, dans l'ordre de publication |
+| `texte_discute` | 355 | un texte déposé ou transmis, à un stade de la navette |
+| `preuve` | 47232 | la fenêtre textuelle qui fonde une arête dérivée |
+| `produite_par` | 7809 | version d'article → texte qui l'a produite (LEGI, déclarée) |
+| `issu_de` | 200 | texte → dossier législatif (DOLE, déclarée) |
+| `renumerote_de` | 1877 | article → article dont il reprend la disposition |
+| `repris_de` | 5766 | segment → segment antérieur dont il reprend le texte |
+| `resulte_de` | 279 | segment → amendement qui l'a écrit — l'arête critique du projet |
+| `motive` | 624 | document → article ou segment que l'un de ses passages explique |
+| `porte_sur` | 27412 | article d'un texte discuté → article du code qu'il modifie |
+| `vise` | 242 | amendement → article du code que son dispositif désigne |
+| `renvoie_a` | 11656 | segment → article cité, interne ou externe au code |
+| `cite_acte_ue` | 1478 | segment → acte de l'Union qu'il nomme |
+| `transpose` | 8 | texte → acte de l'Union dont il déclare la transposition |
+| `verdict` | 2139 | pour chaque article en vigueur, ce que le graphe sait en dire |
+| `diffusion` | 16 | licence, attributions et provenance de ce dump |
+
+## Comment lire une arête
+
+Chaque arête dérivée porte une `methode` (`declaree`, `derivee`, `inferee`), une `confiance` — borne inférieure de Wilson à 95 % de la précision mesurée à la main — et un `preuve_id` qui pointe la fenêtre textuelle qui la fonde. Une arête dérivée sans preuve est refusée à l'écriture, pas signalée à la lecture.
+
+Les précisions mesurées et leurs échantillons sont publiés avec le code, dans `data/mesures/`.
+

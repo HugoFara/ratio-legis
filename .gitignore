@@ -8,3 +8,9 @@ travail/corpus/impacts/*.pdf
 # Textes en discussion : 355 pages HTML et PDF des deux chambres, retéléchargeables
 # depuis `data/corpus/plan-textes.tsv`.
 travail/corpus/textes/
+
+# Le dump ouvert est un artefact reproductible : `tools/diffusion/dump.py` le
+# refait d'une commande. Seuls son manifeste haché et sa notice sont versionnés,
+# comme pour les miroirs DILA et EUR-Lex.
+data/diffusion/*.sqlite
+data/diffusion/tsv/

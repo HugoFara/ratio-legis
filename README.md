@@ -136,6 +136,7 @@ numéro d'aujourd'hui, et 695 dès qu'on remonte aux numéros d'avant 2016.
 | 14. Dossiers des textes | le dossier législatif de chaque texte, déclaré par DOLE | [`docs/20`](docs/20-dossiers-des-textes.md) |
 | 15. Précision de `resulte_de` | les 277 arêtes examinées une à une, six gardes, la décision go/no-go | [`docs/21`](docs/21-precision-resulte-de.md) |
 | 16. Lecture et performance | 425 ms → 9 ms par article, et une restitution redevenue reproductible | [`docs/22`](docs/22-lecture-et-performance.md) |
+| 17. Dump ouvert | republier le graphe, sans rediffuser ce qu'on n'a pas le droit de rediffuser | [`docs/23`](docs/23-dump-ouvert.md) |
 
 ### Reconstruire
 
@@ -354,6 +355,24 @@ produit pas la note « pourquoi cet article » avec son contrat strict et son ve
 explicite `raison non documentée` — qui est pourtant le résultat de premier ordre
 du projet. Manquent aussi l'étiquetage IA de l'article 50 du règlement (UE)
 2024/1689, l'API, le dump ouvert et le surlignage par étape.
+
+## Le dump ouvert
+
+```
+python3 tools/diffusion/dump.py travail/ratio-legis.sqlite data/diffusion
+python3 tools/diffusion/dump.py travail/ratio-legis.sqlite data/diffusion --strict
+```
+
+126 Mo, plus les mêmes arêtes en TSV, un dictionnaire des tables et un manifeste
+haché. Le **texte des 221 rapports de commission n'y est pas** : leur régime de
+réutilisation n'est pas confirmé par les assemblées. URL, hachage et offsets
+restent, ce qui suffit à refaire le lien depuis la source ; les fenêtres de preuve
+qui en viennent sont ramenées aux soixante caractères que le schéma exige au
+minimum — la preuve irréductible, pas de l'extrait. `--strict` rend l'arbitrage
+inverse et recalcule le verdict pour que la base reste cohérente avec elle-même.
+
+Le dump n'est pas versionné : il se refait d'une commande, et seuls son manifeste
+et sa notice le sont — comme pour les miroirs.
 
 ## Licence et attribution
 
