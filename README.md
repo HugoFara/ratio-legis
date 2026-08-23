@@ -12,7 +12,7 @@ sans citation résoluble au niveau du passage.
 
 Spécification complète : [`ratio-legis-feuille-de-route.md`](ratio-legis-feuille-de-route.md).
 
-## État : quinze tranches en base, phase 2 mesurée contre ses seuils, validation humaine de la phase 0 toujours ouverte
+## État : phase 2 close avec deux dérogations écrites, phase 4 entamée, validation humaine de la phase 0 toujours ouverte
 
 Le graphe est chargé et interrogeable article par article. Les quatre critères de
 sortie de la phase 2 ont été **mesurés contre leurs seuils**, ce qui n'avait
@@ -34,6 +34,10 @@ La décision go/no-go du § 8, restée ouverte, est rendue dans
 l'article est tenu par le commentaire de rapport (695 articles) et par le texte
 discuté (807), non par l'amendement (79) — l'hypothèse du § 8 sur le chemin était
 fausse, pas le produit.
+
+**La phase 2 est close** avec ces deux dérogations, écrites au § 4.2 de la feuille
+de route plutôt que laissées tacites. La phase 4 est entamée : interroger le
+graphe coûtait 425 ms par article, il en coûte 9.
 
 Ce que le projet ne peut toujours pas faire, c'est se déclarer conforme : les
 confiances portées par les arêtes sont des bornes de Wilson calculées sur mes
@@ -131,6 +135,7 @@ numéro d'aujourd'hui, et 695 dès qu'on remonte aux numéros d'avant 2016.
 | **Phase 3** | **la note « pourquoi cet article », sous contrat** | [`docs/19`](docs/19-note-phase-3.md) |
 | 14. Dossiers des textes | le dossier législatif de chaque texte, déclaré par DOLE | [`docs/20`](docs/20-dossiers-des-textes.md) |
 | 15. Précision de `resulte_de` | les 277 arêtes examinées une à une, six gardes, la décision go/no-go | [`docs/21`](docs/21-precision-resulte-de.md) |
+| 16. Lecture et performance | 425 ms → 9 ms par article, et une restitution redevenue reproductible | [`docs/22`](docs/22-lecture-et-performance.md) |
 
 ### Reconstruire
 

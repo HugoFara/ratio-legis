@@ -184,6 +184,12 @@ python3 "$RACINE/ingestion/verdict.py" "$BASE"
 python3 "$RACINE/tools/mesures/hygiene.py" "$BASE" "$RACINE/data/perimetre-v1.csv" \
         "$RACINE/data/mesures/hygiene.tsv"
 
+# ------------------------------------------- 8. préparation de la lecture
+etape "8. Index de lecture"
+# En dernier, après toute écriture : ce sont les statistiques du planificateur
+# qui font l'essentiel, et elles décrivent la base telle qu'elle est à la fin.
+python3 "$RACINE/ingestion/index_de_lecture.py" "$BASE"
+
 etape "Terminé"
 echo "base : $BASE ($(du -h "$BASE" | cut -f1))"
 echo "essai : python3 restitution/graphe.py $BASE L224-43"

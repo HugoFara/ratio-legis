@@ -129,7 +129,8 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
 
     version = q("""SELECT v.id_legi, v.date_debut FROM version_article v
                    JOIN article a ON a.id = v.article_id
-                   WHERE a.numero = ? AND v.etat = 'VIGUEUR'""", numero)
+                   WHERE a.numero = ? AND v.etat = 'VIGUEUR'
+                   ORDER BY v.date_debut DESC, v.id_legi""", numero)
     if not version:
         return {}
 
@@ -139,7 +140,7 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
             SELECT id FROM article WHERE numero = ?
             UNION SELECT r.ancien_id FROM renumerote_de r JOIN asc_a ON r.article_id = asc_a.anc)
         SELECT DISTINCT a.numero FROM asc_a JOIN article a ON a.id = asc_a.anc
-        WHERE a.numero <> ?""", numero, numero)]
+        WHERE a.numero <> ? ORDER BY a.numero""", numero, numero)]
 
     d["textes"] = q("""SELECT DISTINCT t.titre, t.date_texte, p.type_lien, p.methode
                        FROM version_article v JOIN article a ON a.id = v.article_id
@@ -166,7 +167,7 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
             JOIN preuve p ON p.id = rd.preuve_id
             LEFT JOIN issu_de i ON i.dossier_id = am.dossier_id
             LEFT JOIN texte_normatif t ON t.id_jorf = i.texte_id
-            GROUP BY am.id""", segment["id"])
+            GROUP BY am.id ORDER BY am.chambre, am.numero""", segment["id"])
         renvois = q("""SELECT numero_cite, portee, code_cite FROM renvoie_a
                        WHERE segment_id = ? ORDER BY numero_cite""", segment["id"])
         # « cite » et rien de plus : voir schema/004-union.sql. Un alinéa peut
@@ -244,7 +245,12 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
         WHERE a.numero = ? AND doc.type IN ('rapport_president_republique',
                                             'expose_des_motifs', 'etude_impact',
                                             'avis_conseil_etat')""", numero)
-    d["motivation_du_texte"].sort(key=lambda m: ORDRE_DOCUMENT[m["type"]])
+    # Le tri doit être total : sans le second critère, deux documents de même
+    # type sortaient dans l'ordre du plan d'exécution, qui change avec les
+    # statistiques du planificateur. Une restitution dont l'ordre dépend d'un
+    # index n'est pas reproductible, et la reproductibilité est ce que ce projet
+    # vend (§ 5.2).
+    d["motivation_du_texte"].sort(key=lambda m: (ORDRE_DOCUMENT[m["type"]], m["url"]))
 
     # La transposition n'est retenue que si le texte français la déclare dans son
     # intitulé au Journal officiel. Elle porte sur le texte entier, comme le
@@ -258,7 +264,7 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
         JOIN transpose tr       ON tr.texte_id = t.id_jorf
         JOIN acte_ue u          ON u.celex = tr.celex
         LEFT JOIN preuve p      ON p.id = tr.preuve_id
-        WHERE a.numero = ?""", numero)
+        WHERE a.numero = ? ORDER BY u.celex""", numero)
 
     # Les considérants motivent l'acte, jamais l'article français : rien ne les
     # relie l'un à l'autre, et deux tentatives de sélection ont été mesurées puis

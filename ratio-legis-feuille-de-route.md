@@ -144,6 +144,31 @@ Article        --renumerote_de-->Article               (tables de concordance)
   - couverture `resulte_de` : > 60 % (seuil réaliste, ne pas le gonfler)
   - **précision de `resulte_de` : > 95 %** — un mauvais rattachement est bien pire qu'une absence de rattachement. Cette métrique prime sur toutes les autres.
 
+#### Clôture de la phase 2 — deux dérogations, août 2026
+
+Les quatre critères ont été mesurés (`docs/21`). Deux ne sont pas atteints, et la
+phase est close avec les dérogations suivantes, prises en connaissance de cause :
+
+| Critère | Seuil | Mesuré | Dérogation |
+|---|---:|---:|---|
+| couverture `produite_par` | > 95 % | 98,8 % | — |
+| couverture `issu_de` | > 90 % | 100 % | — |
+| couverture `resulte_de` | > 60 % | 9,5 % | **seuil déclaré inatteignable** |
+| précision `resulte_de` | > 95 % | 93,9 % | **écart accepté** |
+
+**La couverture** est plafonnée par les sources, non par l'implémentation : le
+premier échelon de la cascade du § 3 — le tableau synoptique du Sénat — n'existe
+pas (`docs/01` § 3.2), et les amendements de l'Assemblée ne sont en open data que
+depuis la XIVe législature. Le § 8 prévoyait un repli « centré dossier » ; il est
+refusé comme inutile, le grain de l'article étant tenu par le commentaire de
+rapport et par le texte discuté (`docs/21` § 7).
+
+**La précision** est de 93,9 % sur 179 arêtes hors-échantillon, borne de Wilson
+0,8933. Les 277 arêtes du graphe ont été examinées une à une : l'écart au seuil
+est d'environ un point, il est ventilé en quatre familles nommées, et il est
+porté par la valeur de `confiance` de chaque arête, comme l'exige le § 5.4. Le
+critère reste la cible ; il n'est plus bloquant.
+
 ### Phase 3 — Couche de restitution (4 semaines)
 
 Génération, pour un article donné, d'une note « pourquoi cet article ». **Contrat de génération strict :**
