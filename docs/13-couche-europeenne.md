@@ -24,13 +24,18 @@ Le code de la consommation est l'un des codes les plus européens du droit
 français. **280 actes de l'Union sont nommés dans son texte**, en toutes lettres,
 déjà présents dans le fonds LEGI. Aucune source nouvelle n'a été nécessaire.
 
+Les trois CELEX vérifiés qui n'entrent pas en base sont ceux que la coupure du
+§ 6 écarte : ils figurent dans un intitulé français, mais au titre d'une
+modification, pas d'une transposition.
+
 ## 2. Ce que la tranche produit
 
 | | |
 |---|---:|
-| Actes de l'Union relevés, **tous vérifiés auprès de Cellar** | **287** |
-| dont règlements | 230 |
-| dont directives | 55 |
+| CELEX construits et confrontés à Cellar | 287 |
+| **Actes retenus en base** | **284** |
+| dont règlements | 229 |
+| dont directives | 53 |
 | dont décisions | 2 |
 | Citations rattachées à un alinéa, avec offsets | **1 478** |
 | écartées faute de preuve exploitable | 0 |

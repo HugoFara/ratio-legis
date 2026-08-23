@@ -12,9 +12,81 @@ sans citation résoluble au niveau du passage.
 
 Spécification complète : [`ratio-legis-feuille-de-route.md`](ratio-legis-feuille-de-route.md).
 
-## État : phase 0 mesurée, jalon go/no-go franchi, validation humaine en attente
+## État : huit tranches en base, validation humaine de la phase 0 toujours ouverte
 
-Aucun code de production n'est écrit, conformément au § 9 de la feuille de route.
+Le graphe est chargé et interrogeable article par article. Ce qu'il ne peut pas
+encore faire, c'est se déclarer conforme : le critère de sortie de la phase 2
+(**précision de `resulte_de` > 95 %**) et celui de la phase 3 (évaluation humaine
+en aveugle) supposent tous deux un jugement extérieur. Les confiances portées par
+les arêtes sont des bornes de Wilson calculées sur mes propres échantillons ; tant
+que les 100 articles du jeu d'annotation ne sont pas validés à la main, **aucune
+phase n'est close**, quoi qu'affichent les compteurs.
+
+### Ce que la base contient
+
+Reconstruite d'une commande depuis le miroir et les plans versionnés
+(`pipeline.sh`), 201 Mo, zéro violation d'intégrité.
+
+| Nœuds | | Arêtes | |
+|---|---:|---|---:|
+| Articles (dont **2 139 en vigueur**) | 3 428 | `produite_par` — quel texte a produit la version | 7 809 |
+| Versions d'articles | 6 131 | `repris_de` — continuité d'un alinéa par-delà la recodification | 5 766 |
+| **Segments (alinéas)** | **26 524** | `renumerote_de` | 1 877 |
+| Documents parlementaires | 258 | `motive` — un passage qui motive, avec offsets | 519 |
+| Amendements (20 342 Sénat, 11 115 Assemblée) | 31 457 | `renvoie_a` — le graphe de renvois | 11 656 |
+| Acteurs | 1 419 | `resulte_de` — l'amendement qui a écrit l'alinéa | 286 |
+| **Actes de l'Union** | **284** | `cite_acte_ue` / `transpose` | 1 478 / 8 |
+
+Ce que cela donne au grain de l'article en vigueur, qui est le seul grain qui
+compte pour le produit :
+
+| | |
+|---|---:|
+| Articles cités par un autre article du fonds | **1 064 (49,7 %)** |
+| Articles atteignant un rapport au Président — grain : le texte entier | 997 |
+| Articles nommant un acte de l'Union | 113 |
+| Articles atteignant une transposition déclarée — grain : le texte entier | 63 |
+| **Articles remontant à un amendement identifié** | **82** |
+| **Articles remontant à un passage qui les nomme** | **65** |
+
+Seules les deux dernières lignes répondent à « pourquoi **cet article** dit
+ceci ». Les autres répondent à « pourquoi ce **texte** existe » — un rapport au
+Président motive une ordonnance de plusieurs centaines d'articles, pas l'alinéa
+qu'on lit. Ce n'est pas la même question, et la restitution refuse de les
+confondre : elle affiche l'avertissement chaque fois qu'elle sert l'un faute de
+l'autre.
+
+### Les tranches
+
+| Tranche | Ce qu'elle produit | Document |
+|---|---|---|
+| 1. LEGI → graphe | articles, versions, segments, `repris_de` | [`docs/06`](docs/06-modele-de-donnees.md) |
+| 2. Rapports → `motive` | le passage d'un rapport qui commente l'article | [`docs/07`](docs/07-tranche-motive.md) |
+| 3. Renvois | « si je modifie cet article, qu'est-ce qui bouge » | [`docs/08`](docs/08-graphe-de-renvois.md) |
+| 4. Amendements → `resulte_de` | l'amendement qui a écrit l'alinéa | [`docs/09`](docs/09-tranche-amendements.md) |
+| 5. Amendements non adoptés | ce qui a été tenté sans aboutir | [`docs/10`](docs/10-amendements-non-adoptes.md) |
+| 6. Assemblée nationale | la XIVe législature, les deux chambres chargées | [`docs/11`](docs/11-tranche-assemblee.md) |
+| 7. But déclaré et rapports au Président | l'objet de l'amendement, la motivation des ordonnances | [`docs/12`](docs/12-but-declare.md) |
+| 8. **Couche européenne** | l'acte de l'Union que l'article cite, la transposition déclarée | [`docs/13`](docs/13-couche-europeenne.md) |
+
+### Reconstruire
+
+```
+./pipeline.sh                 # miroir DILA + plans versionnés → base complète
+```
+
+Tout est reconstructible depuis ce qui est versionné : le miroir DILA
+(`data/raw/dila/`, 6,4 Go, hors dépôt), le périmètre, et les plans de récupération
+`data/corpus/*.tsv`. Ce script a été écrit après avoir **perdu tous les corpus
+dérivés** dans un vidage de `/tmp` : la règle « la donnée brute est sacrée » du
+§ 5.2 ne vaut que si l'on sait aussi la retrouver.
+
+Une seule étape demande le réseau au-delà des téléchargements de sources : la
+vérification des identifiants CELEX auprès de Cellar. Son résultat est versionné,
+donc le reste rejoue hors ligne.
+
+## Phase 0
+
 Les trois livrables de la phase 0 sont produits.
 
 | Livrable | Fichier |
@@ -59,11 +131,13 @@ open data de l'Assemblée nationale.
   `resulte_de`, **n'existe pas**.
 - **DuraLex**, deuxième échelon, est **abandonné depuis février 2019**. L'arête
   critique du projet est donc entièrement à écrire.
-- Les **amendements de l'Assemblée nationale** ne sont en open data que pour les
-  16e et 17e législatures, dont 93 % de la population éligible du périmètre ne
-  relève pas. Le prototype du résolveur montre que c'est bien la source qui
-  manque : les 70 articles issus de la navette et non rattachés sont, selon toute
-  vraisemblance, d'origine Assemblée.
+- ~~Les **amendements de l'Assemblée nationale** ne sont en open data que pour les
+  16e et 17e législatures.~~ **Faux, et corrigé depuis** : la XIVe législature est
+  publiée, sous le chemin `amendements_legis_XIV`. La conclusion venait d'une URL
+  périmée recopiée de la page d'archives de l'Assemblée elle-même. Un 404 sur une
+  URL recopiée prouve que l'URL est mauvaise, jamais que la donnée est absente
+  ([`docs/10`](docs/10-amendements-non-adoptes.md) § 4). 11 115 amendements de
+  l'Assemblée sont chargés.
 - Le § 0 suppose les ordonnances sans motivation : **90,6 % d'entre elles ont un
   rapport au Président de la République**.
 - **Atteindre le dossier n'est pas atteindre la motivation.** L'exposé des motifs
@@ -133,30 +207,60 @@ balise `<p>`. Modèle et schéma : [`docs/06-modele-de-donnees.md`](docs/06-mode
 
 LEGI → articles, versions, **segments**, et l'arête `repris_de` qui porte la
 continuité d'un alinéa à travers une recodification. 3,5 secondes, 26 Mo, zéro
-violation d'intégrité :
+violation d'intégrité. Les compteurs de cette tranche figurent dans le tableau
+d'état plus haut.
 
-| | |
-|---|---:|
-| Segments | 26 524 |
-| Arêtes `produite_par` / `renumerote_de` | 7 809 / 3 849 |
-| **Arêtes `repris_de`** | **9 830** — dont 4 891 intégrales, 4 500 retouchées |
+Les premiers chiffres publiés ici — 3 849 arêtes `renumerote_de`, 9 830
+`repris_de` — étaient **gonflés par un graphe non orienté**. LEGI porte un
+attribut `sens` qui n'est pas fiable et que le projet ignore ; sans lui, 3 848 des
+3 849 arêtes avaient leur réciproque, et la remontée d'ascendance bouclait. La
+direction est désormais reprise de la chronologie des dates d'effet, et les 48
+couples à date égale sont **abandonnés plutôt que devinés** (§ 5.1). Compteurs
+réels : `renumerote_de` 1 877, `repris_de` 5 766.
 
 Base SQLite plutôt que PostgreSQL : le volume ne justifie pas un serveur, et les
 contraintes du schéma ont pu être **réellement testées** — chacune en essayant de
 la violer. Contrepartie à trancher avant la phase 3 : `pg_trgm` et `pgvector`
 disparaissent, remplacés par FTS5 et, pour le rappel vectoriel, un index externe.
 
-## Prochaine étape
+## Ce qui reste à faire
 
-1. **Faire valider les 100 articles** du jeu d'annotation. 66 d'entre eux portent
-   déjà un passage proposé et ses offsets, extraits des rapports de commission —
-   la meilleure source de motivation au niveau de l'article, avec **94,1 %**
-   d'articles nommés contre 24,8 % pour l'étude d'impact. Tant que la validation
-   humaine n'est pas faite, la phase 0 reste ouverte.
-2. **Construire l'extracteur d'amendements AN historiques** : 387 des 449 articles
-   issus de la navette ne sont rattachés à aucun amendement du Sénat.
-3. **Charger les documents et les amendements**, puis produire `resulte_de` sur
-   les segments, la tranche `repris_de` en étant la dépendance.
+**Bloquant, et hors de portée du code.** Faire valider à la main les 100 articles
+du jeu d'annotation. 66 d'entre eux portent déjà un passage proposé et ses
+offsets. Tant que cette validation n'est pas faite, la phase 0 reste ouverte et
+aucune mesure de précision du projet n'est autre chose qu'une auto-évaluation.
+
+**Trois couches de motivation ne sont pas construites.**
+
+1. **Les considérants européens.** `acte_ue.considerants` est vide. C'est pourtant
+   là qu'est le « pourquoi » du droit de l'Union : un considérant de directive est
+   l'exposé des motifs que le droit français n'a pas. Suite naturelle de la
+   huitième tranche, et la moins chère des trois.
+2. **Les études d'impact.** Obligatoires depuis 2009 pour tout projet de loi,
+   elles chiffrent ce que le législateur croyait faire. Les confronter au texte
+   adopté est le seul endroit du projet où l'on pourra montrer un écart entre
+   l'intention annoncée et le dispositif voté — c'est-à-dire le second but du
+   produit. Coût réel : ce sont des PDF, et les offsets doivent survivre.
+3. **Les avis du Conseil d'État**, publics depuis 2015. Le § 4.3 impose de
+   distinguer ce que le Conseil d'État a **objecté** ; cette colonne est vide. Un
+   article adopté malgré une objection est un fait qui n'existe nulle part
+   ailleurs.
+
+**Trous de couverture dans ce qui existe.** Les amendements de l'Assemblée pour
+les législatures XV à XVII (103 articles éligibles, mécanique). La XIIIe, jamais
+publiée en open data, reconstructible seulement page par page depuis Wayback —
+arbitrage à rendre entre le coût et un trou déclaré. Les textes déposés, dont
+l'absence laisse subsister le dernier mode d'échec de `resulte_de`. Les débats en
+séance : le graphe sait ce que le Parlement a **fait**, pas ce qu'il a **dit**.
+
+**La licence de réutilisation des rapports parlementaires** n'est toujours pas
+confirmée auprès des deux chambres. Elle conditionne toute publication.
+
+**Phases 3 et 4 non commencées.** `restitution/graphe.py` montre le graphe ; il ne
+produit pas la note « pourquoi cet article » avec son contrat strict et son verdict
+explicite `raison non documentée` — qui est pourtant le résultat de premier ordre
+du projet. Manquent aussi l'étiquetage IA de l'article 50 du règlement (UE)
+2024/1689, l'API, le dump ouvert et le surlignage par étape.
 
 ## Licence et attribution
 
@@ -176,6 +280,14 @@ python3 restitution/graphe.py base.sqlite L224-43
 python3 restitution/graphe.py base.sqlite L111-1 --html sortie.html
 ```
 
-Deux rendus versionnés dans `restitution/exemples/`. La restitution n'ajoute
-aucune donnée : elle applique les règles § 5.1 (provenance ou silence), § 5.4 (la
-confiance est une donnée) et § 4.3 (toute phrase produite est citable).
+Quatre rendus versionnés dans `restitution/exemples/`, choisis pour ce qu'ils
+montrent : **L224-43** une chaîne complète jusqu'à l'amendement et son but déclaré,
+**L111-1** un article très cité, **L511-7** un article que le droit de l'Union
+sature, **L112-1-1** un article sans aucune motivation parlementaire dont la seule
+raison connue est une directive.
+
+La restitution n'ajoute aucune donnée : elle applique les règles § 5.1 (provenance
+ou silence), § 5.4 (la confiance est une donnée) et § 4.3 (toute phrase produite
+est citable). Elle distingue à l'écran ce qui porte sur **l'article** de ce qui ne
+porte que sur le **texte entier** — un rapport au Président ou une transposition
+déclarée motivent une ordonnance, pas l'alinéa qu'on lit.
