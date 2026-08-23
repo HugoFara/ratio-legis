@@ -5,3 +5,6 @@ __pycache__/
 # depuis `data/corpus/plan-impacts.tsv`, qui est versionné — même raison que pour le
 # miroir DILA. Le texte extrait, lui, est suivi avec les autres documents du corpus.
 travail/corpus/impacts/*.pdf
+# Textes en discussion : 355 pages HTML et PDF des deux chambres, retéléchargeables
+# depuis `data/corpus/plan-textes.tsv`.
+travail/corpus/textes/

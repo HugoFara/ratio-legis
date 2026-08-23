@@ -40,6 +40,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "ingestion"))
 from union_europeenne import ANCRE  # noqa: E402
 
 PLAFOND_CONSIDERANTS = 25          # au-delà, la page devient illisible
+PLAFOND_TEXTES = 8                 # en texte seulement : le HTML les rend tous
 SEUIL_APPARIEMENT = 60          # sous ce seuil, aucune preuve textuelle ne discrimine
 
 # Numéro de l'article du PROJET de loi, tel que l'amendement et le commentaire de
@@ -249,6 +250,14 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
                          WHERE celex = ? ORDER BY rang""", a["celex"])
         for a in d["actes_motivants"]}
 
+    # Sous quel article du texte en discussion cet article a-t-il été débattu.
+    # `direct` distingue la cible nommée telle quelle de celle atteinte par la
+    # chaîne de renumérotation : un texte de 2014 vise L. 121-42, devenu L. 224-43.
+    d["textes_discutes"] = q("""
+        SELECT chambre, stade, article_du_texte, numero_cite, direct, url
+        FROM articles_du_texte WHERE article = ?
+        ORDER BY direct DESC, chambre, stade""", numero)
+
     d["cite_par"] = q("""SELECT article_citant,
                                 min((SELECT fenetre FROM preuve WHERE id = preuve_id)) AS extrait
                          FROM renvois_entrants WHERE article_cite = ?
@@ -344,6 +353,16 @@ def en_texte(d: dict) -> str:
             reste = max(0, u["considerants"] - 2)
             if reste:
                 L.append(f"    … et {reste} autre(s), sur EUR-Lex")
+
+    if d["textes_discutes"]:
+        L.append(f"\nSOUS QUEL ARTICLE IL A ÉTÉ DISCUTÉ ({len(d['textes_discutes'])})")
+        for x in d["textes_discutes"][:PLAFOND_TEXTES]:
+            sous = "" if x["direct"] else f" (visé sous {x['numero_cite']})"
+            L.append(f"  article {x['article_du_texte']}{sous} — {x['stade']}")
+            L.append(f"    {x['url']}")
+        reste = len(d["textes_discutes"]) - PLAFOND_TEXTES
+        if reste > 0:
+            L.append(f"  … et {reste} autre(s) — la liste complète est dans le rendu HTML")
 
     L.append(f"\nCE QUI CITE CET ARTICLE ({len(d['cite_par'])})")
     L.append("  " + ", ".join(c["article_citant"] for c in d["cite_par"]) if d["cite_par"]
@@ -516,6 +535,18 @@ font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-seri
                              f'{len(liste)} — la suite sur EUR-Lex.</p>')
                 p.append("</details>")
             p.append("</div>")
+
+    if d["textes_discutes"]:
+        p.append(f"<h2>Sous quel article il a été discuté "
+                 f"({len(d['textes_discutes'])})</h2>")
+        p.append("<table><tr><th>Article du texte</th><th>Chambre</th>"
+                 "<th>Stade</th><th>Visé sous</th></tr>")
+        for x in d["textes_discutes"]:
+            p.append(f'<tr><td><a href="{e(x["url"])}">article '
+                     f'{e(x["article_du_texte"])}</a></td>'
+                     f'<td>{e(x["chambre"])}</td><td>{e(x["stade"])}</td>'
+                     f'<td>{"" if x["direct"] else e(x["numero_cite"])}</td></tr>')
+        p.append("</table>")
 
     p.append(f"<h2>Ce qui cite cet article ({len(d['cite_par'])})</h2>")
     p.append('<div class="puces">' + "".join(

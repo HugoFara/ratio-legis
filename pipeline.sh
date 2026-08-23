@@ -22,7 +22,7 @@ CODE=LEGITEXT000006069565          # code de la consommation
 
 etape() { printf '\n\033[1m== %s\033[0m\n' "$*"; }
 
-mkdir -p "$TRAVAIL"/{conso,corpus/rapports,corpus/ameli,corpus/impacts,an}
+mkdir -p "$TRAVAIL"/{conso,corpus/rapports,corpus/ameli,corpus/impacts,corpus/textes,an}
 
 # --------------------------------------------------------------- 1. fonds LEGI
 etape "1. Extraction du code depuis le miroir LEGI"
@@ -76,6 +76,15 @@ IMPACTS="$RACINE/data/corpus/plan-impacts.tsv"
 python3 "$RACINE/tools/dila/telecharger_impacts.py" "$IMPACTS" \
         "$TRAVAIL/corpus/impacts" "$TRAVAIL/corpus/rapports"
 
+etape "2 ter. Textes en discussion"
+# Le chaînon « article du texte → article du code ». DOLE n'en porte que les
+# liens ; les pages sont sur les sites des deux chambres, en HTML pour les
+# anciennes et en PDF pour les récentes de l'Assemblée.
+TEXTES="$RACINE/data/corpus/plan-textes.tsv"
+[ -s "$TEXTES" ] || python3 "$RACINE/tools/dila/plan_textes.py" "$MIROIR" \
+        "$RACINE/data/perimetre-v1.csv" "$TEXTES"
+python3 "$RACINE/tools/dila/telecharger_textes.py" "$TEXTES" "$TRAVAIL/corpus/textes"
+
 # ------------------------------------------------------- 3. amendements Sénat
 etape "3. Jeux d'amendements Améli (Sénat)"
 if [ "$(ls "$TRAVAIL/corpus/ameli" | wc -l)" -lt 50 ]; then
@@ -126,6 +135,7 @@ python3 "$RACINE/ingestion/an_vers_amendements.py" "$TRAVAIL/an/amendements_14.c
         "$TRAVAIL/an/acteurs_historique.json.zip" "$BASE"
 python3 "$RACINE/ingestion/amendements_vers_resulte_de.py" "$TRAVAIL/corpus/ameli" "$BASE"
 python3 "$RACINE/ingestion/visees.py" "$BASE"
+python3 "$RACINE/ingestion/textes_deposes.py" "$TRAVAIL/corpus/textes" "$TEXTES" "$BASE"
 
 # ------------------------------------------------------- 6. couche européenne
 etape "6. Droit de l'Union"

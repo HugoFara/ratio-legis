@@ -12,7 +12,7 @@ sans citation résoluble au niveau du passage.
 
 Spécification complète : [`ratio-legis-feuille-de-route.md`](ratio-legis-feuille-de-route.md).
 
-## État : dix tranches en base, validation humaine de la phase 0 toujours ouverte
+## État : onze tranches en base, validation humaine de la phase 0 toujours ouverte
 
 Le graphe est chargé et interrogeable article par article. Ce qu'il ne peut pas
 encore faire, c'est se déclarer conforme : le critère de sortie de la phase 2
@@ -37,6 +37,7 @@ Reconstruite d'une commande depuis le miroir et les plans versionnés
 | Acteurs | 1 419 | `resulte_de` — l'amendement qui a écrit l'alinéa | 286 |
 | **Actes de l'Union** | **284** | `cite_acte_ue` / `transpose` | 1 478 / 8 |
 | **Considérants de l'Union** | **7 674** | `article_acte_ue` — articles d'actes déclarés | 6 237 |
+| **Textes en discussion** | **355** | **`porte_sur`** — l'article du texte → l'article du code | **27 412** |
 
 Ce que cela donne au grain de l'article en vigueur, qui est le seul grain qui
 compte pour le produit :
@@ -44,6 +45,7 @@ compte pour le produit :
 | | |
 |---|---:|
 | Articles cités par un autre article du fonds | **1 064 (49,7 %)** |
+| **Articles reliés à un article de texte en discussion** | **807 (37,7 %)** |
 | **Articles atteignant un document motivant le texte** — grain : le texte entier | **1 160** |
 | dont par un rapport au Président | 997 |
 | dont par un exposé des motifs | 147 |
@@ -75,7 +77,8 @@ l'autre.
 | 7. But déclaré et rapports au Président | l'objet de l'amendement, la motivation des ordonnances | [`docs/12`](docs/12-but-declare.md) |
 | 8. Couche européenne | l'acte de l'Union que l'article cite, la transposition déclarée | [`docs/13`](docs/13-couche-europeenne.md) |
 | 9. Considérants | le motif que l'Union écrit elle-même, et l'article visé de l'acte | [`docs/14`](docs/14-considerants.md) |
-| 10. **Motivation gouvernementale** | exposé des motifs, étude d'impact, avis du Conseil d'État | [`docs/15`](docs/15-motivation-gouvernementale.md) |
+| 10. Motivation gouvernementale | exposé des motifs, étude d'impact, avis du Conseil d'État | [`docs/15`](docs/15-motivation-gouvernementale.md) |
+| 11. **Textes en discussion** | sous quel article du texte l'article du code a été débattu | [`docs/16`](docs/16-textes-discutes.md) |
 
 ### Reconstruire
 
@@ -254,10 +257,16 @@ aucune mesure de précision du projet n'est autre chose qu'une auto-évaluation.
    lecture. Confronter l'impact annoncé au dispositif voté — le second but du
    produit — suppose d'abord de charger les textes déposés.
 
-**Ce qui reste, pour descendre au grain de l'article.** Les textes déposés :
-c'est la pièce qui manque à trois chantiers à la fois — le dernier mode d'échec de
-`resulte_de`, le rapprochement de l'étude d'impact, et les tableaux de concordance
-qui apparient un article de directive à un article du code.
+**Le chaînon est posé, mais il ne débloque pas ce qu'on en attendait.** 807
+articles en vigueur savent désormais sous quel article de quel texte ils ont été
+discutés ([`docs/16`](docs/16-textes-discutes.md)). En revanche, **aucun des 25
+dossiers ayant une étude d'impact n'a de texte déposé dans le corpus** : DOLE ne
+lie le texte déposé que pour les propositions de loi, qui n'ont jamais d'étude
+d'impact. Le rapprochement de l'étude d'impact reste donc à faire, et il passera
+par le numéro de dépôt de la chambre, non par DOLE. Reste aussi à écrire la table
+de correspondance entre les identifiants de texte des corpus d'amendements et ceux
+des textes en discussion, sans laquelle les amendements orphelins ne peuvent pas
+être rattrapés.
 
 **Trous de couverture dans ce qui existe.** Les amendements de l'Assemblée pour
 les législatures XV à XVII (103 articles éligibles, mécanique). La XIIIe, jamais
@@ -298,7 +307,8 @@ montrent : **L224-43** une chaîne complète jusqu'à l'amendement et son but d�
 **L111-1** un article très cité, **L511-7** un article que le droit de l'Union
 sature, **L112-1-1** un article sans aucune motivation parlementaire dont la seule
 raison connue est une directive, **L122-23** les quatre paroles du § 4.3 côte à
-côte — Gouvernement, chiffrage, Conseil d'État, Parlement.
+côte — Gouvernement, chiffrage, Conseil d'État, Parlement —, **L521-2** un article
+suivi à travers la navette et la recodification.
 
 La restitution n'ajoute aucune donnée : elle applique les règles § 5.1 (provenance
 ou silence), § 5.4 (la confiance est une donnée) et § 4.3 (toute phrase produite
