@@ -111,7 +111,15 @@ ORDRE_DOCUMENT = {t: r for r, t in enumerate(
 ABSENT = "texte non rediffusé dans cette base — le document reste à son URL"
 
 
-def cite(extrait: str, limite: int) -> str:
+# `ATTRIBUTION.md` n'autorise, faute de régime de réutilisation confirmé par les
+# deux chambres, que « les offsets et un extrait de 400 caractères à fin de
+# contrôle ». `note.py` le respectait ; ce module non, et il citait jusqu'à 700
+# caractères — 772 se sont retrouvés dans les exemples versionnés. Le plafond est
+# nommé une fois pour qu'il n'y ait plus quatre nombres à tenir d'accord.
+PLAFOND_EXTRAIT = 400
+
+
+def cite(extrait: str, limite: int = PLAFOND_EXTRAIT) -> str:
     court = (extrait or "").strip()[:limite]
     return f"« {court}… »" if court else f"[{ABSENT}]"
 
@@ -356,7 +364,7 @@ def en_texte(d: dict) -> str:
                      f"{r['article_du_texte']} du texte, qui modifie cet article du "
                      "code. Le lien est structurel : le passage ci-dessous ne le "
                      "nomme pas forcément.")
-        L.append("    " + cite(r["extrait"], 600))
+        L.append("    " + cite(r["extrait"]))
 
     for m in d["motivation_du_texte"]:
         L.append(f"\n  [{LIBELLE_DOCUMENT[m['type']]}] lien déclaré, "
@@ -365,7 +373,7 @@ def en_texte(d: dict) -> str:
         L.append(f"  ⚠ porte sur « {m['titre']} » dans son entier, non sur cet article")
         # Début du document, et rien d'autre : aucun passage n'est désigné comme
         # motivant cet article-ci, et en choisir un serait le prétendre.
-        L.append("    début du document : " + cite(m["extrait"], 500))
+        L.append("    début du document : " + cite(m["extrait"]))
 
     for tr in d["transposition"]:
         L.append(f"\n  [transposition déclarée] {nommer(tr)}")
@@ -533,7 +541,7 @@ font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-seri
                     "article du code. Le lien est structurel : le passage ci-dessous "
                     "ne le nomme pas forcément.</p>"
                     if r["voie"] == "section_appariee" else "")
-                 + f'<div>{e(cite(r["extrait"], 700))}</div>'
+                 + f'<div>{e(cite(r["extrait"]))}</div>'
                  f'<div class="meta"><span>{e(r["type"])}</span>'
                  f'<span class="conf">confiance {r["confiance"]:.3f}</span>'
                  f'<span>{e(r["methode"])}</span>'
@@ -547,7 +555,7 @@ font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-seri
                  f'<p class="silence">Ce document motive « {e(m["titre"])} » dans '
                  f'son entier, et non cet article en particulier. Rien n\'y désigne '
                  f'le passage qui le concerne ; voici son début.</p>'
-                 f'<div>{e(cite(m["extrait"], 700))}</div></div>')
+                 f'<div>{e(cite(m["extrait"]))}</div></div>')
 
     for tr in d["transposition"]:
         p.append(f'<div class="raison"><div class="meta">'

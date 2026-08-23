@@ -71,6 +71,13 @@ envisagée, c'est-à-dire au dernier moment où il restait réparable. Un `git p
 publie l'historique, et supprimer des fichiers dans un commit ultérieur ne les
 retire pas des douze commits qui les portaient.
 
+Un second foyer du même oubli a été trouvé dans la foulée : `restitution/note.py`
+plafonnait ses citations à 400 caractères, `restitution/graphe.py` non — il en
+citait 700, et les huit exemples versionnés les portaient. Le plafond est
+désormais une constante nommée, `PLAFOND_EXTRAIT`, et les dix-sept exemples ont
+été régénérés. La règle valait pour trois modules ; elle n'était écrite dans
+aucun.
+
 `travail/` a donc été retiré de l'intégralité de l'historique et ajouté au
 `.gitignore`. Le répertoire est un cache de construction : `pipeline.sh` le
 reconstruit en entier depuis `data/corpus/plan-rapports.tsv`, le miroir DILA et
