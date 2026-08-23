@@ -39,7 +39,7 @@ il dit l'état du dossier avant que la note ne dise le droit.
 
 ### Le filtre n'écarte rien, et c'est un résultat
 
-Passé sur les 2 104 articles en vigueur, il produit **11 638 constats et écarte
+Passé sur les 2 104 articles en vigueur, il produit **11 656 constats et écarte
 zéro phrase**. Aucune note n'est vide. Un compteur qui reste à zéro est
 suspect — il faut donc dire pourquoi celui-ci l'est, et le prouver.
 

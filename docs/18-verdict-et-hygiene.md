@@ -44,14 +44,14 @@ la tranche publie.
 
 ## 3. Le chiffre qu'il ne faut pas publier seul
 
-Sur les 2 104 articles en vigueur, **701 (33,3 %) sont sans raison documentée**.
+Sur les 2 104 articles en vigueur, **699 (33,2 %) sont sans raison documentée**.
 Ce chiffre ne décrit rien, et le publier tel quel serait une faute.
 
 | partie | articles | un passage les motive | origine située | motivation du texte | **raison non documentée** |
 |---|---:|---:|---:|---:|---:|
-| **L** | 1 293 | 693 (53,6 %) | 179 | 416 | **5 (0,4 %)** |
-| **R** | 632 | 41 (6,5 %) | 16 | 47 | **528 (83,5 %)** |
-| **D** | 179 | 0 | 0 | 11 | **168 (93,9 %)** |
+| **L** | 1 293 | 696 (53,8 %) | 177 | 415 | **5 (0,4 %)** |
+| **R** | 632 | 44 (7,0 %) | 14 | 47 | **527 (83,4 %)** |
+| **D** | 179 | 1 | 0 | 11 | **167 (93,3 %)** |
 
 Un décret n'a ni exposé des motifs, ni débat, ni amendement : son silence est
 **structurel**, celui d'un article de loi ne l'est pas. Séparés, les deux chiffres
@@ -59,8 +59,12 @@ disent deux choses vraies et différentes :
 
 - **la partie législative du code de la consommation est documentée à 99,6 %** — 5
   articles sur 1 293 échappent à toute source ;
-- **la partie réglementaire l'est à 16,5 %** — et c'est elle qui porte la masse des
+- **la partie réglementaire l'est à 14,4 %** — et c'est elle qui porte la masse des
   obligations que rencontre un consommateur.
+
+`docs/27` a élargi le périmètre aux parties R et D et mesuré ce que
+l'élargissement change à ces taux : 701 muets deviennent 699. **Le silence
+réglementaire n'était pas un artefact de périmètre.**
 
 Le § 7 de la feuille de route l'annonçait : « Documenter leur absence de
 motivation est un résultat en soi. » Il est ici chiffré.
@@ -73,16 +77,24 @@ constat de pratique. 1 515 des 2 338 objets manquants sont ceux d'amendements
 Améli ne publie pas l'objet de ce qui n'a pas été défendu. La corrélation est
 quasi parfaite — 100 % des retirés avant séance, 99,6 % des irrecevables.
 
-Rapporté aux seuls amendements **adoptés**, le taux est de **0,3 % — 15 sur
-4 686** au Sénat, **0 sur 2 677** à l'Assemblée. Là, le chiffre veut dire quelque
-chose : quinze dispositifs sont entrés dans la loi sans justification publiée.
+Rapporté aux seuls amendements **adoptés**, le taux est de **0,3 % — 17 sur
+5 070** au Sénat, **0 sur 2 677** à l'Assemblée. Là, le chiffre veut dire quelque
+chose : dix-sept dispositifs sont entrés dans la loi sans justification publiée.
 
-**« 78 % du code vient d'ordonnances. »** Vrai de l'origine *apparente* : 1 003
-des 1 281 articles L en vigueur ont une ordonnance pour texte producteur, contre
-266 une loi. Mais remonter la chaîne de renumérotation rétablit une loi dans
-l'ascendance de **1 072 articles, soit 83,7 %**. C'est la thèse du projet, et
+**« 78 % du code vient d'ordonnances. »** Vrai de l'origine *apparente* : 1 008
+des 1 293 articles L en vigueur ont une ordonnance pour texte producteur, contre
+276 une loi. Mais remonter la chaîne de renumérotation rétablit une loi dans
+l'ascendance de **1 080 articles, soit 83,5 %**. C'est la thèse du projet, et
 c'est le seul chiffre de cette liste qui ait demandé onze tranches de travail pour
 devenir calculable.
+
+Les deux premiers nombres se recouvrent de treize articles, dont la version en
+vigueur porte deux textes producteurs de natures différentes. Ils ont d'ailleurs
+longtemps été faux : la mesure comptait les articles ayant **une version
+quelconque** produite par une ordonnance, abrogées et hors vigueur comprises, sur
+un dénominateur d'articles en vigueur — 1 822 sur 1 293, soit 140,9 %. Un taux
+supérieur à cent aurait dû suffire à la faire relire, et il a fallu qu'un
+relecteur extérieur bute sur la phrase pour qu'on la reprenne.
 
 ## 5. Ce que les métriques disent d'autre
 
