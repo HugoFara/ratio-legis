@@ -22,9 +22,40 @@ amendements	assemblee — adoptés	2677	11115	24.1
 amendements	assemblee — sans objet publié	0	11115	0.0	surtout des amendements retirés avant séance ou irrecevables
 amendements	assemblee — adoptés sans objet publié	0	2677	0.0	dispositif adopté sans justification publiée
 amendements	senat — déposés	22102			
-amendements	senat — adoptés	5070	22102	22.9	
+amendements	senat — adoptés	5090	22102	23.0	
 amendements	senat — sans objet publié	2526	22102	11.4	surtout des amendements retirés avant séance ou irrecevables
-amendements	senat — adoptés sans objet publié	17	5070	0.3	dispositif adopté sans justification publiée
+amendements	senat — adoptés sans objet publié	17	5090	0.3	dispositif adopté sans justification publiée
+sort	assemblee — rejete	3280	11115	29.5	
+sort	assemblee — adopte	2677	11115	24.1	
+sort	assemblee — non_soutenu	2436	11115	21.9	
+sort	assemblee — retire	1885	11115	17.0	
+sort	assemblee — irrecevable	447	11115	4.0	sort lu dans l'état procédural, la chambre n'en publie pas
+sort	assemblee — tombe	382	11115	3.4	
+sort	assemblee — non_statue	8	11115	0.1	sort lu dans l'état procédural, la chambre n'en publie pas
+sort	senat — rejete	6655	22102	30.1	
+sort	senat — retire	5810	22102	26.3	
+sort	senat — adopte	5112	22102	23.1	
+sort	senat — non_soutenu	1912	22102	8.7	
+sort	senat — irrecevable	1735	22102	7.8	
+sort	senat — tombe	877	22102	4.0	
+sort	senat — non_statue	1	22102	0.0	
+irrecevabilite	fondement — article 40	905	2182	41.5	
+irrecevabilite	fondement — article 45	603	2182	27.6	
+irrecevabilite	fondement — (non précisé)	449	2182	20.6	
+irrecevabilite	fondement — article 44 bis	117	2182	5.4	
+irrecevabilite	fondement — article 41	93	2182	4.3	
+irrecevabilite	fondement — LOLF	9	2182	0.4	
+irrecevabilite	fondement — LOLFSS	6	2182	0.3	
+tentatives	articles en vigueur portant une tentative, les deux voies	156	2104	7.4	cible déclarée ou alinéa écrit
+tentatives	dont par la cible déclarée du dispositif	83	156	53.2	
+tentatives	dont par un alinéa écrit qui subsiste	83	156	53.2	
+tentatives	tentatives déclarées sur un article en vigueur	129			voie de la cible déclarée seule ; le détail par sort suit
+tentatives	dont adopte	41	129	31.8	
+tentatives	dont rejete	34	129	26.4	
+tentatives	dont retire	30	129	23.3	
+tentatives	dont non_soutenu	17	129	13.2	
+tentatives	dont irrecevable	5	129	3.9	
+tentatives	dont tombe	2	129	1.6	
 navette	dossiers ayant au moins deux états datés	55			
 navette	durée médiane, en jours	147			
 navette	durée la plus courte, en jours	1			

@@ -111,6 +111,77 @@ def mesures(base: sqlite3.Connection, perimetre: Path) -> list[tuple]:
                 adoptes_sans_objet, adoptes,
                 "dispositif adopté sans justification publiée")
 
+    # 3 bis. Le sort, famille par famille. Le décompte des irrecevabilités est le
+    # seul motif d'échec dont la cause soit publiée : l'article 40 dit que
+    # l'amendement coûtait de l'argent et n'a jamais été discuté, l'article 45
+    # qu'il était hors sujet. Ce sont des chiffres d'hygiène au sens du § 7.
+    for chambre, famille, nombre, via_etat in base.execute(
+            "SELECT * FROM sort_par_chambre"):
+        depose = un("SELECT count(*) FROM amendement WHERE chambre = ?", chambre)[0]
+        ajouter("sort", f"{chambre} — {famille}", nombre, depose,
+                "sort lu dans l'état procédural, la chambre n'en publie pas"
+                if via_etat == nombre else "")
+    for motif, nombre in base.execute(
+            "SELECT coalesce(motif, '(non précisé)'), count(*) FROM sort_amendement "
+            "WHERE famille = 'irrecevable' GROUP BY 1 ORDER BY 2 DESC"):
+        ajouter("irrecevabilite", f"fondement — {motif}", nombre,
+                un("SELECT count(*) FROM sort_amendement "
+                   "WHERE famille = 'irrecevable'")[0])
+
+    # 3 ter. Ce que le fonds sait dire d'un article quand on lui demande ce qui a
+    # été tenté sur lui — et non plus seulement ce qui a abouti.
+    tentatives, disputes = un(
+        "SELECT count(*), count(DISTINCT t.article) FROM tentative_sur_article t "
+        "JOIN article a ON a.numero = t.article "
+        "JOIN version_en_vigueur v ON v.article_id = a.id")
+    en_vigueur = un("SELECT count(*) FROM version_en_vigueur")[0]
+    # La restitution réunit deux voies : la cible déclarée par le dispositif
+    # (`vise`, ci-dessus) et l'alinéa effectivement écrit (`resulte_de`, remonté
+    # par `repris_de`). Ne publier que la première ferait dire à la mesure autre
+    # chose qu'à l'écran — voir `restitution/tentatives.py` et `docs/30` § 6.
+    ecrits = un("""
+        WITH RECURSIVE remonte(depart, courant) AS (
+            SELECT s.id, s.id FROM segment s
+            JOIN version_en_vigueur v ON v.id_legi = s.version_id
+            UNION
+            SELECT remonte.depart, r.segment_source_id FROM repris_de r
+            JOIN remonte ON r.segment_id = remonte.courant)
+        SELECT count(DISTINCT a.numero) FROM remonte
+        JOIN resulte_de rd ON rd.segment_id = remonte.courant
+        JOIN segment s ON s.id = remonte.depart
+        JOIN version_article v ON v.id_legi = s.version_id
+        JOIN article a ON a.id = v.article_id""")[0]
+    reunis = un("""
+        WITH RECURSIVE remonte(depart, courant) AS (
+            SELECT s.id, s.id FROM segment s
+            JOIN version_en_vigueur v ON v.id_legi = s.version_id
+            UNION
+            SELECT remonte.depart, r.segment_source_id FROM repris_de r
+            JOIN remonte ON r.segment_id = remonte.courant)
+        SELECT count(*) FROM (
+            SELECT t.article AS numero FROM tentative_sur_article t
+            JOIN article a ON a.numero = t.article
+            JOIN version_en_vigueur v ON v.article_id = a.id
+            UNION
+            SELECT a.numero FROM remonte
+            JOIN resulte_de rd ON rd.segment_id = remonte.courant
+            JOIN segment s ON s.id = remonte.depart
+            JOIN version_article v ON v.id_legi = s.version_id
+            JOIN article a ON a.id = v.article_id)""")[0]
+    ajouter("tentatives", "articles en vigueur portant une tentative, les deux voies",
+            reunis, en_vigueur, "cible déclarée ou alinéa écrit")
+    ajouter("tentatives", "dont par la cible déclarée du dispositif", disputes, reunis)
+    ajouter("tentatives", "dont par un alinéa écrit qui subsiste", ecrits, reunis)
+    ajouter("tentatives", "tentatives déclarées sur un article en vigueur", tentatives,
+            note="voie de la cible déclarée seule ; le détail par sort suit")
+    for famille, nombre in base.execute(
+            "SELECT s.famille, count(*) FROM tentative_sur_article t "
+            "JOIN sort_amendement s ON s.amendement_id = t.amendement_id "
+            "JOIN article a ON a.numero = t.article "
+            "JOIN version_en_vigueur v ON v.article_id = a.id "
+            "GROUP BY 1 ORDER BY 2 DESC"):
+        ajouter("tentatives", f"dont {famille}", nombre, tentatives)
+
     # 4. Durée de la navette, mesurée sur les dates des états du texte.
     par_dossier: dict[str, list[datetime.date]] = defaultdict(list)
     for dossier, stade in base.execute("SELECT dossier_id, stade FROM texte_discute"):

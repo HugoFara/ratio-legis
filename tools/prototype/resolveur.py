@@ -49,7 +49,6 @@ from __future__ import annotations
 
 import csv
 import html
-import io
 import json
 import re
 import sys
@@ -101,12 +100,61 @@ def passages_cites(dispositif: str) -> list[str]:
             if len(norme := normalise(citation)) >= FENETRE]
 
 
+# Les deux seuls champs HTML d'un jeu Améli — Dispositif et Objet — sont les
+# huitième et neuvième d'un enregistrement qui en compte treize. Sept champs les
+# précèdent, quatre les suivent, et aucun de ces onze ne contient de HTML.
+COLONNES_AMELI, AVANT_HTML, APRES_HTML = 13, 7, 4
+
+
+def separer_html(milieu: str) -> tuple[str, str]:
+    """Recolle Dispositif et Objet quand la tabulation ne les sépare plus.
+
+    Les deux champs commencent par `<body`, sans exception sur les 19 534
+    dispositifs et 19 533 objets non vides du corpus. La coupe est donc **la
+    deuxième marque**, et non une position devinée : un dispositif non vide en
+    porte exactement une, jamais deux.
+    """
+    marques = [m.start() for m in re.finditer(r"<body\b", milieu)]
+    if len(marques) >= 2:
+        return milieu[:marques[1]].rstrip("\t"), milieu[marques[1]:]
+    if marques and marques[0] == 0:
+        return milieu.rstrip("\t"), ""          # objet absent
+    return "", milieu.lstrip("\t")              # dispositif absent
+
+
 def lire_ameli(chemin: Path) -> list[dict]:
-    """Jeu Améli : latin-1, tabulations, ligne « sep= » en tête, HTML dans les champs."""
-    brut = chemin.read_bytes().decode("latin-1")
-    corps = "\n".join(brut.split("\n")[1:])
-    return [{(k or "").strip(): (v or "") for k, v in ligne.items()}
-            for ligne in csv.DictReader(io.StringIO(corps), delimiter="\t")]
+    """Jeu Améli : latin-1, tabulations, ligne « sep= » en tête, HTML dans les champs.
+
+    **Le HTML contient des tabulations.** Un objet collé depuis Word emporte son
+    bloc `<style>`, dont les déclarations sont indentées : le champ se scinde en
+    autant de colonnes, tout ce qui le suit glisse vers la droite, et le sort de
+    l'amendement finit par valoir `{font-family:"Cambria Math";`. Soixante-trois
+    enregistrements du corpus étaient dans cet état, dont trois portaient une
+    arête `vise` — et l'Assemblée n'y était pour rien : le défaut est de lecture,
+    pas de source.
+
+    La réparation n'interpole rien. Les sept champs de tête et les quatre de queue
+    sont pris à leurs deux extrémités, où aucun décalage n'est possible ; ce qui
+    reste au milieu est le couple Dispositif / Objet, que `separer_html` recoupe
+    sur la marque `<body`. Vérifiée sur les 63 enregistrements : 63 rendent une
+    URL d'amendement du Sénat, et les 22 039 autres sont rendus à l'identique de
+    la lecture précédente.
+    """
+    lignes = [l for l in chemin.read_bytes().decode("latin-1").split("\n")[1:]
+              if l.strip()]
+    if not lignes:
+        return []
+    colonnes = [c.strip() for c in lignes[0].split("\t")]
+    jeu = []
+    for ligne in lignes[1:]:
+        champs = ligne.split("\t")
+        if len(champs) > len(colonnes):
+            milieu = "\t".join(champs[AVANT_HTML:len(champs) - APRES_HTML])
+            champs = (champs[:AVANT_HTML] + list(separer_html(milieu))
+                      + champs[-APRES_HTML:])
+        champs += [""] * (len(colonnes) - len(champs))
+        jeu.append(dict(zip(colonnes, champs)))
+    return jeu
 
 
 def texte_html(chemin: Path) -> str:

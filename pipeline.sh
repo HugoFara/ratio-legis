@@ -161,6 +161,10 @@ python3 "$RACINE/ingestion/an_vers_amendements.py" "$TRAVAIL/an/amendements_14.c
         "$TRAVAIL/an/acteurs_historique.json.zip" "$BASE"
 python3 "$RACINE/ingestion/amendements_vers_resulte_de.py" "$TRAVAIL/corpus/ameli" "$BASE"
 python3 "$RACINE/ingestion/visees.py" "$BASE"
+# Après les deux chargeurs d'amendements et après `visees` : il lit les deux
+# colonnes de sort des deux chambres, et la vue `tentative_sur_article` qu'il
+# crée s'appuie sur `vise`.
+python3 "$RACINE/ingestion/sort_des_amendements.py" "$BASE"
 python3 "$RACINE/ingestion/textes_deposes.py" "$TRAVAIL/corpus/textes" "$TEXTES" "$BASE"
 # Doit suivre les deux précédents : il lui faut les documents et `porte_sur`.
 python3 "$RACINE/ingestion/sections_vers_motive.py" "$TRAVAIL/corpus/rapports" \

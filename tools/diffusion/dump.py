@@ -93,7 +93,8 @@ AVIS_AUTRE = ("Texte non rediffusé — corps d'un rapport de commission dont la
 # Les arêtes et leurs clefs, sans aucun texte long : le format universel, pour
 # qui ne veut pas ouvrir un fichier SQLite.
 TABLES_TSV = ["article", "renumerote_de", "texte_normatif", "produite_par", "issu_de",
-              "dossier", "verdict", "resulte_de", "vise", "porte_sur", "motive",
+              "dossier", "verdict", "resulte_de", "vise", "sort_amendement",
+              "porte_sur", "motive",
               "transpose", "cite_acte_ue", "acte_ue", "renvoie_a", "repris_de"]
 
 ATTRIBUTIONS = [
@@ -246,6 +247,9 @@ DICTIONNAIRE = {
     "motive": "document → article ou segment que l'un de ses passages explique",
     "porte_sur": "article d'un texte discuté → article du code qu'il modifie",
     "vise": "amendement → article du code que son dispositif désigne",
+    "sort_amendement": "le sort d'un amendement, ramené à huit familles "
+                       "comparables, avec le libellé publié et la colonne d'où "
+                       "il est lu",
     "renvoie_a": "segment → article cité, interne ou externe au code",
     "cite_acte_ue": "segment → acte de l'Union qu'il nomme",
     "transpose": "texte → acte de l'Union dont il déclare la transposition",

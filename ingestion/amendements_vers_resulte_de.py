@@ -33,7 +33,9 @@ Deux garde-fous conservés de la phase 0 :
 Seuls les amendements adoptés produisent une arête : un amendement rejeté n'a
 écrit aucun texte. Il est chargé comme nœud et reste interrogeable — c'est même
 le corpus le plus intéressant pour le législateur, mais ce n'est pas de la
-provenance.
+provenance. Ce qu'il visait est porté par l'arête `vise` (`ingestion/visees.py`)
+et son sort par `ingestion/sort_des_amendements.py`, d'où vient ici le seul
+prédicat « cet amendement a-t-il été adopté ».
 
 Usage :
     amendements_vers_resulte_de.py <corpus/ameli> <base.sqlite>
@@ -49,8 +51,10 @@ from collections import defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools" / "prototype"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from resolveur import (FENETRE, fenetres, lire_ameli,  # noqa: E402
                        normalise, sans_balises)
+from sort_des_amendements import est_adopte  # noqa: E402
 
 # Un dispositif d'amendement cite entre guillemets deux choses opposées : le texte
 # qu'il insère, et celui qu'il abroge ou remplace. `passages_cites` de la phase 0
@@ -296,10 +300,14 @@ def construire_resulte_de(base: sqlite3.Connection) -> dict:
                 index[propre[depart:depart + FENETRE]].add(segment_id)
 
         connus = set(numero_du_segment.values())
-        for amendement_id, dispositif in base.execute(
-                "SELECT id, dispositif FROM amendement "
-                "WHERE dossier_id = ? AND sort = 'Adopté' AND dispositif IS NOT NULL",
-                (dossier,)):
+        # `est_adopte`, non `sort = 'Adopté'` : Améli écrit aussi « Adopté - vote
+        # unique », qui est un adopté et que la comparaison littérale écartait.
+        # Voir `ingestion/sort_des_amendements.py`.
+        for amendement_id, dispositif in [
+                (i, d) for i, sort, etat, d in base.execute(
+                    "SELECT id, sort, etat, dispositif FROM amendement "
+                    "WHERE dossier_id = ? AND dispositif IS NOT NULL", (dossier,))
+                if est_adopte(sort, etat)]:
             # Cibles déclarées, ramenées à leurs classes de renumérotation. Un
             # dispositif qui ne nomme aucun article de ce code — il crée alors des
             # articles dont le numéro n'est pas encore fixé — n'impose rien.

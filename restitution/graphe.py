@@ -40,6 +40,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "ingestion"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from union_europeenne import ANCRE  # noqa: E402
 from citation import ABSENT, PLAFOND_EXTRAIT, cite  # noqa: E402
+from sort_des_amendements import EN_FRANCAIS  # noqa: E402
 import proximite  # noqa: E402
 
 PLAFOND_TEXTES = 8                 # en texte seulement : le HTML les rend tous
@@ -347,9 +348,18 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
                          FROM renvois_entrants WHERE article_cite = ?
                          GROUP BY article_citant ORDER BY article_citant""", numero)
 
-    d["tentatives"] = q("""SELECT amendement, sort, auteur, groupe, loi, formule, objet
-                           FROM historique_article WHERE article = ?
-                           ORDER BY CASE sort WHEN 'Adopté' THEN 0 ELSE 1 END""", numero)
+    # Le tri se faisait sur `CASE sort WHEN 'Adopté'`, comparaison littérale qui
+    # rangeait « Adopté - vote unique » parmi les échecs ; et le libellé était
+    # rendu brut, si bien qu'« Irrecevable art. 45, al. 1 C (cavalier) »
+    # n'apprenait rien à qui ignore ce que l'article 45 interdit. La famille et le
+    # motif viennent maintenant de `sort_amendement` — voir `docs/30`. Le détail
+    # complet, avec l'objet et l'adresse de chaque tentative, est dans
+    # `restitution/tentatives.py`.
+    d["tentatives"] = q("""SELECT amendement, sort_publie AS sort, famille, motif,
+                                  chambre, auteur, groupe, loi, formule, objet
+                           FROM tentative_sur_article WHERE article = ?
+                           ORDER BY famille <> 'adopte', date_texte, amendement""",
+                        numero)
     return d
 
 
@@ -492,7 +502,9 @@ def en_texte(d: dict) -> str:
     if d["tentatives"]:
         L.append(f"\nCE QUI A ÉTÉ TENTÉ ({len(d['tentatives'])})")
         for t in d["tentatives"]:
-            L.append(f"  amdt {t['amendement']:<12s} {t['sort'] or '?':<14s} "
+            marque = EN_FRANCAIS[t["famille"]] + (f" ({t['motif']})" if t["motif"]
+                                                  else "")
+            L.append(f"  amdt {t['amendement']:<12s} {marque:<26s} "
                      f"{(t['auteur'] or '?')[:30]:<32s} {t['formule']}")
     return "\n".join(L)
 
@@ -749,7 +761,10 @@ font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-seri
                  "<tr><th>Amendement</th><th>Sort</th><th>Auteur</th><th>Loi</th>"
                  "<th>Formule</th></tr>")
         for t in d["tentatives"]:
-            p.append(f'<tr><td>{e(t["amendement"])}</td><td>{e(t["sort"])}</td>'
+            marque = e(EN_FRANCAIS[t["famille"]]) + (f' <span class="num">'
+                                                     f'({e(t["motif"])})</span>'
+                                                     if t["motif"] else "")
+            p.append(f'<tr><td>{e(t["amendement"])}</td><td>{marque}</td>'
                      f'<td>{e(t["auteur"])}</td><td>{e(t["loi"])}</td>'
                      f'<td>{e(t["formule"])}</td></tr>')
         p.append("</table>")

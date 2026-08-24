@@ -18,6 +18,14 @@ les sert pas. Écrire une URL plausible mais morte contreviendrait au § 4.3, qu
 exige une citation résoluble : le champ reste vide, et l'amendement est cité par
 son numéro et son texte.
 
+**Les deux colonnes de sort sont chargées, pas une.** `sort[1]/sortEnSeance[1]`
+est le sort, et c'est bien lui qu'il faut lire — `etat[1]` vaut « Discuté » sur
+les 9 966 amendements qui en ont un. Mais l'inverse n'est pas vrai : sur les
+1 149 amendements sans sort publié, `etat` dit « Retiré » 694 fois et
+« Irrecevable » 447 fois. N'en garder qu'une faisait afficher zéro irrecevabilité
+à l'Assemblée. La colonne `etat` est donc en base à côté de `sort`, et
+`ingestion/sort_des_amendements.py` est seul à décider laquelle prime.
+
 Usage :
     an_vers_amendements.py <amendements_extraits.csv> <acteurs_historique.json.zip> <base.sqlite>
 """
@@ -101,15 +109,16 @@ def main() -> None:
         # distincts selon l'un et l'autre.
         texte = f'{a["stade"]}{a["texte"]}/{a["organe_examen"] or "?"}'
         lignes.append((a["dossier"], "assemblee", texte, a["numero"], connus[cle],
-                       a["sort"] or None, sans_balises(a["division"]) or None,
+                       a["sort"] or None, a["etat"] or None,
+                       sans_balises(a["division"]) or None,
                        sans_balises(a["expose"]) or None,
                        sans_balises(a["dispositif"]) or None, None))
 
     base.executemany("INSERT INTO acteur (id, nom, groupe) VALUES (?, ?, ?)", nouveaux)
     base.executemany(
         "INSERT OR IGNORE INTO amendement (dossier_id, chambre, texte_discute, numero,"
-        " auteur_id, sort, subdivision, objet, dispositif, url)"
-        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", lignes)
+        " auteur_id, sort, etat, subdivision, objet, dispositif, url)"
+        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", lignes)
     base.commit()
 
     par_chambre = base.execute(

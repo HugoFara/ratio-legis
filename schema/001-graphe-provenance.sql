@@ -124,6 +124,12 @@ CREATE TABLE amendement (
     numero         TEXT NOT NULL,
     auteur_id      INTEGER REFERENCES acteur,
     sort           TEXT,
+    -- L'état procédural, distinct du sort et publié par la seule Assemblée. Il
+    -- porte le sort de 1 143 amendements dont la colonne `sort` est vide — 694
+    -- retirés, 449 déclarés irrecevables. Les confondre serait faux, ignorer
+    -- celui-ci l'était davantage : l'Assemblée paraissait ne rien déclarer
+    -- irrecevable. Voir `ingestion/sort_des_amendements.py`.
+    etat           TEXT,
     subdivision    TEXT,      -- article du PROJET de loi, jamais du code
     objet          TEXT,
     dispositif     TEXT,

@@ -48,6 +48,7 @@ import graphe  # noqa: E402
 import note  # noqa: E402
 import retentissement  # noqa: E402
 import surlignage  # noqa: E402
+import tentatives  # noqa: E402
 
 BASE = Path(os.environ.get("RATIO_LEGIS_BASE", "travail/ratio-legis.sqlite"))
 
@@ -83,7 +84,7 @@ RESUME = ("Ratio Legis — graphe de provenance normative du droit français. "
           "Pour un article de code en vigueur, les matériaux qui expliquent "
           "pourquoi il existe sous cette forme.")
 
-app = FastAPI(title="Ratio Legis", summary=RESUME, version="0.17.0",
+app = FastAPI(title="Ratio Legis", summary=RESUME, version="0.18.0",
               license_info={"name": "AGPL-3.0-or-later"})
 
 
@@ -145,6 +146,10 @@ def racine() -> dict:
                                              "introduit",
             "/articles/{numero}/retentissement": "si je modifie cet article, "
                                                  "qu'est-ce qui bouge",
+            "/articles/{numero}/tentatives": "ce qui a été tenté sur cet article, "
+                                            "et ce qui l'a fait échouer",
+            "/tentatives/sommet": "les articles sur lesquels le plus de "
+                                  "tentatives ont échoué",
             "/renvois/sommet": "les articles que le plus d'autres articles citent",
             "/mesures": "métriques d'hygiène législative",
             "/attribution": "les mentions obligatoires, en entier",
@@ -301,6 +306,47 @@ def retentissement_html(
     if not donnees:
         raise HTTPException(404, f"aucun article {numero} en vigueur dans ce fonds")
     return retentissement.en_html(donnees)
+
+
+# ------------------------------------------------------- ce qui a été tenté
+# Le seul rendu du produit dont la matière soit faite de droit qui n'existe pas.
+# Voir `tentatives.py`.
+@app.get("/articles/{numero}/tentatives",
+         summary="Ce qui a été tenté sur cet article, et ce qui l'a fait échouer")
+def tentatives_article(numero: str,
+                       base: sqlite3.Connection = Depends(connexion)) -> dict:
+    donnees = tentatives.tenter(base, numero)
+    if not donnees:
+        raise HTTPException(404, f"aucun article {numero} en vigueur dans ce fonds")
+    return enveloppe({**donnees, "ce_que_le_sort_dit":
+                      "Le sort est celui que la chambre publie, jamais un jugement "
+                      "porté sur lui : « retiré » ne dit pas si l'auteur a cédé ou "
+                      "obtenu satisfaction. Deux voies de rattachement, de "
+                      "confiances différentes : l'alinéa écrit (resulte_de, 0,8933) "
+                      "et la cible déclarée par le dispositif (vise, 0,6212). "
+                      "L'absence de tentative est une absence dans le corpus "
+                      "chargé, non une absence au Parlement."})
+
+
+@app.get("/articles/{numero}/tentatives.html", response_class=HTMLResponse,
+         summary="Les mêmes tentatives, à lire")
+def tentatives_html(numero: str,
+                    base: sqlite3.Connection = Depends(connexion)) -> str:
+    donnees = tentatives.tenter(base, numero)
+    if not donnees:
+        raise HTTPException(404, f"aucun article {numero} en vigueur dans ce fonds")
+    return tentatives.en_html(donnees)
+
+
+@app.get("/tentatives/sommet",
+         summary="Les articles sur lesquels le plus de tentatives ont échoué")
+def tentatives_sommet(base: sqlite3.Connection = Depends(connexion),
+                      limite: int = Query(tentatives.SOMMET, ge=1, le=500)) -> dict:
+    return enveloppe({"mesure": "nombre de tentatives déclarées qui n'ont pas "
+                                "abouti — rejetées, retirées, non soutenues, "
+                                "tombées ou déclarées irrecevables. Elle porte sur "
+                                "le corpus chargé, non sur le droit français.",
+                      "articles": tentatives.sommet(base, limite)})
 
 
 @app.get("/renvois/sommet", summary="Les articles que le plus d'autres articles citent")

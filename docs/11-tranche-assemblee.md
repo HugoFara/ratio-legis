@@ -88,3 +88,9 @@ faible.
 **Le sort n'est pas exploité en restitution.** 12 681 amendements rejetés et 795
 irrecevabilités au titre de l'article 40 sont en base ; c'est le produit
 législateur qui reste à écrire, pas la donnée qui manque.
+
+> **Correction, 24 août 2026.** La seconde phrase était inexacte : la fiche de
+> `graphe.py` rendait bien le sort, et la donnée ne manquait pas seulement de
+> produit — elle était fausse sur 1 141 amendements de cette tranche, dont le
+> sort est écrit dans la colonne `etat` et non dans `sort`, et illisible sur 63
+> amendements du Sénat. Voir [`docs/30`](30-sort-des-amendements.md).

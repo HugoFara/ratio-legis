@@ -108,6 +108,7 @@ Reconstruite d'une commande depuis le miroir et les plans versionnés
 | **Actes de l'Union** | **284** | `cite_acte_ue` / `transpose` | 1 572 / 8 |
 | **Considérants de l'Union** | **7 674** | `article_acte_ue` — articles d'actes déclarés | 6 237 |
 | **Textes en discussion** | **371** | **`porte_sur`** — l'article du texte → l'article du code | **30 337** |
+| **Sorts d'amendements, en huit familles** | **33 217** | **`vise`** — l'amendement qui visait l'article, abouti ou non | **276** |
 
 Ce que cela donne au grain de l'article en vigueur, qui est le seul grain qui
 compte pour le produit :
@@ -490,9 +491,10 @@ RATIO_LEGIS_BASE=data/diffusion/ratio-legis.sqlite uvicorn restitution.api:app
 
 `GET /articles/{numero}` rend la fiche de provenance, `/note` la note sous
 contrat, `/surlignage` l'origine de chaque alinéa,
-`/retentissement` ce qu'une modification déplacerait, `/renvois/sommet` les
-articles que le plus d'autres articles citent, `/mesures` les métriques, `/docs`
-la documentation OpenAPI. **12 ms de médiane, 21 ms au 95ᵉ centile**, bout en
+`/retentissement` ce qu'une modification déplacerait, `/tentatives` ce qui a été
+tenté sur l'article et ce qui l'a fait échouer, `/renvois/sommet` les articles
+que le plus d'autres articles citent, `/tentatives/sommet` les plus disputés,
+`/mesures` les métriques, `/docs` la documentation OpenAPI. **12 ms de médiane, 21 ms au 95ᵉ centile**, bout en
 bout. Chaque réponse porte l'attribution et l'avertissement de non-interprétation
 — en en-tête et dans la charge utile, parce qu'une API se consomme sans lire ce
 fichier.
@@ -515,6 +517,54 @@ Il dit ce qu'il faudrait relire ; il ne dit pas ce qu'il faudrait y écrire, et 
 ne le dira jamais. Exemples dans
 [`restitution/exemples/retentissement/`](restitution/exemples/retentissement/),
 détail dans [`docs/29`](docs/29-retentissement.md).
+
+## Ce qui a été tenté
+
+```
+python3 restitution/tentatives.py base.sqlite L732-3        # ce qu'on a tenté, et ce qui l'a bloqué
+python3 restitution/tentatives.py base.sqlite --sommet 25   # les articles les plus disputés
+```
+
+Le graphe dit ce qui a écrit le droit. Il sait aussi dire **ce qu'on a voulu y
+écrire et qui n'y est pas** : sur les amendements du corpus, une petite minorité a
+produit un alinéa qui subsiste ; tout le reste est du droit qui n'existe pas, et
+c'est ce corpus-là qu'un légiste consulte avant de rédiger.
+
+Le sort était en base depuis onze tranches, et la fiche en portait une table — mal
+lue. Le tri comparait le libellé à la chaîne « Adopté », si bien qu'« Adopté -
+vote unique » passait pour un échec. Le libellé était rendu brut, si bien
+qu'« Irrecevable art. 45, al. 1 C (cavalier) » n'apprenait rien. Et surtout,
+**l'Assemblée affichait zéro irrecevabilité quand le Sénat en affichait 1 735** :
+son sort, vide pour 1 149 amendements, est écrit dans la colonne voisine — 694
+retirés, 447 irrecevables, 8 réellement en attente.
+
+Les huit familles de sort sont désormais comparables, et **aucun des 33 217
+amendements n'a plus de libellé illisible** — 63 en avaient un, fragments de
+feuille de style Word que les tabulations d'Améli avaient poussés dans la colonne
+du sort.
+
+| | Assemblée | Sénat |
+|---|---:|---:|
+| **déclaré irrecevable** | **447** *(0 avant)* | 1 735 |
+| retiré | **1 885** *(1 191 avant)* | 5 810 |
+| rejeté · adopté | 3 280 · 2 677 | 6 655 · 5 112 |
+| sort illisible | 0 | 0 *(63 avant)* |
+
+Sur les 2 182 amendements écartés sans discussion : **905 au titre de l'article
+40** — ils aggravaient une charge publique —, 603 comme cavaliers, 117 au titre
+de la règle de l'entonnoir, 93 comme relevant du décret.
+
+Au grain de l'article en vigueur, **156 articles sur 2 104 (7,4 %) portent au
+moins une tentative**, et 56 au moins un échec — 233 tentatives rendues, dont 88
+non abouties. Réunir les deux voies double la couverture de la table que la fiche
+affichait, qui n'en connaissait qu'une. 12,6 ms par article.
+
+Deux voies de rattachement, jamais confondues : l'**alinéa écrit** (`resulte_de`,
+confiance 0,893) et la **cible déclarée** par le dispositif (`vise`, 0,621), la
+seule ouverte à un amendement rejeté. Le sort est nommé, jamais interprété :
+« retiré » ne dit pas si l'auteur a cédé ou obtenu satisfaction, et cela se lit
+dans le compte rendu de séance, que le graphe ne contient pas.
+[`docs/30`](docs/30-sort-des-amendements.md).
 
 ## Classer sans rattacher
 
@@ -587,6 +637,13 @@ qu'un rapport de commission explique, **R512-31** la réponse ordinaire de la
 partie réglementaire — *raison non documentée*, alors que sept articles le
 citent —, **D120-7** un article dont la seule raison connue vient de quatre
 règlements de l'Union.
+
+Quatre tentatives versionnées dans `restitution/exemples/tentatives/`, et le
+classement des articles les plus disputés : **L732-3** trois amendements écartés
+comme cavaliers, dont celui du Gouvernement ; **L312-9** cinq tentatives sur la
+délégation d'assurance emprunteur, toutes échouées ; **L113-3** les deux chambres
+et un sort lu dans l'état procédural ; **L224-43** quatre amendements adoptés dont
+l'alinéa subsiste.
 
 La restitution n'ajoute aucune donnée : elle applique les règles § 5.1 (provenance
 ou silence), § 5.4 (la confiance est une donnée) et § 4.3 (toute phrase produite

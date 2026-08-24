@@ -47,6 +47,7 @@ Le **texte** des rapports de commission n'est pas rediffusé : les conditions pu
 | `motive` | 639 | document → article ou segment que l'un de ses passages explique |
 | `porte_sur` | 30337 | article d'un texte discuté → article du code qu'il modifie |
 | `vise` | 276 | amendement → article du code que son dispositif désigne |
+| `sort_amendement` | 33217 | le sort d'un amendement, ramené à huit familles comparables, avec le libellé publié et la colonne d'où il est lu |
 | `renvoie_a` | 12534 | segment → article cité, interne ou externe au code |
 | `cite_acte_ue` | 1572 | segment → acte de l'Union qu'il nomme |
 | `transpose` | 8 | texte → acte de l'Union dont il déclare la transposition |
