@@ -106,6 +106,18 @@ class Passage:
     termes: tuple[str, ...]
 
 
+def _ordonner(sac: set[str], poids: dict[str, float]) -> tuple[str, ...]:
+    """Les termes communs, du plus rare au plus courant — et le tri est total.
+
+    Trier sur le seul poids ne suffit pas : deux termes de même fréquence ont le
+    même poids, et l'ordre d'itération d'un `set` de chaînes varie d'un processus
+    à l'autre. Les exemples versionnés changeaient donc à chaque régénération sans
+    qu'aucune donnée ait bougé, ce qui contredit `docs/28` — « le classement se
+    rejoue à l'identique » — et la règle § 5.2. Le terme lui-même départage.
+    """
+    return tuple(sorted(sac, key=lambda mot: (-poids[mot], mot)))
+
+
 def termes(texte: str) -> list[tuple[int, str]]:
     """(offset, terme) pour chaque mot retenu, offsets du texte d'origine.
 
@@ -262,7 +274,7 @@ def classer_fenetres(reference: str, texte: str,
             continue                      # déjà couvert par un meilleur passage
         retenus.append(Passage(
             debut, fin, _mise_en_forme(texte, debut, fin, net_debut, net_fin),
-            score, tuple(sorted(sac, key=lambda m: -poids[m]))))
+            score, _ordonner(sac, poids)))
         if len(retenus) == garder:
             break
     return retenus
@@ -292,7 +304,6 @@ def classer_unites(reference: str, unites: list[str],
             continue
         score = sum(poids[mot] for mot in sac)
         if score > 0:
-            classes.append((indice, score,
-                            tuple(sorted(sac, key=lambda m: -poids[m]))))
+            classes.append((indice, score, _ordonner(sac, poids)))
     classes.sort(key=lambda x: (-x[1], x[0]))
     return classes[:garder]

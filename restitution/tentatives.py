@@ -22,6 +22,12 @@ l'écran, comme l'exige la règle § 5.4 :
   formule qui le modifie. C'est la seule voie ouverte à un amendement rejeté, qui
   par construction n'a écrit aucun texte. Confiance 0,6212, la plus basse du
   graphe (`docs/10` § 3).
+- `subdivision déposée` — l'amendement a été discuté sur l'article du texte qui a
+  réécrit celui-ci, et cet article du texte n'en a réécrit aucun autre.
+  Confiance 0,7961 (`docs/31`). Elle ne dit pas que l'amendement visait cet
+  article : un amendement se dépose sur un article de projet de loi, et ce qu'il
+  y propose peut concerner tout autre chose. C'est une position, pas une cible,
+  et le libellé à l'écran le dit ainsi.
 
 **Ce que le module ne dit pas.** Il ne dit pas pourquoi un amendement a échoué.
 « Rejeté » est un fait, « retiré » aussi ; ce qui s'est joué entre les deux est
@@ -57,6 +63,12 @@ SOMMET = 25
 VOIES = {
     "alinea_ecrit": "a écrit un alinéa qui subsiste",
     "cible_declaree": "cible déclarée par le dispositif",
+    # Ce que cette voie dit, et rien de plus : l'amendement a été discuté sur
+    # l'article du texte qui a réécrit celui-ci. Elle ne dit pas qu'il visait cet
+    # article — un amendement se dépose sur un article de projet de loi, et ce
+    # qu'il y propose peut concerner tout autre chose. Le libellé doit donc
+    # rester une phrase de position, jamais de cible.
+    "subdivision_deposee": "déposé sur l'article du texte qui réécrit celui-ci",
 }
 
 # Ce que dit le fondement d'une irrecevabilité, en une ligne. Le motif est publié
@@ -140,9 +152,25 @@ def tenter(base: sqlite3.Connection, numero: str) -> dict:
                 WHERE am.id IN ({marques})""", *manquants):
             tentatives[t["amendement_id"]] = t
 
+    # Troisième voie : la correspondance des identifiants de texte (`docs/31`).
+    # Elle vient en dernier — un amendement déjà rattaché par son dispositif ou
+    # par l'alinéa qu'il a écrit est mieux établi que par la place où il fut
+    # déposé, et la voie la mieux établie doit gagner.
+    for t in q("SELECT * FROM depot_des_amendements WHERE article = ?", numero):
+        if t["amendement_id"] in tentatives:
+            continue
+        t["formule"] = None
+        t["article_du_texte"] = t["subdivision"]
+        tentatives[t["amendement_id"]] = t
+    depots = {t["amendement_id"] for t in
+              q("SELECT amendement_id FROM depot_des_amendements WHERE article = ?",
+                numero)}
+
     for identifiant, t in tentatives.items():
         ecrit = identifiant in ecrivains
-        t["voie"] = "alinea_ecrit" if ecrit else "cible_declaree"
+        t["voie"] = ("alinea_ecrit" if ecrit else
+                     "subdivision_deposee" if t.get("formule") is None
+                     and identifiant in depots else "cible_declaree")
         t["a_ecrit_un_alinea"] = ecrit
         t["confiance"] = ecrivains[identifiant] if ecrit else t["confiance"]
         t["sort"] = EN_FRANCAIS[t["famille"]]
@@ -171,20 +199,31 @@ def tenter(base: sqlite3.Connection, numero: str) -> dict:
 
 
 def sommet(base: sqlite3.Connection, combien: int = SOMMET) -> list[dict]:
-    """Les articles sur lesquels le plus de tentatives ont échoué."""
+    """Les articles sur lesquels le plus de tentatives ont échoué.
+
+    Les deux voies déclaratives sont réunies, et dédoublonnées par amendement :
+    un amendement rattaché à la fois par son dispositif et par sa subdivision est
+    une tentative, pas deux. La voie de l'alinéa écrit n'y figure pas — elle ne
+    porte que des amendements adoptés, qui par définition n'ont pas échoué.
+    """
     base.row_factory = sqlite3.Row
     marques = ",".join("?" * len(ECHEC))
     return [dict(r) for r in base.execute(f"""
-        SELECT t.article AS numero, count(*) AS echecs,
-               sum(t.famille = 'irrecevable') AS irrecevables,
+        WITH echec(article, amendement_id, famille) AS (
+            SELECT article, amendement_id, famille FROM tentative_sur_article
+            WHERE famille IN ({marques})
+            UNION
+            SELECT article, amendement_id, famille FROM depot_des_amendements
+            WHERE famille IN ({marques}))
+        SELECT e.article AS numero, count(*) AS echecs,
+               sum(e.famille = 'irrecevable') AS irrecevables,
                v.verdict, v.partie
-        FROM tentative_sur_article t
-        JOIN article a ON a.numero = t.article
-        JOIN version_en_vigueur e ON e.article_id = a.id
+        FROM echec e
+        JOIN article a ON a.numero = e.article
+        JOIN version_en_vigueur x ON x.article_id = a.id
         LEFT JOIN verdict v ON v.article_id = a.id
-        WHERE t.famille IN ({marques})
-        GROUP BY t.article
-        ORDER BY echecs DESC, t.article LIMIT ?""", (*ECHEC, combien))]
+        GROUP BY e.article
+        ORDER BY echecs DESC, e.article LIMIT ?""", (*ECHEC, *ECHEC, combien))]
 
 
 # ------------------------------------------------------------------ rendu texte
@@ -227,7 +266,7 @@ def en_texte(d: dict) -> str:
         L.append(f"      {VOIES[t['voie']]} · confiance {t['confiance']:.3f}"
                  + (f" · formule « {t['formule']} »" if t["formule"] else ""))
         if t["article_du_texte"]:
-            L.append(f"      déposé sur {t['article_du_texte']}")
+            L.append(f"      subdivision : {t['article_du_texte']} du texte discuté")
         L.append("      " + (cite(t["objet"] or "") if t["objet_cite"]
                              else "[objet non publié par la chambre]"))
         L.append(f"      {t['url'] or SANS_URL}")
@@ -356,7 +395,7 @@ def en_html(d: dict) -> str:
                  f'<span class="sort {classe}">{e(t["sort"])}</span>'
                  f'<div class="meta"><span>{e(CHAMBRES.get(t["chambre"], "?"))}</span>'
                  f'<span>{signature}</span>'
-                 + (f'<span>déposé sur {e(t["article_du_texte"])}</span>'
+                 + (f'<span>{e(t["article_du_texte"])} du texte discuté</span>'
                     if t["article_du_texte"] else "")
                  + f'<span>{e(VOIES[t["voie"]])} · confiance '
                    f'{t["confiance"]:.3f}</span></div>')

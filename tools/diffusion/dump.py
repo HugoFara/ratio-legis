@@ -94,7 +94,7 @@ AVIS_AUTRE = ("Texte non rediffusé — corps d'un rapport de commission dont la
 # qui ne veut pas ouvrir un fichier SQLite.
 TABLES_TSV = ["article", "renumerote_de", "texte_normatif", "produite_par", "issu_de",
               "dossier", "verdict", "resulte_de", "vise", "sort_amendement",
-              "porte_sur", "motive",
+              "depose_sur", "texte_des_amendements", "porte_sur", "motive",
               "transpose", "cite_acte_ue", "acte_ue", "renvoie_a", "repris_de"]
 
 ATTRIBUTIONS = [
@@ -247,6 +247,11 @@ DICTIONNAIRE = {
     "motive": "document → article ou segment que l'un de ses passages explique",
     "porte_sur": "article d'un texte discuté → article du code qu'il modifie",
     "vise": "amendement → article du code que son dispositif désigne",
+    "depose_sur": "amendement → article du code réécrit par l'article du texte "
+                  "sur lequel il fut déposé, quand cet article du texte n'en "
+                  "réécrit qu'un",
+    "texte_des_amendements": "la correspondance entre l'identifiant de texte du "
+                             "corpus d'amendements et celui du texte en discussion",
     "sort_amendement": "le sort d'un amendement, ramené à huit familles "
                        "comparables, avec le libellé publié et la colonne d'où "
                        "il est lu",

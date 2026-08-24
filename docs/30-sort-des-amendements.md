@@ -182,6 +182,11 @@ couverture de la table que la fiche affichait, qui n'en connaissait qu'une.
 | articles portant au moins un échec | 56 |
 | irrecevabilités atteignant un article en vigueur | 5 |
 
+> **Chiffres de cette tranche seule.** La suivante ajoute une troisième voie de
+> rattachement — la subdivision déposée — et les porte à 163 articles, 454
+> tentatives, 257 non abouties, 65 articles portant un échec. Voir
+> [`docs/31`](31-correspondance-des-textes.md) § 6.
+
 Les 5 sont toutes du Sénat et toutes au titre de l'article 45. Les 447 de
 l'Assemblée sont désormais **comptées**, mais aucune n'atteint encore un article
 en vigueur : la couverture de `vise` du côté Assemblée est trop mince pour cela,

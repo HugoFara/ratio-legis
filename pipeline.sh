@@ -166,6 +166,9 @@ python3 "$RACINE/ingestion/visees.py" "$BASE"
 # crée s'appuie sur `vise`.
 python3 "$RACINE/ingestion/sort_des_amendements.py" "$BASE"
 python3 "$RACINE/ingestion/textes_deposes.py" "$TRAVAIL/corpus/textes" "$TEXTES" "$BASE"
+# Doit suivre `textes_deposes` — il lui faut `porte_sur` — et
+# `sort_des_amendements`, dont sa vue reprend les familles.
+python3 "$RACINE/ingestion/textes_des_amendements.py" "$BASE"
 # Doit suivre les deux précédents : il lui faut les documents et `porte_sur`.
 python3 "$RACINE/ingestion/sections_vers_motive.py" "$TRAVAIL/corpus/rapports" \
         "$PERIMETRE" "$RAPPORTS" "$BASE" "$IMPACTS"

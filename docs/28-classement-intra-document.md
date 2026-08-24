@@ -57,7 +57,16 @@ terme présent dans toutes les fenêtres pèse exactement zéro.
 
 Aucun corpus extérieur, aucun apprentissage, aucun vecteur. Le classement se
 rejoue à l'identique, et il **s'explique en montrant les termes qui l'ont
-produit** — ce que la restitution affiche à côté de chaque passage. C'est cette
+produit** — ce que la restitution affiche à côté de chaque passage.
+
+> **Correction, 24 août 2026.** « Se rejoue à l'identique » était faux pour la
+> liste des termes affichés. Elle était triée sur le seul poids, et deux termes
+> de même fréquence ont le même poids : l'ordre d'itération d'un `set` de chaînes
+> départageait, et il varie d'un processus à l'autre. Les exemples versionnés
+> changeaient donc à chaque régénération sans qu'aucune donnée ait bougé — le
+> défaut s'est vu dans un `git diff`, pas dans une mesure. Le terme lui-même
+> départage désormais, et le rendu est identique sous trois `PYTHONHASHSEED`
+> différents. Le classement des passages, lui, était déjà trié totalement. C'est cette
 auditabilité qui rend le geste acceptable : le lecteur juge le classement, il ne
 le subit pas.
 

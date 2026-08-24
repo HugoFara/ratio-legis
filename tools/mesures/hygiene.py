@@ -40,6 +40,9 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "ingestion"))
+from textes_des_amendements import ARTICLE_ADDITIONNEL  # noqa: E402
+
 MOIS = {m: i + 1 for i, m in enumerate(
     "janvier février mars avril mai juin juillet août septembre octobre "
     "novembre décembre".split())}
@@ -174,6 +177,37 @@ def mesures(base: sqlite3.Connection, perimetre: Path) -> list[tuple]:
     ajouter("tentatives", "dont par un alinéa écrit qui subsiste", ecrits, reunis)
     ajouter("tentatives", "tentatives déclarées sur un article en vigueur", tentatives,
             note="voie de la cible déclarée seule ; le détail par sort suit")
+
+    # 3 quater. La troisième voie : la correspondance des identifiants de texte.
+    # Son résultat principal est négatif, et il se compte — voir `docs/31`.
+    depots, arts_depot = un(
+        "SELECT count(*), count(DISTINCT d.article_id) FROM depose_sur d "
+        "JOIN version_en_vigueur v ON v.article_id = d.article_id")
+    ajouter("depot", "amendements positionnés sur un article en vigueur", depots)
+    ajouter("depot", "articles en vigueur atteints", arts_depot, en_vigueur)
+    for chambre, jeux, total_jeux in base.execute(
+        "SELECT t.chambre, count(*), (SELECT count(DISTINCT texte_discute) "
+        "FROM amendement WHERE chambre = t.chambre) FROM texte_des_amendements t "
+        "GROUP BY 1"):
+        ajouter("depot", f"{chambre} — jeux d'amendements appariés à leur texte",
+                jeux, total_jeux)
+    plage, subdivisions = un(
+        "SELECT sum(dans_la_plage), sum(subdivisions) FROM texte_des_amendements")
+    ajouter("depot", "subdivisions tombant dans la plage d'articles du texte",
+            plage, subdivisions, "contrôle de l'appariement ; un texte faux s'y "
+            "verrait en premier")
+    # La règle qui reconnaît un article additionnel est celle de l'ingestion, et
+    # non une approximation en SQL : deux définitions du même fait donneraient
+    # deux chiffres, et c'est celui-ci que `docs/31` § 5 publie.
+    additionnels = sum(
+        1 for (sub,) in base.execute(
+            "SELECT a.subdivision FROM amendement a "
+            "JOIN texte_des_amendements t ON t.chambre = a.chambre "
+            "AND t.texte_corpus = a.texte_discute")
+        if ARTICLE_ADDITIONNEL.search(sub or ""))
+    ajouter("depot", "amendements portant sur un article additionnel", additionnels,
+            note="ils ne visent aucun article existant du code : c'est le "
+                 "plafond de la voie du dépôt")
     for famille, nombre in base.execute(
             "SELECT s.famille, count(*) FROM tentative_sur_article t "
             "JOIN sort_amendement s ON s.amendement_id = t.amendement_id "

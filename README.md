@@ -109,6 +109,7 @@ Reconstruite d'une commande depuis le miroir et les plans versionnés
 | **Considérants de l'Union** | **7 674** | `article_acte_ue` — articles d'actes déclarés | 6 237 |
 | **Textes en discussion** | **371** | **`porte_sur`** — l'article du texte → l'article du code | **30 337** |
 | **Sorts d'amendements, en huit familles** | **33 217** | **`vise`** — l'amendement qui visait l'article, abouti ou non | **276** |
+| Correspondances de texte entre les deux corpus | 93 | **`depose_sur`** — l'article du code réécrit par l'article du texte sur lequel l'amendement fut déposé | **618** |
 
 Ce que cela donne au grain de l'article en vigueur, qui est le seul grain qui
 compte pour le produit :
@@ -421,10 +422,17 @@ discutés ([`docs/16`](docs/16-textes-discutes.md)). En revanche, **aucun des
 dossiers ayant une étude d'impact n'a de texte déposé dans le corpus** : DOLE ne
 lie le texte déposé que pour les propositions de loi, qui n'ont jamais d'étude
 d'impact. Le rapprochement de l'étude d'impact reste donc à faire, et il passera
-par le numéro de dépôt de la chambre, non par DOLE. Reste aussi à écrire la table
-de correspondance entre les identifiants de texte des corpus d'amendements et ceux
-des textes en discussion, sans laquelle les amendements orphelins ne peuvent pas
-être rattrapés.
+par le numéro de dépôt de la chambre, non par DOLE.
+
+**La table de correspondance des identifiants de texte est écrite, et elle ne
+rattrape pas les amendements orphelins.** C'était l'hypothèse ; elle est fausse.
+93 jeux d'amendements sur 114 sont appariés à leur texte — identité de document,
+pas rapprochement, contrôlée par la concordance du dossier et par la plage
+d'articles (97,9 %). Ce qu'elle révèle est ailleurs : sur les 30 312 amendements
+des jeux appariés, **7 501 portent sur un article additionnel**. Ils ne visent
+aucun article existant du code parce qu'ils en créent un, dont le numéro ne sera
+fixé qu'à la codification. Aucune table ne peut leur donner une cible.
+[`docs/31`](docs/31-correspondance-des-textes.md).
 
 **Trous de couverture dans ce qui existe.** Les amendements de l'Assemblée pour
 les législatures XV à XVII (103 articles éligibles, mécanique). La XIIIe, jamais
@@ -521,7 +529,7 @@ détail dans [`docs/29`](docs/29-retentissement.md).
 ## Ce qui a été tenté
 
 ```
-python3 restitution/tentatives.py base.sqlite L732-3        # ce qu'on a tenté, et ce qui l'a bloqué
+python3 restitution/tentatives.py base.sqlite L511-7        # ce qu'on a tenté, et ce qui l'a bloqué
 python3 restitution/tentatives.py base.sqlite --sommet 25   # les articles les plus disputés
 ```
 
@@ -554,17 +562,19 @@ Sur les 2 182 amendements écartés sans discussion : **905 au titre de l'articl
 40** — ils aggravaient une charge publique —, 603 comme cavaliers, 117 au titre
 de la règle de l'entonnoir, 93 comme relevant du décret.
 
-Au grain de l'article en vigueur, **156 articles sur 2 104 (7,4 %) portent au
-moins une tentative**, et 56 au moins un échec — 233 tentatives rendues, dont 88
-non abouties. Réunir les deux voies double la couverture de la table que la fiche
-affichait, qui n'en connaissait qu'une. 12,6 ms par article.
+Au grain de l'article en vigueur, **163 articles sur 2 104 (7,7 %) portent au
+moins une tentative**, et 65 au moins un échec — 454 tentatives rendues, dont 257
+non abouties. 12,5 ms par article.
 
-Deux voies de rattachement, jamais confondues : l'**alinéa écrit** (`resulte_de`,
-confiance 0,893) et la **cible déclarée** par le dispositif (`vise`, 0,621), la
-seule ouverte à un amendement rejeté. Le sort est nommé, jamais interprété :
-« retiré » ne dit pas si l'auteur a cédé ou obtenu satisfaction, et cela se lit
-dans le compte rendu de séance, que le graphe ne contient pas.
-[`docs/30`](docs/30-sort-des-amendements.md).
+Trois voies de rattachement, jamais confondues : l'**alinéa écrit** (`resulte_de`,
+confiance 0,893), la **cible déclarée** par le dispositif (`vise`, 0,621), la
+seule ouverte à un amendement rejeté, et la **subdivision déposée** (`depose_sur`,
+0,796) — l'amendement fut discuté sur l'article du texte qui a réécrit celui-ci,
+et cet article du texte n'en a réécrit aucun autre. Le sort est nommé, jamais
+interprété : « retiré » ne dit pas si l'auteur a cédé ou obtenu satisfaction, et
+cela se lit dans le compte rendu de séance, que le graphe ne contient pas.
+[`docs/30`](docs/30-sort-des-amendements.md),
+[`docs/31`](docs/31-correspondance-des-textes.md).
 
 ## Classer sans rattacher
 
@@ -638,12 +648,13 @@ partie réglementaire — *raison non documentée*, alors que sept articles le
 citent —, **D120-7** un article dont la seule raison connue vient de quatre
 règlements de l'Union.
 
-Quatre tentatives versionnées dans `restitution/exemples/tentatives/`, et le
+Cinq tentatives versionnées dans `restitution/exemples/tentatives/`, et le
 classement des articles les plus disputés : **L732-3** trois amendements écartés
-comme cavaliers, dont celui du Gouvernement ; **L312-9** cinq tentatives sur la
-délégation d'assurance emprunteur, toutes échouées ; **L113-3** les deux chambres
-et un sort lu dans l'état procédural ; **L224-43** quatre amendements adoptés dont
-l'alinéa subsiste.
+comme cavaliers, dont celui du Gouvernement ; **L312-9** la délégation d'assurance
+emprunteur ; **L113-3** les deux chambres et un sort lu dans l'état procédural ;
+**L224-43** quatre amendements adoptés dont l'alinéa subsiste ; **L511-7**
+l'article le plus travaillé du fonds, 91 tentatives, que chaque loi de
+consommation vient allonger.
 
 La restitution n'ajoute aucune donnée : elle applique les règles § 5.1 (provenance
 ou silence), § 5.4 (la confiance est une donnée) et § 4.3 (toute phrase produite

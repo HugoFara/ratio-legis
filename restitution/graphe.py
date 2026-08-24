@@ -360,6 +360,14 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
                            FROM tentative_sur_article WHERE article = ?
                            ORDER BY famille <> 'adopte', date_texte, amendement""",
                         numero)
+    # La voie du dépôt n'entre pas dans cette table : elle rendrait 90 lignes sur
+    # L511-7, là où la fiche est un sommaire. Son compte y figure pourtant, sans
+    # quoi deux rendus du même dépôt donneraient deux nombres différents et le
+    # lecteur n'aurait aucun moyen de savoir lequel croire.
+    d["tentatives_par_depot"] = q(
+        "SELECT count(*) AS n FROM depot_des_amendements WHERE article = ? "
+        "AND amendement_id NOT IN (SELECT amendement_id FROM tentative_sur_article "
+        "WHERE article = ?)", numero, numero)[0]["n"]
     return d
 
 
@@ -506,6 +514,13 @@ def en_texte(d: dict) -> str:
                                                   else "")
             L.append(f"  amdt {t['amendement']:<12s} {marque:<26s} "
                      f"{(t['auteur'] or '?')[:30]:<32s} {t['formule']}")
+    if d["tentatives_par_depot"]:
+        # « autres » ne se dit que s'il y en avait déjà : sur un article sans
+        # aucune cible déclarée, la section précédente est absente.
+        autres = " autre(s)" if d["tentatives"] else ""
+        L.append(f"\n  {d['tentatives_par_depot']}{autres} amendement(s) déposé(s) "
+                 "sur l'article du texte qui\n  réécrit celui-ci — "
+                 "restitution/tentatives.py les rend.")
     return "\n".join(L)
 
 
@@ -768,6 +783,12 @@ font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-seri
                      f'<td>{e(t["auteur"])}</td><td>{e(t["loi"])}</td>'
                      f'<td>{e(t["formule"])}</td></tr>')
         p.append("</table>")
+    if d["tentatives_par_depot"]:
+        autres = " autre(s)" if d["tentatives"] else ""
+        p.append(f'<p class="silence">{d["tentatives_par_depot"]}{autres} '
+                 "amendement(s) ont été déposés sur l'article du texte qui "
+                 "réécrit celui-ci ; ils sont rendus par "
+                 "<code>restitution/tentatives.py</code>.</p>")
 
     p.append('<footer>Ratio Legis — graphe de provenance normative. Aucune arête sans '
              'source résoluble. Les confiances sont des bornes inférieures mesurées à la '
