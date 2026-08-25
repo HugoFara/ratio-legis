@@ -165,7 +165,16 @@ python3 "$RACINE/ingestion/visees.py" "$BASE"
 # colonnes de sort des deux chambres, et la vue `tentative_sur_article` qu'il
 # crée s'appuie sur `vise`.
 python3 "$RACINE/ingestion/sort_des_amendements.py" "$BASE"
-python3 "$RACINE/ingestion/textes_deposes.py" "$TRAVAIL/corpus/textes" "$TEXTES" "$BASE"
+# DOLE ne lie pas le texte déposé d'un projet de loi ; son numéro se lit dans le
+# rapport qui le rapporte, et les textes de commission dans la référence des
+# amendements. Les deux plans sont chargés en une seule passe : ce script
+# reconstruit `texte_discute`, une seconde passe effacerait la première.
+DEPOSES="$RACINE/data/corpus/plan-textes-deposes-an.tsv"
+python3 "$RACINE/tools/an/plan_textes_deposes.py" "$BASE" \
+        "$TRAVAIL/corpus/rapports" "$DEPOSES"
+python3 "$RACINE/tools/dila/telecharger_textes.py" "$DEPOSES" "$TRAVAIL/corpus/textes"
+python3 "$RACINE/ingestion/textes_deposes.py" "$TRAVAIL/corpus/textes" "$TEXTES" \
+        "$BASE" "$DEPOSES"
 # Doit suivre `textes_deposes` — il lui faut `porte_sur` — et
 # `sort_des_amendements`, dont sa vue reprend les familles.
 python3 "$RACINE/ingestion/textes_des_amendements.py" "$BASE"

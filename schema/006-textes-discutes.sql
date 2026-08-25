@@ -15,6 +15,14 @@
 
 PRAGMA foreign_keys = ON;
 
+-- Les dépendantes d'abord. `depose_sur` référence `texte_discute` depuis la
+-- vingt-cinquième tranche : sans ces deux lignes, rejouer ce script sur une base
+-- complète échoue sur une clef étrangère, et l'erreur ne dit pas laquelle. Le
+-- pipeline reconstruit de toute façon les deux dans l'ordre, mais l'idempotence
+-- du § 5.2 vaut aussi pour une exécution isolée.
+DROP VIEW  IF EXISTS depot_des_amendements;
+DROP TABLE IF EXISTS depose_sur;
+DROP TABLE IF EXISTS texte_des_amendements;
 DROP VIEW  IF EXISTS articles_du_texte;
 DROP TABLE IF EXISTS porte_sur;
 DROP TABLE IF EXISTS texte_discute;

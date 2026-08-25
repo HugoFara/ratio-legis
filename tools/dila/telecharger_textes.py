@@ -34,6 +34,26 @@ MINIMUM = 3000        # une page plus courte que cela est une erreur, pas un tex
 # `_texte-adopte-seance`) et ne se déduit pas de celle de la page.
 LIEN_PDF = re.compile(rb'href="([^"]+\.pdf)"')
 
+# **Le premier lien PDF n'est pas le document.** Toutes les pages de l'Assemblée
+# portent en pied un lien vers la déclaration d'accessibilité, et sur les textes
+# de commission de la XIVe législature c'est le **seul** PDF déclaré. Prendre le
+# premier venu a écrit vingt-trois fois cette déclaration à la place du texte —
+# 110 324 octets chacune, toutes identiques, et le chargement n'y trouvait aucun
+# article sans que rien ne le signale.
+#
+# Le document, lui, se déclare par une relation vérifiable : son URL est **celle
+# de la page suivie de `.pdf`**. C'est cette relation qu'on exige. Aucun lien qui
+# la vérifie, aucun fichier écrit : un échec nommé vaut mieux qu'un faux document
+# dans le corpus (§ 5.1).
+def pdf_du_document(corps: bytes, url: str) -> str | None:
+    chemin = re.sub(r"^https?://[^/]+", "", url).split("?")[0]
+    attendu = (chemin.removesuffix(".asp") + ".pdf").lower()
+    for trouve in LIEN_PDF.finditer(corps):
+        lien = trouve.group(1).decode("utf-8", "replace")
+        if re.sub(r"^https?://[^/]+", "", lien).lower() == attendu:
+            return lien
+    return None
+
 
 def obtenir(url: str) -> bytes | None:
     try:
@@ -55,10 +75,9 @@ def telecharger(url: str, cible: Path) -> bool:
     if not exploitable(corps):
         if corps is None:
             return False
-        trouve = LIEN_PDF.search(corps)
-        if not trouve:
+        chemin = pdf_du_document(corps, url)
+        if not chemin:
             return False
-        chemin = trouve.group(1).decode("utf-8", "replace")
         if chemin.startswith("/"):
             chemin = re.sub(r"(https?://[^/]+).*", r"\1", url) + chemin
         corps = obtenir(chemin)

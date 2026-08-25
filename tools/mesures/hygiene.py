@@ -170,11 +170,18 @@ def mesures(base: sqlite3.Connection, perimetre: Path) -> list[tuple]:
             JOIN resulte_de rd ON rd.segment_id = remonte.courant
             JOIN segment s ON s.id = remonte.depart
             JOIN version_article v ON v.id_legi = s.version_id
-            JOIN article a ON a.id = v.article_id)""")[0]
-    ajouter("tentatives", "articles en vigueur portant une tentative, les deux voies",
-            reunis, en_vigueur, "cible déclarée ou alinéa écrit")
+            JOIN article a ON a.id = v.article_id
+            UNION
+            SELECT a.numero FROM depose_sur d
+            JOIN article a ON a.id = d.article_id
+            JOIN version_en_vigueur v ON v.article_id = a.id)""")[0]
+    deposes = un("SELECT count(DISTINCT d.article_id) FROM depose_sur d "
+                 "JOIN version_en_vigueur v ON v.article_id = d.article_id")[0]
+    ajouter("tentatives", "articles en vigueur portant une tentative, les trois voies",
+            reunis, en_vigueur, "cible déclarée, alinéa écrit ou subdivision déposée")
     ajouter("tentatives", "dont par la cible déclarée du dispositif", disputes, reunis)
     ajouter("tentatives", "dont par un alinéa écrit qui subsiste", ecrits, reunis)
+    ajouter("tentatives", "dont par la subdivision déposée", deposes, reunis)
     ajouter("tentatives", "tentatives déclarées sur un article en vigueur", tentatives,
             note="voie de la cible déclarée seule ; le détail par sort suit")
 

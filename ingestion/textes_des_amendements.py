@@ -70,7 +70,10 @@ ASSEMBLEE = (re.compile(r"dyn-\d+-textes-l\d+b0*(\d+)_"),
              re.compile(r"/\d+-propositions-pion0*(\d+)"),
              re.compile(r"/\d+-ta-commission-r0*(\d+)-"),
              re.compile(r"/\d+-rapports-r0*(\d+)-"))
-AMENDEMENT_AN = re.compile(r"^BTC?(\d+)/")
+# `B(?:TC)?`, non `BTC?` : le second se lit « B, puis T, puis C facultatif »,
+# et ne reconnaît donc jamais une référence `B1247`. Les treize jeux que
+# `docs/31` § 3 donnait pour non appariés étaient exactement ceux-là.
+AMENDEMENT_AN = re.compile(r"^B(?:TC)?(\d+)/")
 
 # --- lecture d'une subdivision -------------------------------------------------
 # Le Sénat écrit « Article 12 », l'Assemblée « ART. 12 » ; les deux écrivent

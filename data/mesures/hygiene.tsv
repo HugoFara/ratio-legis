@@ -5,9 +5,9 @@ verdict	partie D — origine située seulement	0	179	0.0
 verdict	partie D — motivation du texte seule	11	179	6.1	
 verdict	partie D — RAISON NON DOCUMENTÉE	167	179	93.3	
 verdict	partie L — articles en vigueur	1293			
-verdict	partie L — un passage les motive	696	1293	53.8	
-verdict	partie L — origine située seulement	177	1293	13.7	
-verdict	partie L — motivation du texte seule	415	1293	32.1	
+verdict	partie L — un passage les motive	708	1293	54.8	
+verdict	partie L — origine située seulement	168	1293	13.0	
+verdict	partie L — motivation du texte seule	412	1293	31.9	
 verdict	partie L — RAISON NON DOCUMENTÉE	5	1293	0.4	
 verdict	partie R — articles en vigueur	632			
 verdict	partie R — un passage les motive	44	632	7.0	
@@ -46,16 +46,17 @@ irrecevabilite	fondement — article 44 bis	117	2182	5.4
 irrecevabilite	fondement — article 41	93	2182	4.3	
 irrecevabilite	fondement — LOLF	9	2182	0.4	
 irrecevabilite	fondement — LOLFSS	6	2182	0.3	
-tentatives	articles en vigueur portant une tentative, les deux voies	156	2104	7.4	cible déclarée ou alinéa écrit
-tentatives	dont par la cible déclarée du dispositif	83	156	53.2	
-tentatives	dont par un alinéa écrit qui subsiste	83	156	53.2	
+tentatives	articles en vigueur portant une tentative, les trois voies	163	2104	7.7	cible déclarée, alinéa écrit ou subdivision déposée
+tentatives	dont par la cible déclarée du dispositif	83	163	50.9	
+tentatives	dont par un alinéa écrit qui subsiste	83	163	50.9	
+tentatives	dont par la subdivision déposée	17	163	10.4	
 tentatives	tentatives déclarées sur un article en vigueur	129			voie de la cible déclarée seule ; le détail par sort suit
 depot	amendements positionnés sur un article en vigueur	226			
 depot	articles en vigueur atteints	17	2104	0.8	
-depot	assemblee — jeux d'amendements appariés à leur texte	26	39	66.7	
+depot	assemblee — jeux d'amendements appariés à leur texte	39	39	100.0	
 depot	senat — jeux d'amendements appariés à leur texte	67	75	89.3	
-depot	subdivisions tombant dans la plage d'articles du texte	3578	3655	97.9	contrôle de l'appariement ; un texte faux s'y verrait en premier
-depot	amendements portant sur un article additionnel	7501			ils ne visent aucun article existant du code : c'est le plafond de la voie du dépôt
+depot	subdivisions tombant dans la plage d'articles du texte	3842	3922	98.0	contrôle de l'appariement ; un texte faux s'y verrait en premier
+depot	amendements portant sur un article additionnel	7790			ils ne visent aucun article existant du code : c'est le plafond de la voie du dépôt
 tentatives	dont adopte	41	129	31.8	
 tentatives	dont rejete	34	129	26.4	
 tentatives	dont retire	30	129	23.3	
@@ -76,7 +77,7 @@ sources	documents — rapport_commission	252
 sources	documents — rapport_president_republique	37			
 sources	actes de l'Union	284			
 sources	considérants	7674			
-sources	textes en discussion	371			
+sources	textes en discussion	424			
 renvois	articles citant L733-1	37			
 renvois	articles citant L412-1	37			
 renvois	articles citant L733-4	35			

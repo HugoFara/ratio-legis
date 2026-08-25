@@ -48,6 +48,15 @@ l'Assemblée. Les 21 restants n'ont aucun document de la bonne série dans le
 corpus — c'est un trou de corpus, non un désaccord : à l'Assemblée, DOLE ne lie
 le texte déposé que pour les propositions de loi (`docs/15` § 5).
 
+> **Correction, 25 août 2026.** L'explication du côté Assemblée était fausse, et
+> le chiffre avec. Les 13 jeux non appariés n'avaient pas de trou de corpus : leur
+> document était déjà en base, apporté par DOLE. Ils échouaient sur une expression
+> rationnelle — `BTC?`, qui se lit « un B, puis un T, puis un C facultatif » et ne
+> reconnaît donc jamais une référence `B1247`. Corrigée en `B(?:TC)?`,
+> **l'Assemblée est appariée à 39 jeux sur 39**, et le contrôle de plage y monte à
+> 99,5 %. Voir [`docs/32`](32-textes-deposes-assemblee.md) § 3. Les 8 jeux du
+> Sénat, eux, restent bien un trou de corpus.
+
 **Les subdivisions tombent dans la plage.** Un amendement déposé sur l'article 12
 suppose que le texte ait au moins douze articles, et `texte_discute.articles` les
 compte. **3 578 subdivisions sur 3 655, soit 97,9 %.** C'est le contrôle qui

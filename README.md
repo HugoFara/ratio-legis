@@ -102,14 +102,14 @@ Reconstruite d'une commande depuis le miroir et les plans versionnés
 | Articles (dont **2 104 en vigueur**) | 3 464 | `produite_par` — quel texte a produit la version | 8 145 |
 | Versions d'articles | 6 362 | `repris_de` — continuité d'un alinéa par-delà la recodification | 6 137 |
 | **Segments (alinéas)** | **28 294** | `renumerote_de` | 1 882 |
-| Documents (rapports, exposés, études d'impact, avis) | 372 | `motive` — un passage qui motive, avec offsets | 639 |
+| Documents (rapports, exposés, études d'impact, avis) | 372 | `motive` — un passage qui motive, avec offsets | 634 |
 | Amendements (22 102 Sénat, 11 115 Assemblée) | 33 217 | `renvoie_a` — le graphe de renvois | 12 534 |
 | Acteurs | 1 478 | `resulte_de` — l'amendement qui a écrit l'alinéa | 279 |
 | **Actes de l'Union** | **284** | `cite_acte_ue` / `transpose` | 1 572 / 8 |
 | **Considérants de l'Union** | **7 674** | `article_acte_ue` — articles d'actes déclarés | 6 237 |
-| **Textes en discussion** | **371** | **`porte_sur`** — l'article du texte → l'article du code | **30 337** |
+| **Textes en discussion** | **424** | **`porte_sur`** — l'article du texte → l'article du code | **33 772** |
 | **Sorts d'amendements, en huit familles** | **33 217** | **`vise`** — l'amendement qui visait l'article, abouti ou non | **276** |
-| Correspondances de texte entre les deux corpus | 93 | **`depose_sur`** — l'article du code réécrit par l'article du texte sur lequel l'amendement fut déposé | **618** |
+| Correspondances de texte entre les deux corpus | 106 | **`depose_sur`** — l'article du code réécrit par l'article du texte sur lequel l'amendement fut déposé | **637** |
 
 Ce que cela donne au grain de l'article en vigueur, qui est le seul grain qui
 compte pour le produit :
@@ -123,7 +123,7 @@ des motifs, ni débat, ni amendement.
 
 | partie | articles | un passage les motive | origine située | motivation du texte | **raison non documentée** |
 |---|---:|---:|---:|---:|---:|
-| **L** | 1 293 | 696 (53,8 %) | 177 | 415 | **5 (0,4 %)** |
+| **L** | 1 293 | 708 (54,8 %) | 168 | 412 | **5 (0,4 %)** |
 | **R** | 632 | 44 | 14 | 47 | **527 (83,4 %)** |
 | **D** | 179 | 1 | 0 | 11 | **167 (93,3 %)** |
 
@@ -426,13 +426,27 @@ par le numéro de dépôt de la chambre, non par DOLE.
 
 **La table de correspondance des identifiants de texte est écrite, et elle ne
 rattrape pas les amendements orphelins.** C'était l'hypothèse ; elle est fausse.
-93 jeux d'amendements sur 114 sont appariés à leur texte — identité de document,
+106 jeux d'amendements sur 114 sont appariés à leur texte — identité de document,
 pas rapprochement, contrôlée par la concordance du dossier et par la plage
-d'articles (97,9 %). Ce qu'elle révèle est ailleurs : sur les 30 312 amendements
-des jeux appariés, **7 501 portent sur un article additionnel**. Ils ne visent
-aucun article existant du code parce qu'ils en créent un, dont le numéro ne sera
-fixé qu'à la codification. Aucune table ne peut leur donner une cible.
+d'articles (98,0 %). Ce qu'elle révèle est ailleurs : sur les amendements des
+jeux appariés, **7 790 portent sur un article additionnel**. Ils ne visent aucun
+article existant du code parce qu'ils en créent un, dont le numéro ne sera fixé
+qu'à la codification. Aucune table ne peut leur donner une cible.
 [`docs/31`](docs/31-correspondance-des-textes.md).
+
+**Les textes déposés de l'Assemblée sont chargés**, par le numéro que le rapport
+de commission déclare — « sur le projet de loi … (n° 2060) » — et non par DOLE,
+qui ne lie ce texte que pour les propositions de loi. 55 numéros relevés, 55
+servis. Le fonds passe de 371 à 424 textes en discussion et de 30 337 à 33 772
+arêtes `porte_sur` ; **la partie législative gagne douze articles** qui passent
+d'« origine située » à « un passage les motive », le texte déposé étant un état
+de plus sur lequel les états doivent s'accorder.
+
+**Mais l'étude d'impact reste au grain du texte**, et le texte déposé n'y était
+pour rien : il fallait le charger, il ne suffit pas. Une étude d'impact n'a pas la
+structure d'un rapport de commission — de 0 à 359 en-têtes d'article sur quatre
+documents —, et c'est un découpeur à écrire, non un chaînon à trouver.
+[`docs/32`](docs/32-textes-deposes-assemblee.md).
 
 **Trous de couverture dans ce qui existe.** Les amendements de l'Assemblée pour
 les législatures XV à XVII (103 articles éligibles, mécanique). La XIIIe, jamais
@@ -564,7 +578,8 @@ de la règle de l'entonnoir, 93 comme relevant du décret.
 
 Au grain de l'article en vigueur, **163 articles sur 2 104 (7,7 %) portent au
 moins une tentative**, et 65 au moins un échec — 454 tentatives rendues, dont 257
-non abouties. 12,5 ms par article.
+non abouties. 12,5 ms par article. Les jeux d'amendements de l'Assemblée sont
+désormais appariés à leur texte **39 sur 39**.
 
 Trois voies de rattachement, jamais confondues : l'**alinéa écrit** (`resulte_de`,
 confiance 0,893), la **cible déclarée** par le dispositif (`vise`, 0,621), la

@@ -27,8 +27,16 @@ une référence sans code nommé vise le code courant — parce qu'on lit un art
 ce code —, un texte en discussion peut modifier n'importe quel code, et en
 modifie souvent plusieurs. Sans code nommé, la portée est `non_resolue`.
 
+**Les plans sont pluriels.** DOLE ne lie pas le texte déposé d'un projet de loi
+— il ne lie que celui des propositions, qui n'ont jamais d'étude d'impact
+(`docs/15` § 5). Le numéro de dépôt se lit ailleurs, et
+`tools/an/plan_textes_deposes.py` en produit un second plan. Les charger en deux
+passes ne marcherait pas : ce script reconstruit `texte_discute` et `porte_sur`,
+et la seconde passe effacerait la première. Il prend donc tous les plans à la
+fois.
+
 Usage :
-    textes_deposes.py <corpus/textes/> <plan-textes.tsv> <base.sqlite>
+    textes_deposes.py <corpus/textes/> <plan-textes.tsv> <base.sqlite> [plan...]
 """
 
 from __future__ import annotations
@@ -234,9 +242,10 @@ def fenetre(texte: str, debut: int, fin: int) -> str | None:
 
 
 def main() -> None:
-    if len(sys.argv) != 4:
+    if len(sys.argv) < 4:
         sys.exit(__doc__)
-    corpus, plan, chemin_base = (Path(a) for a in sys.argv[1:])
+    corpus, plan, chemin_base = (Path(a) for a in sys.argv[1:4])
+    plans = [plan] + [Path(a) for a in sys.argv[4:]]
     base = sqlite3.connect(chemin_base)
     schema = Path(__file__).resolve().parent.parent / "schema" / "006-textes-discutes.sql"
     base.executescript(schema.read_text(encoding="utf-8"))
@@ -251,7 +260,10 @@ def main() -> None:
               "hors_perimetre": 0, "sans_preuve": 0, "cite": 0,
               "citee_sans_action": 0}
 
-    for ligne in csv.DictReader(plan.open(encoding="utf-8"), delimiter="\t"):
+    lues = [ligne for chemin in plans
+            for ligne in csv.DictReader(chemin.open(encoding="utf-8"),
+                                        delimiter="\t")]
+    for ligne in lues:
         fichier = corpus / f"{ligne['dossier']}__{ligne['fichier']}"
         if not fichier.exists():
             compte["absents"] += 1
@@ -313,6 +325,7 @@ def main() -> None:
         "SELECT (SELECT count(DISTINCT article) FROM articles_du_texte), "
         "(SELECT count(DISTINCT article_id) FROM version_en_vigueur)").fetchone()
 
+    print(f"plans lus                  : {len(plans)} ({len(lues)} lignes)")
     print(f"textes chargés             : {len(textes)}")
     print(f"  absents du corpus        : {compte['absents']}")
     print(f"  dossier hors périmètre   : {compte['hors_perimetre']}")
