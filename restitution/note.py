@@ -68,6 +68,13 @@ VOIX_DOCUMENT = {
     "avis_conseil_etat": "conseil_etat",
     "rapport_commission": "parlement",
 }
+# Le genre du libellé, pour l'article indéfini. « Un étude d'impact commente cet
+# article » se lisait aux deux endroits qui nomment un document, et rien ne le
+# corrigeait puisque le seul type rendu jusqu'ici — le rapport de commission —
+# était masculin. Une règle, un endroit.
+GENRE = {"etude_impact": "une", "expose_des_motifs": "un",
+         "avis_conseil_etat": "un", "rapport_president_republique": "un",
+         "rapport_commission": "un", "compte_rendu": "un"}
 LIBELLE = {
     "expose_des_motifs": "exposé des motifs",
     "etude_impact": "étude d'impact",
@@ -144,8 +151,13 @@ def composer(d: dict) -> tuple[list[Phrase], list[str], list[Phrase]]:
                      if structurel else
                      f" Il le commente sous l'article {r['article_du_texte']} du "
                      "texte alors en discussion." if r["article_du_texte"] else "")
-        constat("parlement",
-                f"Un {LIBELLE.get(r['type'], r['type'])} {chambre} commente cet "
+        # La voix vient du **type de document**, jamais de la table. Depuis que
+        # `motive` peut venir d'une étude d'impact (`docs/33`), écrire
+        # « parlement » en dur rangeait la parole du Gouvernement sous celle du
+        # Parlement — l'exact contraire de ce que le § 4.3 demande de distinguer.
+        constat(VOIX_DOCUMENT.get(r["type"], "parlement"),
+                f"{GENRE.get(r['type'], 'un').capitalize()} "
+                f"{LIBELLE.get(r['type'], r['type'])} {chambre} commente cet "
                 f"article.".replace("  ", " ") + precision,
                 source=LIBELLE.get(r["type"], r["type"]), reference=r["url"],
                 nature="web", offsets=(r["offset_debut"], r["offset_fin"]),
@@ -196,7 +208,8 @@ def composer(d: dict) -> tuple[list[Phrase], list[str], list[Phrase]]:
         if meilleur is None:
             constat(VOIX_DOCUMENT.get(m["type"], "gouvernement"),
                     f"Le texte qui a produit cet article — « {m['titre']} » — est "
-                    f"accompagné d'un {LIBELLE[m['type']]}. Ce document porte sur le "
+                    f"accompagné d'{GENRE.get(m['type'], 'un')} "
+                    f"{LIBELLE[m['type']]}. Ce document porte sur le "
                     "texte entier, non sur cet article, et aucun de ses passages ne "
                     "partage assez de vocabulaire avec lui pour être distingué.",
                     source=LIBELLE[m["type"]], reference=m["url"], nature="web",
@@ -204,7 +217,8 @@ def composer(d: dict) -> tuple[list[Phrase], list[str], list[Phrase]]:
             continue
         constat(VOIX_DOCUMENT.get(m["type"], "gouvernement"),
                 f"Le texte qui a produit cet article — « {m['titre']} » — est "
-                f"accompagné d'un {LIBELLE[m['type']]}. Ce document porte sur le "
+                f"accompagné d'{GENRE.get(m['type'], 'un')} "
+                f"{LIBELLE[m['type']]}. Ce document porte sur le "
                 "texte entier, non sur cet article ; le passage ci-dessous est "
                 "celui dont le vocabulaire recouvre le plus celui de l'article "
                 f"({', '.join(meilleur.termes[:6])}). C'est un classement, non un "

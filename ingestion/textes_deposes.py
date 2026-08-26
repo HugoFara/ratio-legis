@@ -47,6 +47,7 @@ import html
 import re
 import sqlite3
 import sys
+from collections import defaultdict
 from pathlib import Path
 
 import fitz          # pymupdf
@@ -80,6 +81,24 @@ ACTION = re.compile(r"\b(?:est|sont)\s+(?:ainsi\s+(?:modifiée?s?|rédigée?s?"
 # numérotation éventuelle.
 ALINEA_CITE = re.compile(r"^\s*(?:[0-9]+[°)]\s*|[a-z][)]\s*|[IVX]+\.\s*[–-]?\s*)*[«“]")
 REFERENCE = re.compile(r"\b([LRD])\.?\s?(\d{3})-(\d{1,3})(?:-(\d{1,3}))?")
+# **L'article écrit dans la citation.** Un article de projet de loi qui réécrit une
+# section entière ne nomme aucune cible dans son instruction : il dit « la section
+# 2 du même code sont remplacées par les dispositions suivantes : », puis écrit le
+# droit nouveau, où chaque article s'ouvre par « Art. L. 121-16. – ». La règle
+# générale — une référence citée n'est jamais une cible — écarte ces numéros,
+# et à juste titre : ce sont des morceaux de la règle nouvelle.
+#
+# Mais l'en-tête d'un alinéa cité n'est pas une référence à du droit existant.
+# C'est la **désignation de l'article qu'on écrit**, et c'est la seule chose que
+# le texte en dise. L'article 5 du projet de loi consommation réécrit vingt-huit
+# articles de cette façon, et `porte_sur` n'en voyait aucun : sur les treize
+# articles à cible interne du texte déposé, ni l'article 5, ni l'article 13, ni
+# l'article 21 — c'est-à-dire précisément ceux dont l'étude d'impact parle.
+#
+# La forme est exacte et vérifiable : un guillemet ouvrant, puis « Art. », puis le
+# numéro. `visees.py` retient la même depuis la cinquième tranche.
+ARTICLE_CREE = re.compile(
+    r"[«“\"]\s*Art\.?\s*([LRD])\.?\s?(\d{3})-(\d{1,3})(?:-(\d{1,3}))?", re.I)
 CODE_NOMME = re.compile(r"\b(?:du|le|au|dans le|de ce)\s+(code\s+[^,;.:)]{3,45})", re.I)
 MEME_CODE = re.compile(r"\b(?:du|le|au|dans le)\s+même\s+code\b", re.I)
 BORNE = re.compile(r"(?<![LRD])(?<!art)(?<!n°)[.;:]")
@@ -96,6 +115,11 @@ AVAL = 140                    # portée du regard en aval, dans la même phrase
 # Précision mesurée à la main sur 20 rattachements tirés au sort : voir
 # `docs/16-textes-discutes.md` § 4. Borne inférieure de Wilson à 95 %.
 CONFIANCE = 0.8389
+# La voie de la citation est mesurée à part, parce qu'elle ne vaut pas la même
+# chose : 15 arêtes justes sur 15 vérifiées à la main **après** la garde de
+# corroboration, tirage disjoint de celui qui a fait découvrir le défaut d'hôte.
+# Borne inférieure de Wilson à 95 %. Voir `docs/33` § 4.
+CONFIANCE_CREE = 0.7961
 
 
 def sans_controles(texte: str) -> str:
@@ -249,16 +273,38 @@ def main() -> None:
     base = sqlite3.connect(chemin_base)
     schema = Path(__file__).resolve().parent.parent / "schema" / "006-textes-discutes.sql"
     base.executescript(schema.read_text(encoding="utf-8"))
-    base.execute("DELETE FROM preuve WHERE methode = 'texte_en_discussion'")
+    base.execute("DELETE FROM preuve WHERE methode IN "
+                 "('texte_en_discussion', 'article_cree')")
 
     connus = {d for (d,) in base.execute("SELECT id_dole FROM dossier")}
     articles = {n: i for n, i in base.execute("SELECT numero, id FROM article")}
+    # **Corroboration par LEGI**, exigée de la seule voie de la citation. Le code
+    # hôte y est implicite : l'instruction le nomme une fois, loin en amont, et un
+    # texte qui modifie plusieurs codes à la suite fait dériver la dernière
+    # mention. Sur quinze arêtes vérifiées à la main, huit étaient fausses de ce
+    # seul fait — des articles du code du tourisme, de la propriété
+    # intellectuelle ou monétaire et financier rattachés au nôtre.
+    #
+    # La garde ne devine pas le bon code : elle demande à une **source
+    # indépendante** si la loi issue de ce dossier a produit une version de cet
+    # article. Si elle ne l'a pas produite, l'article du texte ne l'écrivait pas.
+    # Les huit fausses de l'échantillon y tombent toutes.
+    #
+    # La voie déclarée, elle, n'y est pas soumise : son code est nommé dans la
+    # même phrase, et `docs/16` § 4 en mesure la précision à 20/20.
+    produits = defaultdict(set)
+    for dossier_id, article_id in base.execute(
+            "SELECT i.dossier_id, v.article_id FROM issu_de i "
+            "JOIN produite_par p ON p.texte_id = i.texte_id "
+            "JOIN version_article v ON v.id_legi = p.version_id"):
+        produits[dossier_id].add(article_id)
     suivant = (base.execute("SELECT COALESCE(MAX(id), 0) FROM preuve").fetchone()[0]) + 1
 
     textes, liens, preuves = [], [], []
     compte = {"interne": 0, "externe": 0, "non_resolue": 0, "absents": 0,
               "hors_perimetre": 0, "sans_preuve": 0, "cite": 0,
-              "citee_sans_action": 0}
+              "citee_sans_action": 0, "cree": 0, "cree_deja_declare": 0,
+              "cree_non_corrobore": 0}
 
     lues = [ligne for chemin in plans
             for ligne in csv.DictReader(chemin.open(encoding="utf-8"),
@@ -310,6 +356,40 @@ def main() -> None:
                               code, portee, "derivee", CONFIANCE, suivant))
                 suivant += 1
 
+            # Seconde passe : les articles que l'article du texte **écrit**, et
+            # qu'il ne désigne nulle part ailleurs. Elle vient après la première
+            # et partage son ensemble `vus` : une cible déjà déclarée dans
+            # l'instruction est mieux établie que la même relevée dans la
+            # citation, et ne doit pas être comptée deux fois.
+            for creation in ARTICLE_CREE.finditer(contenu, debut, fin):
+                cle = numero(creation)
+                if (article_du_texte, cle) in vus:
+                    compte["cree_deja_declare"] += 1
+                    continue
+                code = code_de(contenu, reperes, creation.start(), creation.end())
+                if code is None:
+                    portee, article_id = "non_resolue", None
+                elif NOTRE_CODE.search(code):
+                    article_id = articles.get(cle)
+                    portee = "interne" if article_id else "non_resolue"
+                else:
+                    portee, article_id = "externe", None
+                if (portee == "interne"
+                        and article_id not in produits.get(ligne["dossier"], ())):
+                    compte["cree_non_corrobore"] += 1
+                    continue
+                extrait = fenetre(contenu, creation.start(), creation.end())
+                if extrait is None:
+                    compte["sans_preuve"] += 1
+                    continue
+                vus.add((article_du_texte, cle))
+                compte[portee] += 1
+                compte["cree"] += 1
+                preuves.append((suivant, "article_cree", extrait, creation.start()))
+                liens.append((identifiant, article_du_texte, article_id, cle,
+                              code, portee, "derivee", CONFIANCE_CREE, suivant))
+                suivant += 1
+
     base.executemany("INSERT INTO texte_discute (id, dossier_id, chambre, stade, "
                      "url, articles) VALUES (?, ?, ?, ?, ?, ?)", textes)
     base.executemany("INSERT INTO preuve (id, methode, fenetre, source_offset) "
@@ -335,9 +415,12 @@ def main() -> None:
         part = 100 * compte[portee] / len(liens) if liens else 0
         print(f"  {portee:12s}           : {compte[portee]} ({part:.1f} %)")
     print(f"  écartés faute de preuve  : {compte['sans_preuve']}")
-    print(f"références écartées :")
+    print("références écartées :")
     print(f"  dans un passage cité, donc non cibles : {compte['cite']}")
     print(f"  sans verbe modificatif, donc citées : {compte['citee_sans_action']}")
+    print(f"\narticles écrits dans la citation, relevés : {compte['cree']}")
+    print(f"  déjà déclarés par l'instruction : {compte['cree_deja_declare']}")
+    print(f"  écartés, non corroborés par LEGI : {compte['cree_non_corrobore']}")
     print(f"\narticles en vigueur reliés à un article de texte : {couverts} "
           f"({100 * couverts / en_vigueur:.1f} %)")
     print(f"\nintégrité : {len(violations)} violation(s) de clef étrangère")

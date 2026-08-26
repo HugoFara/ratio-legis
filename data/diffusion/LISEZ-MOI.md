@@ -21,7 +21,7 @@ Le **texte** des rapports de commission n'est pas rediffusé : les conditions pu
 - `documents_dont_le_texte_est_retire_senat` : 122
 - `documents_dont_le_texte_est_retire_assemblee` : 130
 - `documents_dont_le_texte_est_retire` : 252
-- `fenetres_de_preuve_ramenees_a_60_caracteres` : 634
+- `fenetres_de_preuve_ramenees_a_60_caracteres` : 671
 
 ## Tables
 
@@ -38,16 +38,16 @@ Le **texte** des rapports de commission n'est pas rediffusé : les conditions pu
 | `acte_ue` | 284 | un acte de l'Union identifié par son CELEX |
 | `considerant` | 7674 | un considérant d'un acte de l'Union, dans l'ordre de publication |
 | `texte_discute` | 424 | un texte déposé ou transmis, à un stade de la navette |
-| `preuve` | 54945 | la fenêtre textuelle qui fonde une arête dérivée |
+| `preuve` | 65011 | la fenêtre textuelle qui fonde une arête dérivée |
 | `produite_par` | 8145 | version d'article → texte qui l'a produite (LEGI, déclarée) |
 | `issu_de` | 200 | texte → dossier législatif (DOLE, déclarée) |
 | `renumerote_de` | 1882 | article → article dont il reprend la disposition |
 | `repris_de` | 6137 | segment → segment antérieur dont il reprend le texte |
 | `resulte_de` | 279 | segment → amendement qui l'a écrit — l'arête critique du projet |
-| `motive` | 634 | document → article ou segment que l'un de ses passages explique |
-| `porte_sur` | 33772 | article d'un texte discuté → article du code qu'il modifie |
+| `motive` | 686 | document → article ou segment que l'un de ses passages explique |
+| `porte_sur` | 43786 | article d'un texte discuté → article du code qu'il modifie |
 | `vise` | 276 | amendement → article du code que son dispositif désigne |
-| `depose_sur` | 637 | amendement → article du code réécrit par l'article du texte sur lequel il fut déposé, quand cet article du texte n'en réécrit qu'un |
+| `depose_sur` | 874 | amendement → article du code réécrit par l'article du texte sur lequel il fut déposé, quand cet article du texte n'en réécrit qu'un |
 | `texte_des_amendements` | 106 | la correspondance entre l'identifiant de texte du corpus d'amendements et celui du texte en discussion |
 | `sort_amendement` | 33217 | le sort d'un amendement, ramené à huit familles comparables, avec le libellé publié et la colonne d'où il est lu |
 | `renvoie_a` | 12534 | segment → article cité, interne ou externe au code |

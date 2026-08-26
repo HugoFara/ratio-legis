@@ -102,14 +102,14 @@ Reconstruite d'une commande depuis le miroir et les plans versionnés
 | Articles (dont **2 104 en vigueur**) | 3 464 | `produite_par` — quel texte a produit la version | 8 145 |
 | Versions d'articles | 6 362 | `repris_de` — continuité d'un alinéa par-delà la recodification | 6 137 |
 | **Segments (alinéas)** | **28 294** | `renumerote_de` | 1 882 |
-| Documents (rapports, exposés, études d'impact, avis) | 372 | `motive` — un passage qui motive, avec offsets | 634 |
+| Documents (rapports, exposés, études d'impact, avis) | 372 | `motive` — un passage qui motive, avec offsets | 686 |
 | Amendements (22 102 Sénat, 11 115 Assemblée) | 33 217 | `renvoie_a` — le graphe de renvois | 12 534 |
 | Acteurs | 1 478 | `resulte_de` — l'amendement qui a écrit l'alinéa | 279 |
 | **Actes de l'Union** | **284** | `cite_acte_ue` / `transpose` | 1 572 / 8 |
 | **Considérants de l'Union** | **7 674** | `article_acte_ue` — articles d'actes déclarés | 6 237 |
-| **Textes en discussion** | **424** | **`porte_sur`** — l'article du texte → l'article du code | **33 772** |
+| **Textes en discussion** | **424** | **`porte_sur`** — l'article du texte → l'article du code | **43 786** |
 | **Sorts d'amendements, en huit familles** | **33 217** | **`vise`** — l'amendement qui visait l'article, abouti ou non | **276** |
-| Correspondances de texte entre les deux corpus | 106 | **`depose_sur`** — l'article du code réécrit par l'article du texte sur lequel l'amendement fut déposé | **637** |
+| Correspondances de texte entre les deux corpus | 106 | **`depose_sur`** — l'article du code réécrit par l'article du texte sur lequel l'amendement fut déposé | **874** |
 
 Ce que cela donne au grain de l'article en vigueur, qui est le seul grain qui
 compte pour le produit :
@@ -123,7 +123,7 @@ des motifs, ni débat, ni amendement.
 
 | partie | articles | un passage les motive | origine située | motivation du texte | **raison non documentée** |
 |---|---:|---:|---:|---:|---:|
-| **L** | 1 293 | 708 (54,8 %) | 168 | 412 | **5 (0,4 %)** |
+| **L** | 1 293 | 756 (58,5 %) | 199 | 333 | **5 (0,4 %)** |
 | **R** | 632 | 44 | 14 | 47 | **527 (83,4 %)** |
 | **D** | 179 | 1 | 0 | 11 | **167 (93,3 %)** |
 
@@ -442,11 +442,26 @@ arêtes `porte_sur` ; **la partie législative gagne douze articles** qui passen
 d'« origine située » à « un passage les motive », le texte déposé étant un état
 de plus sur lequel les états doivent s'accorder.
 
-**Mais l'étude d'impact reste au grain du texte**, et le texte déposé n'y était
-pour rien : il fallait le charger, il ne suffit pas. Une étude d'impact n'a pas la
-structure d'un rapport de commission — de 0 à 359 en-têtes d'article sur quatre
-documents —, et c'est un découpeur à écrire, non un chaînon à trouver.
-[`docs/32`](docs/32-textes-deposes-assemblee.md).
+**L'étude d'impact est arrivée au grain de l'article**, mais le découpeur n'a pas
+suffi : il rendait trois articles. Le chaînon était plus haut. `porte_sur` était
+**aveugle aux réécritures de section entière** — l'article 5 du projet de loi
+consommation réécrit vingt-huit articles sous la forme `« Art. L. 121-16. – »`, et
+aucun n'était vu, précisément ceux dont l'étude d'impact parle. L'en-tête d'un
+alinéa cité n'est pas une référence à du droit existant : c'est la désignation de
+l'article qu'on écrit.
+
+Les articles en vigueur reliés à un article de texte passent de 819 à **964**, et
+**79 articles de la partie législative montent d'un rang** dans le verdict. Le
+code hôte étant implicite dans une citation, cette voie porte une garde propre —
+LEGI doit confirmer que la loi du dossier a bien produit l'article — et sa
+confiance mesurée à part, 0,796 contre 0,839.
+
+**La voix du Gouvernement existe enfin au grain de l'article** : quinze articles
+portent un passage de l'étude d'impact qui les chiffre, là où `motive` ne venait
+que des rapports de commission. Quinze, et le plafond est mesuré : sur les 2 016
+articles de texte des dossiers ayant une étude d'impact, 220 seulement touchent ce
+code. [`docs/32`](docs/32-textes-deposes-assemblee.md),
+[`docs/33`](docs/33-article-ecrit-dans-la-citation.md).
 
 **Trous de couverture dans ce qui existe.** Les amendements de l'Assemblée pour
 les législatures XV à XVII (103 articles éligibles, mécanique). La XIIIe, jamais
@@ -576,10 +591,9 @@ Sur les 2 182 amendements écartés sans discussion : **905 au titre de l'articl
 40** — ils aggravaient une charge publique —, 603 comme cavaliers, 117 au titre
 de la règle de l'entonnoir, 93 comme relevant du décret.
 
-Au grain de l'article en vigueur, **163 articles sur 2 104 (7,7 %) portent au
-moins une tentative**, et 65 au moins un échec — 454 tentatives rendues, dont 257
-non abouties. 12,5 ms par article. Les jeux d'amendements de l'Assemblée sont
-désormais appariés à leur texte **39 sur 39**.
+Au grain de l'article en vigueur, **165 articles sur 2 104 portent au moins une
+tentative** — 689 tentatives rendues, dont 460 non abouties. Les jeux
+d'amendements de l'Assemblée sont appariés à leur texte **39 sur 39**.
 
 Trois voies de rattachement, jamais confondues : l'**alinéa écrit** (`resulte_de`,
 confiance 0,893), la **cible déclarée** par le dispositif (`vise`, 0,621), la

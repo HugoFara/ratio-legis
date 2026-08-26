@@ -263,7 +263,15 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
         JOIN document doc ON doc.dossier_id = i.dossier_id
         WHERE a.numero = ? AND doc.type IN ('rapport_president_republique',
                                             'expose_des_motifs', 'etude_impact',
-                                            'avis_conseil_etat')""", numero)
+                                            'avis_conseil_etat')
+          -- Un document qui porte déjà un passage rattaché à cet article n'est
+          -- pas un document « qui ne concerne que le texte entier ». Depuis que
+          -- `motive` peut venir d'une étude d'impact (`docs/33`), le même
+          -- document sortait deux fois : une fois comme passage qui explique
+          -- l'article, une fois comme document qui ne dit rien de lui. Les deux
+          -- phrases se contredisent, et c'est la seconde qui est fausse.
+          AND doc.id NOT IN (SELECT m.document_id FROM motive m
+                             WHERE m.article_id = a.id)""", numero)
     # Le tri doit être total : sans le second critère, deux documents de même
     # type sortaient dans l'ordre du plan d'exécution, qui change avec les
     # statistiques du planificateur. Une restitution dont l'ordre dépend d'un
