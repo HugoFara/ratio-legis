@@ -359,7 +359,7 @@ def main() -> None:
     compte = retirer_les_rapports(base, strict)
     base.commit()
     if strict:
-        # Retirer 624 arêtes `motive` sans recalculer le verdict laisserait la
+        # Retirer 684 arêtes `motive` sans recalculer le verdict laisserait la
         # base affirmer qu'un passage motive un article qu'elle ne peut plus
         # montrer. Un dump doit être cohérent avec lui-même, pas avec la base
         # dont il vient.

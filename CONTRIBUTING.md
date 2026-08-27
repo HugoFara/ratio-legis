@@ -108,8 +108,8 @@ Deux interdits, qui ont déjà été enfreints par inadvertance :
   reproduction de leurs travaux, mais à des conditions — gratuité, attribution,
   intégrité côté Sénat, interdiction de l'usage commercial côté Assemblée — qui
   ne se transmettent pas sous Licence Ouverte. Le plafond est une constante nommée
-  dans [`restitution/graphe.py`](restitution/graphe.py) — utilisez-la plutôt que
-  d'écrire le nombre.
+  dans [`restitution/citation.py`](restitution/citation.py) — utilisez-la plutôt
+  que d'écrire le nombre.
 
 ## Les commits
 
@@ -126,8 +126,7 @@ Par ordre croissant de difficulté :
 |---|---|
 | Amendements de l'Assemblée, législatures XV à XVII | mécanique, 103 articles éligibles |
 | Les 172 couples à état unique de `sections_vers_motive` ([`docs/17`](docs/17-sections-appariees.md)) | charger d'autres états du texte |
-| Table de correspondance entre identifiants de texte des corpus d'amendements et `texte_discute.id` | sans elle, les amendements orphelins restent orphelins |
-| Rapprochement des études d'impact par **numéro de dépôt** de la chambre | DOLE ne suffit pas, et on sait pourquoi |
+| Les huit textes récents sans dossier DOLE, entrés par les incréments quotidiens | le critère `issu_de` du § 4.2 est repassé sous son seuil |
 | Tableaux de concordance des textes de transposition | seul chemin connu vers un lien européen au grain de l'article |
 | XIIIe législature, reconstructible page par page depuis Wayback | arbitrage coût / trou déclaré à rendre |
 

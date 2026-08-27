@@ -65,23 +65,24 @@ chaque régime, ce qu'un réutilisateur peut faire et à quelles conditions.
 
 **Le dépôt** ne versionne aucun corps de rapport. Il conserve l'URL, le hachage,
 les offsets, et des extraits plafonnés à **400 caractères** — constante
-`PLAFOND_EXTRAIT` dans `restitution/graphe.py`, respectée aussi par
-`restitution/note.py`. Un extrait attribué, daté, résolvable vers sa source par
-ses offsets est une citation, non une rediffusion.
+`PLAFOND_EXTRAIT` dans `restitution/citation.py`, respectée aussi par
+`restitution/graphe.py` et `restitution/note.py`. Un extrait attribué, daté,
+résolvable vers sa source par ses offsets est une citation, non une
+rediffusion.
 
 **Le dump ouvert** (`tools/diffusion/dump.py`) :
 
 - porte le graphe sous **Licence Ouverte / Etalab 2.0**, et le code sous
   **AGPL-3.0-or-later** ;
-- **ne rediffuse aucun corps de rapport** : les 221 documents gardent leur URL,
+- **ne rediffuse aucun corps de rapport** : les 252 documents gardent leur URL,
   leur hachage et leurs offsets, leur texte est remplacé par un avis **qui nomme
   le régime de la chambre concernée** ;
 - **conserve les fenêtres de preuve, ramenées à soixante caractères** — le
-  plancher que le schéma exige. Sans elles, 624 arêtes `motive` deviennent
+  plancher que le schéma exige. Sans elles, 684 arêtes `motive` deviennent
   inauditables, ce qu'interdit la règle § 5.1, *provenance ou silence*. Soixante
   caractères sont la preuve irréductible ; quatre cents seraient de l'extrait ;
 - offre l'arbitrage inverse sous l'option `--strict`, qui retire du dump les
-  rapports **et** les 624 arêtes qui en dépendent, puis recalcule le verdict pour
+  rapports **et** les 684 arêtes qui en dépendent, puis recalcule le verdict pour
   que la base reste cohérente avec elle-même.
 
 Cette position est plus prudente que ce que le Sénat exige et conforme à ce que

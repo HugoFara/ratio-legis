@@ -67,9 +67,18 @@ jamais été fait :
 | Critère § 4.2 | Seuil | Mesuré | |
 |---|---:|---:|---|
 | couverture `produite_par` | > 95 % | 2 081 / 2 104 — **98,9 %** | atteint |
-| couverture `issu_de` | > 90 % | 68 / 68 lois et ordonnances utiles — **100 %** | atteint, [`docs/20`](docs/20-dossiers-des-textes.md) |
-| couverture `resulte_de` | > 60 % | 79 / 832 — **9,5 %** | **non atteint**, décision go du § 8 rendue |
+| couverture `issu_de` | > 90 % | 66 / 74 lois et ordonnances utiles — **89,2 %** | **repassé sous le seuil**, [`docs/20`](docs/20-dossiers-des-textes.md) |
+| couverture `resulte_de` | > 60 % | 83 / 896 — **9,3 %** | **non atteint**, décision go du § 8 rendue |
 | **précision `resulte_de`** | **> 95 %** | 168 / 179 hors-échantillon — **93,9 %** | **non atteint**, et mesuré |
+
+Les trois couvertures sont re-mesurées sur la base d'aujourd'hui ; la clôture
+d'août 2026 et ses deux dérogations sont enregistrées au § 4.2 de la feuille de
+route, avec les valeurs d'alors. **`issu_de` y était à 68 / 68 et n'y est plus** :
+huit textes entrés depuis par les incréments quotidiens — de l'ordonnance du
+3 septembre 2025 à la loi du 18 août 2026 — produisent une version en vigueur
+sans qu'un dossier DOLE leur soit rattaché. Le fonds avance tous les jours, le
+corpus des dossiers ne suit pas tout seul, et c'est un critère de sortie qui le
+dit.
 
 **Toutes les arêtes `resulte_de` du graphe ont été examinées une à une** — 277
 sur 277, en trois tirages reproductibles. Aucune n'est inconnue, et quinze sont
@@ -200,8 +209,12 @@ numéro d'aujourd'hui, et 806 dès qu'on remonte aux numéros d'avant 2016.
 | 21. Parties R et D | le périmètre couvre les trois parties ; le silence réglementaire n'en venait pas | [`docs/27`](docs/27-parties-r-et-d.md) |
 | 22. Classement intra-document | classer sans rattacher, quand aucune arête ne désigne le passage | [`docs/28`](docs/28-classement-intra-document.md) |
 | 23. Retentissement | « si je modifie cet article, qu'est-ce qui bouge », en produit à part | [`docs/29`](docs/29-retentissement.md) |
-| 24. Hôte du code cité | un code nommé dans une citation ne déclare pas ce que le texte modifie | [`docs/34`](docs/34-hote-du-code-cite.md) |
-| 25. `depose_sur` re-mesuré | une garde devenue fabricante d'unicité, et un numéro de subdivision lu en entier | [`docs/35`](docs/35-depose-sur-apres-la-reparation.md) |
+| 24. Sort des amendements | huit familles comparables, et l'irrecevabilité lue là où la chambre l'écrit | [`docs/30`](docs/30-sort-des-amendements.md) |
+| 25. Correspondance des textes | apparier les identifiants de texte des deux corpus, et mesurer leur plafond | [`docs/31`](docs/31-correspondance-des-textes.md) |
+| 26. Textes déposés de l'Assemblée | charger par le numéro de dépôt que le rapport déclare, faute de lien DOLE | [`docs/32`](docs/32-textes-deposes-assemblee.md) |
+| 27. Article écrit dans la citation | l'en-tête d'un alinéa cité désigne l'article qu'on écrit, non du droit existant | [`docs/33`](docs/33-article-ecrit-dans-la-citation.md) |
+| 28. Hôte du code cité | un code nommé dans une citation ne déclare pas ce que le texte modifie | [`docs/34`](docs/34-hote-du-code-cite.md) |
+| 29. `depose_sur` re-mesuré | une garde devenue fabricante d'unicité, et un numéro de subdivision lu en entier | [`docs/35`](docs/35-depose-sur-apres-la-reparation.md) |
 
 ### Tenir à jour
 
@@ -423,15 +436,17 @@ articles en vigueur savent désormais sous quel article de quel texte ils ont é
 discutés ([`docs/16`](docs/16-textes-discutes.md)). En revanche, **aucun des
 dossiers ayant une étude d'impact n'a de texte déposé dans le corpus** : DOLE ne
 lie le texte déposé que pour les propositions de loi, qui n'ont jamais d'étude
-d'impact. Le rapprochement de l'étude d'impact reste donc à faire, et il passera
-par le numéro de dépôt de la chambre, non par DOLE.
+d'impact. ~~Le rapprochement de l'étude d'impact reste donc à faire, et il
+passera par le numéro de dépôt de la chambre, non par DOLE.~~ **Fait**, par ce
+chemin exactement : c'est l'objet des deux paragraphes suivants.
 
 **La table de correspondance des identifiants de texte est écrite, et elle ne
 rattrape pas les amendements orphelins.** C'était l'hypothèse ; elle est fausse.
 106 jeux d'amendements sur 114 sont appariés à leur texte — identité de document,
 pas rapprochement, contrôlée par la concordance du dossier et par la plage
-d'articles (98,0 %). Ce qu'elle révèle est ailleurs : sur les amendements des
-jeux appariés, **7 790 portent sur un article additionnel**. Ils ne visent aucun
+d'articles (4 368 / 4 449, 98,2 %). Ce qu'elle révèle est ailleurs : sur les
+amendements des jeux appariés, **7 790 portent sur un article additionnel**. Ils
+ne visent aucun
 article existant du code parce qu'ils en créent un, dont le numéro ne sera fixé
 qu'à la codification. Aucune table ne peut leur donner une cible.
 [`docs/31`](docs/31-correspondance-des-textes.md).
