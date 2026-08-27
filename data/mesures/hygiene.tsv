@@ -5,9 +5,9 @@ verdict	partie D — origine située seulement	0	179	0.0
 verdict	partie D — motivation du texte seule	11	179	6.1	
 verdict	partie D — RAISON NON DOCUMENTÉE	167	179	93.3	
 verdict	partie L — articles en vigueur	1293			
-verdict	partie L — un passage les motive	756	1293	58.5	
-verdict	partie L — origine située seulement	199	1293	15.4	
-verdict	partie L — motivation du texte seule	333	1293	25.8	
+verdict	partie L — un passage les motive	796	1293	61.6	
+verdict	partie L — origine située seulement	216	1293	16.7	
+verdict	partie L — motivation du texte seule	276	1293	21.3	
 verdict	partie L — RAISON NON DOCUMENTÉE	5	1293	0.4	
 verdict	partie R — articles en vigueur	632			
 verdict	partie R — un passage les motive	44	632	7.0	

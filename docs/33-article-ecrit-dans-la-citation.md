@@ -175,6 +175,10 @@ d'avoir produit l'article ; un article créé puis abrogé avant la promulgation
 renuméroté entre-temps, y échoue sans être faux. C'est le prix de la règle § 5.3,
 et il est chiffré plutôt que supposé.
 
+*(Addendum du 26 août 2026 : elle l'est dans [`docs/34`](34-hote-du-code-cite.md).
+La cause était qu'un code nommé dans une citation était retenu comme déclaration
+d'hôte ; le paragraphe qui suit reste vrai de l'état où cette tranche s'est arrêtée.)*
+
 **La règle du code hôte n'est pas corrigée.** Elle reste ce qu'elle est, et la
 garde protège la voie nouvelle sans réparer l'ancienne — même constat que
 `docs/31` § 7. Le corriger demande de re-mesurer la onzième tranche.

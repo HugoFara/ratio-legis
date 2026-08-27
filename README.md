@@ -95,21 +95,21 @@ compteurs.
 ### Ce que la base contient
 
 Reconstruite d'une commande depuis le miroir et les plans versionnés
-(`pipeline.sh`), 262 Mo, zéro violation d'intégrité.
+(`pipeline.sh`), 271 Mo, zéro violation d'intégrité.
 
 | Nœuds | | Arêtes | |
 |---|---:|---|---:|
 | Articles (dont **2 104 en vigueur**) | 3 464 | `produite_par` — quel texte a produit la version | 8 145 |
 | Versions d'articles | 6 362 | `repris_de` — continuité d'un alinéa par-delà la recodification | 6 137 |
 | **Segments (alinéas)** | **28 294** | `renumerote_de` | 1 882 |
-| Documents (rapports, exposés, études d'impact, avis) | 372 | `motive` — un passage qui motive, avec offsets | 686 |
+| Documents (rapports, exposés, études d'impact, avis) | 372 | `motive` — un passage qui motive, avec offsets | 734 |
 | Amendements (22 102 Sénat, 11 115 Assemblée) | 33 217 | `renvoie_a` — le graphe de renvois | 12 534 |
 | Acteurs | 1 478 | `resulte_de` — l'amendement qui a écrit l'alinéa | 279 |
 | **Actes de l'Union** | **284** | `cite_acte_ue` / `transpose` | 1 572 / 8 |
 | **Considérants de l'Union** | **7 674** | `article_acte_ue` — articles d'actes déclarés | 6 237 |
-| **Textes en discussion** | **424** | **`porte_sur`** — l'article du texte → l'article du code | **43 786** |
+| **Textes en discussion** | **424** | **`porte_sur`** — l'article du texte → l'article du code | **44 032** |
 | **Sorts d'amendements, en huit familles** | **33 217** | **`vise`** — l'amendement qui visait l'article, abouti ou non | **276** |
-| Correspondances de texte entre les deux corpus | 106 | **`depose_sur`** — l'article du code réécrit par l'article du texte sur lequel l'amendement fut déposé | **874** |
+| Correspondances de texte entre les deux corpus | 106 | **`depose_sur`** — l'article du code réécrit par l'article du texte sur lequel l'amendement fut déposé | **906** |
 
 Ce que cela donne au grain de l'article en vigueur, qui est le seul grain qui
 compte pour le produit :
@@ -123,7 +123,7 @@ des motifs, ni débat, ni amendement.
 
 | partie | articles | un passage les motive | origine située | motivation du texte | **raison non documentée** |
 |---|---:|---:|---:|---:|---:|
-| **L** | 1 293 | 756 (58,5 %) | 199 | 333 | **5 (0,4 %)** |
+| **L** | 1 293 | 796 (61,6 %) | 216 | 276 | **5 (0,4 %)** |
 | **R** | 632 | 44 | 14 | 47 | **527 (83,4 %)** |
 | **D** | 179 | 1 | 0 | 11 | **167 (93,3 %)** |
 
@@ -147,8 +147,8 @@ métriques : [`data/mesures/hygiene.tsv`](data/mesures/hygiene.tsv).
 
 | | |
 |---|---:|
-| **Articles remontant à un passage qui les motive** | **701 (33,3 %)** |
-| Articles reliés à un article de texte en discussion | 812 (38,6 %) |
+| **Articles remontant à un passage qui les motive** | **806 (38,3 %)** |
+| Articles reliés à un article de texte en discussion | 1 066 (50,7 %) |
 | Articles nommant un acte de l'Union | 117 |
 | Articles remontant à un amendement identifié | 83 |
 | Articles cités par un autre article du fonds | 1 039 (49,4 %) |
@@ -169,8 +169,8 @@ faute de l'autre :
 | Articles atteignant une transposition déclarée | 60 |
 
 Tous ces comptes suivent la **chaîne de renumérotation**. Un compteur qui ne le
-dit pas est ininterprétable sur ce corpus : `motive` couvre 84 articles par leur
-numéro d'aujourd'hui, et 701 dès qu'on remonte aux numéros d'avant 2016.
+dit pas est ininterprétable sur ce corpus : `motive` couvre 109 articles par leur
+numéro d'aujourd'hui, et 806 dès qu'on remonte aux numéros d'avant 2016.
 
 ### Les tranches
 
@@ -200,6 +200,7 @@ numéro d'aujourd'hui, et 701 dès qu'on remonte aux numéros d'avant 2016.
 | 21. Parties R et D | le périmètre couvre les trois parties ; le silence réglementaire n'en venait pas | [`docs/27`](docs/27-parties-r-et-d.md) |
 | 22. Classement intra-document | classer sans rattacher, quand aucune arête ne désigne le passage | [`docs/28`](docs/28-classement-intra-document.md) |
 | 23. Retentissement | « si je modifie cet article, qu'est-ce qui bouge », en produit à part | [`docs/29`](docs/29-retentissement.md) |
+| 24. Hôte du code cité | un code nommé dans une citation ne déclare pas ce que le texte modifie | [`docs/34`](docs/34-hote-du-code-cite.md) |
 
 ### Tenir à jour
 
@@ -463,6 +464,21 @@ articles de texte des dossiers ayant une étude d'impact, 220 seulement touchent
 code. [`docs/32`](docs/32-textes-deposes-assemblee.md),
 [`docs/33`](docs/33-article-ecrit-dans-la-citation.md).
 
+**Le code hôte est réparé à la source, et il rapportait surtout du rappel.** Deux
+contrôles à la main avaient trouvé la même cause à un mois d'intervalle — un code
+nommé **dans une citation** gouvernait tout ce qui suivait, alors qu'il n'est
+qu'un morceau des mots insérés — et chaque fois la garde avait protégé l'arête
+nouvelle sans réparer l'ancienne. La règle du § 4 de [`docs/16`](docs/16-textes-discutes.md),
+« le texte cité n'est pas le texte qui cite », est désormais appliquée aux noms de
+code comme elle l'était aux références. Sur la population qu'elle touche, mesurée
+avant correction : **8 arêtes justes sur 15**. Après : 58 arêtes internes s'en
+vont, **1 817 arrivent** — la dérive coûtait trente fois plus en rappel qu'en
+précision, et cela ne se voyait pas, parce qu'une arête `externe` sort du produit
+sans bruit. Les articles en vigueur reliés à un article de texte passent de 964 à
+**1 066**, ceux qu'un passage motive de 701 à **806**, et les deux précisions sont
+re-mesurées sur pièces neuves — 20/20 et 15/15, mêmes bornes qu'avant, sur une
+population qui, elle, a changé. [`docs/34`](docs/34-hote-du-code-cite.md).
+
 **Trous de couverture dans ce qui existe.** Les amendements de l'Assemblée pour
 les législatures XV à XVII (103 articles éligibles, mécanique). La XIIIe, jamais
 publiée en open data, reconstructible seulement page par page depuis Wayback —
@@ -496,7 +512,7 @@ python3 tools/diffusion/dump.py travail/ratio-legis.sqlite data/diffusion
 python3 tools/diffusion/dump.py travail/ratio-legis.sqlite data/diffusion --strict
 ```
 
-126 Mo, plus les mêmes arêtes en TSV, un dictionnaire des tables et un manifeste
+141 Mo, plus les mêmes arêtes en TSV, un dictionnaire des tables et un manifeste
 haché. Le **texte des 252 rapports de commission n'y est pas** : leur régime de
 réutilisation n'est pas confirmé par les assemblées. URL, hachage et offsets
 restent, ce qui suffit à refaire le lien depuis la source ; les fenêtres de preuve

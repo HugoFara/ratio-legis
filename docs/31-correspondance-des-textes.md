@@ -159,6 +159,10 @@ réel et il est nommé ; le corriger touche 30 337 lignes et demande de re-mesur
 la précision de la onzième tranche. La garde protège l'arête nouvelle, elle ne
 répare pas l'ancienne.
 
+*(Addendum du 26 août 2026 : le défaut d'hôte du § 4 est corrigé à la source dans
+[`docs/34`](34-hote-du-code-cite.md) ; la garde locale décrite ici fait depuis, pour
+l'essentiel, double emploi.)*
+
 **Elle n'atteint pas les 21 jeux non appariés.** Il leur manque un document dans
 le corpus, non une règle d'appariement. Charger les textes déposés de l'Assemblée
 par le numéro de dépôt de la chambre — et non par DOLE, qui ne les lie pas — reste

@@ -160,5 +160,10 @@ prétendue.
 404 sur ses pages `publication_pl` ; le service a été retiré. Les mêmes textes
 existent peut-être sous une autre adresse au Sénat — non cherché.
 
+**Le code hôte pouvait dériver, et la mesure de ce § 4 ne le voyait pas.** Un
+code nommé *dans une citation* gouvernait tout ce qui suivait. Le tirage de vingt
+portait sur la population entière, où cette cellule pèse 6,8 % : l'erreur n'y
+apparaît pas. Réparé et re-mesuré dans [`docs/34`](34-hote-du-code-cite.md).
+
 **Les plages ne sont pas dépliées.** « Les articles L. 521-1 à L. 521-5 sont ainsi
 rédigés » ne produit que L. 521-1 et L. 521-5, pas les trois du milieu.

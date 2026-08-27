@@ -22,6 +22,12 @@ article aurait perdu tout ce qui suit la première mention, sans rien signaler.
 référence ; « Dans le même code, les articles L. 521-1 à L. 521-5 » la nomme
 avant. Les deux formes coexistent dans la même page.
 
+**Un code nommé dans une citation ne déclare pas l'hôte.** C'est la règle du
+§ 4 de `docs/16` — « le texte cité n'est pas le texte qui cite » — appliquée aux
+noms de code comme elle l'était aux références. Sans elle, « sont insérés les mots :
+« … mentionnées à l'article L. 121-16 du code de la consommation » » faisait
+basculer dans ce code tout ce que le dispositif modifiait ensuite (`docs/34`).
+
 **Aucune référence n'est attribuée par défaut.** Contrairement à `renvoie_a`, où
 une référence sans code nommé vise le code courant — parce qu'on lit un article de
 ce code —, un texte en discussion peut modifier n'importe quel code, et en
@@ -173,11 +179,29 @@ def numero(m: re.Match) -> str:
                                                        else "")
 
 
-def mentions_de_code(texte: str) -> list[tuple[int, str]]:
-    """Positions et noms des codes nommés, « du même code » résolu au précédent.
+def mentions_de_code(texte: str, debuts: list[int]) -> list[tuple[int, str]]:
+    """Positions et noms des codes **déclarés**, « du même code » résolu au précédent.
 
     Le report se fait sur le texte entier : c'est la convention légistique, et la
     restreindre à l'article courant perdrait tout ce qui suit la première mention.
+
+    **Un code nommé dans un passage cité ne déclare pas l'hôte.** C'est la règle
+    du § 4 de `docs/16` — « le texte cité n'est pas le texte qui cite » — qui
+    n'avait été appliquée qu'aux références, jamais aux codes, et l'oubli
+    produisait précisément les rattachements que deux contrôles à la main ont
+    trouvés faux (`docs/31` § 4, `docs/33` § 3) :
+
+    > Au 1° du I de l'article L. 310-3 **du code de commerce**, après les mots :
+    > « pour ces deux périodes, », sont insérés les mots : « et pour les ventes
+    > autres que celles mentionnées à l'article L. 121-16 **du code de la
+    > consommation** ».
+
+    Le code que ce dispositif modifie est le premier ; le second est un morceau
+    des mots insérés. Retenu comme dernière mention, il faisait basculer dans le
+    code de la consommation tout ce qui suivait — « Le chapitre II du titre II du
+    livre V **du même code** », c'est-à-dire les magasins généraux du code de
+    commerce. Sur quinze arêtes tirées de la population que cette dérive touche,
+    sept étaient fausses, et les sept prennent leur hôte dans une citation.
     """
     reperes: list[tuple[int, str]] = []
     evenements = [(m.start(), REPRISE.split(m.group(1))[0].strip().lower())
@@ -185,6 +209,8 @@ def mentions_de_code(texte: str) -> list[tuple[int, str]]:
     evenements += [(m.start(), None) for m in MEME_CODE.finditer(texte)]
     dernier = None
     for position, nom in sorted(evenements):
+        if dans_une_citation(texte, debuts, position):
+            continue
         if nom is not None:
             dernier = nom
         if dernier is not None:
@@ -259,9 +285,22 @@ def est_une_cible(texte: str, debut: int, fin: int) -> bool:
     return bool(ACTION.search(texte, fin, limite))
 
 
-def fenetre(texte: str, debut: int, fin: int) -> str | None:
+def bornes(texte: str, debut: int, fin: int) -> tuple[int, int]:
+    """Bornes de la fenêtre de preuve autour d'une référence.
+
+    Séparées de `fenetre` parce que la garde d'hôte s'y adosse : le code est dit
+    **nommé** quand sa mention tombe dans cette fenêtre, **supposé** quand elle
+    est plus loin. La preuve stockée et la garde regardent ainsi exactement le
+    même passage — une garde qui jugerait sur plus que ce que la preuve montre
+    ne serait pas vérifiable.
+    """
     marge = max(0, (200 - (fin - debut)) // 2)
-    extrait = re.sub(r"\s+", " ", texte[max(0, debut - marge):fin + marge]).strip()
+    return max(0, debut - marge), fin + marge
+
+
+def fenetre(texte: str, debut: int, fin: int) -> str | None:
+    gauche, droite = bornes(texte, debut, fin)
+    extrait = re.sub(r"\s+", " ", texte[gauche:droite]).strip()
     return extrait if len(extrait) >= FENETRE_MINI else None
 
 
@@ -318,9 +357,9 @@ def main() -> None:
             compte["hors_perimetre"] += 1
             continue
         contenu = texte_brut(fichier)
-        reperes = mentions_de_code(contenu)
         decoupe = articles_du_texte(contenu)
         debuts = index_des_lignes(contenu)
+        reperes = mentions_de_code(contenu, debuts)
         identifiant = f"{ligne['chambre']}/{ligne['fichier']}"
         textes.append((identifiant, ligne["dossier"], ligne["chambre"],
                        ligne["stade"], ligne["url"], len(decoupe)))
@@ -362,7 +401,16 @@ def main() -> None:
             # l'instruction est mieux établie que la même relevée dans la
             # citation, et ne doit pas être comptée deux fois.
             for creation in ARTICLE_CREE.finditer(contenu, debut, fin):
-                cle = numero(creation)
+                # « Art. L. 120-1 A » n'est pas l'article L. 120-1. La lettre
+                # fait partie du numéro, et le fonds n'en porte aucune : le
+                # numéro suffixé ne se résout pas, l'arête reste `non_resolue`
+                # au lieu de tomber sur l'article voisin. Trois arêtes, toutes
+                # sur la vente en vrac, et toutes fausses sans cette lecture.
+                # Dans un en-tête d'alinéa cité la lettre est sans ambiguïté —
+                # aucun « à » ne suit un numéro d'article à cet endroit.
+                lettre = re.match(r"\s+([A-H]{1,2})\b", contenu[creation.end():
+                                                                creation.end() + 6])
+                cle = numero(creation) + (f" {lettre.group(1)}" if lettre else "")
                 if (article_du_texte, cle) in vus:
                     compte["cree_deja_declare"] += 1
                     continue
