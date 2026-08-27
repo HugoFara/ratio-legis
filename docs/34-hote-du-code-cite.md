@@ -166,6 +166,10 @@ en a pas, elle rattache mieux celle qui existe.
 
 ## 8. Ce que la tranche ne fait pas
 
+*(Addendum du 27 août 2026 : la garde de `docs/31` est retirée dans
+[`docs/35`](35-depose-sur-apres-la-reparation.md), et le raisonnement ci-dessous
+était incomplet — elle ne coûtait pas du rappel, elle fabriquait de l'unicité.)*
+
 **Elle ne relâche pas les deux gardes locales, qui coûtent maintenant plus
 qu'elles ne rapportent.** La garde de `docs/31` — la fenêtre de preuve doit nommer
 le code — écartait 1 398 cibles ; elle en écarte **3 823** maintenant que

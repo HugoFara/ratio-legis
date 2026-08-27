@@ -47,7 +47,7 @@ Le **texte** des rapports de commission n'est pas rediffusé : les conditions pu
 | `motive` | 734 | document → article ou segment que l'un de ses passages explique |
 | `porte_sur` | 44032 | article d'un texte discuté → article du code qu'il modifie |
 | `vise` | 276 | amendement → article du code que son dispositif désigne |
-| `depose_sur` | 906 | amendement → article du code réécrit par l'article du texte sur lequel il fut déposé, quand cet article du texte n'en réécrit qu'un |
+| `depose_sur` | 476 | amendement → article du code réécrit par l'article du texte sur lequel il fut déposé, quand cet article du texte n'en réécrit qu'un |
 | `texte_des_amendements` | 106 | la correspondance entre l'identifiant de texte du corpus d'amendements et celui du texte en discussion |
 | `sort_amendement` | 33217 | le sort d'un amendement, ramené à huit familles comparables, avec le libellé publié et la colonne d'où il est lu |
 | `renvoie_a` | 12534 | segment → article cité, interne ou externe au code |

@@ -58,8 +58,15 @@ from pathlib import Path
 
 import fitz          # pymupdf
 
+# La série latine va plus loin que « duodecies », et un rang manquant ne se
+# rattrape pas : « Article 17 quindecies » n'est alors pas reconnu comme en-tête,
+# et **son contenu est rattaché à l'article précédent** — le défaut que le
+# commentaire ci-dessous nomme comme le pire possible. 39 en-têtes du corpus
+# étaient dans ce cas. Les rangs composés d'un rang listé — « terdecies » se lit
+# « ter » puis « decies » — n'ont pas besoin d'entrée propre ; les autres si.
 ORDINAL = (r"(?:er|bis|ter|quater|quinquies|sexies|septies|octies|nonies|decies"
-           r"|undecies|duodecies)")
+           r"|undecies|duodecies|quindecies|sexdecies|septdecies|octodecies"
+           r"|novodecies|vicies|unvicies|duovicies|tervicies)")
 # L'en-tête peut porter deux lettres — « Article 4 bis BB » — et une mention de
 # navette entre parenthèses — « Article 18 B (nouveau) », « Article 27 quater
 # (Non modifié) ». Une première version n'admettait ni l'une ni l'autre : les

@@ -24,7 +24,8 @@ l'écran, comme l'exige la règle § 5.4 :
   graphe (`docs/10` § 3).
 - `subdivision déposée` — l'amendement a été discuté sur l'article du texte qui a
   réécrit celui-ci, et cet article du texte n'en a réécrit aucun autre.
-  Confiance 0,7961 (`docs/31`). Elle ne dit pas que l'amendement visait cet
+  Confiance 0,7961 (`docs/31`, re-mesurée par `docs/35`). Elle ne dit pas que
+  l'amendement visait cet
   article : un amendement se dépose sur un article de projet de loi, et ce qu'il
   y propose peut concerner tout autre chose. C'est une position, pas une cible,
   et le libellé à l'écran le dit ainsi.

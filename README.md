@@ -109,7 +109,7 @@ Reconstruite d'une commande depuis le miroir et les plans versionnés
 | **Considérants de l'Union** | **7 674** | `article_acte_ue` — articles d'actes déclarés | 6 237 |
 | **Textes en discussion** | **424** | **`porte_sur`** — l'article du texte → l'article du code | **44 032** |
 | **Sorts d'amendements, en huit familles** | **33 217** | **`vise`** — l'amendement qui visait l'article, abouti ou non | **276** |
-| Correspondances de texte entre les deux corpus | 106 | **`depose_sur`** — l'article du code réécrit par l'article du texte sur lequel l'amendement fut déposé | **906** |
+| Correspondances de texte entre les deux corpus | 106 | **`depose_sur`** — l'article du code réécrit par l'article du texte sur lequel l'amendement fut déposé | **476** |
 
 Ce que cela donne au grain de l'article en vigueur, qui est le seul grain qui
 compte pour le produit :
@@ -201,6 +201,7 @@ numéro d'aujourd'hui, et 806 dès qu'on remonte aux numéros d'avant 2016.
 | 22. Classement intra-document | classer sans rattacher, quand aucune arête ne désigne le passage | [`docs/28`](docs/28-classement-intra-document.md) |
 | 23. Retentissement | « si je modifie cet article, qu'est-ce qui bouge », en produit à part | [`docs/29`](docs/29-retentissement.md) |
 | 24. Hôte du code cité | un code nommé dans une citation ne déclare pas ce que le texte modifie | [`docs/34`](docs/34-hote-du-code-cite.md) |
+| 25. `depose_sur` re-mesuré | une garde devenue fabricante d'unicité, et un numéro de subdivision lu en entier | [`docs/35`](docs/35-depose-sur-apres-la-reparation.md) |
 
 ### Tenir à jour
 
@@ -479,6 +480,20 @@ sans bruit. Les articles en vigueur reliés à un article de texte passent de 96
 re-mesurées sur pièces neuves — 20/20 et 15/15, mêmes bornes qu'avant, sur une
 population qui, elle, a changé. [`docs/34`](docs/34-hote-du-code-cite.md).
 
+**Réparer un maillon oblige à re-mesurer ce qui repose dessus.** `depose_sur`
+compose deux liens de `porte_sur` ; sa confiance, écrite en constante et mesurée
+à 15/15 par `docs/31`, ne s'est pas mise à jour toute seule quand la population
+sous elle a changé. **Sa précision réelle était tombée à 3 sur 15.** La garde qui
+la protégeait — la fenêtre de preuve doit nommer le code — n'avait plus de fausses
+cibles à retirer : elle retirait des cibles vraies, et faisait ainsi passer pour
+unique un article de texte qui en réécrit douze. 501 des 906 arêtes en venaient,
+et leur accord avec la cible que l'amendement déclare lui-même tombait à 2 sur 17,
+contre 12 sur 15 pour les arêtes légitimes. La garde est retirée, le numéro de
+subdivision est enfin lu en entier — « Article 60 bis A » n'est pas l'article
+60 bis, « Article 5 sexdecies » n'est pas l'article 5 —, et l'arête vaut de
+nouveau **15 sur 15**, pour 476 arêtes au lieu de 906 et **deux articles en
+vigueur de plus**. [`docs/35`](docs/35-depose-sur-apres-la-reparation.md).
+
 **Trous de couverture dans ce qui existe.** Les amendements de l'Assemblée pour
 les législatures XV à XVII (103 articles éligibles, mécanique). La XIIIe, jamais
 publiée en open data, reconstructible seulement page par page depuis Wayback —
@@ -608,14 +623,18 @@ Sur les 2 182 amendements écartés sans discussion : **905 au titre de l'articl
 de la règle de l'entonnoir, 93 comme relevant du décret.
 
 Au grain de l'article en vigueur, **165 articles sur 2 104 portent au moins une
-tentative** — 689 tentatives rendues, dont 460 non abouties. Les jeux
+tentative** — 457 tentatives rendues, dont 254 non abouties. Les jeux
 d'amendements de l'Assemblée sont appariés à leur texte **39 sur 39**.
 
 Trois voies de rattachement, jamais confondues : l'**alinéa écrit** (`resulte_de`,
 confiance 0,893), la **cible déclarée** par le dispositif (`vise`, 0,621), la
 seule ouverte à un amendement rejeté, et la **subdivision déposée** (`depose_sur`,
 0,796) — l'amendement fut discuté sur l'article du texte qui a réécrit celui-ci,
-et cet article du texte n'en a réécrit aucun autre. Le sort est nommé, jamais
+et cet article du texte n'en a réécrit aucun autre. Cette dernière a été
+**re-mesurée après la réparation de son maillon** : la garde qui la protégeait
+était devenue une fabrique d'unicité, sa précision réelle était tombée à 3 sur 15,
+et elle est revenue à 15 sur 15 pour 476 arêtes au lieu de 906
+([`docs/35`](docs/35-depose-sur-apres-la-reparation.md)). Le sort est nommé, jamais
 interprété : « retiré » ne dit pas si l'auteur a cédé ou obtenu satisfaction, et
 cela se lit dans le compte rendu de séance, que le graphe ne contient pas.
 [`docs/30`](docs/30-sort-des-amendements.md),

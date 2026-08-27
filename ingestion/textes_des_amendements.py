@@ -79,9 +79,25 @@ AMENDEMENT_AN = re.compile(r"^B(?:TC)?(\d+)/")
 # Le Sénat écrit « Article 12 », l'Assemblée « ART. 12 » ; les deux écrivent
 # « premier » pour 1. Le suffixe latin fait partie du numéro : l'article 19 octies
 # n'est pas l'article 19.
+#
+# **La lettre aussi.** « Article 60 bis A », « ART. 18 D » : la navette insère des
+# articles nouveaux et les distingue par une lettre, exactement comme `ENTETE` le
+# lit du côté du texte depuis la onzième tranche. Sans elle, l'amendement déposé
+# sur l'article 60 bis A était rattaché à l'article 60 bis — un autre article, un
+# autre objet. Trois arêtes sur quinze tirées au sort en venaient ; 1 230
+# subdivisions portent une lettre, et 454 articles de texte en portent une dans
+# `porte_sur`, ce qui est le même besoin vu des deux bouts.
+#
+# **Et la série latine va au-delà de « decies ».** « Article 5 sexdecies » était
+# lu « article 5 » : la quinzième arête du tirage de la vingt-neuvième tranche,
+# fausse pour cette seule raison. Les rangs composés — « terdecies » = « ter » +
+# « decies » — se lisaient déjà ; les autres non.
 SUBDIVISION = re.compile(
     r"\bart(?:icle)?\.?\s+(premier|1er|\d+)\s*"
-    r"(bis|ter|quater|quinquies|sexies|septies|octies|nonies|decies)?", re.I)
+    r"(bis|ter|quater|quinquies|sexies|septies|octies|nonies|decies"
+    r"|undecies|duodecies|quindecies|sexdecies|septdecies|octodecies"
+    r"|novodecies|vicies|unvicies|duovicies|tervicies)?"
+    r"(?:\s*([A-H]{1,2})\b)?", re.I)
 # « art. add. après Article 19 » ne vise pas l'article 19. L'amendement demande la
 # création d'un article qui n'existe pas encore, dont le numéro dans le code n'est
 # pas fixé et ne le sera qu'à la codification. La subdivision ne dit alors rien du
@@ -91,13 +107,18 @@ ARTICLE_ADDITIONNEL = re.compile(
     re.I)
 
 # Borne inférieure de Wilson à 95 % pour 15 arêtes justes sur 15 vérifiées à la
-# main, tirées après la garde et disjointes de l'échantillon qui a servi à la
-# concevoir. Le premier tirage, sur le graphe d'avant la garde, donnait 13/15 —
-# ses deux erreurs sont celles que la garde retire.
+# main sur le graphe d'aujourd'hui — hôte réparé (`docs/34`), garde retirée,
+# subdivision lue en entier. Tirage disjoint de celui qui a servi à décider.
+#
+# La valeur est celle que portait déjà `docs/31` § 4, et elle ne décrit plus la
+# même arête : entre les deux, la réparation de `porte_sur` avait fait tomber la
+# précision réelle à 3 sur 15 sans que rien ne le signale (`docs/35` § 3). Une
+# confiance écrite en constante ne se surveille pas toute seule ; celle-ci est
+# désormais adossée à une fiche rejouable,
+# `data/mesures/precision-depose-sur.tsv`.
 #
 # Ce n'est pas la confiance de `porte_sur` (0,8389) reprise telle quelle : une
-# chaîne de deux liens ne vaut pas son maillon le plus fort, et le mesurer était
-# moins cher que d'en discuter. Voir `docs/31` § 4.
+# chaîne de deux liens ne vaut pas son maillon le plus fort.
 CONFIANCE = 0.7961
 
 
@@ -107,7 +128,8 @@ def numero_de_subdivision(subdivision: str | None) -> str | None:
         return None
     tete = trouve.group(1).lower()
     tete = "1er" if tete in ("premier", "1er") else tete
-    return tete + (" " + trouve.group(2).lower() if trouve.group(2) else "")
+    return tete + "".join(" " + partie.lower() for partie in trouve.groups()[1:]
+                          if partie)
 
 
 def tete_numerique(numero: str) -> int | None:
@@ -160,28 +182,25 @@ def construire(base: sqlite3.Connection, schema: Path) -> dict:
     base.executescript(schema.read_text(encoding="utf-8"))
     compte: dict[str, int] = defaultdict(int)
 
-    # `porte_sur` retient une convention légistique : quand un dispositif ne nomme
-    # aucun code, il modifie le sien. Elle vaut pour ce qu'elle mesure — `docs/16`
-    # § 4 la donne à 20/20 — et elle ne supporte pas d'être composée. Un contrôle
-    # à la main sur quinze arêtes en a donné deux fausses, toutes deux de la même
-    # cause : « Le code de la propriété intellectuelle est ainsi modifié : … 9°
-    # L'article L. 722-1 est complété », où l'hôte est déclaré une seule fois en
-    # tête du bloc, hors de la fenêtre de preuve du 9°.
+    # **La garde d'hôte est retirée, et ce n'est pas un relâchement.** Elle
+    # existait parce que `porte_sur` attribuait le code hôte à des références
+    # qu'il ne gouvernait pas : exiger que la fenêtre de preuve nomme le code
+    # écartait les fausses. Ce défaut est corrigé à la source (`docs/34`) — un
+    # code nommé dans une citation ne déclare plus l'hôte —, et la garde n'a
+    # donc plus de fausses à retirer. Ce qu'elle retirait ensuite, ce sont des
+    # cibles **vraies**, et l'effet était pire que le mal : en retranchant des
+    # cibles d'un article de texte qui en réécrit plusieurs, elle le faisait
+    # passer pour n'en réécrire qu'un, et fabriquait ainsi l'unicité que la
+    # règle ci-dessous exige.
     #
-    # La garde ne devine pas : elle exige que **la fenêtre de preuve nomme le code
-    # de la consommation**, au lieu de se contenter de l'avoir supposé. Elle coûte
-    # 1 398 cibles, et c'est le prix de la règle § 5.3 ; elle en libère aussi, un
-# article de texte qui semblait en réécrire plusieurs n'en réécrivant plus
-# qu'un une fois les cibles supposées retirées.
-    CODE = "consommation"
+    # Mesuré : sur quinze arêtes tirées du graphe encore gardé, **501 des 906**
+    # reposaient sur un article de texte à cibles multiples, et l'accord avec la
+    # cible que l'amendement déclare lui-même tombait à 2 sur 17 — contre 12 sur
+    # 15 pour les articles à cible unique. Voir `docs/35` § 3.
     cibles: dict[tuple[str, str], set[int]] = defaultdict(set)
-    for texte_id, article_du_texte, article_id, fenetre in base.execute(
-            "SELECT p.texte_id, lower(p.article_du_texte), p.article_id, pr.fenetre "
-            "FROM porte_sur p LEFT JOIN preuve pr ON pr.id = p.preuve_id "
-            "WHERE p.portee = 'interne'"):
-        if CODE not in (fenetre or "").lower():
-            compte["hote_suppose_non_nomme"] += 1
-            continue
+    for texte_id, article_du_texte, article_id in base.execute(
+            "SELECT texte_id, lower(article_du_texte), article_id "
+            "FROM porte_sur WHERE portee = 'interne'"):
         cibles[(texte_id, article_du_texte)].add(article_id)
 
     lignes, aretes = [], []
@@ -261,8 +280,6 @@ def main() -> None:
           f"{compte['subdivision_sans_cible_dans_le_code']}")
     print(f"  l'article du texte en modifie plusieurs              : "
           f"{compte['cible_non_unique']}")
-    print(f"  cible écartée, code hôte supposé et non nommé        : "
-          f"{compte['hote_suppose_non_nomme']}")
     print(f"  subdivision illisible                                : "
           f"{compte['subdivision_illisible']}")
 
