@@ -119,7 +119,16 @@ ARTICLE_ADDITIONNEL = re.compile(
 #
 # Ce n'est pas la confiance de `porte_sur` (0,8389) reprise telle quelle : une
 # chaîne de deux liens ne vaut pas son maillon le plus fort.
-CONFIANCE = 0.7961
+#
+# Re-mesurée le 19 septembre 2026 par deux juges indépendants sur quinze arêtes
+# de la population d'aujourd'hui — cibles comptées dans tous les codes — :
+# **7 justes sur 15**, Wilson 0,2481 (`precision-depose-sur-cibles-tous-codes.tsv`,
+# `docs/41`). La composition est formellement exacte bien plus souvent que
+# cela ; ce qui tombe, c'est ce que l'arête prétend : « l'amendement portait sur
+# cet article ». Un amendement déposé sur l'article 18 du texte peut ne toucher
+# que le code monétaire, et l'arête le rattache à L. 311-8-1. La confiance
+# porte la mesure, pas la définition.
+CONFIANCE = 0.2481
 
 
 def numero_de_subdivision(subdivision: str | None) -> str | None:
@@ -202,6 +211,17 @@ def construire(base: sqlite3.Connection, schema: Path) -> dict:
             "SELECT texte_id, lower(article_du_texte), article_id "
             "FROM porte_sur WHERE portee = 'interne'"):
         cibles[(texte_id, article_du_texte)].add(article_id)
+    # « Et aucun autre » vaut pour tous les codes, pas pour le seul nôtre. Un
+    # article de texte qui réécrit L. 224-3 et cinq articles du code de
+    # l'énergie n'a pas une cible unique : l'amendement déposé sur lui peut
+    # porter sur le gaz. Jugées par deux modèles, les quatre arêtes du tirage
+    # de docs/37 sur lesquelles ils se contredisaient étaient toutes de ce type
+    # — 304 des 550 arêtes en dépendaient (docs/41).
+    for texte_id, article_du_texte in base.execute(
+            "SELECT DISTINCT texte_id, lower(article_du_texte) "
+            "FROM porte_sur WHERE portee = 'externe'"):
+        if (texte_id, article_du_texte) in cibles:
+            cibles[(texte_id, article_du_texte)].add(-1)   # cible hors du code
 
     lignes, aretes = [], []
     for chambre, corpus, texte_id in correspondances(base):

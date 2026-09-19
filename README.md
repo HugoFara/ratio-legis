@@ -118,7 +118,7 @@ Reconstruite d'une commande depuis le miroir et les plans versionnés
 | **Considérants de l'Union** | **7 674** | `article_acte_ue` — articles d'actes déclarés | 6 237 |
 | **Textes en discussion** | **854** | **`porte_sur`** — l'article du texte → l'article du code | **59 076** |
 | **Sorts d'amendements, en huit familles** | **42 142** | **`vise`** — l'amendement qui visait l'article, abouti ou non | **318** |
-| Correspondances de texte entre les deux corpus | 163 | **`depose_sur`** — l'article du code réécrit par l'article du texte sur lequel l'amendement fut déposé | **550** |
+| Correspondances de texte entre les deux corpus | 163 | **`depose_sur`** — l'article du code réécrit par l'article du texte sur lequel l'amendement fut déposé | **246** (confiance 0,25) |
 
 Ce que cela donne au grain de l'article en vigueur, qui est le seul grain qui
 compte pour le produit :
@@ -220,6 +220,7 @@ numéro d'aujourd'hui, et 783 dès qu'on remonte aux numéros d'avant 2016.
 | 32. Lignées | un numéro n'est pas un article : 285 numéros réutilisés en 2016, 144 « passages motivants » qui expliquaient une autre disposition | [`docs/38`](docs/38-lignees.md) |
 | 33. Cent verdicts d'agents | le jeu annoté par sept modèles pour 72 $ ; `motive` retrouvé au passage 29/72, rapport au Président sans arête 18/72 ; ce que cela ne vaut pas | [`docs/39`](docs/39-cent-verdicts-d-agents.md) |
 | 34. États intermédiaires | 764 arêtes `porte_sur` que la loi promulguée n'a pas confirmées ; 31 « origines situées » qui n'en étaient pas | [`docs/40`](docs/40-etats-intermediaires.md) |
+| 35. Deux tirages jugés à deux | `porte_sur` 34/35 et 18/20 ; `depose_sur` 7/15 — la composition est exacte, ce qu'elle prétend ne l'est pas ; 304 arêtes à cibles hors du code retirées | [`docs/41`](docs/41-deux-tirages-juges-par-des-agents.md) |
 
 ### Tenir à jour
 

@@ -128,14 +128,17 @@ NOTRE_CODE = re.compile(r"consommation", re.I)
 FENETRE_MINI = 60
 AVAL = 140                    # portée du regard en aval, dans la même phrase
 
-# Précision mesurée à la main sur 20 rattachements tirés au sort : voir
-# `docs/16-textes-discutes.md` § 4. Borne inférieure de Wilson à 95 %.
-CONFIANCE = 0.8389
+# Précision mesurée à la main sur 20 rattachements tirés au sort (`docs/16`
+# § 4, 20/20), puis par deux juges indépendants sur 15 de plus le 19 septembre
+# 2026, population d'aujourd'hui (`docs/41`) : 14 justes sur 15. Les deux
+# tirages réunis, 34 sur 35 ; borne inférieure de Wilson à 95 %.
+CONFIANCE = 0.8558
 # La voie de la citation est mesurée à part, parce qu'elle ne vaut pas la même
 # chose : 15 arêtes justes sur 15 vérifiées à la main **après** la garde de
-# corroboration, tirage disjoint de celui qui a fait découvrir le défaut d'hôte.
-# Borne inférieure de Wilson à 95 %. Voir `docs/33` § 4.
-CONFIANCE_CREE = 0.7961
+# corroboration (`docs/33` § 4), puis 3 sur 5 le 19 septembre 2026 — dont une
+# fausse par glissement de numérotation en navette : le texte adopté écrit
+# « Art. L. 423-5 », promulgué L. 423-6. Réunis, 18 sur 20 ; Wilson à 95 %.
+CONFIANCE_CREE = 0.6996
 
 
 def sans_controles(texte: str) -> str:
