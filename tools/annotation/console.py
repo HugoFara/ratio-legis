@@ -43,6 +43,9 @@ Commandes (toutes précédées du répertoire préparé par `preparer.py`) :
                                            [--commentaire "…"] [--proposition acceptee|corrigee|hors_sujet]
     rendre <article> --annotateur A --verdict V --proposition acceptee
                                            reprendre le passage proposé tel quel
+    confirmer <article> --annotateur A [--commentaire "…"]
+                                           relecture : garder verdict et passage, signer ;
+                                           l'annotateur précédent reste dans le commentaire
 
 `--verdict` : motive | dossier_seulement | non_documente. Un `motive` sans
 passage est refusé : le protocole exige l'offset. `--debut` et `--fin` sont
@@ -278,6 +281,28 @@ def cmd_rattacher(a) -> None:
             print(f"[{rang}] {nom}  {len(texte)} signes")
 
 
+def cmd_confirmer(a) -> None:
+    """La relecture ne réécrit pas ce qu'elle approuve : elle signe. Le verdict
+    et le passage restent, l'annotateur devient le relecteur, et le nom de
+    l'annotateur précédent passe dans le commentaire — pour que l'accord entre
+    les deux reste lisible après coup."""
+    from datetime import date
+    with verrou(a.repertoire):
+        lignes = charger(a.repertoire)
+        ligne = ligne_de(lignes, a.article)
+        if not ligne["ANNOT_verdict"]:
+            sys.exit(f"{a.article} n'a pas de verdict à confirmer")
+        precedent = ligne["annotateur"]
+        ligne["ANNOT_commentaire"] = (f"[confirmé par {a.annotateur} le {date.today().isoformat()}, "
+                                      f"verdict de {precedent}"
+                                      + (f" : {a.commentaire}" if a.commentaire else "") + "] "
+                                      + ligne["ANNOT_commentaire"])
+        ligne["annotateur"] = a.annotateur
+        ligne["date"] = date.today().isoformat()
+        sauver(lignes, a.repertoire / "annotations-100.csv")
+    print(f"{a.article}: {ligne['ANNOT_verdict']} — confirmé ({precedent} → {a.annotateur})")
+
+
 def cmd_rendre(a) -> None:
     if a.verdict not in VERDICTS:
         sys.exit(f"verdict attendu : {', '.join(VERDICTS)}")
@@ -351,6 +376,9 @@ def main() -> None:
     c.add_argument("--url", required=True); c.set_defaults(f=cmd_importer)
     c = sp.add_parser("rattacher"); c.add_argument("article"); c.add_argument("dossier")
     c.set_defaults(f=cmd_rattacher)
+    c = sp.add_parser("confirmer"); c.add_argument("article")
+    c.add_argument("--annotateur", required=True); c.add_argument("--commentaire")
+    c.set_defaults(f=cmd_confirmer)
     c = sp.add_parser("rendre"); c.add_argument("article")
     c.add_argument("--annotateur", required=True); c.add_argument("--verdict", required=True)
     c.add_argument("--document", type=int); c.add_argument("--debut"); c.add_argument("--fin")

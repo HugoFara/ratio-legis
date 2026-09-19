@@ -161,9 +161,15 @@ def main() -> None:
             else:
                 concordantes = [a for a in aretes if a[0] == document_id
                                 and a[1] < fin and debut < a[2]]
+                meme_document = [a for a in aretes if a[0] == document_id]
                 fiche["aretes_concordantes"] = len(concordantes)
+                # « autre passage » : la base motive dans le même document,
+                # ailleurs ; « autre document » : elle motive, mais pas là où
+                # l'annotateur a cité — un autre rapport, une autre lecture. Les
+                # deux ne se relisent pas de la même façon.
                 fiche["passage"] = ("retrouve" if concordantes else
-                                    "autre_passage" if aretes else "aucune_arete")
+                                    "autre_passage" if meme_document else
+                                    "autre_document" if aretes else "aucune_arete")
                 # Le document est-il au moins servi au grain du texte ? Alors le
                 # classement lexical de docs/28 propose des passages sans rien
                 # affirmer : mesurer s'il met le bon en tête est la seule mesure

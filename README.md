@@ -281,6 +281,7 @@ Les trois livrables de la phase 0 sont produits.
 | Schéma SQLite | [`schema/001-graphe-provenance.sql`](schema/001-graphe-provenance.sql) |
 | Ingestion, première tranche | [`ingestion/legi_vers_graphe.py`](ingestion/legi_vers_graphe.py) |
 | Jeu d'annotation humaine, 100 articles | [`data/golden-set/jeu-annotation-100-prerempli.csv`](data/golden-set/jeu-annotation-100-prerempli.csv) |
+| Les cent verdicts, avec passages et relecture | [`data/golden-set/annotations-100.csv`](data/golden-set/annotations-100.csv), index des documents cités [`documents-annotation.tsv`](data/golden-set/documents-annotation.tsv) |
 | Périmètre de phase 0, figé, 1 280 articles L | [`data/perimetre-v1.csv`](data/perimetre-v1.csv) |
 | Périmètre en vigueur, 2 091 articles, les trois parties | [`data/perimetre-v2.csv`](data/perimetre-v2.csv) |
 | Golden set, données machine | [`data/golden-set/golden-set-v1.json`](data/golden-set/golden-set-v1.json) |
