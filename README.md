@@ -111,7 +111,7 @@ Reconstruite d'une commande depuis le miroir et les plans versionnés
 | Articles (dont **2 104 en vigueur**) | 3 464 | `produite_par` — quel texte a produit la version | 8 145 |
 | Versions d'articles | 6 362 | `repris_de` — continuité d'un alinéa par-delà la recodification | 6 137 |
 | **Segments (alinéas)** | **28 294** | `renumerote_de` | 1 882 |
-| Documents (rapports, exposés, études d'impact, avis) | 372 | `motive` — un passage qui motive, avec offsets | 734 |
+| Documents (rapports, exposés, études d'impact, avis) | 393 | `motive` — un passage qui motive, avec offsets | 751 |
 | Amendements (22 102 Sénat, 11 115 Assemblée) | 33 217 | `renvoie_a` — le graphe de renvois | 12 534 |
 | Acteurs | 1 478 | `resulte_de` — l'amendement qui a écrit l'alinéa | 279 |
 | **Actes de l'Union** | **284** | `cite_acte_ue` / `transpose` | 1 572 / 8 |
@@ -132,7 +132,7 @@ des motifs, ni débat, ni amendement.
 
 | partie | articles | un passage les motive | origine située | motivation du texte | **raison non documentée** |
 |---|---:|---:|---:|---:|---:|
-| **L** | 1 293 | 796 (61,6 %) | 216 | 276 | **5 (0,4 %)** |
+| **L** | 1 293 | 801 (61,9 %) | 211 | 276 | **5 (0,4 %)** |
 | **R** | 632 | 44 | 14 | 47 | **527 (83,4 %)** |
 | **D** | 179 | 1 | 0 | 11 | **167 (93,3 %)** |
 
@@ -156,7 +156,7 @@ métriques : [`data/mesures/hygiene.tsv`](data/mesures/hygiene.tsv).
 
 | | |
 |---|---:|
-| **Articles remontant à un passage qui les motive** | **806 (38,3 %)** |
+| **Articles remontant à un passage qui les motive** | **812 (38,6 %)** |
 | Articles reliés à un article de texte en discussion | 1 066 (50,7 %) |
 | Articles nommant un acte de l'Union | 117 |
 | Articles remontant à un amendement identifié | 83 |
@@ -178,8 +178,8 @@ faute de l'autre :
 | Articles atteignant une transposition déclarée | 60 |
 
 Tous ces comptes suivent la **chaîne de renumérotation**. Un compteur qui ne le
-dit pas est ininterprétable sur ce corpus : `motive` couvre 109 articles par leur
-numéro d'aujourd'hui, et 806 dès qu'on remonte aux numéros d'avant 2016.
+dit pas est ininterprétable sur ce corpus : `motive` couvre 115 articles par leur
+numéro d'aujourd'hui, et 812 dès qu'on remonte aux numéros d'avant 2016.
 
 ### Les tranches
 
@@ -215,6 +215,7 @@ numéro d'aujourd'hui, et 806 dès qu'on remonte aux numéros d'avant 2016.
 | 27. Article écrit dans la citation | l'en-tête d'un alinéa cité désigne l'article qu'on écrit, non du droit existant | [`docs/33`](docs/33-article-ecrit-dans-la-citation.md) |
 | 28. Hôte du code cité | un code nommé dans une citation ne déclare pas ce que le texte modifie | [`docs/34`](docs/34-hote-du-code-cite.md) |
 | 29. `depose_sur` re-mesuré | une garde devenue fabricante d'unicité, et un numéro de subdivision lu en entier | [`docs/35`](docs/35-depose-sur-apres-la-reparation.md) |
+| 30. Jeu d'annotation, prêt | 25 offsets sur 66 ne résolvaient plus, la XVIe législature n'avait pas de corps ; l'outillage de l'annotateur | [`docs/36`](docs/36-jeu-d-annotation-prepare.md) |
 
 ### Tenir à jour
 
@@ -410,9 +411,12 @@ revanche une **évaluation humaine en aveugle** sur le golden set, qui suppose l
 jeu d'annotation validé.
 
 **Bloquant, et hors de portée du code.** Faire valider à la main les 100 articles
-du jeu d'annotation. 66 d'entre eux portent déjà un passage proposé et ses
+du jeu d'annotation. 74 d'entre eux portent déjà un passage proposé et ses
 offsets. Tant que cette validation n'est pas faite, la phase 0 reste ouverte et
 aucune mesure de précision du projet n'est autre chose qu'une auto-évaluation.
+Tout ce qu'il faut pour annoter — fiches, documents, saisie sans compter un
+offset, et la mesure qui confrontera le résultat au graphe — est dans
+`tools/annotation/` ([`docs/36`](docs/36-jeu-d-annotation-prepare.md)).
 
 **Trois couches de motivation ne sont pas construites.**
 

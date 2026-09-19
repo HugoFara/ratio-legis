@@ -132,7 +132,18 @@ Par ordre croissant de difficulté :
 
 **La contribution la plus bloquante n'est pas du code** : la validation à la main
 des 100 articles du jeu d'annotation. Tant qu'elle n'est pas faite, aucune mesure
-de précision du projet n'est autre chose qu'une auto-évaluation.
+de précision du projet n'est autre chose qu'une auto-évaluation. La marche à
+suivre est dans [`docs/36`](docs/36-jeu-d-annotation-prepare.md) § 5 :
+
+```
+python3 tools/prototype/jeu_annotation.py data/golden-set/jeu-annotation-100.csv \
+        travail/corpus/rapports data/golden-set/jeu-annotation-100-prerempli.csv
+python3 tools/annotation/preparer.py data/golden-set/jeu-annotation-100-prerempli.csv \
+        travail/ratio-legis.sqlite travail/corpus/rapports travail/annotation
+python3 tools/annotation/annoter.py travail/annotation --annotateur <vos initiales>
+python3 tools/annotation/verifier.py travail/annotation/annotations-100.csv \
+        travail/ratio-legis.sqlite travail/corpus/rapports data/mesures/golden-set-100.tsv
+```
 
 ## Signaler un lien faux
 

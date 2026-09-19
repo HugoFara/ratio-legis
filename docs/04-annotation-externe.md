@@ -120,6 +120,10 @@ Deux creux restent à traiter, et ils sont de nature différente :
 
 - **16e-17e législature à 10 %.** Anomalie de récupération, pas de fond : les
   rapports récents sont publiés sous des URL différentes. À corriger.
+
+  > **Corrigé le 19 septembre 2026 par [`docs/36`](36-jeu-d-annotation-prepare.md)
+  > § 3.** Les pages téléchargées étaient des pages de garde ; le texte intégral
+  > est sous `/dyn/opendata/`. La strate passe à 6 / 10, le jeu entier à 74 / 100.
 - **Origine antérieure à l'open data à 20 %.** Structurel : les rapports d'avant
   2008 ne sont pas systématiquement en ligne. Ces articles resteront « raison non
   documentée », ce qui est le résultat attendu.
