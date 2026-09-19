@@ -117,7 +117,7 @@ def echantillon(base: sqlite3.Connection, sauf: set[tuple[str, str]],
 
 
 def article_id_de(base: sqlite3.Connection, numero: str) -> int:
-    return base.execute("SELECT id FROM article WHERE numero = ?",
+    return base.execute("SELECT id FROM article_courant WHERE numero = ?",
                         (numero,)).fetchone()[0]
 
 

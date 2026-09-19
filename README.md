@@ -108,10 +108,10 @@ Reconstruite d'une commande depuis le miroir et les plans versionnés
 
 | Nœuds | | Arêtes | |
 |---|---:|---|---:|
-| Articles (dont **2 104 en vigueur**) | 3 464 | `produite_par` — quel texte a produit la version | 8 145 |
+| Articles — lignées (dont **2 104 en vigueur**) | 3 877 | `produite_par` — quel texte a produit la version | 8 145 |
 | Versions d'articles | 6 362 | `repris_de` — continuité d'un alinéa par-delà la recodification | 6 137 |
-| **Segments (alinéas)** | **28 294** | `renumerote_de` | 1 882 |
-| Documents (rapports, exposés, études d'impact, avis) | 785 | `motive` — un passage qui motive, avec offsets | 1 566 |
+| **Segments (alinéas)** | **28 294** | `renumerote_de` | 1 929 |
+| Documents (rapports, exposés, études d'impact, avis) | 785 | `motive` — un passage qui motive, avec offsets | 1 557 |
 | Amendements (31 027 Sénat, 11 115 Assemblée) | 42 142 | `renvoie_a` — le graphe de renvois | 12 534 |
 | Acteurs | 1 644 | `resulte_de` — l'amendement qui a écrit l'alinéa | 308 |
 | **Actes de l'Union** | **284** | `cite_acte_ue` / `transpose` | 1 572 / 8 |
@@ -132,12 +132,12 @@ des motifs, ni débat, ni amendement.
 
 | partie | articles | un passage les motive | origine située | motivation du texte | **raison non documentée** |
 |---|---:|---:|---:|---:|---:|
-| **L** | 1 293 | 907 (70,1 %) | 121 | 260 | **5 (0,4 %)** |
-| **R** | 632 | 51 | 8 | 47 | **526 (83,2 %)** |
+| **L** | 1 293 | 763 (59,0 %) | 143 | 382 | **5 (0,4 %)** |
+| **R** | 632 | 43 | 12 | 47 | **530 (83,9 %)** |
 | **D** | 179 | 1 | 0 | 11 | **167 (93,3 %)** |
 
 **La partie législative du code de la consommation est documentée à 99,6 %. La
-partie réglementaire l'est à 14,5 %** — et c'est elle qui porte la masse des
+partie réglementaire l'est à 14,1 %** — et c'est elle qui porte la masse des
 obligations que rencontre un consommateur.
 
 Ce n'est pas un effet de périmètre. Les parties R et D en étaient exclues depuis
@@ -145,7 +145,7 @@ la phase 0, pour un motif écrit — « rattachement à DOLE mesuré à 0 % » �
 [`docs/27`](docs/27-parties-r-et-d.md) montre faux : 64 articles réglementaires
 sur 811 ont un dossier législatif dans leur ascendance. Le périmètre a été élargi
 aux trois parties, le corpus a suivi, et le nombre d'articles sans raison
-documentée est passé de 701 à **698**. **Le silence de la partie réglementaire est
+documentée est passé de 701 à **702** — après la scission des lignées, [`docs/38`](docs/38-lignees.md). **Le silence de la partie réglementaire est
 un état du fonds documentaire français**, et il est désormais mesuré sur un
 périmètre qui ne l'exclut plus.
 
@@ -156,10 +156,10 @@ métriques : [`data/mesures/hygiene.tsv`](data/mesures/hygiene.tsv).
 
 | | |
 |---|---:|
-| **Articles remontant à un passage qui les motive** | **938 (44,6 %)** |
-| Articles reliés à un article de texte en discussion | 1 079 (51,3 %) |
+| **Articles remontant à un passage qui les motive** | **783 (37,2 %)** |
+| Articles reliés à un article de texte en discussion | 949 (45,1 %) |
 | Articles nommant un acte de l'Union | 117 |
-| Articles remontant à un amendement identifié | 122 |
+| Articles remontant à un amendement identifié | 104 |
 | Articles cités par un autre article du fonds | 1 039 (49,4 %) |
 
 **Au grain du texte** — ce qui répond à « pourquoi ce *texte* existe ». Un rapport
@@ -178,8 +178,8 @@ faute de l'autre :
 | Articles atteignant une transposition déclarée | 60 |
 
 Tous ces comptes suivent la **chaîne de renumérotation**. Un compteur qui ne le
-dit pas est ininterprétable sur ce corpus : `motive` couvre 245 articles par leur
-numéro d'aujourd'hui, et 938 dès qu'on remonte aux numéros d'avant 2016.
+dit pas est ininterprétable sur ce corpus : `motive` couvre 162 articles par leur
+numéro d'aujourd'hui, et 783 dès qu'on remonte aux numéros d'avant 2016.
 
 ### Les tranches
 
@@ -217,6 +217,7 @@ numéro d'aujourd'hui, et 938 dès qu'on remonte aux numéros d'avant 2016.
 | 29. `depose_sur` re-mesuré | une garde devenue fabricante d'unicité, et un numéro de subdivision lu en entier | [`docs/35`](docs/35-depose-sur-apres-la-reparation.md) |
 | 30. Jeu d'annotation, prêt | 25 offsets sur 66 ne résolvaient plus, la XVIe législature n'avait pas de corps ; l'outillage de l'annotateur | [`docs/36`](docs/36-jeu-d-annotation-prepare.md) |
 | 31. Dossiers de tout l'historique | le corpus ne suivait que le dossier d'origine ; 94 dossiers, 106 articles L motivés de plus | [`docs/37`](docs/37-dossiers-de-tout-l-historique.md) |
+| 32. Lignées | un numéro n'est pas un article : 285 numéros réutilisés en 2016, 144 « passages motivants » qui expliquaient une autre disposition | [`docs/38`](docs/38-lignees.md) |
 
 ### Tenir à jour
 
@@ -405,7 +406,7 @@ disparaissent, remplacés par FTS5 et, pour le rappel vectoriel, un index extern
 ## Ce qui reste à faire
 
 **La note est écrite, l'évaluation ne l'est pas.** `restitution/note.py` produit
-la note « pourquoi cet article » sous le contrat du § 4.3 : 11 656 constats sur
+la note « pourquoi cet article » sous le contrat du § 4.3 : 11 599 constats sur
 les 2 104 articles, zéro phrase écartée faute de citation, aucune note vide
 ([`docs/19`](docs/19-note-phase-3.md)). Le critère de sortie de la phase 3 est en
 revanche une **évaluation humaine en aveugle** sur le golden set, qui suppose le

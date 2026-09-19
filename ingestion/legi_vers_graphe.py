@@ -191,12 +191,86 @@ def anterieurs(version: Version, versions: dict[str, Version]) -> list[Version]:
     return retenus
 
 
+# Deux textes qui partagent moins de la moitié de leur vocabulaire ne sont pas
+# la même disposition. Mesuré sur les 289 numéros en vigueur qui ont eu une
+# version abrogée avant le 1er juillet 2016 : 285 sont sous 0,15, quatre au-dessus
+# de 0,5, aucun entre les deux — le seuil ne tranche rien de discutable.
+SEUIL_MEME_DISPOSITION = 0.5
+MOT = re.compile(r"\w{4,}")
+
+
+def similarite(a: str, b: str) -> float:
+    """Part du vocabulaire commun (Jaccard sur les mots de quatre lettres et plus)."""
+    ma, mb = set(MOT.findall(a.lower())), set(MOT.findall(b.lower()))
+    return len(ma & mb) / len(ma | mb) if ma | mb else 1.0
+
+
+def lignees(chronologie: list[Version]) -> list[int]:
+    """Rang de lignée de chaque version d'un même numéro, dans l'ordre chronologique.
+
+    Un numéro change de disposition quand sa version en cours est **abrogée** et
+    que la version qui reprend le numéro n'a pas le même texte. La recodification
+    de 2016 l'a fait 285 fois sur le code en vigueur ; le nœud clé par numéro
+    faisait de l'ancienne disposition l'historique de la nouvelle.
+
+    Les versions mort-nées ou annulées ne portent pas de lignée propre : elles
+    suivent la version vivante qui entre en vigueur à la même date — c'est celle
+    qu'elles devaient être —, à défaut la disposition en cours à leur date.
+    """
+    vivantes = [v for v in chronologie if v.etat not in ("MODIFIE_MORT_NE", "ANNULE")]
+    rang_vivante: dict[str, int] = {}
+    rang, derniere = 1, None
+    for version in vivantes:
+        if derniere is not None and derniere.etat in ABROGATION \
+                and similarite(derniere.texte, version.texte) < SEUIL_MEME_DISPOSITION:
+            rang += 1
+        rang_vivante[version.id_legi] = rang
+        derniere = version
+
+    # Une version mort-née rejoint la vivante qui entre en vigueur à sa date si
+    # elle en est la rédaction — même texte à peu près — ; sinon la disposition
+    # en cours, au même critère ; sinon elle fait lignée à part. L313-8 en 2016 :
+    # la version mort-née de l'ordonnance de mars (la fiche standardisée,
+    # renumérotée L313-10 en juillet) n'a rien à voir avec le L313-8 vivant
+    # (l'information sur l'assurance emprunteur) ; les fondre faisait remonter
+    # à L313-10, par la concordance, le rapport de 2022 sur L313-8.
+    rangs, rang_suivant = [], rang + 1
+    for version in chronologie:
+        if version.id_legi in rang_vivante:
+            rangs.append(rang_vivante[version.id_legi])
+            continue
+        meme_date = [v for v in vivantes if v.date_debut == version.date_debut]
+        en_cours = [v for v in reversed(vivantes) if v.date_debut <= version.date_debut]
+        repere = next((v for v in meme_date + en_cours
+                       if similarite(v.texte, version.texte) >= SEUIL_MEME_DISPOSITION),
+                      None)
+        if repere is not None:
+            rangs.append(rang_vivante[repere.id_legi])
+        else:
+            rangs.append(rang_suivant)
+            rang_suivant += 1
+    return rangs
+
+
 def inserer_noeuds(base: sqlite3.Connection, versions: dict[str, Version]) -> dict:
-    articles: dict[tuple[str, str], int] = {}
+    """Un nœud `article` par lignée ; `articles` rend l'identifiant de chaque version."""
+    par_numero: dict[tuple[str, str], list[Version]] = defaultdict(list)
     for version in versions.values():
-        articles.setdefault((version.code, version.numero), len(articles) + 1)
-    base.executemany("INSERT INTO article (id, code, numero) VALUES (?, ?, ?)",
-                     [(i, code, numero) for (code, numero), i in articles.items()])
+        par_numero[(version.code, version.numero)].append(version)
+
+    articles: dict[str, int] = {}          # id_legi → article.id
+    noeuds: list[tuple[int, str, str, int]] = []
+    for (code, numero), groupe in sorted(par_numero.items()):
+        chronologie = sorted(groupe, key=lambda v: (v.date_debut, v.id_legi))
+        ids: dict[int, int] = {}
+        for version, rang in zip(chronologie, lignees(chronologie)):
+            if rang not in ids:
+                ids[rang] = len(noeuds) + 1
+                noeuds.append((ids[rang], code, numero, rang))
+            articles[version.id_legi] = ids[rang]
+    base.executemany("INSERT INTO article (id, code, numero, lignee) VALUES (?, ?, ?, ?)",
+                     noeuds)
+    scindes = sum(1 for n in noeuds if n[3] > 1)
 
     textes: dict[str, tuple] = {}
     for version in versions.values():
@@ -208,7 +282,7 @@ def inserer_noeuds(base: sqlite3.Connection, versions: dict[str, Version]) -> di
 
     base.executemany(
         "INSERT INTO version_article VALUES (?, ?, ?, ?, ?, ?, ?)",
-        [(v.id_legi, articles[(v.code, v.numero)], v.date_debut, v.date_fin or None,
+        [(v.id_legi, articles[v.id_legi], v.date_debut, v.date_fin or None,
           v.etat, v.texte, empreinte(v.texte)) for v in versions.values()])
 
     lignes_segments = []
@@ -221,11 +295,12 @@ def inserer_noeuds(base: sqlite3.Connection, versions: dict[str, Version]) -> di
             position += len(segment) + 1  # le séparateur inséré dans version.texte
     base.executemany("INSERT INTO segment VALUES (?, ?, ?, ?, ?, ?, ?)", lignes_segments)
     base.execute("INSERT INTO segment_fts (rowid, texte) SELECT rowid, texte FROM segment")
-    return {"articles": articles, "textes": textes, "segments": len(lignes_segments)}
+    return {"articles": articles, "noeuds": len(noeuds), "scindes": scindes,
+            "textes": textes, "segments": len(lignes_segments)}
 
 
 def inserer_aretes_declarees(base: sqlite3.Connection, versions: dict[str, Version],
-                             articles: dict[tuple[str, str], int]) -> dict:
+                             articles: dict[str, int]) -> dict:
     produite_par = {(v.id_legi, cid, type_lien)
                     for v in versions.values()
                     for cid, _, _, type_lien in v.producteurs if cid}
@@ -235,9 +310,9 @@ def inserer_aretes_declarees(base: sqlite3.Connection, versions: dict[str, Versi
 
     renumerote = set()
     for version in versions.values():
-        cible = articles[(version.code, version.numero)]
+        cible = articles[version.id_legi]
         for precedent in anterieurs(version, versions):
-            source = articles[(precedent.code, precedent.numero)]
+            source = articles[precedent.id_legi]
             if source != cible:
                 renumerote.add((cible, source))
     base.executemany(
@@ -327,7 +402,8 @@ def main() -> None:
         "SELECT count(*) FROM repris_de WHERE preuve_id IS NULL").fetchone()[0]
 
     print(f"versions d'articles       : {len(versions)}")
-    print(f"articles distincts        : {len(noeuds['articles'])}")
+    print(f"articles distincts        : {noeuds['noeuds']} "
+          f"(dont {noeuds['scindes']} lignées nouvelles d'un numéro réutilisé)")
     print(f"segments                  : {noeuds['segments']} "
           f"({noeuds['segments'] / len(versions):.1f} par version)")
     print(f"  non appariables (<60 c.) : "

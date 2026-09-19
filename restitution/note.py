@@ -409,7 +409,7 @@ def verifier_le_contrat(base: sqlite3.Connection, limite: int | None) -> None:
         sys.exit("le filtre n'écarte pas une phrase sans source : contrat rompu")
 
     numeros = [n for (n,) in base.execute(
-        "SELECT a.numero FROM verdict v JOIN article a ON a.id = v.article_id"
+        "SELECT a.numero FROM verdict v JOIN article_courant a ON a.id = v.article_id"
         + (f" LIMIT {int(limite)}" if limite else ""))]
     constats = ecartees = vides = 0
     for numero in numeros:

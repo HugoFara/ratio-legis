@@ -26,11 +26,12 @@ from __future__ import annotations
 import re
 import sqlite3
 import sys
-from collections import defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools" / "prototype"))
 from resolveur import sans_balises  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lignees import Resolveur  # noqa: E402
 
 # La négation finale interdit de tronquer : « L. 111-6-1-3 » du code de la
 # construction se lisait « L. 111-6-1 », qui existe au code de la consommation.
@@ -128,7 +129,7 @@ def main() -> None:
     base.executescript("DROP VIEW IF EXISTS historique_article; DROP TABLE IF EXISTS vise;")
     base.executescript(schema.read_text(encoding="utf-8"))
 
-    articles = {n: i for i, n in base.execute("SELECT id, numero FROM article")}
+    resolveur = Resolveur(base)   # le numéro visé se résout à la date du dossier
     # Un amendement à un projet de loi qui n'a produit aucun article de ce code ne
     # peut pas en viser un. La restriction écarte les dossiers d'environnement,
     # d'urbanisme ou de propriété intellectuelle dont les numéros d'articles
@@ -147,7 +148,8 @@ def main() -> None:
         if dossier not in dossiers_du_code:
             hors_dossier += 1
             continue
-        retenues = [(articles[n], f) for n, f in cibles(dispositif) if n in articles]
+        retenues = [(resolveur.du_dossier(n, dossier), f) for n, f in cibles(dispositif)]
+        retenues = [(i, f) for i, f in retenues if i is not None]
         if not retenues:
             sans_cible += 1
             continue

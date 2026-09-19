@@ -76,7 +76,7 @@ def mesures(base: sqlite3.Connection, perimetre: Path) -> list[tuple]:
     # article compté deux fois vaut mieux qu'un article attribué à tort.
     apparente = dict(base.execute(
         "SELECT t.nature, count(DISTINCT a.id) FROM version_en_vigueur v "
-        "JOIN article a ON a.id = v.article_id AND a.numero LIKE 'L%' "
+        "JOIN article_courant a ON a.id = v.article_id AND a.numero LIKE 'L%' "
         "JOIN produite_par p ON p.version_id = v.id_legi "
         "JOIN texte_normatif t ON t.id_jorf = p.texte_id "
         "GROUP BY 1"))
@@ -135,7 +135,7 @@ def mesures(base: sqlite3.Connection, perimetre: Path) -> list[tuple]:
     # été tenté sur lui — et non plus seulement ce qui a abouti.
     tentatives, disputes = un(
         "SELECT count(*), count(DISTINCT t.article) FROM tentative_sur_article t "
-        "JOIN article a ON a.numero = t.article "
+        "JOIN article_courant a ON a.numero = t.article "
         "JOIN version_en_vigueur v ON v.article_id = a.id")
     en_vigueur = un("SELECT count(*) FROM version_en_vigueur")[0]
     # La restitution réunit deux voies : la cible déclarée par le dispositif
@@ -153,7 +153,7 @@ def mesures(base: sqlite3.Connection, perimetre: Path) -> list[tuple]:
         JOIN resulte_de rd ON rd.segment_id = remonte.courant
         JOIN segment s ON s.id = remonte.depart
         JOIN version_article v ON v.id_legi = s.version_id
-        JOIN article a ON a.id = v.article_id""")[0]
+        JOIN article_courant a ON a.id = v.article_id""")[0]
     reunis = un("""
         WITH RECURSIVE remonte(depart, courant) AS (
             SELECT s.id, s.id FROM segment s
@@ -163,14 +163,14 @@ def mesures(base: sqlite3.Connection, perimetre: Path) -> list[tuple]:
             JOIN remonte ON r.segment_id = remonte.courant)
         SELECT count(*) FROM (
             SELECT t.article AS numero FROM tentative_sur_article t
-            JOIN article a ON a.numero = t.article
+            JOIN article_courant a ON a.numero = t.article
             JOIN version_en_vigueur v ON v.article_id = a.id
             UNION
             SELECT a.numero FROM remonte
             JOIN resulte_de rd ON rd.segment_id = remonte.courant
             JOIN segment s ON s.id = remonte.depart
             JOIN version_article v ON v.id_legi = s.version_id
-            JOIN article a ON a.id = v.article_id
+            JOIN article_courant a ON a.id = v.article_id
             UNION
             SELECT a.numero FROM depose_sur d
             JOIN article a ON a.id = d.article_id
@@ -218,7 +218,7 @@ def mesures(base: sqlite3.Connection, perimetre: Path) -> list[tuple]:
     for famille, nombre in base.execute(
             "SELECT s.famille, count(*) FROM tentative_sur_article t "
             "JOIN sort_amendement s ON s.amendement_id = t.amendement_id "
-            "JOIN article a ON a.numero = t.article "
+            "JOIN article_courant a ON a.numero = t.article "
             "JOIN version_en_vigueur v ON v.article_id = a.id "
             "GROUP BY 1 ORDER BY 2 DESC"):
         ajouter("tentatives", f"dont {famille}", nombre, tentatives)

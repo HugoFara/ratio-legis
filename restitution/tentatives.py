@@ -104,7 +104,7 @@ def tenter(base: sqlite3.Connection, numero: str) -> dict:
     q = lambda s, *a: [dict(r) for r in base.execute(s, a)]  # noqa: E731
 
     version = q("""SELECT v.id_legi, v.date_debut FROM version_en_vigueur v
-                   JOIN article a ON a.id = v.article_id
+                   JOIN article_courant a ON a.id = v.article_id
                    WHERE a.numero = ? ORDER BY v.date_debut DESC, v.id_legi""", numero)
     if not version:
         return {}
@@ -117,7 +117,7 @@ def tenter(base: sqlite3.Connection, numero: str) -> dict:
         WITH RECURSIVE remonte(courant) AS (
             SELECT s.id FROM segment s
             JOIN version_en_vigueur v ON v.id_legi = s.version_id
-            JOIN article a ON a.id = v.article_id WHERE a.numero = ?
+            JOIN article_courant a ON a.id = v.article_id WHERE a.numero = ?
             UNION
             SELECT r.segment_source_id FROM repris_de r
             JOIN remonte ON r.segment_id = remonte.courant)
@@ -220,7 +220,7 @@ def sommet(base: sqlite3.Connection, combien: int = SOMMET) -> list[dict]:
                sum(e.famille = 'irrecevable') AS irrecevables,
                v.verdict, v.partie
         FROM echec e
-        JOIN article a ON a.numero = e.article
+        JOIN article_courant a ON a.numero = e.article
         JOIN version_en_vigueur x ON x.article_id = a.id
         LEFT JOIN verdict v ON v.article_id = a.id
         GROUP BY e.article

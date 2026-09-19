@@ -172,7 +172,6 @@ def main() -> None:
 
     cibles, compte = cibles_par_article_du_texte(base)
     legi, titres, _ = rattachements_legi(base)
-    numeros = {i: n for n, i in base.execute("SELECT numero, id FROM article")}
     liens = urls_du_plan(plan) | urls_des_impacts(plan_impacts)
     documents = {url: (i, texte, type_) for i, url, texte, type_ in base.execute(
         "SELECT id, url, texte, type FROM document "
@@ -239,7 +238,7 @@ def main() -> None:
                 compte["sans_cible"] += 1
                 continue
             for article_id in sorted(commun):
-                if dossier not in legi.get(numeros[article_id], ()):
+                if dossier not in legi.get(article_id, ()):
                     compte["non_corrobore"] += 1
                     continue
                 if (document_id, article_id) in deja | vus:

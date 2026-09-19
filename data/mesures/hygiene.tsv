@@ -5,18 +5,18 @@ verdict	partie D — origine située seulement	0	179	0.0
 verdict	partie D — motivation du texte seule	11	179	6.1	
 verdict	partie D — RAISON NON DOCUMENTÉE	167	179	93.3	
 verdict	partie L — articles en vigueur	1293			
-verdict	partie L — un passage les motive	907	1293	70.1	
-verdict	partie L — origine située seulement	121	1293	9.4	
-verdict	partie L — motivation du texte seule	260	1293	20.1	
+verdict	partie L — un passage les motive	763	1293	59.0	
+verdict	partie L — origine située seulement	143	1293	11.1	
+verdict	partie L — motivation du texte seule	382	1293	29.5	
 verdict	partie L — RAISON NON DOCUMENTÉE	5	1293	0.4	
 verdict	partie R — articles en vigueur	632			
-verdict	partie R — un passage les motive	51	632	8.1	
-verdict	partie R — origine située seulement	8	632	1.3	
+verdict	partie R — un passage les motive	43	632	6.8	
+verdict	partie R — origine située seulement	12	632	1.9	
 verdict	partie R — motivation du texte seule	47	632	7.4	
-verdict	partie R — RAISON NON DOCUMENTÉE	526	632	83.2	
+verdict	partie R — RAISON NON DOCUMENTÉE	530	632	83.9	
 origine	articles L dont la version en vigueur vient d'une ordonnance	1008	1293	78.0	origine apparente
 origine	articles L dont la version en vigueur vient d'une loi	276	1293	21.3	origine apparente
-origine	articles L ayant une loi dans leur ascendance	1080	1293	83.5	origine réelle, chaîne de renumérotation remontée
+origine	articles L ayant une loi dans leur ascendance	1043	1293	80.7	origine réelle, chaîne de renumérotation remontée
 amendements	assemblee — déposés	11115			
 amendements	assemblee — adoptés	2677	11115	24.1	
 amendements	assemblee — sans objet publié	0	11115	0.0	surtout des amendements retirés avant séance ou irrecevables
@@ -46,13 +46,13 @@ irrecevabilite	fondement — article 41	170	2955	5.8
 irrecevabilite	fondement — article 44 bis	135	2955	4.6	
 irrecevabilite	fondement — LOLF	10	2955	0.3	
 irrecevabilite	fondement — LOLFSS	6	2955	0.2	
-tentatives	articles en vigueur portant une tentative, les trois voies	185	2104	8.8	cible déclarée, alinéa écrit ou subdivision déposée
-tentatives	dont par la cible déclarée du dispositif	102	185	55.1	
-tentatives	dont par un alinéa écrit qui subsiste	83	185	44.9	
-tentatives	dont par la subdivision déposée	29	185	15.7	
+tentatives	articles en vigueur portant une tentative, les trois voies	180	2104	8.6	cible déclarée, alinéa écrit ou subdivision déposée
+tentatives	dont par la cible déclarée du dispositif	102	180	56.7	
+tentatives	dont par un alinéa écrit qui subsiste	83	180	46.1	
+tentatives	dont par la subdivision déposée	19	180	10.6	
 tentatives	tentatives déclarées sur un article en vigueur	158			voie de la cible déclarée seule ; le détail par sort suit
-depot	amendements positionnés sur un article en vigueur	298			
-depot	articles en vigueur atteints	29	2104	1.4	
+depot	amendements positionnés sur un article en vigueur	192			
+depot	articles en vigueur atteints	19	2104	0.9	
 depot	assemblee — jeux d'amendements appariés à leur texte	39	39	100.0	
 depot	senat — jeux d'amendements appariés à leur texte	124	143	86.7	
 depot	subdivisions tombant dans la plage d'articles du texte	5479	5702	96.1	contrôle de l'appariement ; un texte faux s'y verrait en premier
@@ -83,4 +83,4 @@ renvois	articles citant L412-1	37
 renvois	articles citant L733-4	35			
 renvois	articles citant L733-7	32			
 renvois	articles citant L313-1	25			
-perimetre	articles éligibles à resulte_de	896			
+perimetre	articles éligibles à resulte_de	887			

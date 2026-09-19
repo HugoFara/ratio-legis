@@ -226,7 +226,7 @@ def table_diffusion(base: sqlite3.Connection, source: Path, strict: bool,
 
 
 DICTIONNAIRE = {
-    "article": "un article de code, identifié par son numéro",
+    "article": "un article de code : numéro et lignée — le rang de la disposition qui a porté ce numéro",
     "version_article": "une rédaction datée d'un article, telle que LEGI la publie",
     "segment": "un alinéa d'une version, avec ses offsets dans le texte",
     "texte_normatif": "une loi, une ordonnance, un décret ou un arrêté",

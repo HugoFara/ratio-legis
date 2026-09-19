@@ -128,7 +128,7 @@ def lignes_nouvelles(base: sqlite3.Connection, deja: set[str]) -> list[dict]:
     chaines = ascendance(base)
     versions = {r["numero"]: dict(r) for r in base.execute("""
         SELECT a.numero, v.id_legi, v.date_debut
-        FROM version_en_vigueur v JOIN article a ON a.id = v.article_id""")}
+        FROM version_en_vigueur v JOIN article_courant a ON a.id = v.article_id""")}
 
     nouvelles = []
     for numero, version in sorted(versions.items()):

@@ -124,7 +124,7 @@ def echantillon(base: sqlite3.Connection, corpus: Path, filtres: dict,
     fonds = {}
     for article_id, numero, date, texte in base.execute(
             "SELECT v.article_id, a.numero, min(v.date_debut), v.texte "
-            "FROM version_article v JOIN article a ON a.id = v.article_id "
+            "FROM version_article v JOIN article_courant a ON a.id = v.article_id "
             "GROUP BY v.article_id"):
         fonds[article_id] = (numero, date, texte)
 

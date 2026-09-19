@@ -101,12 +101,12 @@ def tirer(base: sqlite3.Connection, effectif: int,
         LEFT JOIN acteur ac ON ac.id = am.auteur_id
         JOIN segment s ON s.id = r.segment_id
         JOIN version_article v ON v.id_legi = s.version_id
-        JOIN article a ON a.id = v.article_id""").fetchall()
+        JOIN article_courant a ON a.id = v.article_id""").fetchall()
 
     vise: dict[int, set[str]] = defaultdict(set)
     for amendement, numero in base.execute("""
             SELECT v.amendement_id, a.numero FROM vise v
-            JOIN article a ON a.id = v.article_id"""):
+            JOIN article_courant a ON a.id = v.article_id"""):
         vise[amendement].add(numero)
     racines = classes_de_renumerotation(base)
 

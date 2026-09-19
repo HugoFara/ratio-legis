@@ -202,13 +202,13 @@ def articles(base: sqlite3.Connection = Depends(connexion),
         f"""SELECT a.numero, v.partie, v.verdict, v.a_passage_motivant,
                    v.a_amendement, v.a_article_du_texte, v.a_document_du_texte,
                    v.a_acte_ue
-            FROM verdict v JOIN article a ON a.id = v.article_id
+            FROM verdict v JOIN article_courant a ON a.id = v.article_id
             {ou} ORDER BY a.numero LIMIT ?""", (*valeurs, limite)).fetchall()
     colonnes = ["numero", "partie", "verdict", "a_passage_motivant", "a_amendement",
                 "a_article_du_texte", "a_document_du_texte", "a_acte_ue"]
     resultat = [dict(zip(colonnes, l)) for l in lignes]
     total = base.execute(
-        f"SELECT COUNT(*) FROM verdict v JOIN article a ON a.id = v.article_id {ou}",
+        f"SELECT COUNT(*) FROM verdict v JOIN article_courant a ON a.id = v.article_id {ou}",
         valeurs).fetchone()[0]
     suite = resultat[-1]["numero"] if len(resultat) == limite else None
     return enveloppe({"total_du_filtre": total, "rendus": len(resultat),

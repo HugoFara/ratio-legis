@@ -81,7 +81,7 @@ def retentir(base: sqlite3.Connection, numero: str,
     q = lambda s, *a: [dict(r) for r in base.execute(s, a)]  # noqa: E731
 
     version = q("""SELECT v.id_legi, v.date_debut FROM version_en_vigueur v
-                   JOIN article a ON a.id = v.article_id
+                   JOIN article_courant a ON a.id = v.article_id
                    WHERE a.numero = ? ORDER BY v.date_debut DESC, v.id_legi""", numero)
     if not version:
         return {}
@@ -100,7 +100,7 @@ def retentir(base: sqlite3.Connection, numero: str,
             WHERE o.rang < ?)
         SELECT o.numero, min(o.rang) AS rang, v.verdict, v.partie
         FROM onde o
-        LEFT JOIN article a ON a.numero = o.numero
+        LEFT JOIN article_courant a ON a.numero = o.numero
         LEFT JOIN verdict v ON v.article_id = a.id
         WHERE o.rang > 0 AND o.numero <> ?
         GROUP BY o.numero
@@ -134,7 +134,7 @@ def retentir(base: sqlite3.Connection, numero: str,
                (SELECT v.verdict FROM article a2 JOIN verdict v ON v.article_id = a2.id
                 WHERE a2.id = r.article_id) AS verdict
         FROM version_en_vigueur v
-        JOIN article a  ON a.id = v.article_id
+        JOIN article_courant a  ON a.id = v.article_id
         JOIN segment s  ON s.version_id = v.id_legi
         JOIN renvoie_a r ON r.segment_id = s.id
         WHERE a.numero = ?
@@ -154,7 +154,7 @@ def sommet(base: sqlite3.Connection, combien: int = SOMMET) -> list[dict]:
         SELECT r.article_cite AS numero, count(DISTINCT r.article_citant) AS citants,
                v.verdict, v.partie
         FROM renvois_entrants r
-        LEFT JOIN article a ON a.numero = r.article_cite
+        LEFT JOIN article_courant a ON a.numero = r.article_cite
         LEFT JOIN verdict v ON v.article_id = a.id
         GROUP BY r.article_cite
         ORDER BY citants DESC, r.article_cite

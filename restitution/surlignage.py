@@ -51,7 +51,7 @@ def surligner(base: sqlite3.Connection, numero: str) -> dict:
     q = lambda s, *a: [dict(r) for r in base.execute(s, a)]  # noqa: E731
 
     version = q("""SELECT v.id_legi, v.date_debut, v.texte FROM version_en_vigueur v
-                   JOIN article a ON a.id = v.article_id
+                   JOIN article_courant a ON a.id = v.article_id
                    WHERE a.numero = ?
                    ORDER BY v.date_debut DESC, v.id_legi""", numero)
     if not version:

@@ -74,7 +74,7 @@ VOIES = {
     # Sous quel article de quel texte il a été discuté.
     "a_article_du_texte": """
         SELECT DISTINCT a.id FROM articles_du_texte x
-        JOIN article a ON a.numero = x.article""",
+        JOIN article_courant a ON a.numero = x.article""",
     # Un document qui motive le texte entier : exposé, étude d'impact, avis,
     # rapport au Président.
     "a_document_du_texte": """
@@ -85,7 +85,7 @@ VOIES = {
     # Un acte de l'Union cité par l'article, ou transposé par son texte.
     "a_acte_ue": """
         SELECT DISTINCT a.id FROM union_par_article u
-        JOIN article a ON a.numero = u.article
+        JOIN article_courant a ON a.numero = u.article
         UNION
         SELECT DISTINCT v.article_id FROM version_article v
         JOIN produite_par p ON p.version_id = v.id_legi

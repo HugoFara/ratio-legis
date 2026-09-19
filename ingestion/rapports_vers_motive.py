@@ -55,6 +55,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools" / "prototype"))
 from commentaires_rapports import ARTICLE, PLAGE, commentaires, texte_brut  # noqa: E402
+from lignees import Resolveur  # noqa: E402
 
 FENETRE_MINI = 60          # longueur minimale d'une preuve, imposée par le schéma
 
@@ -174,7 +175,7 @@ def url_dossier(nom: str) -> str | None:
             if trouve and "expose-motifs" in nom else None)
 
 
-def rattachements_legi(base: sqlite3.Connection) -> tuple[dict[str, set[str]], dict[str, str],
+def rattachements_legi(base: sqlite3.Connection) -> tuple[dict[int, set[str]], dict[str, str],
                                                           dict[str, int | None]]:
     """Ce que LEGI et DOLE déclarent : article → dossiers, dossier → titre, législature.
 
@@ -185,22 +186,22 @@ def rattachements_legi(base: sqlite3.Connection) -> tuple[dict[str, set[str]], d
     retenus ici, « dossier hors périmètre ». La base sait mieux : `produite_par`
     dit quel texte a produit chaque version, `issu_de` le dossier du texte.
 
-    Le numéro d'avant recodification est retenu au même titre que le numéro
-    actuel : un rapport de 2013 nomme L121-105, jamais L224-65. Chaque numéro
-    porte les dossiers de ses propres versions, plus ceux de ses ancêtres.
+    Clé par identifiant de lignée, non par numéro : un rapport de 2010 nommant
+    L313-10 est corroboré par le dossier de 2010 pour la lignée du cautionnement,
+    et par rien pour celle de la fiche standardisée. Chaque lignée porte les
+    dossiers de ses propres versions plus ceux de ses ancêtres renumérotés.
     """
-    articles: dict[str, set[str]] = defaultdict(set)
-    for numero, dossier in base.execute("""
+    articles: dict[int, set[str]] = defaultdict(set)
+    for article_id, dossier in base.execute("""
         WITH RECURSIVE asc_a(art, anc) AS (
             SELECT id, id FROM article
             UNION SELECT a.art, r.ancien_id FROM renumerote_de r JOIN asc_a a
             ON r.article_id = a.anc)
-        SELECT DISTINCT art.numero, i.dossier_id FROM asc_a a
-        JOIN article art       ON art.id = a.art
+        SELECT DISTINCT a.art, i.dossier_id FROM asc_a a
         JOIN version_article v ON v.article_id = a.anc
         JOIN produite_par p    ON p.version_id = v.id_legi
         JOIN issu_de i         ON i.texte_id = p.texte_id"""):
-        articles[numero.replace(" ", "")].add(dossier)
+        articles[article_id].add(dossier)
     titres: dict[str, str] = {}
     legislatures: dict[str, int | None] = {}
     for dossier, titre, legislature in base.execute(
@@ -221,6 +222,7 @@ def main() -> None:
     base = sqlite3.connect(chemin_base)
     base.execute("PRAGMA foreign_keys = ON")
     legi, titres, legislatures = rattachements_legi(base)
+    resolveur = Resolveur(base)
     # Reconstruction, non complément : les documents portent des identifiants
     # explicites et une seconde exécution entrait sinon en collision. Le même
     # défaut avait laissé en base des arêtes `resulte_de` à l'ancienne confiance.
@@ -232,7 +234,6 @@ def main() -> None:
     base.execute("DELETE FROM motive")
     base.execute("DELETE FROM document")
     base.executemany("DELETE FROM preuve WHERE id = ?", [(i,) for i in anciennes])
-    ids_articles = {n: i for i, n in base.execute("SELECT id, numero FROM article")}
     prochaine_preuve = base.execute(
         "SELECT coalesce(max(id), 0) + 1 FROM preuve").fetchone()[0]
     # Dossiers et `issu_de` sont désormais écrits par `dossiers_des_textes.py`,
@@ -279,6 +280,7 @@ def main() -> None:
             for numero, md, mf in mentions(corps):
                 candidats.append({
                     "document": identifiant, "dossier": dossier, "numero": numero,
+                    "article_id": resolveur.du_dossier(numero, dossier),
                     "article_du_texte": section["article_du_texte"],
                     "offset_debut": debut, "offset_fin": fin,
                     "mention": (debut + md, debut + mf),
@@ -291,7 +293,7 @@ def main() -> None:
 
     # -------------------------------------------- confiance mesurée, non choisie
     def corrobore(c: dict) -> bool:
-        return c["dossier"] in legi.get(c["numero"], ())
+        return c["dossier"] in legi.get(c["article_id"], ())
 
     # Le dénominateur est restreint aux citations qui désignent un article de ce
     # code. Rapporté à toutes les citations, le taux ne mesurerait rien
@@ -300,7 +302,7 @@ def main() -> None:
     # d'une arête. La question posée est : le rapporteur nommant un article de ce
     # code dans le commentaire d'un dossier, LEGI rattache-t-il cet article à ce
     # dossier ?
-    connus = [c for c in candidats if c["numero"] in ids_articles]
+    connus = [c for c in candidats if c["article_id"] is not None]
     taux = {}
     for classe in (True, False):
         groupe = [c for c in connus if c["en_tete"] is classe]
@@ -313,7 +315,7 @@ def main() -> None:
     aretes, preuves, sans_preuve = [], [], 0
     vus: set[tuple[int, int]] = set()
     for c in candidats:
-        article_id = ids_articles.get(c["numero"])
+        article_id = c["article_id"]
         if article_id is None or not c["en_tete"] or not corrobore(c):
             continue
         if (c["document"], article_id) in vus:

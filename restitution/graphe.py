@@ -137,7 +137,7 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
     q = lambda s, *a: [dict(r) for r in base.execute(s, a)]  # noqa: E731
 
     version = q("""SELECT v.id_legi, v.date_debut FROM version_en_vigueur v
-                   JOIN article a ON a.id = v.article_id
+                   JOIN article_courant a ON a.id = v.article_id
                    WHERE a.numero = ?
                    ORDER BY v.date_debut DESC, v.id_legi""", numero)
     if not version:
@@ -146,13 +146,13 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
     d = {"numero": numero, "version": version[0]}
     d["anciens"] = [r["numero"] for r in q("""
         WITH RECURSIVE asc_a(anc) AS (
-            SELECT id FROM article WHERE numero = ?
+            SELECT id FROM article_courant WHERE numero = ?
             UNION SELECT r.ancien_id FROM renumerote_de r JOIN asc_a ON r.article_id = asc_a.anc)
         SELECT DISTINCT a.numero FROM asc_a JOIN article a ON a.id = asc_a.anc
         WHERE a.numero <> ? ORDER BY a.numero""", numero, numero)]
 
     d["textes"] = q("""SELECT DISTINCT t.titre, t.date_texte, p.type_lien, p.methode
-                       FROM version_article v JOIN article a ON a.id = v.article_id
+                       FROM version_article v JOIN article_courant a ON a.id = v.article_id
                        JOIN produite_par p ON p.version_id = v.id_legi
                        JOIN texte_normatif t ON t.id_jorf = p.texte_id
                        WHERE a.numero = ? ORDER BY t.date_texte""", numero)
@@ -213,7 +213,7 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
 
     d["raisons"] = q("""
         WITH RECURSIVE asc_a(anc) AS (
-            SELECT id FROM article WHERE numero = ?
+            SELECT id FROM article_courant WHERE numero = ?
             UNION SELECT r.ancien_id FROM renumerote_de r JOIN asc_a ON r.article_id = asc_a.anc)
         SELECT doc.type, doc.url, m.article_du_texte, m.confiance, m.methode,
                m.offset_debut, m.offset_fin,
@@ -256,7 +256,7 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
     d["motivation_du_texte"] = q("""
         SELECT DISTINCT t.titre, doc.url, doc.type, doc.texte AS corps,
                length(doc.texte) AS taille
-        FROM version_article v JOIN article a ON a.id = v.article_id
+        FROM version_article v JOIN article_courant a ON a.id = v.article_id
         JOIN produite_par p ON p.version_id = v.id_legi
         JOIN texte_normatif t ON t.id_jorf = p.texte_id
         JOIN issu_de i ON i.texte_id = t.id_jorf
@@ -297,7 +297,7 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
         SELECT DISTINCT u.denomination, u.type_acte, u.url, t.titre, p.fenetre,
                tr.methode, tr.confiance
         FROM version_article v
-        JOIN article a          ON a.id = v.article_id
+        JOIN article_courant a          ON a.id = v.article_id
         JOIN produite_par pp    ON pp.version_id = v.id_legi
         JOIN texte_normatif t   ON t.id_jorf = pp.texte_id
         JOIN transpose tr       ON tr.texte_id = t.id_jorf
@@ -315,7 +315,7 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
                max(EXISTS (SELECT 1 FROM transpose tr
                            JOIN produite_par pp ON pp.texte_id = tr.texte_id
                            JOIN version_article vv ON vv.id_legi = pp.version_id
-                           JOIN article aa ON aa.id = vv.article_id
+                           JOIN article_courant aa ON aa.id = vv.article_id
                            WHERE tr.celex = u.celex AND aa.numero = ?)) AS transposee
         FROM acte_ue u
         LEFT JOIN considerant c ON c.celex = u.celex
@@ -323,7 +323,7 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
            OR EXISTS (SELECT 1 FROM transpose tr
                       JOIN produite_par pp ON pp.texte_id = tr.texte_id
                       JOIN version_article vv ON vv.id_legi = pp.version_id
-                      JOIN article aa ON aa.id = vv.article_id
+                      JOIN article_courant aa ON aa.id = vv.article_id
                       WHERE tr.celex = u.celex AND aa.numero = ?)
         GROUP BY u.celex ORDER BY transposee DESC, u.celex""",
         numero, numero, numero)

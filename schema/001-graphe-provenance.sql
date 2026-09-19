@@ -18,12 +18,25 @@ PRAGMA foreign_keys = ON;
 
 -- --------------------------------------------------------------------- nœuds
 
+-- Un article n'est pas un numéro. 285 numéros du code en vigueur ont désigné
+-- une autre disposition avant le 1er juillet 2016 — L313-10 fut le cautionnement
+-- disproportionné de 1993 à 2016, il est la fiche standardisée d'information
+-- depuis — et le nœud clé par numéro les confondait : l'historique de l'un
+-- devenait celui de l'autre, et un rapport de 2010 commentant le cautionnement
+-- « motivait » la fiche standardisée. `docs/02` § 7 l'avait écrit : résoudre par
+-- identifiant, jamais par numéro. La **lignée** est ce qui manquait : le rang de
+-- la disposition qui a porté ce numéro, incrémenté à chaque discontinuité —
+-- numéro abrogé, puis recréé avec un texte sans rapport (`legi_vers_graphe.py`).
+-- La lignée la plus haute est celle d'aujourd'hui ; `article_courant` la sert à
+-- tout ce qui entre par un numéro sans date.
 CREATE TABLE article (
     id      INTEGER PRIMARY KEY,
     code    TEXT NOT NULL,
     numero  TEXT NOT NULL,
-    UNIQUE (code, numero)
+    lignee  INTEGER NOT NULL DEFAULT 1,
+    UNIQUE (code, numero, lignee)
 ) STRICT;
+
 
 CREATE TABLE version_article (
     id_legi     TEXT PRIMARY KEY,              -- LEGIARTI…
@@ -36,6 +49,24 @@ CREATE TABLE version_article (
 ) STRICT;
 
 CREATE INDEX version_article_par_article ON version_article (article_id, date_debut);
+
+-- Période couverte par chaque lignée, pour résoudre un numéro cité par un
+-- document daté : le rapport de 2010 qui nomme L313-10 parle de la lignée qui
+-- portait ce numéro en 2010.
+CREATE VIEW periode_article AS
+    SELECT article_id, min(date_debut) AS debut,
+           max(coalesce(date_fin, '9999-12-31')) AS fin
+    FROM version_article
+    WHERE etat NOT IN ('MODIFIE_MORT_NE', 'ANNULE')
+    GROUP BY article_id;
+
+-- La lignée d'aujourd'hui : la plus haute parmi celles qui ont eu une version
+-- vivante — une lignée faite d'une seule version mort-née ne compte pas.
+CREATE VIEW article_courant AS
+    SELECT id, code, numero, lignee FROM article a
+    WHERE lignee = (SELECT max(b.lignee) FROM article b
+                    JOIN periode_article p ON p.article_id = b.id
+                    WHERE b.code = a.code AND b.numero = a.numero);
 
 -- Un segment est un alinéa. Le fonds LEGI ne le balise pas de façon fiable :
 -- 26,5 % des articles n'ont aucune balise <p> et le fonds compte deux fois plus

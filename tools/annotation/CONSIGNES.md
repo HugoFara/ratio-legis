@@ -64,13 +64,16 @@ de l'historique — est celui du texte que tu cherches, `rattacher` suffit :
 
     $C rattacher <article> JORFDOLE…
 
-**Méfie-toi de l'historique quand le numéro a été réutilisé.** 285 articles en
-vigueur portent un numéro qui désignait une **autre disposition** avant le
-1er juillet 2016 (recodification). La fiche mêle alors les deux : les textes
-d'avant 2016 concernent l'ancienne disposition, pas celle que tu annotes.
-Compare le texte en vigueur aux versions anciennes ; si elles n'ont rien à
-voir, cherche la loi qui a réellement écrit le dispositif actuel — par ses
-mots, `chercher`, dans les dossiers postérieurs, puis `rattacher`.
+**Méfie-toi d'un historique qui commence en 2016.** 285 articles en vigueur
+portent un numéro qui désignait une autre disposition avant la recodification
+du 1er juillet 2016 ; depuis la scission des lignées (`docs/38`), la fiche ne
+montre que la disposition actuelle — mais elle ne remonte qu'aussi loin que
+LEGI déclare la concordance, et LEGI ne la déclare pas toujours (L313-10 vient
+de L312-6-2, la loi bancaire de 2013 ; rien ne le dit). Si l'historique
+s'arrête à 2016 alors que le dispositif est manifestement plus ancien, cherche
+la loi qui l'a réellement écrit — par ses mots, `chercher`, dans les dossiers
+antérieurs du corpus —, puis `rattacher`, et dis-le dans le commentaire :
+c'est une concordance manquante, et elle vaut d'être signalée.
 
 ## 5. Rendre le verdict
 

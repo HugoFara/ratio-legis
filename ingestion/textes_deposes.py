@@ -58,6 +58,9 @@ from pathlib import Path
 
 import fitz          # pymupdf
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lignees import Resolveur  # noqa: E402
+
 # La série latine va plus loin que « duodecies », et un rang manquant ne se
 # rattrape pas : « Article 17 quindecies » n'est alors pas reconnu comme en-tête,
 # et **son contenu est rattaché à l'article précédent** — le défaut que le
@@ -323,7 +326,10 @@ def main() -> None:
                  "('texte_en_discussion', 'article_cree')")
 
     connus = {d for (d,) in base.execute("SELECT id_dole FROM dossier")}
-    articles = {n: i for n, i in base.execute("SELECT numero, id FROM article")}
+    # Le numéro se résout à la date du dossier : un texte de 2010 qui modifie
+    # « L. 313-10 » modifie le cautionnement, pas la fiche standardisée qui porte
+    # ce numéro depuis 2016 (`lignees.py`).
+    resolveur = Resolveur(base)
     # **Corroboration par LEGI**, exigée de la seule voie de la citation. Le code
     # hôte y est implicite : l'instruction le nomme une fois, loin en amont, et un
     # texte qui modifie plusieurs codes à la suite fait dériver la dernière
@@ -386,7 +392,7 @@ def main() -> None:
                 if code is None:
                     portee, article_id = "non_resolue", None
                 elif NOTRE_CODE.search(code):
-                    article_id = articles.get(cle)
+                    article_id = resolveur.du_dossier(cle, ligne["dossier"])
                     portee = "interne" if article_id else "non_resolue"
                 else:
                     portee, article_id = "externe", None
@@ -425,7 +431,7 @@ def main() -> None:
                 if code is None:
                     portee, article_id = "non_resolue", None
                 elif NOTRE_CODE.search(code):
-                    article_id = articles.get(cle)
+                    article_id = resolveur.du_dossier(cle, ligne["dossier"])
                     portee = "interne" if article_id else "non_resolue"
                 else:
                     portee, article_id = "externe", None

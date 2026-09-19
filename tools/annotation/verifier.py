@@ -85,7 +85,7 @@ def aretes_motive(base: sqlite3.Connection, numero: str) -> list[tuple[int, int,
     """(document_id, offset_debut, offset_fin) sur l'article et ses anciens numéros."""
     return [tuple(r) for r in base.execute("""
         WITH RECURSIVE asc_a(anc) AS (
-            SELECT id FROM article WHERE numero = ?
+            SELECT id FROM article_courant WHERE numero = ?
             UNION SELECT r.ancien_id FROM renumerote_de r JOIN asc_a ON r.article_id = asc_a.anc)
         SELECT DISTINCT m.document_id, m.offset_debut, m.offset_fin
         FROM asc_a JOIN motive m ON m.article_id = asc_a.anc""", (numero,))]
@@ -98,7 +98,7 @@ def main() -> None:
     base = sqlite3.connect(f"file:{base_chemin}?mode=ro", uri=True)
     empreintes = documents_par_empreinte(base)
     verdicts = dict(base.execute(
-        "SELECT a.numero, v.verdict FROM verdict v JOIN article a ON a.id = v.article_id"))
+        "SELECT a.numero, v.verdict FROM verdict v JOIN article_courant a ON a.id = v.article_id"))
 
     lignes = list(csv.DictReader(annotations.open(encoding="utf-8")))
     annotees = [l for l in lignes if l["ANNOT_verdict"]]

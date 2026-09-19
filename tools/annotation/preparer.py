@@ -95,7 +95,7 @@ def mentions(texte: str, numeros: list[str]) -> list[int]:
 
 def article_en_vigueur(base: sqlite3.Connection, numero: str) -> str:
     ligne = base.execute("""SELECT v.texte FROM version_en_vigueur v
-                            JOIN article a ON a.id = v.article_id
+                            JOIN article_courant a ON a.id = v.article_id
                             WHERE a.numero = ?
                             ORDER BY v.date_debut DESC, v.id_legi""", (numero,)).fetchone()
     return ligne[0] if ligne else "(aucune version en vigueur dans la base)"
@@ -104,7 +104,7 @@ def article_en_vigueur(base: sqlite3.Connection, numero: str) -> str:
 def anciens_numeros(base: sqlite3.Connection, numero: str) -> list[str]:
     return [r[0] for r in base.execute("""
         WITH RECURSIVE asc_a(anc) AS (
-            SELECT id FROM article WHERE numero = ?
+            SELECT id FROM article_courant WHERE numero = ?
             UNION SELECT r.ancien_id FROM renumerote_de r JOIN asc_a ON r.article_id = asc_a.anc)
         SELECT DISTINCT a.numero FROM asc_a JOIN article a ON a.id = asc_a.anc
         WHERE a.numero <> ? ORDER BY a.numero""", (numero, numero))]
@@ -114,7 +114,7 @@ def historique(base: sqlite3.Connection, numero: str) -> list[dict]:
     """Chaque texte ayant produit une version de l'article ou de ses anciens numéros."""
     return [dict(r) for r in base.execute("""
         WITH RECURSIVE asc_a(anc) AS (
-            SELECT id FROM article WHERE numero = ?
+            SELECT id FROM article_courant WHERE numero = ?
             UNION SELECT r.ancien_id FROM renumerote_de r JOIN asc_a ON r.article_id = asc_a.anc)
         SELECT DISTINCT a.numero, v.date_debut, p.type_lien, t.titre, t.nature,
                         t.id_jorf, i.dossier_id, d.titre AS dossier_titre
