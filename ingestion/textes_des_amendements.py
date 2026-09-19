@@ -59,7 +59,9 @@ from collections import defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from textes_deposes import articles_du_texte, texte_brut  # noqa: E402
+from textes_deposes import (ARTICLE_CREE, REFERENCE, articles_du_texte,  # noqa: E402
+                            dans_une_citation, est_une_cible, index_des_lignes,
+                            numero as numero_de, texte_brut)
 
 # --- identification des documents, par chambre --------------------------------
 # Sénat : (session, numéro). `petite-loi-ameli` porte la session en entier ; les
@@ -142,16 +144,23 @@ CONFIANCE = 0.2481            # composition seule, population d'avant les voies,
 #                   après les corrections de docs/43 — les quatre fausses sont
 #                   des alinéas gouvernés par une instruction que porte_sur n'a
 #                   pas relevée (article inséré, instruction sautée) : la portée
-#                   d'une instruction n'est pas bornée par la suivante.
-#                   Retenu : le dernier tirage, Wilson 0,5840.
+#                   d'une instruction n'est pas bornée par la suivante. Puis,
+#                   l'instruction lue dans le texte à toutes ses occurrences,
+#                   bornée par le paragraphe de tête, les lignes de statut du
+#                   Sénat exclues du compte : 17 / 20 sur un troisième tirage
+#                   disjoint (docs/44), Wilson 0,6396 — les trois fausses sont
+#                   des sous-instructions (a bis), 2°) que le parseur ne borne
+#                   pas encore.
 #   visee            7 / 10 (docs/42), puis 13 / 15 après les gardes de vise —
 #                   ancre d'insertion, code hôte, numéro glissé, « L. 312-9-… ».
 #                   Wilson 0,6212.
 #   article_entier   7 / 10, puis 6 / 7 — Wilson 0,4869 : « N ne réécrit que A »
 #                   repose sur porte_sur, qui ne voit pas tout ce que N réécrit.
 # Deux juges (deepseek-v4p1-flash, glm-5p3-flash), qwen3p8-max en arbitrage.
-CONFIANCE_PAR_VOIE = {"visee": 0.6212, "alinea": 0.5840, "article_entier": 0.4869}
+CONFIANCE_PAR_VOIE = {"visee": 0.6212, "alinea": 0.6396, "article_entier": 0.4869}
 
+PARAGRAPHE = re.compile(r"^[ \t]*[IVXL]{1,6}(?:\s*(?:bis|ter|quater|quinquies|sexies))?\s*\.\s*[–-]",
+                        re.M)
 ALINEA = re.compile(r"\b(?:l['’]\s*)?alin[ée]as?\s+(\d{1,3})\b", re.I)
 ARTICLE_ENTIER = re.compile(r"^\s*(?:I\.\s*[–-]\s*)?(supprimer|r[ée]diger ainsi|r[ée]tablir)\s+cet\s+article",
                             re.I)
@@ -173,11 +182,18 @@ def tete_numerique(numero: str) -> int | None:
     return int(chiffres) if chiffres.isdigit() else (1 if chiffres == "1er" else None)
 
 
+# La ligne de statut que le Sénat imprime sous le titre — « (Non modifié) »,
+# « (Supprimé) », « (Conforme) » — n'est pas un alinéa : la numérotation des
+# amendements l'exclut, et la compter décalait tout d'un cran (docs/44).
+STATUT = re.compile(r"^\s*\(?\s*(?:non modifiée?s?|supprimée?s?|conformes?|"
+                    r"suppression (?:maintenue|conforme))\s*\)?\s*$", re.I)
+
+
 def alineas_de(texte: str, debut: int, fin: int) -> list[tuple[int, int]]:
     """Bornes de chaque alinéa de l'article du texte : une ligne non vide."""
     bornes, position = [], debut
     for ligne in texte[debut:fin].split("\n"):
-        if ligne.strip():
+        if ligne.strip() and not STATUT.match(ligne):
             bornes.append((position, position + len(ligne)))
         position += len(ligne) + 1
     return bornes
@@ -204,13 +220,42 @@ class Textes:
         self.cache[texte_id] = (texte, articles)
         return self.cache[texte_id]
 
+    def instructions(self, texte: str, debut: int, fin: int) -> list[tuple[int, str]]:
+        """Chaque instruction de l'article du texte, à sa position : une référence
+        hors citation qui est une cible (« L'article L. 218-7 est complété »), ou
+        un article que le texte écrit (« Art. L. 333-6. – »). **Toutes** les
+        occurrences, là où `porte_sur` n'en retient qu'une par numéro : la
+        portée d'une instruction est bornée par la suivante, quelle qu'elle soit
+        — quatre arêtes fausses sur vingt venaient d'une instruction que
+        `porte_sur` n'avait pas relevée et qui gouvernait pourtant l'alinéa
+        (docs/43 § 2)."""
+        segment = texte[debut:fin]
+        debuts = index_des_lignes(segment)
+        trouvees = []
+        for m in REFERENCE.finditer(segment):
+            if dans_une_citation(segment, debuts, m.start()):
+                continue
+            if est_une_cible(segment, m.start(), m.end()):
+                trouvees.append((debut + m.start(), numero_de(m)))
+        for m in ARTICLE_CREE.finditer(segment):
+            trouvees.append((debut + m.start(), numero_de(m)))
+        # Un paragraphe de tête — « III. – L'article 1er de la loi du 29 mars
+        # 1944 est abrogé » — ouvre une instruction même quand elle ne vise aucun
+        # article de code ; sans cette borne, le II sur L. 113-3 gouvernait
+        # encore les alinéas du III. Une borne sans numéro rend l'alinéa
+        # illisible plutôt que rattaché à l'instruction d'avant.
+        for m in PARAGRAPHE.finditer(segment):
+            trouvees.append((debut + m.start(), ""))
+        return sorted(trouvees)
+
     def gouvernant(self, texte_id: str, numero: str, alinea: int,
-                   mentions: list[tuple[int, int | None]]) -> int | None | str:
+                   mentions: dict[str, int | None]) -> int | None | str:
         """L'article du code que le texte réécrit à l'alinéa `alinea` de l'article
-        `numero` : la dernière instruction relevée par `porte_sur` avant la fin de
-        cet alinéa. `mentions` : (offset, article_id ou None si hors du code).
-        Rend l'identifiant, None si l'instruction porte sur un autre code, ou
-        'illisible' si l'alinéa n'existe pas."""
+        `numero` : la dernière instruction du texte avant la fin de cet alinéa,
+        résolue par ce que `porte_sur` en sait. `mentions` : numéro cité →
+        article_id, ou None si hors du code. Rend l'identifiant, None si
+        l'instruction porte sur un autre code, 'illisible' si l'alinéa n'existe
+        pas ou si l'instruction qui le gouverne n'est pas connue."""
         charge = self.charger(texte_id)
         if not charge or numero not in charge[1]:
             return "illisible"
@@ -219,10 +264,14 @@ class Textes:
         if not 1 <= alinea <= len(bornes):
             return "illisible"
         fin_alinea = bornes[alinea - 1][1]
-        precedentes = [m for m in mentions if m[0] <= fin_alinea]
+        precedentes = [i for i in self.instructions(texte, *articles[numero])
+                       if i[0] <= fin_alinea]
         if not precedentes:
             return "illisible"
-        return max(precedentes)[1]
+        cle = precedentes[-1][1]
+        if not cle or cle not in mentions:
+            return "illisible"       # instruction sans numéro, ou non relevée
+        return mentions[cle]
 
 
 def correspondances(base: sqlite3.Connection) -> list[tuple[str, str, str]]:
@@ -307,13 +356,12 @@ def construire(base: sqlite3.Connection, schema: Path, corpus_textes: Path) -> d
 
     # Les mentions de `porte_sur` avec leur offset, internes et externes : c'est
     # ce qui dit quel article du code le texte réécrit à tel endroit.
-    mentions: dict[tuple[str, str], list[tuple[int, int | None]]] = defaultdict(list)
-    for texte_id, article_du_texte, article_id, portee, offset in base.execute(
-            "SELECT p.texte_id, lower(p.article_du_texte), p.article_id, p.portee, "
-            "pr.source_offset FROM porte_sur p JOIN preuve pr ON pr.id = p.preuve_id "
-            "WHERE pr.source_offset IS NOT NULL"):
-        mentions[(texte_id, article_du_texte)].append(
-            (offset, article_id if portee == "interne" else None))
+    mentions: dict[tuple[str, str], dict[str, int | None]] = defaultdict(dict)
+    for texte_id, article_du_texte, article_id, portee, cle in base.execute(
+            "SELECT texte_id, lower(article_du_texte), article_id, portee, numero_cite "
+            "FROM porte_sur"):
+        mentions[(texte_id, article_du_texte)][cle.replace(" ", "")] = (
+            article_id if portee == "interne" else None)
     # Ce que l'amendement déclare viser lui-même, chaîne de renumérotation comprise.
     chaine: dict[int, set[int]] = defaultdict(set)
     for origine, courant in base.execute("""
@@ -377,7 +425,7 @@ def construire(base: sqlite3.Connection, schema: Path, corpus_textes: Path) -> d
             trouve = ALINEA.search(dispositif)
             if trouve:
                 cible = textes.gouvernant(texte_id, numero, int(trouve.group(1)),
-                                          mentions.get((texte_id, numero), []))
+                                          mentions.get((texte_id, numero), {}))
                 if cible == "illisible":
                     compte["alinea_illisible"] += 1
                 elif cible is None:

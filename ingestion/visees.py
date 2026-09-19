@@ -114,8 +114,11 @@ def vise_un_autre_code(texte: str, debut: int, fin: int) -> bool:
 # gardes du code hôte et du numéro glissé : **16 justes, 2 fausses, 2 douteuses
 # sur 20** — Wilson 0,5840 (`precision-vise-2.tsv`, `docs/43`). Avant les
 # gardes, 9 sur 20 : le tiret insécable avait triplé l'arête, et la moitié du
-# gain était des homonymes d'autres codes.
-CONFIANCE = 0.5840
+# gain était des homonymes d'autres codes. Troisième tirage, disjoint, après la
+# règle « hôte inconnu = pas de rattachement » : **20 sur 20** (docs/44),
+# Wilson 0,8389. Réunis, 36 justes sur 40 ; la constante prend le dernier
+# tirage, comme pour toutes les arêtes dont la population a changé entre deux.
+CONFIANCE = 0.8389
 
 
 def code_nomme(texte: str, debut: int, fin: int) -> bool:
@@ -207,7 +210,12 @@ def main() -> None:
             codes_de_l_hote = hote.get((texte_id, numero))
         retenues = []
         for n, (formule, nomme) in cibles(dispositif):
-            if not nomme and codes_de_l_hote is not None and codes_de_l_hote != {"interne"}:
+            # Sans code nommé, le numéro ne vaut que par son hôte ; hôte étranger,
+            # hôte multi-codes, ou hôte inconnu — jeu d'amendements non apparié à
+            # un texte — : on ne rattache pas. Dix amendements y perdent leur
+            # arête, dont celui qui complétait « L. 131-4 » du code de
+            # l'environnement (docs/43 § 2) ; c'est le prix de la règle § 5.3.
+            if not nomme and codes_de_l_hote != {"interne"}:
                 hote_etranger += 1
                 continue
             article_id = resolveur.du_dossier(n, dossier)

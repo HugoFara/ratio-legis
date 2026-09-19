@@ -46,23 +46,23 @@ irrecevabilite	fondement — article 41	170	2955	5.8
 irrecevabilite	fondement — article 44 bis	135	2955	4.6	
 irrecevabilite	fondement — LOLF	10	2955	0.3	
 irrecevabilite	fondement — LOLFSS	6	2955	0.2	
-tentatives	articles en vigueur portant une tentative, les trois voies	209	2104	9.9	cible déclarée, alinéa écrit ou subdivision déposée
-tentatives	dont par la cible déclarée du dispositif	135	209	64.6	
-tentatives	dont par un alinéa écrit qui subsiste	83	209	39.7	
-tentatives	dont par la subdivision déposée	30	209	14.4	
-tentatives	tentatives déclarées sur un article en vigueur	315			voie de la cible déclarée seule ; le détail par sort suit
-depot	amendements positionnés sur un article en vigueur	190			
-depot	articles en vigueur atteints	30	2104	1.4	
+tentatives	articles en vigueur portant une tentative, les trois voies	207	2104	9.8	cible déclarée, alinéa écrit ou subdivision déposée
+tentatives	dont par la cible déclarée du dispositif	132	207	63.8	
+tentatives	dont par un alinéa écrit qui subsiste	83	207	40.1	
+tentatives	dont par la subdivision déposée	31	207	15.0	
+tentatives	tentatives déclarées sur un article en vigueur	304			voie de la cible déclarée seule ; le détail par sort suit
+depot	amendements positionnés sur un article en vigueur	188			
+depot	articles en vigueur atteints	31	2104	1.5	
 depot	assemblee — jeux d'amendements appariés à leur texte	39	39	100.0	
 depot	senat — jeux d'amendements appariés à leur texte	124	143	86.7	
 depot	subdivisions tombant dans la plage d'articles du texte	5488	5712	96.1	contrôle de l'appariement ; un texte faux s'y verrait en premier
 depot	amendements portant sur un article additionnel	9088			ils ne visent aucun article existant du code : c'est le plafond de la voie du dépôt
-tentatives	dont rejete	119	315	37.8	
-tentatives	dont retire	66	315	21.0	
-tentatives	dont adopte	63	315	20.0	
-tentatives	dont irrecevable	42	315	13.3	
-tentatives	dont non_soutenu	21	315	6.7	
-tentatives	dont tombe	4	315	1.3	
+tentatives	dont rejete	116	304	38.2	
+tentatives	dont retire	64	304	21.1	
+tentatives	dont adopte	58	304	19.1	
+tentatives	dont irrecevable	42	304	13.8	
+tentatives	dont non_soutenu	20	304	6.6	
+tentatives	dont tombe	4	304	1.3	
 navette	dossiers ayant au moins deux états datés	110			
 navette	durée médiane, en jours	131			
 navette	durée la plus courte, en jours	1			
