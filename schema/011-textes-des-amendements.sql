@@ -61,11 +61,27 @@ CREATE TABLE texte_des_amendements (
 -- vise pas l'article 19 : il vise un article qui n'existe pas encore, et dont le
 -- numéro dans le code n'est pas fixé. 7 501 amendements sont dans ce cas — c'est
 -- le résultat principal de la tranche, et c'est un résultat négatif.
+-- **Trois voies, mesurées à part** (docs/42). La composition seule — déposé sur
+-- l'article N du texte, N réécrit A et aucun autre — vaut 7 sur 15 quand on
+-- lui demande ce qu'elle prétend, « l'amendement portait sur A » (docs/41) :
+-- un amendement déposé sur N peut ne toucher qu'un paragraphe qui modifie un
+-- autre code. Le dispositif dit presque toujours **où** il porte, par le numéro
+-- d'alinéa du texte ; et l'alinéa se laisse rattacher à l'article du code que
+-- le texte réécrit à cet endroit.
+--
+--   visee           le dispositif nomme l'article du code, et c'est celui-là
+--   alinea          le dispositif nomme un alinéa de l'article du texte, et
+--                   l'instruction qui gouverne cet alinéa réécrit A
+--   article_entier  le dispositif porte sur tout l'article du texte
+--                   (« Supprimer cet article », « Rédiger ainsi cet article »)
+--                   et N ne réécrit que A
 CREATE TABLE depose_sur (
     amendement_id     INTEGER NOT NULL REFERENCES amendement,
     article_id        INTEGER NOT NULL REFERENCES article,
     texte_id          TEXT NOT NULL REFERENCES texte_discute,
     article_du_texte  TEXT NOT NULL,
+    voie              TEXT NOT NULL DEFAULT 'article_entier'
+                      CHECK (voie IN ('visee', 'alinea', 'article_entier')),
     methode           TEXT NOT NULL DEFAULT 'derivee'
                       CHECK (methode IN ('declaree', 'derivee', 'inferee')),
     confiance         REAL NOT NULL CHECK (confiance BETWEEN 0 AND 1),

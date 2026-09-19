@@ -46,16 +46,16 @@ irrecevabilite	fondement — article 41	170	2955	5.8
 irrecevabilite	fondement — article 44 bis	135	2955	4.6	
 irrecevabilite	fondement — LOLF	10	2955	0.3	
 irrecevabilite	fondement — LOLFSS	6	2955	0.2	
-tentatives	articles en vigueur portant une tentative, les trois voies	179	2104	8.5	cible déclarée, alinéa écrit ou subdivision déposée
-tentatives	dont par la cible déclarée du dispositif	102	179	57.0	
-tentatives	dont par un alinéa écrit qui subsiste	83	179	46.4	
-tentatives	dont par la subdivision déposée	14	179	7.8	
+tentatives	articles en vigueur portant une tentative, les trois voies	189	2104	9.0	cible déclarée, alinéa écrit ou subdivision déposée
+tentatives	dont par la cible déclarée du dispositif	102	189	54.0	
+tentatives	dont par un alinéa écrit qui subsiste	83	189	43.9	
+tentatives	dont par la subdivision déposée	31	189	16.4	
 tentatives	tentatives déclarées sur un article en vigueur	158			voie de la cible déclarée seule ; le détail par sort suit
-depot	amendements positionnés sur un article en vigueur	50			
-depot	articles en vigueur atteints	14	2104	0.7	
+depot	amendements positionnés sur un article en vigueur	191			
+depot	articles en vigueur atteints	31	2104	1.5	
 depot	assemblee — jeux d'amendements appariés à leur texte	39	39	100.0	
 depot	senat — jeux d'amendements appariés à leur texte	124	143	86.7	
-depot	subdivisions tombant dans la plage d'articles du texte	5479	5702	96.1	contrôle de l'appariement ; un texte faux s'y verrait en premier
+depot	subdivisions tombant dans la plage d'articles du texte	5488	5712	96.1	contrôle de l'appariement ; un texte faux s'y verrait en premier
 depot	amendements portant sur un article additionnel	9088			ils ne visent aucun article existant du code : c'est le plafond de la voie du dépôt
 tentatives	dont adopte	51	158	32.3	
 tentatives	dont rejete	41	158	25.9	

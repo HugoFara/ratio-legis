@@ -58,6 +58,9 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from textes_deposes import articles_du_texte, texte_brut  # noqa: E402
+
 # --- identification des documents, par chambre --------------------------------
 # Sénat : (session, numéro). `petite-loi-ameli` porte la session en entier ; les
 # préfixes `pjl`/`ppl` la portent sur deux chiffres — `pjl13-283` est le texte 283
@@ -92,11 +95,15 @@ AMENDEMENT_AN = re.compile(r"^B(?:TC)?(\d+)/")
 # lu « article 5 » : la quinzième arête du tirage de la vingt-neuvième tranche,
 # fausse pour cette seule raison. Les rangs composés — « terdecies » = « ter » +
 # « decies » — se lisaient déjà ; les autres non.
+# Les rangs composés d'abord, et une frontière de mot après le rang : sans elle,
+# « 72 terdecies » se lisait « 72 ter » — un amendement rétablissant l'article
+# 72 terdecies était rattaché à l'article 72 ter, et l'arête jugée fausse par
+# trois juges (docs/42).
 SUBDIVISION = re.compile(
     r"\bart(?:icle)?\.?\s+(premier|1er|\d+)\s*"
-    r"(bis|ter|quater|quinquies|sexies|septies|octies|nonies|decies"
-    r"|undecies|duodecies|quindecies|sexdecies|septdecies|octodecies"
-    r"|novodecies|vicies|unvicies|duovicies|tervicies)?"
+    r"(terdecies|quaterdecies|quindecies|sexdecies|septdecies|octodecies"
+    r"|novodecies|unvicies|duovicies|tervicies|vicies|undecies|duodecies"
+    r"|bis|ter|quater|quinquies|sexies|septies|octies|nonies|decies)?\b"
     r"(?:\s*([A-H]{1,2})\b)?", re.I)
 # « art. add. après Article 19 » ne vise pas l'article 19. L'amendement demande la
 # création d'un article qui n'existe pas encore, dont le numéro dans le code n'est
@@ -128,7 +135,22 @@ ARTICLE_ADDITIONNEL = re.compile(
 # cet article ». Un amendement déposé sur l'article 18 du texte peut ne toucher
 # que le code monétaire, et l'arête le rattache à L. 311-8-1. La confiance
 # porte la mesure, pas la définition.
-CONFIANCE = 0.2481
+CONFIANCE = 0.2481            # composition seule, population d'avant les voies, docs/41
+# Chaque voie mesurée à part le 19 septembre 2026, par trois juges — qwen3p8-max
+# (compté), deepseek-v4p1-flash, glm-5p3-flash —, tirages disjoints (docs/42) :
+#   alinea          18 / 20, unanimité 19 / 20 — Wilson 0,6990
+#   visee            7 / 10, unanimité  9 / 10 — Wilson 0,3968 : le dispositif
+#                   nomme l'article comme ancre d'insertion (« après l'article
+#                   L. 312-9, il est inséré… »), ce que `vise` prend pour une cible
+#   article_entier   7 / 10, unanimité 10 / 10 — Wilson 0,3968 : « N ne réécrit
+#                   que A » repose sur `porte_sur`, qui ne voit ni l'article que
+#                   le texte insère, ni toujours l'autre code qu'il modifie
+CONFIANCE_PAR_VOIE = {"visee": 0.3968, "alinea": 0.6990, "article_entier": 0.3968}
+
+ALINEA = re.compile(r"\b(?:l['’]\s*)?alin[ée]as?\s+(\d{1,3})\b", re.I)
+ARTICLE_ENTIER = re.compile(r"^\s*(?:I\.\s*[–-]\s*)?(supprimer|r[ée]diger ainsi|r[ée]tablir)\s+cet\s+article",
+                            re.I)
+AJOUT_EN_FIN = re.compile(r"^\s*(?:I\.\s*[–-]\s*)?compl[ée]ter\s+cet\s+article", re.I)
 
 
 def numero_de_subdivision(subdivision: str | None) -> str | None:
@@ -144,6 +166,58 @@ def numero_de_subdivision(subdivision: str | None) -> str | None:
 def tete_numerique(numero: str) -> int | None:
     chiffres = numero.split(" ")[0]
     return int(chiffres) if chiffres.isdigit() else (1 if chiffres == "1er" else None)
+
+
+def alineas_de(texte: str, debut: int, fin: int) -> list[tuple[int, int]]:
+    """Bornes de chaque alinéa de l'article du texte : une ligne non vide."""
+    bornes, position = [], debut
+    for ligne in texte[debut:fin].split("\n"):
+        if ligne.strip():
+            bornes.append((position, position + len(ligne)))
+        position += len(ligne) + 1
+    return bornes
+
+
+class Textes:
+    """Les textes en discussion, lus une fois, et leurs articles découpés."""
+
+    def __init__(self, base: sqlite3.Connection, corpus: Path) -> None:
+        self.base, self.corpus = base, corpus
+        self.cache: dict[str, tuple[str, dict[str, tuple[int, int]]]] = {}
+
+    def charger(self, texte_id: str) -> tuple[str, dict[str, tuple[int, int]]] | None:
+        if texte_id in self.cache:
+            return self.cache[texte_id]
+        ligne = self.base.execute("SELECT dossier_id FROM texte_discute WHERE id = ?",
+                                  (texte_id,)).fetchone()
+        fichier = self.corpus / f"{ligne[0]}__{texte_id.split('/', 1)[1]}" if ligne else None
+        if not fichier or not fichier.exists():
+            self.cache[texte_id] = None
+            return None
+        texte = texte_brut(fichier)
+        articles = {numero: (debut, fin) for numero, debut, fin in articles_du_texte(texte)}
+        self.cache[texte_id] = (texte, articles)
+        return self.cache[texte_id]
+
+    def gouvernant(self, texte_id: str, numero: str, alinea: int,
+                   mentions: list[tuple[int, int | None]]) -> int | None | str:
+        """L'article du code que le texte réécrit à l'alinéa `alinea` de l'article
+        `numero` : la dernière instruction relevée par `porte_sur` avant la fin de
+        cet alinéa. `mentions` : (offset, article_id ou None si hors du code).
+        Rend l'identifiant, None si l'instruction porte sur un autre code, ou
+        'illisible' si l'alinéa n'existe pas."""
+        charge = self.charger(texte_id)
+        if not charge or numero not in charge[1]:
+            return "illisible"
+        texte, articles = charge
+        bornes = alineas_de(texte, *articles[numero])
+        if not 1 <= alinea <= len(bornes):
+            return "illisible"
+        fin_alinea = bornes[alinea - 1][1]
+        precedentes = [m for m in mentions if m[0] <= fin_alinea]
+        if not precedentes:
+            return "illisible"
+        return max(precedentes)[1]
 
 
 def correspondances(base: sqlite3.Connection) -> list[tuple[str, str, str]]:
@@ -187,7 +261,7 @@ def correspondances(base: sqlite3.Connection) -> list[tuple[str, str, str]]:
     return trouvees
 
 
-def construire(base: sqlite3.Connection, schema: Path) -> dict:
+def construire(base: sqlite3.Connection, schema: Path, corpus_textes: Path) -> dict:
     base.executescript(schema.read_text(encoding="utf-8"))
     compte: dict[str, int] = defaultdict(int)
 
@@ -223,13 +297,36 @@ def construire(base: sqlite3.Connection, schema: Path) -> dict:
         if (texte_id, article_du_texte) in cibles:
             cibles[(texte_id, article_du_texte)].add(-1)   # cible hors du code
 
+    # Les mentions de `porte_sur` avec leur offset, internes et externes : c'est
+    # ce qui dit quel article du code le texte réécrit à tel endroit.
+    mentions: dict[tuple[str, str], list[tuple[int, int | None]]] = defaultdict(list)
+    for texte_id, article_du_texte, article_id, portee, offset in base.execute(
+            "SELECT p.texte_id, lower(p.article_du_texte), p.article_id, p.portee, "
+            "pr.source_offset FROM porte_sur p JOIN preuve pr ON pr.id = p.preuve_id "
+            "WHERE pr.source_offset IS NOT NULL"):
+        mentions[(texte_id, article_du_texte)].append(
+            (offset, article_id if portee == "interne" else None))
+    # Ce que l'amendement déclare viser lui-même, chaîne de renumérotation comprise.
+    chaine: dict[int, set[int]] = defaultdict(set)
+    for origine, courant in base.execute("""
+        WITH RECURSIVE c(origine, courant) AS (
+            SELECT id, id FROM article
+            UNION SELECT c.origine, r.ancien_id FROM renumerote_de r JOIN c ON r.article_id = c.courant
+            UNION SELECT c.origine, r.article_id FROM renumerote_de r JOIN c ON r.ancien_id = c.courant)
+        SELECT origine, courant FROM c"""):
+        chaine[origine].add(courant)
+    visees: dict[int, set[int]] = defaultdict(set)
+    for amendement_id, article_id in base.execute("SELECT amendement_id, article_id FROM vise"):
+        visees[amendement_id].add(article_id)
+    textes = Textes(base, corpus_textes)
+
     lignes, aretes = [], []
     for chambre, corpus, texte_id in correspondances(base):
         etendue = base.execute("SELECT articles FROM texte_discute WHERE id = ?",
                                (texte_id,)).fetchone()[0]
         distinctes, dans_la_plage = set(), 0
-        for amendement_id, subdivision in base.execute(
-                "SELECT id, subdivision FROM amendement "
+        for amendement_id, subdivision, dispositif in base.execute(
+                "SELECT id, subdivision, coalesce(dispositif, '') FROM amendement "
                 "WHERE chambre = ? AND texte_discute = ?", (chambre, corpus)):
             numero = numero_de_subdivision(subdivision)
             if numero and numero not in distinctes:
@@ -252,11 +349,49 @@ def construire(base: sqlite3.Connection, schema: Path) -> dict:
             if not vises:
                 compte["subdivision_sans_cible_dans_le_code"] += 1
                 continue
+            internes = {v for v in vises if v != -1}
+
+            # 1. Le dispositif nomme l'article du code : c'est lui, s'il est
+            #    l'une des cibles de l'article du texte (chaîne comprise).
+            declarees = visees.get(amendement_id, set())
+            if declarees:
+                communes = {c for c in internes if chaine[c] & declarees}
+                if len(communes) == 1:
+                    aretes.append((amendement_id, communes.pop(), texte_id, numero,
+                                   "visee", "derivee", CONFIANCE_PAR_VOIE["visee"]))
+                    compte["voie_visee"] += 1
+                else:
+                    compte["visee_contredite"] += 1
+                continue
+
+            # 2. Le dispositif nomme un alinéa : l'instruction qui gouverne cet
+            #    alinéa dans le texte dit quel article du code est réécrit là.
+            trouve = ALINEA.search(dispositif)
+            if trouve:
+                cible = textes.gouvernant(texte_id, numero, int(trouve.group(1)),
+                                          mentions.get((texte_id, numero), []))
+                if cible == "illisible":
+                    compte["alinea_illisible"] += 1
+                elif cible is None:
+                    compte["alinea_hors_du_code"] += 1
+                else:
+                    aretes.append((amendement_id, cible, texte_id, numero,
+                                   "alinea", "derivee", CONFIANCE_PAR_VOIE["alinea"]))
+                    compte["voie_alinea"] += 1
+                continue
+
+            # 3. Tout l'article du texte, ou rien qu'on sache lire : la composition
+            #    seule, et seulement si l'article ne réécrit que cet article-là.
+            if AJOUT_EN_FIN.search(dispositif):
+                compte["ajout_en_fin_de_l_article"] += 1   # un paragraphe nouveau : cible inconnue
+                continue
             if len(vises) > 1:
                 compte["cible_non_unique"] += 1
                 continue
             aretes.append((amendement_id, next(iter(vises)), texte_id, numero,
-                           "derivee", CONFIANCE))
+                           "article_entier", "derivee", CONFIANCE_PAR_VOIE["article_entier"]))
+            compte["voie_article_entier" if ARTICLE_ENTIER.search(dispositif)
+                   else "voie_article_entier_par_defaut"] += 1
         lignes.append((chambre, corpus, texte_id, "numero_declare",
                        len(distinctes), dans_la_plage))
 
@@ -265,7 +400,7 @@ def construire(base: sqlite3.Connection, schema: Path) -> dict:
         " methode, subdivisions, dans_la_plage) VALUES (?, ?, ?, ?, ?, ?)", lignes)
     base.executemany(
         "INSERT OR IGNORE INTO depose_sur (amendement_id, article_id, texte_id,"
-        " article_du_texte, methode, confiance) VALUES (?, ?, ?, ?, ?, ?)", aretes)
+        " article_du_texte, voie, methode, confiance) VALUES (?, ?, ?, ?, ?, ?, ?)", aretes)
     compte["jeux_apparies"] = len(lignes)
     compte["aretes"] = len(aretes)
     return compte
@@ -275,11 +410,12 @@ def main() -> None:
     if not 2 <= len(sys.argv) <= 3:
         sys.exit(__doc__)
     base = sqlite3.connect(Path(sys.argv[1]))
+    racine = Path(__file__).resolve().parent.parent
     schema = Path(sys.argv[2]) if len(sys.argv) == 3 else \
-        Path(__file__).resolve().parent.parent / "schema" / \
-        "011-textes-des-amendements.sql"
+        racine / "schema" / "011-textes-des-amendements.sql"
+    corpus_textes = racine / "travail" / "corpus" / "textes"
     base.execute("PRAGMA foreign_keys = ON")
-    compte = construire(base, schema)
+    compte = construire(base, schema, corpus_textes)
     base.commit()
 
     jeux = base.execute(
@@ -302,6 +438,20 @@ def main() -> None:
           f"{compte['cible_non_unique']}")
     print(f"  subdivision illisible                                : "
           f"{compte['subdivision_illisible']}")
+    print(f"  la cible déclarée par le dispositif contredit l'article : "
+          f"{compte['visee_contredite']}")
+    print(f"  l'alinéa nommé est gouverné par un autre code        : "
+          f"{compte['alinea_hors_du_code']}")
+    print(f"  l'alinéa nommé est illisible dans le texte           : "
+          f"{compte['alinea_illisible']}")
+    print(f"  un paragraphe ajouté en fin d'article, cible inconnue : "
+          f"{compte['ajout_en_fin_de_l_article']}")
+    print("\narêtes par voie")
+    print(f"  visee — le dispositif nomme l'article                : {compte['voie_visee']}")
+    print(f"  alinea — l'instruction gouvernant l'alinéa           : {compte['voie_alinea']}")
+    print(f"  article_entier — supprimer / rédiger cet article     : {compte['voie_article_entier']}")
+    print(f"  article_entier — dispositif non lu, cible unique     : "
+          f"{compte['voie_article_entier_par_defaut']}")
 
     articles, amendements = base.execute(
         "SELECT count(DISTINCT article_id), count(DISTINCT amendement_id) "

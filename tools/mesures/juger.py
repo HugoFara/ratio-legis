@@ -8,15 +8,15 @@ l'amendement —, et une colonne `verdict` vide. Ce module expose la fiche à
 un annotateur qui ne tient pas de terminal : lire une arête, rendre `juste`,
 `faux` ou `douteux`, signer.
 
-Deux colonnes de verdict, pour que deux juges rendent sans se lire :
-`verdict` (le premier, celui que `--bilan` compte) et `verdict_bis`. Chaque
+Trois colonnes de verdict, pour que trois juges rendent sans se lire :
+`verdict` (celui que `--bilan` compte), `verdict_bis`, `verdict_ter`. Chaque
 verdict porte son juge et son commentaire dans des colonnes voisines. Les
 écritures prennent un verrou sur le fichier.
 
-    juger.py <fiche.tsv> etat [--colonne verdict|verdict_bis]
+    juger.py <fiche.tsv> etat [--colonne verdict|verdict_bis|verdict_ter]
     juger.py <fiche.tsv> montrer <cle>
     juger.py <fiche.tsv> rendre <cle> --verdict juste|faux|douteux --juge <nom>
-             --commentaire "…" [--colonne verdict|verdict_bis]
+             --commentaire "…" [--colonne verdict|verdict_bis|verdict_ter]
 
 Ce que chaque arête affirme, et donc ce que « juste » veut dire :
 
@@ -24,10 +24,21 @@ Ce que chaque arête affirme, et donc ce que « juste » veut dire :
   complète, abroge) l'article A du code de la consommation. Faux si le texte
   ne fait que citer A, si A est d'un autre code, ou si l'article du texte est
   mal identifié. Douteux si la fenêtre ne permet pas de trancher.
-- `depose_sur` : l'amendement fut déposé sur l'article N du texte, et cet
-  article N réécrit A — donc l'amendement portait sur A. Faux si la
-  subdivision déclarée n'est pas N, si N réécrit plusieurs articles, ou si le
-  dispositif de l'amendement vise manifestement autre chose. Douteux sinon.
+- `depose_sur` : **l'amendement portait sur l'article A du code** — c'est ce
+  que la restitution écrit, et c'est ce qu'on juge. La colonne `voie` dit
+  comment l'arête l'a établi, et donc quoi vérifier :
+  - `visee` : le dispositif nomme A (ou son ancien numéro). Faux si le
+    dispositif nomme A sans le modifier, ou vise en réalité un autre article.
+  - `alinea` : le dispositif nomme un alinéa de l'article N du texte, et
+    l'instruction du texte qui gouverne cet alinéa réécrit A. Faux si cet
+    alinéa relève d'une autre instruction (autre article du code, autre code),
+    ou si l'alinéa cité n'est pas celui que le texte numérote ainsi. Lis le
+    texte en discussion à l'article N (`travail/corpus/textes/<dossier>__…`)
+    et compte les alinéas ; la `fenetre` donne l'instruction retenue.
+  - `article_entier` : le dispositif porte sur tout l'article N (« Supprimer
+    cet article », « Rédiger ainsi… »), et N ne réécrit que A. Faux si N
+    réécrit aussi d'autres articles ou d'autres codes.
+  Douteux si la ligne et le texte ne permettent pas de trancher.
 """
 
 from __future__ import annotations
@@ -63,7 +74,7 @@ def cmd_etat(a) -> None:
     _, lignes = charger(a.fiche)
     for l in lignes:
         print(f"{l['cle']}  {l.get(a.colonne) or '—':<8} "
-              f"{l.get('juge' if a.colonne == 'verdict' else 'juge_bis', '')}")
+              f"{l.get('juge' + a.colonne[7:], '')}")
     faits = sum(bool(l.get(a.colonne)) for l in lignes)
     print(f"\n{faits} jugée(s), {len(lignes) - faits} à juger ({a.colonne})")
 
@@ -74,8 +85,7 @@ def cmd_montrer(a) -> None:
     if ligne is None:
         sys.exit(f"clef inconnue : {a.cle}")
     for nom, valeur in ligne.items():
-        if nom in ("verdict", "verdict_bis", "juge", "juge_bis", "commentaire",
-                   "commentaire_bis") or not valeur:
+        if nom.startswith(("verdict", "juge", "commentaire", "date_jugement")) or not valeur:
             continue
         if nom in LONGS:
             print(f"\n{nom.upper()}\n{valeur}\n")
@@ -86,12 +96,12 @@ def cmd_montrer(a) -> None:
 def cmd_rendre(a) -> None:
     if a.verdict not in VERDICTS:
         sys.exit(f"verdict attendu : {', '.join(VERDICTS)}")
-    suffixe = "" if a.colonne == "verdict" else "_bis"
+    suffixe = a.colonne[7:]          # "", "_bis" ou "_ter"
     with (a.fiche.parent / f".{a.fiche.name}.verrou").open("w") as v:
         fcntl.flock(v, fcntl.LOCK_EX)
         colonnes, lignes = charger(a.fiche)
-        for nouvelle in ("verdict_bis", "juge", "juge_bis", "commentaire",
-                         "commentaire_bis", "date_jugement"):
+        for nouvelle in ("verdict_bis", "verdict_ter", "juge", "juge_bis", "juge_ter",
+                         "commentaire", "commentaire_bis", "commentaire_ter", "date_jugement"):
             if nouvelle not in colonnes:
                 colonnes.append(nouvelle)
         ligne = next((l for l in lignes if l["cle"] == a.cle), None)
@@ -113,13 +123,13 @@ def main() -> None:
     p.add_argument("fiche", type=Path)
     sp = p.add_subparsers(dest="commande", required=True)
     c = sp.add_parser("etat"); c.add_argument("--colonne", default="verdict",
-                                             choices=("verdict", "verdict_bis"))
+                                             choices=("verdict", "verdict_bis", "verdict_ter"))
     c.set_defaults(f=cmd_etat)
     c = sp.add_parser("montrer"); c.add_argument("cle"); c.set_defaults(f=cmd_montrer)
     c = sp.add_parser("rendre"); c.add_argument("cle")
     c.add_argument("--verdict", required=True); c.add_argument("--juge", required=True)
     c.add_argument("--commentaire")
-    c.add_argument("--colonne", default="verdict", choices=("verdict", "verdict_bis"))
+    c.add_argument("--colonne", default="verdict", choices=("verdict", "verdict_bis", "verdict_ter"))
     c.set_defaults(f=cmd_rendre)
     a = p.parse_args()
     if not a.fiche.exists():

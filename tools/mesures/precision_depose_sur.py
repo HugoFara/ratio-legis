@@ -31,6 +31,7 @@ arêtes d'une fiche déjà examinée.
 
 Usage :
     precision_depose_sur.py <base.sqlite> <fiche.tsv> [effectif] [--sauf <fiche.tsv>]
+                            [--voie visee|alinea|article_entier]
     precision_depose_sur.py --bilan <fiche.tsv>
 """
 
@@ -47,12 +48,12 @@ from precision_porte_sur import coupe, wilson      # noqa: E402
 
 EFFECTIF = 15
 COLONNES = ["verdict", "cle", "chambre", "amendement", "sort", "auteur",
-            "article", "cibles_de_l_article", "vise", "texte", "article_du_texte",
+            "article", "cibles_de_l_article", "vise", "voie", "texte", "article_du_texte",
             "subdivision", "fenetre", "dispositif", "article_du_fonds", "url"]
 
 
 def echantillon(base: sqlite3.Connection, sauf: set[tuple[str, str]],
-                effectif: int) -> list[dict]:
+                effectif: int, voie: str | None = None) -> list[dict]:
     base.executescript("""
         CREATE TEMP TABLE cibles AS
             SELECT texte_id, lower(article_du_texte) AS art,
@@ -69,10 +70,10 @@ def echantillon(base: sqlite3.Connection, sauf: set[tuple[str, str]],
     lignes = []
     for (amendement, numero, chambre, sort, auteur, article, texte_id,
          article_du_texte, subdivision, dispositif, url, combien, texte_article,
-         fenetre) in base.execute("""
+         fenetre, voie_arete) in base.execute("""
             SELECT d.amendement_id, am.numero, am.chambre, am.sort, ac.nom,
                    a.numero, d.texte_id, d.article_du_texte, am.subdivision,
-                   am.dispositif, am.url, c.combien, v.texte, pr.fenetre
+                   am.dispositif, am.url, c.combien, v.texte, pr.fenetre, d.voie
             FROM depose_sur d
             JOIN amendement am ON am.id = d.amendement_id
             LEFT JOIN acteur ac ON ac.id = am.auteur_id
@@ -105,7 +106,7 @@ def echantillon(base: sqlite3.Connection, sauf: set[tuple[str, str]],
                 f"{amendement}|{article}".encode()).hexdigest()[:16],
             "chambre": chambre, "amendement": numero, "sort": sort or "",
             "auteur": auteur or "", "article": article,
-            "cibles_de_l_article": str(combien or 0), "vise": lu,
+            "cibles_de_l_article": str(combien or 0), "vise": lu, "voie": voie_arete,
             "texte": texte_id, "article_du_texte": article_du_texte,
             "subdivision": coupe(subdivision, 90), "fenetre": coupe(fenetre, 220),
             "dispositif": coupe(dispositif, 420),
@@ -113,6 +114,8 @@ def echantillon(base: sqlite3.Connection, sauf: set[tuple[str, str]],
         })
     lignes = [l for l in lignes if (l["amendement"], l["article"]) not in sauf]
     lignes.sort(key=lambda l: l["cle"])
+    if voie:
+        lignes = [l for l in lignes if l["voie"] == voie]
     return lignes[:effectif]
 
 
@@ -148,12 +151,17 @@ def main() -> None:
         sauf = {(l["amendement"], l["article"]) for l in
                 csv.DictReader(deja.open(encoding="utf-8"), delimiter="\t")}
         arguments = arguments[:place] + arguments[place + 2:]
+    voie = None
+    if "--voie" in arguments:
+        place = arguments.index("--voie")
+        voie = arguments[place + 1]
+        arguments = arguments[:place] + arguments[place + 2:]
     if len(arguments) not in (2, 3):
         sys.exit(__doc__)
     chemin_base, fiche = Path(arguments[0]), Path(arguments[1])
     effectif = int(arguments[2]) if len(arguments) == 3 else EFFECTIF
     base = sqlite3.connect(chemin_base)
-    lignes = echantillon(base, sauf, effectif)
+    lignes = echantillon(base, sauf, effectif, voie)
     with fiche.open("w", encoding="utf-8", newline="") as sortie:
         graveur = csv.DictWriter(sortie, COLONNES, delimiter="\t",
                                  lineterminator="\n")
