@@ -209,8 +209,9 @@ def fiche(ligne: dict, texte_article: str, anciens: list[str],
               "motive              un passage explique pourquoi CET article dit ceci",
               "dossier_seulement   un document motive le texte ou le dispositif, "
               "pas cet article",
-              "non_documente       rien, après recherche exhaustive — résultat de "
-              "premier ordre",
+              "non_documente       aucun document ne motive L'ORIGINE du dispositif "
+              "(le texte qui l'a écrit ; une recodification à droit constant n'est pas "
+              "l'origine), après recherche exhaustive — résultat de premier ordre",
               "", "Décisions du 19 septembre 2026 (docs/36 § 6) :",
               "  - un rapport au Président qui ne nomme pas l'article vaut "
               "dossier_seulement, sauf passage consacré au dispositif ;",

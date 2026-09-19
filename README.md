@@ -126,18 +126,18 @@ compte pour le produit :
 ### Le verdict
 
 Pour chaque article en vigueur, le graphe rend un verdict — y compris, et surtout,
-quand il est négatif. Le taux global de 33,2 % d'articles sans raison documentée
+quand il est négatif. Le taux global de 36,1 % d'articles sans raison documentée
 ne veut rien dire : il faut séparer les parties, parce qu'un décret n'a ni exposé
 des motifs, ni débat, ni amendement.
 
 | partie | articles | un passage les motive | origine située | motivation du texte | **raison non documentée** |
 |---|---:|---:|---:|---:|---:|
-| **L** | 1 293 | 763 (59,0 %) | 143 | 382 | **5 (0,4 %)** |
-| **R** | 632 | 43 | 12 | 47 | **530 (83,9 %)** |
+| **L** | 1 293 | 763 (59,0 %) | 143 | 317 | **70 (5,4 %)** |
+| **R** | 632 | 43 | 12 | 54 | **523 (82,8 %)** |
 | **D** | 179 | 1 | 0 | 11 | **167 (93,3 %)** |
 
-**La partie législative du code de la consommation est documentée à 99,6 %. La
-partie réglementaire l'est à 14,1 %** — et c'est elle qui porte la masse des
+**La partie législative du code de la consommation est documentée à 94,6 %. La
+partie réglementaire l'est à 14,9 %** — et c'est elle qui porte la masse des
 obligations que rencontre un consommateur.
 
 Ce n'est pas un effet de périmètre. Les parties R et D en étaient exclues depuis
@@ -145,7 +145,7 @@ la phase 0, pour un motif écrit — « rattachement à DOLE mesuré à 0 % » �
 [`docs/27`](docs/27-parties-r-et-d.md) montre faux : 64 articles réglementaires
 sur 811 ont un dossier législatif dans leur ascendance. Le périmètre a été élargi
 aux trois parties, le corpus a suivi, et le nombre d'articles sans raison
-documentée est passé de 701 à **702** — après la scission des lignées, [`docs/38`](docs/38-lignees.md). **Le silence de la partie réglementaire est
+documentée est passé de 701 à **760** — après la scission des lignées, [`docs/38`](docs/38-lignees.md), et la redéfinition de « non documenté », [`docs/39`](docs/39-cent-verdicts-d-agents.md) § 3 : une recodification à droit constant ne documente pas ce que l'article dit. **Le silence de la partie réglementaire est
 un état du fonds documentaire français**, et il est désormais mesuré sur un
 périmètre qui ne l'exclut plus.
 

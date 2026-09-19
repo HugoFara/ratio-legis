@@ -76,12 +76,28 @@ VOIES = {
         SELECT DISTINCT a.id FROM articles_du_texte x
         JOIN article_courant a ON a.numero = x.article""",
     # Un document qui motive le texte entier : exposé, étude d'impact, avis,
-    # rapport au Président.
+    # rapport au Président. Mais le texte doit avoir **écrit** le dispositif —
+    # créé l'article à la racine de sa chaîne de renumérotation, ou modifié une
+    # de ses versions — et non l'avoir seulement recodifié : la création d'un
+    # numéro nouveau pour un article qui a des ancêtres est une renumérotation,
+    # et son rapport au Président motive la refonte, pas ce que l'article dit.
+    # Sans cette réserve, tout article de 1993 était « motivé » par le rapport de
+    # la recodification de 2016, et « raison non documentée » n'avait plus de
+    # sens (docs/39 § 3). Le verdict suit la définition que les annotateurs
+    # appliquent.
     "a_document_du_texte": """
-        SELECT DISTINCT v.article_id FROM version_article v
+        WITH RECURSIVE ascendance(cible, ancetre) AS (
+            SELECT id, id FROM article
+            UNION SELECT a.cible, r.ancien_id
+            FROM renumerote_de r JOIN ascendance a ON r.article_id = a.ancetre)
+        SELECT DISTINCT a.cible FROM ascendance a
+        JOIN version_article v ON v.article_id = a.ancetre
         JOIN produite_par p ON p.version_id = v.id_legi
         JOIN issu_de i ON i.texte_id = p.texte_id
-        JOIN document d ON d.dossier_id = i.dossier_id""",
+        JOIN document d ON d.dossier_id = i.dossier_id
+        WHERE p.type_lien IN ('MODIFIE', 'MODIFICATION', 'RECTIFICATION')
+           OR (p.type_lien IN ('CREE', 'CREATION')
+               AND NOT EXISTS (SELECT 1 FROM renumerote_de r WHERE r.article_id = a.ancetre))""",
     # Un acte de l'Union cité par l'article, ou transposé par son texte.
     "a_acte_ue": """
         SELECT DISTINCT a.id FROM union_par_article u

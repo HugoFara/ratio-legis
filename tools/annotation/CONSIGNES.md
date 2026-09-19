@@ -34,13 +34,27 @@ contexte ; la proposition de la machine ; les verdicts possibles.
 |---|---|
 | `motive` | un passage explique **cet article** — son dispositif, pas le texte entier. Il faut le désigner. |
 | `dossier_seulement` | un document motive le texte ou le dispositif d'ensemble, pas cet article. Le désigner si un passage s'en approche, sinon reprendre le document proposé. |
-| `non_documente` | rien, **après recherche exhaustive** (§ 4). |
+| `non_documente` | aucun document ne motive **l'origine du dispositif**, après recherche exhaustive (§ 4). |
+
+**Ce que « l'origine du dispositif » veut dire (décision du 19 septembre 2026,
+`docs/39` § 3).** Le texte qui a écrit le dispositif, ou l'a substantiellement
+réécrit — pas n'importe quel texte de l'historique. Une recodification à
+droit constant (ordonnance 2016-301), une coordination, une renumérotation ne
+sont pas l'origine : leur rapport au Président motive la refonte, pas ce que
+l'article dit. Un article de 1993 dont le seul document est le rapport de la
+recodification de 2016 est `non_documente`, même si ce rapport est dans son
+historique. `dossier_seulement` se réserve au document qui motive **le texte
+qui a écrit le dispositif** sans consacrer de passage à l'article — le rapport
+au Président de l'ordonnance qui l'a créé, l'exposé des motifs de la loi qui
+l'a introduit. Dans le commentaire, dis quel texte tu tiens pour l'origine.
 
 ## 3. Deux règles fixées le 19 septembre 2026, à appliquer sans exception
 
 1. **Un rapport au Président de la République qui ne nomme pas l'article vaut
-   `dossier_seulement`**, sauf s'il consacre un passage au dispositif de
-   l'article — alors `motive`, avec ce passage.
+   `dossier_seulement`** si l'ordonnance a écrit le dispositif, sauf s'il
+   consacre un passage au dispositif de l'article — alors `motive`, avec ce
+   passage. Si l'ordonnance n'a fait que recodifier ou modifier à la marge un
+   dispositif plus ancien, son rapport ne documente pas l'origine (§ 2).
 2. **La recherche est exhaustive.** Le dossier d'origine du jeu est une
    convention (le texte qui a *créé* l'article, un saut). L'historique de la
    fiche liste **tous** les textes ; pour un article recodifié en 2016, la

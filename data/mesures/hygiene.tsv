@@ -7,13 +7,13 @@ verdict	partie D — RAISON NON DOCUMENTÉE	167	179	93.3
 verdict	partie L — articles en vigueur	1293			
 verdict	partie L — un passage les motive	763	1293	59.0	
 verdict	partie L — origine située seulement	143	1293	11.1	
-verdict	partie L — motivation du texte seule	382	1293	29.5	
-verdict	partie L — RAISON NON DOCUMENTÉE	5	1293	0.4	
+verdict	partie L — motivation du texte seule	317	1293	24.5	
+verdict	partie L — RAISON NON DOCUMENTÉE	70	1293	5.4	
 verdict	partie R — articles en vigueur	632			
 verdict	partie R — un passage les motive	43	632	6.8	
 verdict	partie R — origine située seulement	12	632	1.9	
-verdict	partie R — motivation du texte seule	47	632	7.4	
-verdict	partie R — RAISON NON DOCUMENTÉE	530	632	83.9	
+verdict	partie R — motivation du texte seule	54	632	8.5	
+verdict	partie R — RAISON NON DOCUMENTÉE	523	632	82.8	
 origine	articles L dont la version en vigueur vient d'une ordonnance	1008	1293	78.0	origine apparente
 origine	articles L dont la version en vigueur vient d'une loi	276	1293	21.3	origine apparente
 origine	articles L ayant une loi dans leur ascendance	1043	1293	80.7	origine réelle, chaîne de renumérotation remontée

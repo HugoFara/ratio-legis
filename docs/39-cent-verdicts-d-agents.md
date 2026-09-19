@@ -111,6 +111,22 @@ Le second désaccord est de grain : kimi cite des passages de 2 500 signes
 en moyenne, deepseek de 500. Le protocole ne fixe pas la longueur d'un
 passage ; la mesure par recouvrement d'intervalles est indulgente aux longs.
 
+### Décision, le jour même
+
+`non_documente` est redéfini : **aucun document ne motive l'origine du
+dispositif** — le texte qui l'a écrit ou substantiellement réécrit, non
+n'importe quel texte de l'historique. Une recodification à droit constant, une
+coordination, une renumérotation ne sont pas l'origine (`CONSIGNES.md` § 2).
+Neuf `dossier_seulement` sont reclassés, commentaire à l'appui ; le verdict de
+la base suit la même définition (`ingestion/verdict.py`) : un document compte
+si son texte a créé la racine de la chaîne de renumérotation ou modifié une
+version, pas s'il a seulement créé un numéro nouveau pour un article qui a
+des ancêtres. La partie L passe de 5 à **70** articles sans raison documentée
+(0,4 % → 5,4 %) ; « documentée à 99,6 % » devient 94,6 %, et c'est le chiffre
+honnête. Sur le jeu : 15 `non_documente`, dont 7 que la base rend tels quels,
+4 qu'elle dit « origine située », 2 « motivation du texte », 2 « passage
+motivant » — ces deux-là sont à relire en premier.
+
 ## 4. Ce que cela ne vaut pas, et ce qu'il reste
 
 **Rien de ceci n'est l'évaluation humaine de la phase 3.** Cent verdicts
