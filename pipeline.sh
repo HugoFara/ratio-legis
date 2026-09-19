@@ -180,11 +180,6 @@ ingere "$RACINE/ingestion/renvois.py" "$BASE"
 ingere "$RACINE/ingestion/an_vers_amendements.py" "$TRAVAIL/an/amendements_14.csv" \
         "$TRAVAIL/an/acteurs_historique.json.zip" "$BASE"
 ingere "$RACINE/ingestion/amendements_vers_resulte_de.py" "$TRAVAIL/corpus/ameli" "$BASE"
-ingere "$RACINE/ingestion/visees.py" "$BASE"
-# Après les deux chargeurs d'amendements et après `visees` : il lit les deux
-# colonnes de sort des deux chambres, et la vue `tentative_sur_article` qu'il
-# crée s'appuie sur `vise`.
-ingere "$RACINE/ingestion/sort_des_amendements.py" "$BASE"
 # DOLE ne lie pas le texte déposé d'un projet de loi ; son numéro se lit dans le
 # rapport qui le rapporte, et les textes de commission dans la référence des
 # amendements. Les deux plans sont chargés en une seule passe : ce script
@@ -195,7 +190,15 @@ python3 "$RACINE/tools/an/plan_textes_deposes.py" "$BASE" \
 python3 "$RACINE/tools/dila/telecharger_textes.py" "$DEPOSES" "$TRAVAIL/corpus/textes"
 ingere "$RACINE/ingestion/textes_deposes.py" "$TRAVAIL/corpus/textes" "$TEXTES" \
         "$BASE" "$DEPOSES"
-# Doit suivre `textes_deposes` — il lui faut `porte_sur` — et
+# `visees` vient après `porte_sur` depuis docs/43 : un numéro que le dispositif
+# ne qualifie pas hérite du code hôte de l'article du texte, et c'est
+# `porte_sur` qui le sait.
+ingere "$RACINE/ingestion/visees.py" "$BASE"
+# Après les deux chargeurs d'amendements et après `visees` : il lit les deux
+# colonnes de sort des deux chambres, et la vue `tentative_sur_article` qu'il
+# crée s'appuie sur `vise`.
+ingere "$RACINE/ingestion/sort_des_amendements.py" "$BASE"
+# Doit suivre `textes_deposes` — il lui faut `porte_sur` —, `visees` et
 # `sort_des_amendements`, dont sa vue reprend les familles.
 ingere "$RACINE/ingestion/textes_des_amendements.py" "$BASE"
 # Doit suivre les deux précédents : il lui faut les documents et `porte_sur`.

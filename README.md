@@ -116,9 +116,9 @@ Reconstruite d'une commande depuis le miroir et les plans versionnés
 | Acteurs | 1 644 | `resulte_de` — l'amendement qui a écrit l'alinéa | 308 |
 | **Actes de l'Union** | **284** | `cite_acte_ue` / `transpose` | 1 572 / 8 |
 | **Considérants de l'Union** | **7 674** | `article_acte_ue` — articles d'actes déclarés | 6 237 |
-| **Textes en discussion** | **854** | **`porte_sur`** — l'article du texte → l'article du code | **59 076** |
-| **Sorts d'amendements, en huit familles** | **42 142** | **`vise`** — l'amendement qui visait l'article, abouti ou non | **318** |
-| Correspondances de texte entre les deux corpus | 163 | **`depose_sur`** — l'article du code que l'amendement touche, par l'alinéa du texte qu'il nomme | **1 155** (confiance 0,70 par l'alinéa) |
+| **Textes en discussion** | **854** | **`porte_sur`** — l'article du texte → l'article du code | **77 182** (5 702 internes) |
+| **Sorts d'amendements, en huit familles** | **42 142** | **`vise`** — l'amendement qui visait l'article, abouti ou non | **594** (confiance 0,58) |
+| Correspondances de texte entre les deux corpus | 163 | **`depose_sur`** — l'article du code que l'amendement touche, par l'alinéa du texte qu'il nomme | **1 147** (confiance 0,58 par l'alinéa) |
 
 Ce que cela donne au grain de l'article en vigueur, qui est le seul grain qui
 compte pour le produit :
@@ -222,6 +222,7 @@ numéro d'aujourd'hui, et 783 dès qu'on remonte aux numéros d'avant 2016.
 | 34. États intermédiaires | 764 arêtes `porte_sur` que la loi promulguée n'a pas confirmées ; 31 « origines situées » qui n'en étaient pas | [`docs/40`](docs/40-etats-intermediaires.md) |
 | 35. Deux tirages jugés à deux | `porte_sur` 34/35 et 18/20 ; `depose_sur` 7/15 — la composition est exacte, ce qu'elle prétend ne l'est pas ; 304 arêtes à cibles hors du code retirées | [`docs/41`](docs/41-deux-tirages-juges-par-des-agents.md) |
 | 36. `depose_sur` par l'alinéa | trois voies — l'article nommé, l'alinéa du texte, l'article entier — mesurées à trois juges : 18/20, 7/10, 7/10 ; 1 155 arêtes | [`docs/42`](docs/42-depose-sur-par-l-alinea.md) |
+| 37. `vise` et `porte_sur` corrigés | l'ancre, le code hôte, le numéro glissé, les quatre chiffres ; `vise` mesurée pour la première fois : 9/20 avant, 16/20 après | [`docs/43`](docs/43-vise-et-porte-sur-corriges.md) |
 
 ### Tenir à jour
 

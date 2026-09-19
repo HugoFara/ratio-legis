@@ -32,14 +32,23 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools" / "proto
 from resolveur import sans_balises  # noqa: E402
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lignees import Resolveur  # noqa: E402
+from textes_des_amendements import correspondances, numero_de_subdivision  # noqa: E402
+from collections import defaultdict  # noqa: E402
+
+
+def corpus_vers_texte(base: sqlite3.Connection) -> dict[tuple[str, str], str]:
+    """(chambre, clef du corpus d'amendements) → texte en discussion apparié."""
+    return {(chambre, corpus): texte_id for chambre, corpus, texte_id in correspondances(base)}
 
 # La négation finale interdit de tronquer : « L. 111-6-1-3 » du code de la
 # construction se lisait « L. 111-6-1 », qui existe au code de la consommation.
 # Le suffixe en lettre appartient au numéro : « Art. L. 222-1 B » du code de
 # l'environnement n'est pas L. 222-1 du code de la consommation. Le laisser tomber
 # fabriquait une identité entre deux articles sans rapport.
+# « L. 312-9-… » — l'article nouveau dont le numéro n'est pas fixé — n'est pas
+# L. 312-9 : le tiret suivi de n'importe quoi d'autre qu'un blanc ferme la lecture.
 ARTICLE = re.compile(
-    r"\b([LRD])\.?\s?(\d{3})-(\d{1,3})(?:-(\d{1,3}))?(?!\s?-\s?\d)(?!\s[A-Z]\b)")
+    r"\b([LRD])\.?\s?(\d{3,4})-(\d{1,3})(?:-(\d{1,3}))?(?!\s?-\s?\S)(?!\s[A-Z]\b)")
 
 # Formules de modification de la légistique française. Relevées après le numéro,
 # dans la fenêtre qui suit immédiatement : « L'article L. 121-36 est ainsi rédigé ».
@@ -47,15 +56,21 @@ APRES = re.compile(
     r"^[^.;«»]{0,60}?\b(?:est|sont)\s+(?:ainsi\s+)?"
     r"(r[ée]dig[ée]s?|modifi[ée]s?|compl[ée]t[ée]s?|abrog[ée]s?|remplac[ée]s?|ins[ée]r[ée]s?)",
     re.I)
-# Formules qui précèdent le numéro : « Après l'article L. 121-36, il est inséré ».
+# Formules qui précèdent le numéro : « Au début de l'article L. 121-36, … ».
+# « Après l'article L. 121-36, il est inséré un article L. 121-36-1 » n'y est
+# plus : L. 121-36 y est une **ancre**, pas une cible — l'amendement ne le
+# modifie en rien, il place un article nouveau après lui. Trois juges l'ont dit
+# sur trois arêtes (docs/42 § 3) ; `ANCRE` l'écarte.
 AVANT = re.compile(
-    r"\b(apr[èe]s|avant|au d[ée]but de|à la fin de)\s+(?:le|la|l')?\s*article\s*$", re.I)
+    r"\b(au d[ée]but de|à la fin de)\s+(?:le|la|l['’])?\s*article\s*$", re.I)
+ANCRE = re.compile(r"\b(?:apr[èe]s|avant|à la suite de)\s+(?:le|la|l['’])?\s*article\s*$", re.I)
 # Un amendement à un projet de loi de consommation ne nomme pas l'article du code
 # comme cible : il le rédige. « Insérer trois alinéas ainsi rédigés : "Art.
 # L. 121-104. – Lorsque le consommateur…" ». Sans cette forme, les amendements des
 # dossiers les plus lourds du périmètre — ceux qui écrivent le code — étaient
 # précisément ceux qu'on ne voyait pas.
 CREATION = re.compile(r"[«\"]\s*(?:art|article)\.?\s*$", re.I)
+TIRETS = str.maketrans({"\u2011": "-", "\u2010": "-", "\u00a0": " ", "\u202f": " "})
 
 # Le numéro seul ne dit pas le code : L. 152-1 existe au code de l'environnement,
 # L. 121-1 au code de l'urbanisme, et les deux au code de la consommation. Un
@@ -93,29 +108,53 @@ def vise_un_autre_code(texte: str, debut: int, fin: int) -> bool:
     return not any("consommation" in n or "présent code" in n for n in noms)
 
 
-# Précision mesurée à la main sur 15 arêtes tirées au sort : 13/15. Borne
-# inférieure de Wilson à 95 %. Voir `docs/10-amendements-non-adoptes.md` § 3.
-CONFIANCE = 0.6212
+# Précision mesurée à la main sur 15 arêtes tirées au sort en août : 13/15
+# (`docs/10` § 3). Re-mesurée le 19 septembre 2026 par deux juges indépendants
+# (deepseek-v4p1-flash, glm-5p3-flash, qwen3p8-max en arbitrage) après les
+# gardes du code hôte et du numéro glissé : **16 justes, 2 fausses, 2 douteuses
+# sur 20** — Wilson 0,5840 (`precision-vise-2.tsv`, `docs/43`). Avant les
+# gardes, 9 sur 20 : le tiret insécable avait triplé l'arête, et la moitié du
+# gain était des homonymes d'autres codes.
+CONFIANCE = 0.5840
 
 
-def cibles(dispositif: str) -> list[tuple[str, str]]:
-    """Articles visés par une formule de modification, avec la formule relevée."""
-    texte = sans_balises(dispositif)
-    trouves: dict[str, str] = {}
+def code_nomme(texte: str, debut: int, fin: int) -> bool:
+    """Le dispositif nomme-t-il un code — le nôtre — pour cette référence ?"""
+    if CODE_NOMME.search(clause(texte, debut, fin)):
+        return True
+    return bool(list(CODE_NOMME.finditer(texte, 0, debut)))
+
+
+def cibles(dispositif: str) -> list[tuple[str, tuple[str, bool]]]:
+    """Articles visés par une formule de modification : (numéro, (formule, code nommé)).
+
+    `code nommé` dit si le dispositif désigne lui-même le code de la
+    consommation. Sans cela, « L. 122-3 » d'un amendement au code forestier se
+    rattachait à notre L. 122-3 : le dispositif ne nomme pas son code quand
+    l'article du texte le dit pour lui. Neuf arêtes sur vingt du premier
+    tirage (docs/43) : c'est la voie non nommée qui les portait toutes.
+    """
+    # Tirets insécables et espaces fines des sites des chambres : « L. 223‑1 »
+    # n'était pas lu.
+    texte = sans_balises(dispositif).translate(TIRETS)
+    trouves: dict[str, tuple[str, bool]] = {}
     for m in ARTICLE.finditer(texte):
         cle = f"{m.group(1)}{m.group(2)}-{m.group(3)}" + (f"-{m.group(4)}" if m.group(4) else "")
         if vise_un_autre_code(texte, m.start(), m.end()):
             continue
+        if ANCRE.search(texte[max(0, m.start() - 40):m.start()]):
+            continue
+        nomme = code_nomme(texte, m.start(), m.end())
         suite = APRES.match(texte[m.end():m.end() + 80])
         if suite:
-            trouves.setdefault(cle, suite.group(1).lower())
+            trouves.setdefault(cle, (suite.group(1).lower(), nomme))
             continue
         amont = AVANT.search(texte[max(0, m.start() - 40):m.start()])
         if amont:
-            trouves.setdefault(cle, amont.group(1).lower())
+            trouves.setdefault(cle, (amont.group(1).lower(), nomme))
             continue
         if CREATION.search(texte[max(0, m.start() - 20):m.start()]):
-            trouves.setdefault(cle, "rédigé")
+            trouves.setdefault(cle, ("rédigé", nomme))
     return list(trouves.items())
 
 
@@ -142,14 +181,42 @@ def main() -> None:
     dossiers_du_code = {d for (d,) in base.execute(
         "SELECT DISTINCT i.dossier_id FROM issu_de i "
         "JOIN produite_par p ON p.texte_id = i.texte_id")}
-    aretes, sans_cible, hors_dossier = [], 0, 0
-    for amendement_id, dossier, dispositif in base.execute(
-            "SELECT id, dossier_id, dispositif FROM amendement WHERE dispositif IS NOT NULL"):
+    # Le code hôte de l'article du texte sur lequel l'amendement est déposé :
+    # `porte_sur` sait quels codes cet article modifie. Un dispositif qui ne
+    # nomme pas son code hérite de celui-là ; s'il n'est pas le nôtre, ou si
+    # l'article du texte en modifie plusieurs, le numéro nu ne se rattache pas.
+    hote: dict[tuple[str, str], set[str]] = defaultdict(set)
+    for texte_id, article_du_texte, portee in base.execute(
+            "SELECT texte_id, lower(article_du_texte), portee FROM porte_sur"):
+        hote[(texte_id, article_du_texte)].add("interne" if portee == "interne" else "autre")
+    textes_du_corpus = corpus_vers_texte(base)
+    # Un article que le dispositif **crée** sous un numéro (« Art. L. 121-105. – »)
+    # n'est le nôtre que si la loi du dossier a bien écrit ce numéro : la
+    # numérotation proposée par un projet glisse en navette (docs/41 § 2).
+    aretes, sans_cible, hors_dossier, hote_etranger, numero_glisse = [], 0, 0, 0, 0
+    for amendement_id, dossier, dispositif, chambre, corpus, subdivision in base.execute(
+            "SELECT id, dossier_id, dispositif, chambre, texte_discute, subdivision "
+            "FROM amendement WHERE dispositif IS NOT NULL"):
         if dossier not in dossiers_du_code:
             hors_dossier += 1
             continue
-        retenues = [(resolveur.du_dossier(n, dossier), f) for n, f in cibles(dispositif)]
-        retenues = [(i, f) for i, f in retenues if i is not None]
+        codes_de_l_hote = None
+        texte_id = textes_du_corpus.get((chambre, corpus))
+        numero = numero_de_subdivision(subdivision)
+        if texte_id and numero:
+            codes_de_l_hote = hote.get((texte_id, numero))
+        retenues = []
+        for n, (formule, nomme) in cibles(dispositif):
+            if not nomme and codes_de_l_hote is not None and codes_de_l_hote != {"interne"}:
+                hote_etranger += 1
+                continue
+            article_id = resolveur.du_dossier(n, dossier)
+            if article_id is None:
+                continue
+            if formule == "rédigé" and article_id not in resolveur.ecrits.get(dossier, ()):
+                numero_glisse += 1
+                continue
+            retenues.append((article_id, formule))
         if not retenues:
             sans_cible += 1
             continue
@@ -179,6 +246,8 @@ def main() -> None:
     print(f"  avec une cible déclarée  : {vises} ({100 * vises / total:.1f} %)")
     print(f"  sans cible dans ce code  : {sans_cible}")
     print(f"  dossiers ne touchant pas ce code : {hors_dossier}")
+    print(f"  numéro nu, article du texte hors de ce code ou multi-codes : {hote_etranger}")
+    print(f"  article créé sous un numéro que la loi n'a pas écrit : {numero_glisse}")
     print(f"articles du code visés     : {touches}")
     print(f"  dont en vigueur          : {en_vigueur}")
     print("\npar sort :")

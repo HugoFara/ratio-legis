@@ -96,7 +96,12 @@ ACTION = re.compile(r"\b(?:est|sont)\s+(?:ainsi\s+(?:modifiée?s?|rédigée?s?"
 # vues hors citation. C'est le **début de ligne** qui tranche, après la
 # numérotation éventuelle.
 ALINEA_CITE = re.compile(r"^\s*(?:[0-9]+[°)]\s*|[a-z][)]\s*|[IVX]+\.\s*[–-]?\s*)*[«“]")
-REFERENCE = re.compile(r"\b([LRD])\.?\s?(\d{3})-(\d{1,3})(?:-(\d{1,3}))?")
+# Trois ou quatre chiffres : le code de la santé publique numérote L. 2133-1, le
+# code des transports L. 6761-1. Avec trois chiffres seuls, ces références
+# n'étaient pas même vues — ni internes, ni externes —, et un article de texte
+# qui modifiait deux articles de la santé publique et un du nôtre passait pour
+# n'en réécrire qu'un (docs/42, `article_entier`).
+REFERENCE = re.compile(r"\b([LRD])\.?\s?(\d{3,4})-(\d{1,3})(?:-(\d{1,3}))?(?!\s?-\s?\S)")
 # **L'article écrit dans la citation.** Un article de projet de loi qui réécrit une
 # section entière ne nomme aucune cible dans son instruction : il dit « la section
 # 2 du même code sont remplacées par les dispositions suivantes : », puis écrit le
@@ -114,7 +119,7 @@ REFERENCE = re.compile(r"\b([LRD])\.?\s?(\d{3})-(\d{1,3})(?:-(\d{1,3}))?")
 # La forme est exacte et vérifiable : un guillemet ouvrant, puis « Art. », puis le
 # numéro. `visees.py` retient la même depuis la cinquième tranche.
 ARTICLE_CREE = re.compile(
-    r"[«“\"]\s*Art\.?\s*([LRD])\.?\s?(\d{3})-(\d{1,3})(?:-(\d{1,3}))?", re.I)
+    r"[«“\"]\s*Art\.?\s*([LRD])\.?\s?(\d{3,4})-(\d{1,3})(?:-(\d{1,3}))?(?!\s?-\s?\S)", re.I)
 CODE_NOMME = re.compile(r"\b(?:du|le|au|dans le|de ce)\s+(code\s+[^,;.:)]{3,45})", re.I)
 MEME_CODE = re.compile(r"\b(?:du|le|au|dans le)\s+même\s+code\b", re.I)
 BORNE = re.compile(r"(?<![LRD])(?<!art)(?<!n°)[.;:]")

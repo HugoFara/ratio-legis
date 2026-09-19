@@ -138,14 +138,19 @@ ARTICLE_ADDITIONNEL = re.compile(
 CONFIANCE = 0.2481            # composition seule, population d'avant les voies, docs/41
 # Chaque voie mesurée à part le 19 septembre 2026, par trois juges — qwen3p8-max
 # (compté), deepseek-v4p1-flash, glm-5p3-flash —, tirages disjoints (docs/42) :
-#   alinea          18 / 20, unanimité 19 / 20 — Wilson 0,6990
-#   visee            7 / 10, unanimité  9 / 10 — Wilson 0,3968 : le dispositif
-#                   nomme l'article comme ancre d'insertion (« après l'article
-#                   L. 312-9, il est inséré… »), ce que `vise` prend pour une cible
-#   article_entier   7 / 10, unanimité 10 / 10 — Wilson 0,3968 : « N ne réécrit
-#                   que A » repose sur `porte_sur`, qui ne voit ni l'article que
-#                   le texte insère, ni toujours l'autre code qu'il modifie
-CONFIANCE_PAR_VOIE = {"visee": 0.3968, "alinea": 0.6990, "article_entier": 0.3968}
+#   alinea          18 / 20 (docs/42), puis 16 / 20 sur un second tirage disjoint
+#                   après les corrections de docs/43 — les quatre fausses sont
+#                   des alinéas gouvernés par une instruction que porte_sur n'a
+#                   pas relevée (article inséré, instruction sautée) : la portée
+#                   d'une instruction n'est pas bornée par la suivante.
+#                   Retenu : le dernier tirage, Wilson 0,5840.
+#   visee            7 / 10 (docs/42), puis 13 / 15 après les gardes de vise —
+#                   ancre d'insertion, code hôte, numéro glissé, « L. 312-9-… ».
+#                   Wilson 0,6212.
+#   article_entier   7 / 10, puis 6 / 7 — Wilson 0,4869 : « N ne réécrit que A »
+#                   repose sur porte_sur, qui ne voit pas tout ce que N réécrit.
+# Deux juges (deepseek-v4p1-flash, glm-5p3-flash), qwen3p8-max en arbitrage.
+CONFIANCE_PAR_VOIE = {"visee": 0.6212, "alinea": 0.5840, "article_entier": 0.4869}
 
 ALINEA = re.compile(r"\b(?:l['’]\s*)?alin[ée]as?\s+(\d{1,3})\b", re.I)
 ARTICLE_ENTIER = re.compile(r"^\s*(?:I\.\s*[–-]\s*)?(supprimer|r[ée]diger ainsi|r[ée]tablir)\s+cet\s+article",
@@ -291,11 +296,14 @@ def construire(base: sqlite3.Connection, schema: Path, corpus_textes: Path) -> d
     # porter sur le gaz. Jugées par deux modèles, les quatre arêtes du tirage
     # de docs/37 sur lesquelles ils se contredisaient étaient toutes de ce type
     # — 304 des 550 arêtes en dépendaient (docs/41).
+    # Une cible non résolue en est une aussi : « il est inséré un article
+    # L. 522-7-1 » que la loi promulguée n'a jamais porté reste, dans le texte,
+    # un second article réécrit (docs/42 § 3).
     for texte_id, article_du_texte in base.execute(
             "SELECT DISTINCT texte_id, lower(article_du_texte) "
-            "FROM porte_sur WHERE portee = 'externe'"):
+            "FROM porte_sur WHERE portee IN ('externe', 'non_resolue')"):
         if (texte_id, article_du_texte) in cibles:
-            cibles[(texte_id, article_du_texte)].add(-1)   # cible hors du code
+            cibles[(texte_id, article_du_texte)].add(-1)   # cible hors du code, ou non résolue
 
     # Les mentions de `porte_sur` avec leur offset, internes et externes : c'est
     # ce qui dit quel article du code le texte réécrit à tel endroit.

@@ -39,6 +39,10 @@ Ce que chaque arête affirme, et donc ce que « juste » veut dire :
     cet article », « Rédiger ainsi… »), et N ne réécrit que A. Faux si N
     réécrit aussi d'autres articles ou d'autres codes.
   Douteux si la ligne et le texte ne permettent pas de trancher.
+- `vise` : **le dispositif de l'amendement modifie, crée, abroge ou réécrit
+  l'article A du code de la consommation.** Faux s'il ne fait que le citer,
+  le nomme comme ancre (« après l'article A, il est inséré… »), ou vise un
+  homonyme d'un autre code. La `formule` dit ce qui a été relevé.
 """
 
 from __future__ import annotations
