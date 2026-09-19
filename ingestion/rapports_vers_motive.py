@@ -91,6 +91,10 @@ MARQUEURS = (("expose-motifs", "expose_des_motifs"),
              ("rapport-pr", "rapport_president_republique"))
 
 
+RAPPORT_DYN_AN = re.compile(
+    r"https?://www\.assemblee-nationale\.fr/dyn/(\d+)/rapports/[^/]+/l\d+b(\d+)_rapport-fond$")
+
+
 def type_document(nom: str) -> str:
     """Le type se lit dans le nom du fichier, posé par l'outil qui l'a écrit."""
     for marqueur, type_document in MARQUEURS:
@@ -116,6 +120,14 @@ def urls_du_plan(plan: Path) -> dict[str, str]:
         liens[f"{dossier}__{nom}"] = url
         if "senat.fr/rap/" in url and nom.endswith(".html"):
             liens[f"{dossier}__{nom[:-5]}_mono.html"] = f"{url[:-5]}_mono.html"
+        # Même situation à l'Assemblée depuis la XVIe législature : le plan pointe
+        # une page de garde, le texte est sous /dyn/opendata/ (voir
+        # `telecharger_rapports.sh`, qui applique la même règle).
+        integral = RAPPORT_DYN_AN.match(url.split("#", 1)[0])
+        if integral:
+            nom = f"RAPPANR5L{integral.group(1)}B{integral.group(2)}.html"
+            liens[f"{dossier}__{nom}"] = \
+                f"https://www.assemblee-nationale.fr/dyn/opendata/{nom}"
     return liens
 
 

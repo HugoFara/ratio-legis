@@ -9,6 +9,12 @@
 # Deux particularités des sources :
 #   - les rapports du Sénat sont paginés ; seule la version `_mono.html` porte le
 #     texte, et son URL se déduit mécaniquement de celle de la page d'index ;
+#   - depuis la XVIe législature, l'Assemblée publie ses rapports sous
+#     `/dyn/<lég>/rapports/<commission>/l<lég>b<n°>_rapport-fond` — une page de
+#     garde de 75 ko, sans le corps. Le texte intégral est sous
+#     `/dyn/opendata/RAPPANR5L<lég>B<n°>.html`, et l'URL s'en déduit aussi ;
+#     sans cette règle, la XVIe et la XVIIe législature entraient en base sans
+#     un seul commentaire d'article ;
 #   - une page d'index du Sénat fait moins de 20 ko, ce qui sert de test de rejet —
 #     mais seulement pour les rapports : un texte de loi court est légitimement
 #     petit, et lui appliquer le même seuil fait perdre les petits dossiers ;
@@ -25,8 +31,19 @@ PLAN="${1:?plan tsv requis}"
 DEST="${2:?répertoire de destination requis}"
 mkdir -p "$DEST"
 
+# Texte intégral d'un rapport de l'Assemblée publié sous /dyn/, ou rien.
+texte_integral_an() {
+  local url="${1%%#*}" leg num
+  case "$url" in
+    *assemblee-nationale.fr/dyn/*/rapports/*_rapport-fond)
+      leg="${url##*/l}"; leg="${leg%%b*}"
+      num="${url##*b}"; num="${num%_rapport-fond}"
+      echo "https://www.assemblee-nationale.fr/dyn/opendata/RAPPANR5L${leg}B${num}.html" ;;
+  esac
+}
+
 recuperer() {
-  local dossier="$1" url="$2" nom code
+  local dossier="$1" url="${2%%#*}" nom code
   nom="${dossier}__$(basename "$url")"
   [ -s "$DEST/$nom" ] && return 0
   code=$(curl -sSL --max-time 120 -o "$DEST/$nom" -w '%{http_code}' "$url" 2>/dev/null)
@@ -46,6 +63,8 @@ while IFS=$'\t' read -r dossier url; do
   case "$url" in
     *senat.fr/rap/*.html) recuperer "$dossier" "${url%.html}_mono.html" ;;
   esac
+  integral=$(texte_integral_an "$url")
+  [ -n "$integral" ] && recuperer "$dossier" "$integral"
 done < "$PLAN"
 
 echo "rapports récupérés : $(ls "$DEST" | wc -l)"

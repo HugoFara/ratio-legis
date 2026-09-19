@@ -5,8 +5,8 @@ verdict	partie D — origine située seulement	0	179	0.0
 verdict	partie D — motivation du texte seule	11	179	6.1	
 verdict	partie D — RAISON NON DOCUMENTÉE	167	179	93.3	
 verdict	partie L — articles en vigueur	1293			
-verdict	partie L — un passage les motive	796	1293	61.6	
-verdict	partie L — origine située seulement	216	1293	16.7	
+verdict	partie L — un passage les motive	801	1293	61.9	
+verdict	partie L — origine située seulement	211	1293	16.3	
 verdict	partie L — motivation du texte seule	276	1293	21.3	
 verdict	partie L — RAISON NON DOCUMENTÉE	5	1293	0.4	
 verdict	partie R — articles en vigueur	632			
@@ -73,7 +73,7 @@ chambres	articles dont un alinéa est tracé jusqu'à un amendement	109			sans r
 sources	documents — avis_conseil_etat	15			
 sources	documents — etude_impact	27			
 sources	documents — expose_des_motifs	41			
-sources	documents — rapport_commission	252			
+sources	documents — rapport_commission	273			
 sources	documents — rapport_president_republique	37			
 sources	actes de l'Union	284			
 sources	considérants	7674			
