@@ -85,19 +85,23 @@ def demander(invite: str) -> str:
 
 
 def documents_de(ligne: dict, repertoire: Path) -> list[tuple[str, str]]:
-    """(nom du fichier, texte brut), dans l'ordre de la fiche, externes à la fin."""
-    dossiers = set(ligne["dossiers"].split()) | {f"externe:{ligne['num_article']}"}
-    docs = []
+    """(nom du fichier, texte brut), numérotés dans un ordre stable.
+
+    L'ordre est celui de la colonne `dossiers` — celui de la fiche —, puis le nom
+    de fichier ; les documents importés viennent en dernier. `rattacher` ajoute
+    un dossier en fin de colonne : les numéros déjà cités ne bougent pas. Sans
+    cela, trois annotateurs ont cité le mauvais « [n] ».
+    """
+    ordre = {d: i for i, d in enumerate(ligne["dossiers"].split())}
+    ordre[f"externe:{ligne['num_article']}"] = len(ordre)
+    entrees = []
     with (repertoire / "documents.tsv").open(encoding="utf-8") as f:
         for entree in csv.DictReader(f, delimiter="\t"):
-            if entree["dossier"] in dossiers:
-                # newline="" : sans lui, Python replie les « \r\n » des pages des
-                # chambres en « \n », et chaque offset calculé ici serait décalé
-                # de tout ce qui précède par rapport à `document.texte` en base.
-                texte = (repertoire / "documents" / nom_texte(entree["fichier"])).read_text(
-                    encoding="utf-8", newline="")
-                docs.append((entree["fichier"], texte))
-    return docs
+            if entree["dossier"] in ordre:
+                entrees.append(entree)
+    entrees.sort(key=lambda e: (ordre[e["dossier"]], e["fichier"]))
+    return [(e["fichier"], (repertoire / "documents" / nom_texte(e["fichier"])).read_text(
+                encoding="utf-8", newline="")) for e in entrees]
 
 
 def convertir(source: Path) -> str | None:
@@ -158,11 +162,19 @@ def choisir_document(docs: list[tuple[str, str]], defaut: str = "") -> tuple[str
         print("  numéro de document attendu")
 
 
+def motif_de(fragment: str, insensible: bool = False) -> re.Pattern:
+    """Espaces normalisés, apostrophes droite et typographique confondues : les
+    textes des chambres mêlent les deux, et l'annotateur ne peut pas le voir."""
+    mots = [re.escape(m).replace("'", "['’]").replace("’", "['’]")
+            for m in fragment.replace("’", "'").split()]
+    return re.compile(r"\s+".join(mots), re.I if insensible else 0)
+
+
 def localiser(texte: str, fragment: str, apres: int = 0) -> tuple[int, int] | None:
     """Bornes de l'occurrence unique de `fragment` (espaces normalisés), ou None."""
     if not fragment:
         return None
-    motif = re.compile(r"\s+".join(re.escape(m) for m in fragment.split()))
+    motif = motif_de(fragment)
     trouves = [(m.start(), m.end()) for m in motif.finditer(texte, apres)]
     if len(trouves) == 1:
         return trouves[0]
@@ -207,7 +219,7 @@ def chercher(docs: list[tuple[str, str]], n: str, mots: str) -> None:
         print("  numéro de document attendu")
         return
     nom, texte = docs[int(n) - 1]
-    motif = re.compile(r"\s+".join(re.escape(m) for m in mots.split()), re.I)
+    motif = motif_de(mots, insensible=True)
     trouves = [m.start() for m in motif.finditer(texte)]
     print(f"  {nom} : {len(trouves)} occurrence(s) de « {mots} »")
     for position in trouves[:20]:

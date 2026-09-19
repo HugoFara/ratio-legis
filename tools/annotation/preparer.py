@@ -263,8 +263,10 @@ def main() -> None:
     sans_document = 0
     for ligne in lignes:
         numero = ligne["num_article"]
-        documents = [(nom, type_document(nom), texte) for nom, texte in textes.items()
-                     if nom.split("__", 1)[0] in dossiers_par_article[numero]]
+        ordre = {d: i for i, d in enumerate(dossiers_par_article[numero])}
+        documents = sorted(((nom, type_document(nom), texte) for nom, texte in textes.items()
+                            if nom.split("__", 1)[0] in ordre),
+                           key=lambda d: (ordre[d[0].split("__", 1)[0]], d[0]))
         sans_document += not documents
         (destination / "fiches" / f"{numero}.txt").write_text(
             fiche(ligne, article_en_vigueur(base, numero),
@@ -272,7 +274,21 @@ def main() -> None:
             encoding="utf-8")
 
     annotations = destination / "annotations-100.csv"
-    if not annotations.exists():
+    if annotations.exists():
+        # Les verdicts restent ; la liste des dossiers consultables suit la base.
+        # Sans cela, après la scission des lignées, `fiche` et `documents` ne
+        # montraient plus le même historique — vu par un annotateur.
+        with annotations.open(encoding="utf-8", newline="") as f:
+            existantes = list(csv.DictReader(f))
+        for ligne in existantes:
+            ligne["dossiers"] = " ".join(dossiers_par_article.get(ligne["num_article"], []))
+        provisoire = annotations.with_suffix(".csv.tmp")
+        with provisoire.open("w", encoding="utf-8", newline="") as f:
+            ecrivain = csv.DictWriter(f, fieldnames=COLONNES)
+            ecrivain.writeheader()
+            ecrivain.writerows(existantes)
+        provisoire.replace(annotations)
+    else:
         with annotations.open("w", encoding="utf-8", newline="") as f:
             ecrivain = csv.DictWriter(f, fieldnames=COLONNES)
             ecrivain.writeheader()

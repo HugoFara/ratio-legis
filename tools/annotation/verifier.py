@@ -49,7 +49,9 @@ from pathlib import Path
 
 RACINE = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(RACINE / "tools" / "prototype"))
+sys.path.insert(0, str(RACINE / "restitution"))
 from commentaires_rapports import texte_brut  # noqa: E402
+from proximite import classer_fenetres  # noqa: E402
 
 # Ce que chaque verdict humain attend du verdict de la base.
 ATTENDU = {"motive": {"passage_motivant"},
@@ -58,7 +60,7 @@ ATTENDU = {"motive": {"passage_motivant"},
 
 COLONNES = ["num_article", "strate", "verdict_humain", "verdict_base", "concorde",
             "affirmation_non_etayee", "passage", "aretes_motive", "aretes_concordantes",
-            "proposition_jugee", "annotateur"]
+            "classement_lexical", "proposition_jugee", "annotateur"]
 
 
 def wilson(succes: int, total: int, z: float = 1.96) -> float:
@@ -79,6 +81,26 @@ def taux(succes: int, total: int) -> str:
 
 def documents_par_empreinte(base: sqlite3.Connection) -> dict[str, int]:
     return {h: i for i, h in base.execute("SELECT id, hash FROM document")}
+
+
+def documents_du_texte(base: sqlite3.Connection, numero: str) -> set[int]:
+    """Les documents que la base sert au grain du texte entier pour cet article."""
+    return {d for (d,) in base.execute("""
+        WITH RECURSIVE asc_a(anc) AS (
+            SELECT id FROM article_courant WHERE numero = ?
+            UNION SELECT r.ancien_id FROM renumerote_de r JOIN asc_a ON r.article_id = asc_a.anc)
+        SELECT DISTINCT doc.id FROM asc_a
+        JOIN version_article v ON v.article_id = asc_a.anc
+        JOIN produite_par p ON p.version_id = v.id_legi
+        JOIN issu_de i ON i.texte_id = p.texte_id
+        JOIN document doc ON doc.dossier_id = i.dossier_id""", (numero,))}
+
+
+def texte_en_vigueur(base: sqlite3.Connection, numero: str) -> str:
+    ligne = base.execute("""SELECT v.texte FROM version_en_vigueur v
+                            JOIN article_courant a ON a.id = v.article_id
+                            WHERE a.numero = ?""", (numero,)).fetchone()
+    return ligne[0] if ligne else ""
 
 
 def aretes_motive(base: sqlite3.Connection, numero: str) -> list[tuple[int, int, int]]:
@@ -121,6 +143,7 @@ def main() -> None:
                  "affirmation_non_etayee": int(machine == "passage_motivant"
                                                and humain != "motive"),
                  "passage": "", "aretes_motive": len(aretes), "aretes_concordantes": 0,
+                 "classement_lexical": "",
                  "proposition_jugee": ligne["proposition_jugee"],
                  "annotateur": ligne["annotateur"]}
 
@@ -141,6 +164,19 @@ def main() -> None:
                 fiche["aretes_concordantes"] = len(concordantes)
                 fiche["passage"] = ("retrouve" if concordantes else
                                     "autre_passage" if aretes else "aucune_arete")
+                # Le document est-il au moins servi au grain du texte ? Alors le
+                # classement lexical de docs/28 propose des passages sans rien
+                # affirmer : mesurer s'il met le bon en tête est la seule mesure
+                # que ce classement ait jamais eue.
+                if not aretes and document_id in documents_du_texte(base, numero):
+                    fiche["passage"] = "document_atteint_sans_passage"
+                    texte_doc = base.execute("SELECT texte FROM document WHERE id = ?",
+                                             (document_id,)).fetchone()[0]
+                    classes = classer_fenetres(texte_en_vigueur(base, numero), texte_doc)
+                    rangs = [r for r, c in enumerate(classes, 1)
+                             if c.debut < fin and debut < c.fin]
+                    fiche["classement_lexical"] = (f"rang_{rangs[0]}" if rangs else
+                                                   "hors_des_3" if classes else "non_classe")
         fiches.append(fiche)
 
     with sortie.open("w", encoding="utf-8", newline="") as f:
@@ -183,6 +219,12 @@ def main() -> None:
     print(f"   rappel de motive au grain du passage : "
           f"{taux(etats['retrouve'], len(motives))}")
     print(f"   dont trous du corpus (document trouvé hors corpus) : {etats['hors_corpus']}")
+    atteints = [f for f in motives if f["passage"] == "document_atteint_sans_passage"]
+    if atteints:
+        rangs = Counter(f["classement_lexical"] for f in atteints)
+        print(f"   document servi au grain du texte, sans arête : {len(atteints)} → "
+              f"le classement lexical (docs/28) met le passage annoté "
+              f"{dict(rangs)}")
     # Précision : la base affirme un passage ; l'humain le confirme, ou dit
     # qu'un autre passage motive, ou qu'aucun ne motive.
     affirme = [f for f in fiches if f["verdict_base"] == "passage_motivant"]

@@ -24,6 +24,9 @@ contexte ; la proposition de la machine ; les verdicts possibles.
     $C mentions <article> <n>       chaque mention de l'article dans le document n
     $C chercher <article> <n> mots  occurrences de « mots » dans le document n
     $C lire <article> <n> <offset> [longueur]   le texte lui-même, autour d'un offset
+    $C versions <article>           chaque version LEGI de l'article, datée, avec son
+                                    texte producteur — pour savoir depuis quand le
+                                    dispositif existe, et sous quel numéro
 
 ## 2. Les trois verdicts
 
@@ -71,9 +74,14 @@ montre que la disposition actuelle — mais elle ne remonte qu'aussi loin que
 LEGI déclare la concordance, et LEGI ne la déclare pas toujours (L313-10 vient
 de L312-6-2, la loi bancaire de 2013 ; rien ne le dit). Si l'historique
 s'arrête à 2016 alors que le dispositif est manifestement plus ancien, cherche
-la loi qui l'a réellement écrit — par ses mots, `chercher`, dans les dossiers
-antérieurs du corpus —, puis `rattacher`, et dis-le dans le commentaire :
-c'est une concordance manquante, et elle vaut d'être signalée.
+la loi qui l'a réellement écrit — par les mots du dispositif, dans tout le
+corpus indexé :
+
+    $C corpus <article> mots du dispositif
+
+qui dit quels dossiers les portent et lesquels sont hors de l'historique ;
+puis `rattacher`, et dis-le dans le commentaire : c'est une concordance
+manquante, et elle vaut d'être signalée.
 
 ## 5. Rendre le verdict
 

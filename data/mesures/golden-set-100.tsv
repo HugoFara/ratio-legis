@@ -1,0 +1,26 @@
+num_article	strate	verdict_humain	verdict_base	concorde	affirmation_non_etayee	passage	aretes_motive	aretes_concordantes	classement_lexical	proposition_jugee	annotateur
+L313-10	origine_ordonnance	motive	motivation_du_texte	0	0	aucune_arete	0	0		hors_sujet	agent:claude-opus-5
+L224-25-15	origine_ordonnance	dossier_seulement	motivation_du_texte	1	0		0	0		acceptee	agent:kimi-k3
+L224-25-12	origine_ordonnance	motive	motivation_du_texte	0	0	document_atteint_sans_passage	0	0	hors_des_3	corrigee	agent:kimi-k3
+L224-26-3	origine_ordonnance	dossier_seulement	motivation_du_texte	1	0		0	0		corrigee	agent:kimi-k3
+L224-103	origine_ordonnance	motive	motivation_du_texte	0	0	document_atteint_sans_passage	0	0	rang_3	corrigee	agent:kimi-k3
+L131-1-1	origine_ordonnance	motive	motivation_du_texte	0	0	document_atteint_sans_passage	0	0	rang_1	corrigee	agent:kimi-k3
+L132-25	origine_ordonnance	motive	origine_situee	0	0	hors_corpus	0	0		corrigee	agent:claude-opus-5
+L224-25-21	origine_ordonnance	dossier_seulement	motivation_du_texte	1	0		0	0		corrigee	agent:kimi-k3
+L224-25-28	origine_ordonnance	dossier_seulement	motivation_du_texte	1	0		0	0		acceptee	agent:kimi-k3
+L313-19	origine_ordonnance	dossier_seulement	motivation_du_texte	1	0		0	0		corrigee	agent:kimi-k3
+L224-9-1	origine_ordonnance	motive	motivation_du_texte	0	0	document_atteint_sans_passage	0	0	rang_1	corrigee	agent:kimi-k3
+L621-6	origine_ordonnance	motive	passage_motivant	1	0	autre_passage	2	0		corrigee	agent:kimi-k3
+L224-25-7	origine_ordonnance	dossier_seulement	motivation_du_texte	1	0		0	0		corrigee	agent:kimi-k3
+L224-68-1	origine_ordonnance	motive	motivation_du_texte	0	0	document_atteint_sans_passage	0	0	rang_1	corrigee	agent:kimi-k3
+L425-1	origine_ordonnance	motive	passage_motivant	1	0	retrouve	2	1		corrigee	agent:kimi-k3
+L462-1	origine_ordonnance	dossier_seulement	passage_motivant	0	1		1	0		corrigee	agent:kimi-k3
+L433-11	origine_ordonnance	dossier_seulement	motivation_du_texte	1	0		0	0		acceptee	agent:kimi-k3
+L224-106	origine_ordonnance	motive	motivation_du_texte	0	0	document_atteint_sans_passage	0	0	rang_1	corrigee	agent:kimi-k3
+L241-8	origine_ordonnance	dossier_seulement	motivation_du_texte	1	0		0	0		corrigee	agent:kimi-k3
+L217-2	origine_ordonnance	motive	motivation_du_texte	0	0	document_atteint_sans_passage	0	0	rang_1	corrigee	agent:kimi-k3
+L511-1	origine_ordonnance	dossier_seulement	motivation_du_texte	1	0		0	0		corrigee	agent:kimi-k3
+L315-11	origine_ordonnance	motive	motivation_du_texte	0	0	document_atteint_sans_passage	0	0	rang_1	corrigee	agent:kimi-k3
+L341-47	origine_ordonnance	dossier_seulement	motivation_du_texte	1	0		0	0		corrigee	agent:kimi-k3
+L242-18-2	origine_ordonnance	dossier_seulement	motivation_du_texte	1	0		0	0		acceptee	agent:kimi-k3
+L224-108	origine_ordonnance	motive	motivation_du_texte	0	0	document_atteint_sans_passage	0	0	hors_des_3	corrigee	agent:kimi-k3
