@@ -34,6 +34,14 @@ MINIMUM = 3000        # une page plus courte que cela est une erreur, pas un tex
 # `_texte-adopte-seance`) et ne se déduit pas de celle de la page.
 LIEN_PDF = re.compile(rb'href="([^"]+\.pdf)"')
 
+# La coquille déclare aussi, depuis la XVe législature, la version HTML du
+# document sous `/dyn/opendata/` — le même texte que le PDF, sans les NUL ni
+# les coupures de page de l'extraction. On la préfère. Elle est aussi ce qui
+# reconnaît la coquille : une page qui déclare où est le document n'est pas le
+# document, et « rticle » y figure pourtant, dans la navigation. Seize textes
+# adoptés étaient entrés au corpus ainsi, 77 ko chacun, zéro en-tête d'article.
+LIEN_OPENDATA = re.compile(rb'href="(/dyn/opendata/[A-Z0-9]+\.html)"')
+
 # **Le premier lien PDF n'est pas le document.** Toutes les pages de l'Assemblée
 # portent en pied un lien vers la déclaration d'accessibilité, et sur les textes
 # de commission de la XIVe législature c'est le **seul** PDF déclaré. Prendre le
@@ -64,10 +72,16 @@ def obtenir(url: str) -> bytes | None:
         return None
 
 
+def coquille(corps: bytes) -> str | None:
+    """Le chemin du document HTML que la page déclare, si elle est une coquille."""
+    trouve = LIEN_OPENDATA.search(corps)
+    return trouve.group(1).decode() if trouve else None
+
+
 def exploitable(corps: bytes | None) -> bool:
     """Le contenu décide, pas le code de retour : une coquille répond 200."""
     return corps is not None and len(corps) >= MINIMUM and (
-        corps.startswith(b"%PDF") or b"rticle" in corps)
+        corps.startswith(b"%PDF") or (b"rticle" in corps and not coquille(corps)))
 
 
 def telecharger(url: str, cible: Path) -> bool:
@@ -75,7 +89,7 @@ def telecharger(url: str, cible: Path) -> bool:
     if not exploitable(corps):
         if corps is None:
             return False
-        chemin = pdf_du_document(corps, url)
+        chemin = coquille(corps) or pdf_du_document(corps, url)
         if not chemin:
             return False
         if chemin.startswith("/"):
@@ -97,7 +111,9 @@ def main() -> None:
     echecs = []
     for ligne in csv.DictReader(plan.open(encoding="utf-8"), delimiter="\t"):
         cible = corpus / f"{ligne['dossier']}__{ligne['fichier']}"
-        if cible.exists() and cible.stat().st_size >= MINIMUM:
+        # Un fichier présent n'est repris que s'il est le document : une coquille
+        # écrite par une version antérieure de ce script se retélécharge.
+        if cible.exists() and exploitable(cible.read_bytes()):
             repris += 1
             continue
         if telecharger(ligne["url"], cible):

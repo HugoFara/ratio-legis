@@ -116,7 +116,7 @@ Reconstruite d'une commande depuis le miroir et les plans versionnés
 | Acteurs | 1 478 | `resulte_de` — l'amendement qui a écrit l'alinéa | 279 |
 | **Actes de l'Union** | **284** | `cite_acte_ue` / `transpose` | 1 572 / 8 |
 | **Considérants de l'Union** | **7 674** | `article_acte_ue` — articles d'actes déclarés | 6 237 |
-| **Textes en discussion** | **424** | **`porte_sur`** — l'article du texte → l'article du code | **44 032** |
+| **Textes en discussion** | **424** | **`porte_sur`** — l'article du texte → l'article du code | **44 097** |
 | **Sorts d'amendements, en huit familles** | **33 217** | **`vise`** — l'amendement qui visait l'article, abouti ou non | **276** |
 | Correspondances de texte entre les deux corpus | 106 | **`depose_sur`** — l'article du code réécrit par l'article du texte sur lequel l'amendement fut déposé | **476** |
 
