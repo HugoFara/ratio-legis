@@ -44,7 +44,11 @@ Commandes, une fois la fiche affichée :
 
 Usage :
     annoter.py <répertoire préparé par preparer.py> --annotateur <initiales>
-               [--reprendre <numéro>]
+               [--strate <strate>] [--reprendre <numéro>]
+
+`--strate` restreint la session à une strate du jeu — `origine_ordonnance`,
+`eligible_L12_L15`, … — pour annoter par population homogène, la même règle en
+tête d'un bout à l'autre.
 """
 
 from __future__ import annotations
@@ -290,11 +294,15 @@ def main() -> None:
     repertoire = Path(args[0])
     annotateur = args[args.index("--annotateur") + 1]
     reprendre = args[args.index("--reprendre") + 1] if "--reprendre" in args else None
+    strate = args[args.index("--strate") + 1] if "--strate" in args else None
 
     chemin = repertoire / "annotations-100.csv"
     lignes = list(csv.DictReader(chemin.open(encoding="utf-8")))
-    a_faire = [l for l in lignes if not l["ANNOT_verdict"] or l["num_article"] == reprendre]
-    print(f"{len(lignes) - len(a_faire)} annoté(s), {len(a_faire)} à faire")
+    a_faire = [l for l in lignes
+               if (not l["ANNOT_verdict"] or l["num_article"] == reprendre)
+               and (strate is None or l["strate"] == strate)]
+    print(f"{sum(bool(l['ANNOT_verdict']) for l in lignes)} annoté(s), "
+          f"{len(a_faire)} à faire" + (f" dans la strate {strate}" if strate else ""))
 
     faits = 0
     try:
