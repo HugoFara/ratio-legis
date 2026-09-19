@@ -45,9 +45,9 @@ des avis du Conseil d'État.
 **Ce que ça coûte.** Le miroir DILA pèse 6,4 Go et sa première récupération est
 longue ; ensuite elle est incrémentale et prend quelques secondes. Les corpus
 téléchargés par le pipeline — rapports, amendements, textes en discussion —
-ajoutent environ 740 Mo. L'ingestion elle-même, une fois tout sur le disque,
+ajoutent environ 1,5 Go. L'ingestion elle-même, une fois tout sur le disque,
 prend **environ cinq minutes** ; c'est elle que rejoue `quotidien.sh` chaque
-matin. Comptez 8 Go de disque au total.
+matin. Comptez 9 Go de disque au total.
 
 **Si quelque chose manque**, le pipeline le dit et s'arrête plutôt que de
 produire une base incomplète en silence. Chaque étape est idempotente : la
@@ -104,21 +104,21 @@ compteurs.
 ### Ce que la base contient
 
 Reconstruite d'une commande depuis le miroir et les plans versionnés
-(`pipeline.sh`), 271 Mo, zéro violation d'intégrité.
+(`pipeline.sh`), 447 Mo, zéro violation d'intégrité.
 
 | Nœuds | | Arêtes | |
 |---|---:|---|---:|
 | Articles (dont **2 104 en vigueur**) | 3 464 | `produite_par` — quel texte a produit la version | 8 145 |
 | Versions d'articles | 6 362 | `repris_de` — continuité d'un alinéa par-delà la recodification | 6 137 |
 | **Segments (alinéas)** | **28 294** | `renumerote_de` | 1 882 |
-| Documents (rapports, exposés, études d'impact, avis) | 393 | `motive` — un passage qui motive, avec offsets | 751 |
-| Amendements (22 102 Sénat, 11 115 Assemblée) | 33 217 | `renvoie_a` — le graphe de renvois | 12 534 |
-| Acteurs | 1 478 | `resulte_de` — l'amendement qui a écrit l'alinéa | 279 |
+| Documents (rapports, exposés, études d'impact, avis) | 785 | `motive` — un passage qui motive, avec offsets | 1 566 |
+| Amendements (31 027 Sénat, 11 115 Assemblée) | 42 142 | `renvoie_a` — le graphe de renvois | 12 534 |
+| Acteurs | 1 644 | `resulte_de` — l'amendement qui a écrit l'alinéa | 308 |
 | **Actes de l'Union** | **284** | `cite_acte_ue` / `transpose` | 1 572 / 8 |
 | **Considérants de l'Union** | **7 674** | `article_acte_ue` — articles d'actes déclarés | 6 237 |
-| **Textes en discussion** | **424** | **`porte_sur`** — l'article du texte → l'article du code | **44 097** |
-| **Sorts d'amendements, en huit familles** | **33 217** | **`vise`** — l'amendement qui visait l'article, abouti ou non | **276** |
-| Correspondances de texte entre les deux corpus | 106 | **`depose_sur`** — l'article du code réécrit par l'article du texte sur lequel l'amendement fut déposé | **476** |
+| **Textes en discussion** | **854** | **`porte_sur`** — l'article du texte → l'article du code | **59 076** |
+| **Sorts d'amendements, en huit familles** | **42 142** | **`vise`** — l'amendement qui visait l'article, abouti ou non | **318** |
+| Correspondances de texte entre les deux corpus | 163 | **`depose_sur`** — l'article du code réécrit par l'article du texte sur lequel l'amendement fut déposé | **550** |
 
 Ce que cela donne au grain de l'article en vigueur, qui est le seul grain qui
 compte pour le produit :
@@ -132,12 +132,12 @@ des motifs, ni débat, ni amendement.
 
 | partie | articles | un passage les motive | origine située | motivation du texte | **raison non documentée** |
 |---|---:|---:|---:|---:|---:|
-| **L** | 1 293 | 801 (61,9 %) | 211 | 276 | **5 (0,4 %)** |
-| **R** | 632 | 44 | 14 | 47 | **527 (83,4 %)** |
+| **L** | 1 293 | 907 (70,1 %) | 121 | 260 | **5 (0,4 %)** |
+| **R** | 632 | 51 | 8 | 47 | **526 (83,2 %)** |
 | **D** | 179 | 1 | 0 | 11 | **167 (93,3 %)** |
 
 **La partie législative du code de la consommation est documentée à 99,6 %. La
-partie réglementaire l'est à 14,4 %** — et c'est elle qui porte la masse des
+partie réglementaire l'est à 14,5 %** — et c'est elle qui porte la masse des
 obligations que rencontre un consommateur.
 
 Ce n'est pas un effet de périmètre. Les parties R et D en étaient exclues depuis
@@ -145,7 +145,7 @@ la phase 0, pour un motif écrit — « rattachement à DOLE mesuré à 0 % » �
 [`docs/27`](docs/27-parties-r-et-d.md) montre faux : 64 articles réglementaires
 sur 811 ont un dossier législatif dans leur ascendance. Le périmètre a été élargi
 aux trois parties, le corpus a suivi, et le nombre d'articles sans raison
-documentée est passé de 701 à **699**. **Le silence de la partie réglementaire est
+documentée est passé de 701 à **698**. **Le silence de la partie réglementaire est
 un état du fonds documentaire français**, et il est désormais mesuré sur un
 périmètre qui ne l'exclut plus.
 
@@ -156,10 +156,10 @@ métriques : [`data/mesures/hygiene.tsv`](data/mesures/hygiene.tsv).
 
 | | |
 |---|---:|
-| **Articles remontant à un passage qui les motive** | **812 (38,6 %)** |
-| Articles reliés à un article de texte en discussion | 1 066 (50,7 %) |
+| **Articles remontant à un passage qui les motive** | **938 (44,6 %)** |
+| Articles reliés à un article de texte en discussion | 1 079 (51,3 %) |
 | Articles nommant un acte de l'Union | 117 |
-| Articles remontant à un amendement identifié | 83 |
+| Articles remontant à un amendement identifié | 122 |
 | Articles cités par un autre article du fonds | 1 039 (49,4 %) |
 
 **Au grain du texte** — ce qui répond à « pourquoi ce *texte* existe ». Un rapport
@@ -169,17 +169,17 @@ faute de l'autre :
 
 | | |
 |---|---:|
-| **Articles atteignant un document motivant le texte** | **1 195 (56,8 %)** |
-| dont par un rapport au Président | 988 |
-| dont par un exposé des motifs | 162 |
-| dont par une étude d'impact | 136 |
-| dont par un avis du Conseil d'État | 135 |
+| **Articles atteignant un document motivant le texte** | **1 258 (59,8 %)** |
+| dont par un rapport au Président | 994 |
+| dont par un exposé des motifs | 206 |
+| dont par une étude d'impact | 181 |
+| dont par un avis du Conseil d'État | 178 |
 | Articles atteignant un considérant européen | 117 |
 | Articles atteignant une transposition déclarée | 60 |
 
 Tous ces comptes suivent la **chaîne de renumérotation**. Un compteur qui ne le
-dit pas est ininterprétable sur ce corpus : `motive` couvre 115 articles par leur
-numéro d'aujourd'hui, et 812 dès qu'on remonte aux numéros d'avant 2016.
+dit pas est ininterprétable sur ce corpus : `motive` couvre 245 articles par leur
+numéro d'aujourd'hui, et 938 dès qu'on remonte aux numéros d'avant 2016.
 
 ### Les tranches
 
@@ -216,6 +216,7 @@ numéro d'aujourd'hui, et 812 dès qu'on remonte aux numéros d'avant 2016.
 | 28. Hôte du code cité | un code nommé dans une citation ne déclare pas ce que le texte modifie | [`docs/34`](docs/34-hote-du-code-cite.md) |
 | 29. `depose_sur` re-mesuré | une garde devenue fabricante d'unicité, et un numéro de subdivision lu en entier | [`docs/35`](docs/35-depose-sur-apres-la-reparation.md) |
 | 30. Jeu d'annotation, prêt | 25 offsets sur 66 ne résolvaient plus, la XVIe législature n'avait pas de corps ; l'outillage de l'annotateur | [`docs/36`](docs/36-jeu-d-annotation-prepare.md) |
+| 31. Dossiers de tout l'historique | le corpus ne suivait que le dossier d'origine ; 94 dossiers, 106 articles L motivés de plus | [`docs/37`](docs/37-dossiers-de-tout-l-historique.md) |
 
 ### Tenir à jour
 

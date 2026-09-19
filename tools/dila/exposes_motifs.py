@@ -22,18 +22,20 @@ Le périmètre suffit à savoir quels dossiers extraire : lire la base créerait
 dépendance circulaire, puisque c'est le chargement de ce corpus qui la peuple.
 
 Usage :
-    exposes_motifs.py <miroir_dila/> <perimetre.csv> <destination/>
+    exposes_motifs.py <miroir_dila/> <dossiers-du-perimetre.tsv> <destination/>
 """
 
 from __future__ import annotations
 
-import csv
 import html
 import re
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from dossiers_du_perimetre import lire  # noqa: E402
 
 EXPOSE = re.compile(r"<EXPOSE_MOTIF>(.*?)</EXPOSE_MOTIF>", re.S)
 MINIMUM = 200          # en deçà, la balise est présente mais vide
@@ -57,11 +59,9 @@ def extraire(archive: Path, motifs: list[str], destination: str) -> None:
 def main() -> None:
     if len(sys.argv) != 4:
         sys.exit(__doc__)
-    miroir, perimetre, destination = (Path(a) for a in sys.argv[1:])
+    miroir, liste, destination = (Path(a) for a in sys.argv[1:])
     destination.mkdir(parents=True, exist_ok=True)
-    dossiers = sorted({l["id_dole_origine"] for l in
-                       csv.DictReader(perimetre.open(encoding="utf-8"))
-                       if l["id_dole_origine"]})
+    dossiers = sorted({l["id_dole"] for l in lire(liste)})
 
     archives = sorted(miroir.glob("DOLE/Freemium_dole_global_*.tar.gz"))
     if not archives:

@@ -15,17 +15,19 @@ DOLE ne l'expose pas directement, mais il publie pour chaque dossier des liens
     https://www.senat.fr/amendements/2013-2014/283/jeu_complet_2013-2014_283.csv
 
 Usage :
-    plan_ameli.py <miroir_dila/> <perimetre.csv> <sortie.tsv>
+    plan_ameli.py <miroir_dila/> <dossiers-du-perimetre.tsv> <sortie.tsv>
 """
 
 from __future__ import annotations
 
-import csv
 import re
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "dila"))
+from dossiers_du_perimetre import lire  # noqa: E402
 
 PETITE_LOI = re.compile(r"petite-loi-ameli/(\d{4}-\d{4})/(\d+)\.html")
 # Deuxième forme, plus fréquente : les liens vers le texte lui-même. Le préfixe
@@ -46,11 +48,9 @@ def couples_du_texte(texte: str) -> set[tuple[str, str]]:
 def main() -> None:
     if len(sys.argv) != 4:
         sys.exit(__doc__)
-    miroir, perimetre, sortie = (Path(a) for a in sys.argv[1:])
+    miroir, liste, sortie = (Path(a) for a in sys.argv[1:])
 
-    dossiers = sorted({l["id_dole_origine"] for l in
-                       csv.DictReader(perimetre.open(encoding="utf-8"))
-                       if l["id_dole_origine"]})
+    dossiers = sorted({l["id_dole"] for l in lire(liste)})
     archives = sorted(miroir.glob("DOLE/Freemium_dole_global_*.tar.gz"))
     if not archives:
         sys.exit("archive DOLE globale absente du miroir")

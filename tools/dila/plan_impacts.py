@@ -21,7 +21,7 @@ Le plan produit est versionné : le pipeline doit pouvoir retélécharger sans
 retraverser l'archive DOLE.
 
 Usage :
-    plan_impacts.py <miroir_dila/> <perimetre.csv> <plan-impacts.tsv>
+    plan_impacts.py <miroir_dila/> <dossiers-du-perimetre.tsv> <plan-impacts.tsv>
 """
 
 from __future__ import annotations
@@ -34,6 +34,9 @@ import sys
 import tempfile
 import unicodedata
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from dossiers_du_perimetre import lire  # noqa: E402
 
 LIEN = re.compile(r"<LIEN\b([^>]*?)/?>", re.S)
 ATTR = re.compile(r'(\w+)="([^"]*)"')
@@ -56,10 +59,8 @@ def extraire(archive: Path, motifs: list[str], destination: str) -> None:
 def main() -> None:
     if len(sys.argv) != 4:
         sys.exit(__doc__)
-    miroir, perimetre, sortie = (Path(a) for a in sys.argv[1:])
-    dossiers = sorted({l["id_dole_origine"] for l in
-                       csv.DictReader(perimetre.open(encoding="utf-8"))
-                       if l["id_dole_origine"]})
+    miroir, liste, sortie = (Path(a) for a in sys.argv[1:])
+    dossiers = sorted({l["id_dole"] for l in lire(liste)})
     archives = sorted(miroir.glob("DOLE/Freemium_dole_global_*.tar.gz"))
     if not archives:
         sys.exit("archive globale DOLE absente du miroir")

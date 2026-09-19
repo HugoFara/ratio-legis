@@ -23,7 +23,7 @@ Sont écartés, et comptés :
   - les liens hors des deux chambres, dont le corpus ne sait rien.
 
 Usage :
-    plan_rapports.py <miroir_dila/> <perimetre.csv> <plan-rapports.tsv>
+    plan_rapports.py <miroir_dila/> <dossiers-du-perimetre.tsv> <plan-rapports.tsv>
 """
 
 from __future__ import annotations
@@ -35,6 +35,9 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from dossiers_du_perimetre import lire  # noqa: E402
 
 LIEN = re.compile(r"<LIEN\b([^>]*?)/?>", re.S)
 ATTR = re.compile(r'(\w+)="([^"]*)"')
@@ -56,10 +59,8 @@ def extraire(archive: Path, motifs: list[str], destination: str) -> None:
 def main() -> None:
     if len(sys.argv) != 4:
         sys.exit(__doc__)
-    miroir, perimetre, sortie = (Path(a) for a in sys.argv[1:])
-    dossiers = sorted({l["id_dole_origine"] for l in
-                       csv.DictReader(perimetre.open(encoding="utf-8"))
-                       if l["id_dole_origine"]})
+    miroir, liste, sortie = (Path(a) for a in sys.argv[1:])
+    dossiers = sorted({l["id_dole"] for l in lire(liste)})
     archives = sorted(miroir.glob("DOLE/Freemium_dole_global_*.tar.gz"))
     if not archives:
         sys.exit("archive globale DOLE absente du miroir")

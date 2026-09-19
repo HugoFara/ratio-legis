@@ -174,26 +174,39 @@ def url_dossier(nom: str) -> str | None:
             if trouve and "expose-motifs" in nom else None)
 
 
-def rattachements_legi(perimetre: Path) -> tuple[dict[str, set[str]], dict[str, str],
-                                                 dict[str, int | None]]:
-    """Ce que LEGI déclare : article → dossiers, dossier → titre du texte.
+def rattachements_legi(base: sqlite3.Connection) -> tuple[dict[str, set[str]], dict[str, str],
+                                                          dict[str, int | None]]:
+    """Ce que LEGI et DOLE déclarent : article → dossiers, dossier → titre, législature.
+
+    Lu dans la base, non dans le périmètre. Le périmètre ne porte qu'un dossier
+    par article — celui du texte qui a créé le prédécesseur — et le corpus s'y
+    était aligné : 94 dossiers de textes ayant **modifié** un article en vigueur
+    n'y figuraient pas, et leurs rapports n'auraient de toute façon pas été
+    retenus ici, « dossier hors périmètre ». La base sait mieux : `produite_par`
+    dit quel texte a produit chaque version, `issu_de` le dossier du texte.
 
     Le numéro d'avant recodification est retenu au même titre que le numéro
-    actuel : un rapport de 2013 nomme L121-105, jamais L224-65.
+    actuel : un rapport de 2013 nomme L121-105, jamais L224-65. Chaque numéro
+    porte les dossiers de ses propres versions, plus ceux de ses ancêtres.
     """
     articles: dict[str, set[str]] = defaultdict(set)
+    for numero, dossier in base.execute("""
+        WITH RECURSIVE asc_a(art, anc) AS (
+            SELECT id, id FROM article
+            UNION SELECT a.art, r.ancien_id FROM renumerote_de r JOIN asc_a a
+            ON r.article_id = a.anc)
+        SELECT DISTINCT art.numero, i.dossier_id FROM asc_a a
+        JOIN article art       ON art.id = a.art
+        JOIN version_article v ON v.article_id = a.anc
+        JOIN produite_par p    ON p.version_id = v.id_legi
+        JOIN issu_de i         ON i.texte_id = p.texte_id"""):
+        articles[numero.replace(" ", "")].add(dossier)
     titres: dict[str, str] = {}
     legislatures: dict[str, int | None] = {}
-    for ligne in csv.DictReader(perimetre.open(encoding="utf-8")):
-        dossier = ligne["id_dole_origine"]
-        if not dossier:
-            continue
-        titres.setdefault(dossier, ligne["texte_origine"])
-        legislatures.setdefault(dossier, int(ligne["legislature_origine"])
-                                if ligne["legislature_origine"].isdigit() else None)
-        for cle in (ligne["num_article"], ligne["article_predecesseur"]):
-            if cle:
-                articles[cle.replace(" ", "")].add(dossier)
+    for dossier, titre, legislature in base.execute(
+            "SELECT id_dole, titre, legislature FROM dossier"):
+        titres[dossier] = titre
+        legislatures[dossier] = legislature
     return articles, titres, legislatures
 
 
@@ -203,11 +216,11 @@ def main() -> None:
     dossier_rapports, perimetre, plan, chemin_base = (Path(a) for a in sys.argv[1:5])
     plan_impacts = Path(sys.argv[5]) if len(sys.argv) == 6 else None
 
-    legi, titres, legislatures = rattachements_legi(perimetre)
     liens = urls_du_plan(plan) | urls_des_impacts(plan_impacts)
 
     base = sqlite3.connect(chemin_base)
     base.execute("PRAGMA foreign_keys = ON")
+    legi, titres, legislatures = rattachements_legi(base)
     # Reconstruction, non complément : les documents portent des identifiants
     # explicites et une seconde exécution entrait sinon en collision. Le même
     # défaut avait laissé en base des arêtes `resulte_de` à l'ancienne confiance.
@@ -220,19 +233,10 @@ def main() -> None:
     base.execute("DELETE FROM document")
     base.executemany("DELETE FROM preuve WHERE id = ?", [(i,) for i in anciennes])
     ids_articles = {n: i for i, n in base.execute("SELECT id, numero FROM article")}
-    par_titre = {t: c for c, t in base.execute(
-        "SELECT id_jorf, titre FROM texte_normatif")}
     prochaine_preuve = base.execute(
         "SELECT coalesce(max(id), 0) + 1 FROM preuve").fetchone()[0]
-
-    # ------------------------------------------------------- dossiers et textes
-    base.executemany(
-        "INSERT OR IGNORE INTO dossier (id_dole, titre, legislature) VALUES (?, ?, ?)",
-        [(d, titres[d], legislatures[d]) for d in sorted(titres)])
-    issu_de = [(par_titre[titres[d]], d) for d in sorted(titres)
-               if titres[d] in par_titre]
-    base.executemany(
-        "INSERT OR IGNORE INTO issu_de (texte_id, dossier_id) VALUES (?, ?)", issu_de)
+    # Dossiers et `issu_de` sont désormais écrits par `dossiers_des_textes.py`,
+    # avant le périmètre ; cette tranche les lit, elle ne les fabrique plus.
 
     # ------------------------------------------------ documents et candidatures
     documents, candidats, sans_url = [], [], 0
@@ -348,7 +352,6 @@ def main() -> None:
     print(f"documents chargés          : {len(documents)}")
     print(f"  sans URL, écartés        : {sans_url}")
     print(f"dossiers                   : {len(titres)}")
-    print(f"arêtes issu_de             : {len(issu_de)}")
     print(f"\ncitations d'article candidates : {len(candidats)}")
     print(f"  désignant un article de ce code : {len(connus)}")
     print(f"    déclarées en en-tête   : {sum(1 for c in connus if c['en_tete'])} "

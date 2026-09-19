@@ -23,18 +23,20 @@ fichier de structure. Chercher le texte dans le fichier `version`, comme le fait
 l'intuition, ne rend rien et ne lève aucune erreur.
 
 Usage :
-    rapports_president.py <miroir_dila/> <perimetre.csv> <destination/>
+    rapports_president.py <miroir_dila/> <dossiers-du-perimetre.tsv> <destination/>
 """
 
 from __future__ import annotations
 
-import csv
 import html
 import re
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from dossiers_du_perimetre import lire  # noqa: E402
 
 ID_TEXTE_2 = re.compile(r"<ID_TEXTE_2>(JORFTEXT\d+)</ID_TEXTE_2>")
 ARTICLE = re.compile(r"(JORFARTI\d+)")
@@ -60,12 +62,10 @@ def extraire(archive: Path, motifs: list[str], destination: str) -> None:
 def main() -> None:
     if len(sys.argv) != 4:
         sys.exit(__doc__)
-    miroir, perimetre, destination = (Path(a) for a in sys.argv[1:])
+    miroir, liste, destination = (Path(a) for a in sys.argv[1:])
     destination.mkdir(parents=True, exist_ok=True)
 
-    dossiers = sorted({l["id_dole_origine"] for l in
-                       csv.DictReader(perimetre.open(encoding="utf-8"))
-                       if l["id_dole_origine"] and l["nature_origine"] == "ORDONNANCE"})
+    dossiers = sorted({l["id_dole"] for l in lire(liste) if l["nature"] == "ordonnance"})
     dole = sorted(miroir.glob("DOLE/Freemium_dole_global_*.tar.gz"))
     jorf = sorted(miroir.glob("JORF/Freemium_jorf_global_*.tar.gz"))
     if not dole or not jorf:

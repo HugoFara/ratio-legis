@@ -22,6 +22,13 @@
 set -uo pipefail
 RACINE="$(cd "$(dirname "$0")" && pwd)"
 
+# Une étape d'ingestion qui échoue arrête le pipeline. Sans cela — vu le
+# 19 septembre 2026 — `texte_discute` s'est chargé à zéro sur une collision
+# d'identifiants, les tranches suivantes ont tourné sur le trou, et l'hygiène a
+# publié « 0 texte en discussion » comme un chiffre. Un téléchargement peut
+# échouer, le pipeline le compte ; une ingestion, non.
+ingere() { python3 "$@" || { echo "ÉCHEC : ${1##*/} — pipeline arrêté" >&2; exit 1; }; }
+
 # L'interpréteur fait partie de ce qu'il faut pour rejouer le pipeline, au même
 # titre que le miroir et les plans. Le laisser implicite, c'est accepter que
 # « rejouable » veuille dire « rejouable ici » — l'inverse de la règle § 5.2.
@@ -38,6 +45,7 @@ CODE=LEGITEXT000006069565          # code de la consommation
 PERIMETRE="$RACINE/data/perimetre-v2.csv"
 IMPACTS="$RACINE/data/corpus/plan-impacts.tsv"
 TEXTES="$RACINE/data/corpus/plan-textes.tsv"
+DOSSIERS="$RACINE/data/dossiers-du-perimetre.tsv"
 RAPPORTS="$RACINE/data/corpus/plan-rapports.tsv"
 
 etape() { printf '\n\033[1m== %s\033[0m\n' "$*"; }
@@ -70,10 +78,22 @@ etape "1 bis. Fonds LEGI en base, dossiers DOLE, périmètre"
 # périmètre ne saurait pas quels articles ont un dossier dans leur ascendance —
 # c'est-à-dire exactement ce que l'exclusion des parties R et D avait supposé nul.
 rm -f "$BASE"
-python3 "$RACINE/ingestion/legi_vers_graphe.py" "$TRAVAIL/conso" "$BASE"
-python3 "$RACINE/ingestion/dossiers_des_textes.py" "$MIROIR" "$BASE"
+ingere "$RACINE/ingestion/legi_vers_graphe.py" "$TRAVAIL/conso" "$BASE"
+ingere "$RACINE/ingestion/dossiers_des_textes.py" "$MIROIR" "$BASE"
 python3 "$RACINE/tools/phase0/perimetre.py" "$BASE" \
         "$RACINE/data/perimetre-v1.csv" "$PERIMETRE"
+# Les dossiers à récupérer sont ceux de tout l'historique des articles en
+# vigueur, pas le seul dossier d'origine que porte le périmètre : un texte qui
+# modifie un article a un dossier, et ce dossier motive ce qu'il a réécrit. La
+# liste est versionnée ; quand elle bouge, les plans se régénèrent.
+python3 "$RACINE/tools/dila/dossiers_du_perimetre.py" "$BASE" "$DOSSIERS.new"
+if ! cmp -s "$DOSSIERS" "$DOSSIERS.new"; then
+  mv "$DOSSIERS.new" "$DOSSIERS"
+  rm -f "$RAPPORTS" "$IMPACTS" "$TEXTES" "$RACINE/data/corpus/plan-ameli.tsv"
+  echo "   liste des dossiers modifiée : plans à régénérer"
+else
+  rm -f "$DOSSIERS.new"
+fi
 
 # ------------------------------------------------------- 2. rapports et textes
 etape "2. Rapports de commission"
@@ -83,7 +103,7 @@ etape "2. Rapports de commission"
 # périmètre a bougé, en déclarant le corpus complet alors qu'il manquait les
 # dossiers nouveaux.
 [ -s "$RAPPORTS" ] || python3 "$RACINE/tools/dila/plan_rapports.py" "$MIROIR" \
-        "$PERIMETRE" "$RAPPORTS"
+        "$DOSSIERS" "$RAPPORTS"
 bash "$RACINE/tools/prototype/telecharger_rapports.sh" \
      "$RAPPORTS" "$TRAVAIL/corpus/rapports"
 
@@ -91,19 +111,19 @@ bash "$RACINE/tools/prototype/telecharger_rapports.sh" \
 # motivation publiée est le rapport au Président de la République. Il est au
 # Journal officiel, donc dans le miroir — aucun accès réseau.
 python3 "$RACINE/tools/dila/rapports_president.py" "$MIROIR" \
-        "$PERIMETRE" "$TRAVAIL/corpus/rapports"
+        "$DOSSIERS" "$TRAVAIL/corpus/rapports"
 
 # L'exposé des motifs est dans le XML DOLE lui-même, sous <EXPOSE_MOTIF> : ni
 # téléchargement, ni PDF, ni OCR. C'est la colonne « ce que le Gouvernement a
 # déclaré vouloir » du § 4.3.
 python3 "$RACINE/tools/dila/exposes_motifs.py" "$MIROIR" \
-        "$PERIMETRE" "$TRAVAIL/corpus/rapports"
+        "$DOSSIERS" "$TRAVAIL/corpus/rapports"
 
 etape "2 bis. Études d'impact et avis du Conseil d'État"
 # Les seuls documents du corpus qui n'existent qu'en PDF. DOLE n'en porte que le
 # lien ; le plan est versionné pour retélécharger sans retraverser l'archive.
 [ -s "$IMPACTS" ] || python3 "$RACINE/tools/dila/plan_impacts.py" "$MIROIR" \
-        "$PERIMETRE" "$IMPACTS"
+        "$DOSSIERS" "$IMPACTS"
 python3 "$RACINE/tools/dila/telecharger_impacts.py" "$IMPACTS" \
         "$TRAVAIL/corpus/impacts" "$TRAVAIL/corpus/rapports"
 
@@ -112,14 +132,14 @@ etape "2 ter. Textes en discussion"
 # liens ; les pages sont sur les sites des deux chambres, en HTML pour les
 # anciennes et en PDF pour les récentes de l'Assemblée.
 [ -s "$TEXTES" ] || python3 "$RACINE/tools/dila/plan_textes.py" "$MIROIR" \
-        "$PERIMETRE" "$TEXTES"
+        "$DOSSIERS" "$TEXTES"
 python3 "$RACINE/tools/dila/telecharger_textes.py" "$TEXTES" "$TRAVAIL/corpus/textes"
 
 # ------------------------------------------------------- 3. amendements Sénat
 etape "3. Jeux d'amendements Améli (Sénat)"
 AMELI="$RACINE/data/corpus/plan-ameli.tsv"
 [ -s "$AMELI" ] || python3 "$RACINE/tools/senat/plan_ameli.py" "$MIROIR" \
-        "$PERIMETRE" "$AMELI"
+        "$DOSSIERS" "$AMELI"
 while IFS=$'\t' read -r dossier session texte; do
   [ -z "${texte:-}" ] && continue
   url="https://www.senat.fr/amendements/${session}/${texte}/jeu_complet_${session}_${texte}.csv"
@@ -154,17 +174,17 @@ python3 "$RACINE/tools/an/extraire_amendements_an.py" \
 etape "5. Ingestion"
 # `legi_vers_graphe` et `dossiers_des_textes` sont passés à l'étape 1 bis : le
 # périmètre en dépend, et le corpus dépend du périmètre.
-python3 "$RACINE/ingestion/rapports_vers_motive.py" "$TRAVAIL/corpus/rapports" \
+ingere "$RACINE/ingestion/rapports_vers_motive.py" "$TRAVAIL/corpus/rapports" \
         "$PERIMETRE" "$RAPPORTS" "$BASE" "$IMPACTS"
-python3 "$RACINE/ingestion/renvois.py" "$BASE"
-python3 "$RACINE/ingestion/an_vers_amendements.py" "$TRAVAIL/an/amendements_14.csv" \
+ingere "$RACINE/ingestion/renvois.py" "$BASE"
+ingere "$RACINE/ingestion/an_vers_amendements.py" "$TRAVAIL/an/amendements_14.csv" \
         "$TRAVAIL/an/acteurs_historique.json.zip" "$BASE"
-python3 "$RACINE/ingestion/amendements_vers_resulte_de.py" "$TRAVAIL/corpus/ameli" "$BASE"
-python3 "$RACINE/ingestion/visees.py" "$BASE"
+ingere "$RACINE/ingestion/amendements_vers_resulte_de.py" "$TRAVAIL/corpus/ameli" "$BASE"
+ingere "$RACINE/ingestion/visees.py" "$BASE"
 # Après les deux chargeurs d'amendements et après `visees` : il lit les deux
 # colonnes de sort des deux chambres, et la vue `tentative_sur_article` qu'il
 # crée s'appuie sur `vise`.
-python3 "$RACINE/ingestion/sort_des_amendements.py" "$BASE"
+ingere "$RACINE/ingestion/sort_des_amendements.py" "$BASE"
 # DOLE ne lie pas le texte déposé d'un projet de loi ; son numéro se lit dans le
 # rapport qui le rapporte, et les textes de commission dans la référence des
 # amendements. Les deux plans sont chargés en une seule passe : ce script
@@ -173,13 +193,13 @@ DEPOSES="$RACINE/data/corpus/plan-textes-deposes-an.tsv"
 python3 "$RACINE/tools/an/plan_textes_deposes.py" "$BASE" \
         "$TRAVAIL/corpus/rapports" "$DEPOSES"
 python3 "$RACINE/tools/dila/telecharger_textes.py" "$DEPOSES" "$TRAVAIL/corpus/textes"
-python3 "$RACINE/ingestion/textes_deposes.py" "$TRAVAIL/corpus/textes" "$TEXTES" \
+ingere "$RACINE/ingestion/textes_deposes.py" "$TRAVAIL/corpus/textes" "$TEXTES" \
         "$BASE" "$DEPOSES"
 # Doit suivre `textes_deposes` — il lui faut `porte_sur` — et
 # `sort_des_amendements`, dont sa vue reprend les familles.
-python3 "$RACINE/ingestion/textes_des_amendements.py" "$BASE"
+ingere "$RACINE/ingestion/textes_des_amendements.py" "$BASE"
 # Doit suivre les deux précédents : il lui faut les documents et `porte_sur`.
-python3 "$RACINE/ingestion/sections_vers_motive.py" "$TRAVAIL/corpus/rapports" \
+ingere "$RACINE/ingestion/sections_vers_motive.py" "$TRAVAIL/corpus/rapports" \
         "$PERIMETRE" "$RAPPORTS" "$BASE" "$IMPACTS"
 
 # ------------------------------------------------------- 6. couche européenne
@@ -196,26 +216,26 @@ TITRES="$RACINE/data/corpus/titres-jorf.tsv"
 CELEX="$RACINE/data/corpus/celex-verifies.tsv"
 [ -s "$CELEX" ] || python3 "$RACINE/tools/ue/verifier_celex.py" "$BASE" "$CELEX"
 
-python3 "$RACINE/ingestion/union_europeenne.py" "$BASE" "$CELEX" "$TITRES"
+ingere "$RACINE/ingestion/union_europeenne.py" "$BASE" "$CELEX" "$TITRES"
 
 # Le « pourquoi » du droit de l'Union est dans ses considérants, publiés avec
 # l'acte. EUR-Lex les rend en HTML structuré selon ELI ; le miroir est hors dépôt
 # comme celui de la DILA, seul son manifeste est versionné.
 EURLEX="$RACINE/data/raw/eurlex"
 python3 "$RACINE/tools/ue/recuperer_actes.py" "$BASE" "$EURLEX"
-python3 "$RACINE/ingestion/considerants.py" "$BASE" "$EURLEX"
+ingere "$RACINE/ingestion/considerants.py" "$BASE" "$EURLEX"
 
 # --------------------------------------------------- 7. verdict et métriques
 etape "7. Verdict et métriques d'hygiène"
-python3 "$RACINE/ingestion/verdict.py" "$BASE"
-python3 "$RACINE/tools/mesures/hygiene.py" "$BASE" "$PERIMETRE" \
+ingere "$RACINE/ingestion/verdict.py" "$BASE"
+ingere "$RACINE/tools/mesures/hygiene.py" "$BASE" "$PERIMETRE" \
         "$RACINE/data/mesures/hygiene.tsv"
 
 # ------------------------------------------- 8. préparation de la lecture
 etape "8. Index de lecture"
 # En dernier, après toute écriture : ce sont les statistiques du planificateur
 # qui font l'essentiel, et elles décrivent la base telle qu'elle est à la fin.
-python3 "$RACINE/ingestion/index_de_lecture.py" "$BASE"
+ingere "$RACINE/ingestion/index_de_lecture.py" "$BASE"
 
 etape "Terminé"
 echo "base : $BASE ($(du -h "$BASE" | cut -f1))"

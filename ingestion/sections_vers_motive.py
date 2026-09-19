@@ -39,7 +39,6 @@ Usage :
 
 from __future__ import annotations
 
-import csv
 import re
 import sqlite3
 import sys
@@ -172,7 +171,7 @@ def main() -> None:
     base.execute("DELETE FROM preuve WHERE methode = 'section_appariee'")
 
     cibles, compte = cibles_par_article_du_texte(base)
-    legi, titres, _ = rattachements_legi(perimetre)
+    legi, titres, _ = rattachements_legi(base)
     numeros = {i: n for n, i in base.execute("SELECT numero, id FROM article")}
     liens = urls_du_plan(plan) | urls_des_impacts(plan_impacts)
     documents = {url: (i, texte, type_) for i, url, texte, type_ in base.execute(
