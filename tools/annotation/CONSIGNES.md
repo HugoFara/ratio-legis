@@ -58,6 +58,20 @@ Il devient le document numéro n suivant, citable comme les autres. Un document
 trouvé hors corpus est compté à part par la mesure : c'est un **trou du
 corpus**, distinct d'un silence du fonds — c'est une donnée en soi.
 
+**Avant d'importer, vérifie que le corpus ne l'a pas déjà** : si le dossier
+est marqué « aucun document » dans la fiche mais qu'un autre dossier — absent
+de l'historique — est celui du texte que tu cherches, `rattacher` suffit :
+
+    $C rattacher <article> JORFDOLE…
+
+**Méfie-toi de l'historique quand le numéro a été réutilisé.** 285 articles en
+vigueur portent un numéro qui désignait une **autre disposition** avant le
+1er juillet 2016 (recodification). La fiche mêle alors les deux : les textes
+d'avant 2016 concernent l'ancienne disposition, pas celle que tu annotes.
+Compare le texte en vigueur aux versions anciennes ; si elles n'ont rien à
+voir, cherche la loi qui a réellement écrit le dispositif actuel — par ses
+mots, `chercher`, dans les dossiers postérieurs, puis `rattacher`.
+
 ## 5. Rendre le verdict
 
     $C rendre <article> --annotateur agent:<modèle> --verdict motive \

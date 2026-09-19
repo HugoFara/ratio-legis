@@ -29,6 +29,8 @@ Commandes (toutes précédées du répertoire préparé par `preparer.py`) :
     chercher <article> <n> <mots…>         occurrences de <mots> dans le document n
     lire <article> <n> <offset> [longueur] un extrait du document n, à l'offset donné
     importer <article> <chemin> --url URL  un document trouvé hors corpus
+    rattacher <article> <JORFDOLE…>        les documents qu'a le corpus pour un dossier
+                                           absent de l'historique de la fiche
     rendre <article> --annotateur A --verdict V [--document n --debut "mots" --fin "mots"]
                                            [--commentaire "…"] [--proposition acceptee|corrigee|hors_sujet]
     rendre <article> --annotateur A --verdict V --proposition acceptee
@@ -51,8 +53,16 @@ from contextlib import contextmanager
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from annoter import (CONTEXTE, aplatir, convertir, documents_de,  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools" / "prototype"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "ingestion"))
+from annoter import (CONTEXTE, EXTRAIT, aplatir, convertir, documents_de,  # noqa: E402
                      enregistrer, indexer, localiser, mentions, sauver)
+from preparer import nom_texte  # noqa: E402
+from commentaires_rapports import texte_brut  # noqa: E402
+from rapports_vers_motive import type_document  # noqa: E402
+
+RACINE = Path(__file__).resolve().parents[2]
+CORPUS = RACINE / "travail" / "corpus" / "rapports"
 
 VERDICTS = ("motive", "dossier_seulement", "non_documente")
 JUGEMENTS = ("acceptee", "corrigee", "hors_sujet")
@@ -160,6 +170,49 @@ def cmd_importer(a) -> None:
     print(f"ajouté : [{rang}] {nom} ({len(texte)} signes)")
 
 
+def cmd_rattacher(a) -> None:
+    """Le premier agent a dû retélécharger un rapport que le corpus possédait :
+    l'historique de la fiche ne menait pas au bon dossier (L313-10, dont le
+    numéro portait une autre disposition avant 2016). Rattacher ce que le corpus
+    a déjà vaut mieux qu'un doublon « externe » qui fausserait la mesure."""
+    import hashlib
+    fichiers = sorted(f for f in CORPUS.glob(f"{a.dossier}__*")
+                      if not f.name.endswith(("#", "_rapport-fond")))
+    if not fichiers:
+        sys.exit(f"aucun document au corpus pour {a.dossier}")
+    with verrou(a.repertoire):
+        index_path = a.repertoire / "documents.tsv"
+        with index_path.open(encoding="utf-8") as f:
+            connus = {e["fichier"] for e in csv.DictReader(f, delimiter="\t")}
+        ajoutes = 0
+        with index_path.open("a", encoding="utf-8", newline="") as f:
+            ecrivain = csv.writer(f, delimiter="\t", lineterminator="\n")
+            for fichier in fichiers:
+                if fichier.name in connus:
+                    continue
+                texte = texte_brut(fichier)
+                if len(texte) < 2000:
+                    continue
+                (a.repertoire / "documents" / nom_texte(fichier.name)).write_text(
+                    texte, encoding="utf-8", newline="")
+                ecrivain.writerow([a.dossier, fichier.name, type_document(fichier.name),
+                                   len(texte), hashlib.sha256(texte.encode()).hexdigest(),
+                                   ""])
+                ajoutes += 1
+        lignes = charger(a.repertoire)
+        ligne = ligne_de(lignes, a.article)
+        dossiers = ligne["dossiers"].split()
+        if a.dossier not in dossiers:
+            ligne["dossiers"] = " ".join(dossiers + [a.dossier])
+            sauver(lignes, a.repertoire / "annotations-100.csv")
+    docs = documents_de(ligne, a.repertoire)
+    print(f"{a.dossier} rattaché à {a.article} : {ajoutes} document(s) indexé(s), "
+          f"{len(docs)} au total")
+    for rang, (nom, texte) in enumerate(docs, 1):
+        if nom.startswith(a.dossier + "__"):
+            print(f"[{rang}] {nom}  {len(texte)} signes")
+
+
 def cmd_rendre(a) -> None:
     if a.verdict not in VERDICTS:
         sys.exit(f"verdict attendu : {', '.join(VERDICTS)}")
@@ -200,8 +253,12 @@ def cmd_rendre(a) -> None:
     print(f"{a.article}: {ligne['ANNOT_verdict']} — proposition {ligne['proposition_jugee']}"
           f" — {ligne['annotateur']}")
     if passage:
+        longueur = passage[2] - passage[1]
         print(f"  {ligne['ANNOT_document']} [{ligne['ANNOT_offset_debut']}–"
-              f"{ligne['ANNOT_offset_fin']}]\n  {ligne['ANNOT_passage_cite']}")
+              f"{ligne['ANNOT_offset_fin']}], {longueur} signes\n  "
+              f"{ligne['ANNOT_passage_cite']}"
+              + (f" […] (extrait cité plafonné à {EXTRAIT} signes ; les offsets "
+                 f"couvrent le passage entier)" if longueur > EXTRAIT else ""))
 
 
 def main() -> None:
@@ -223,6 +280,8 @@ def main() -> None:
     c.set_defaults(f=cmd_lire)
     c = sp.add_parser("importer"); c.add_argument("article"); c.add_argument("chemin")
     c.add_argument("--url", required=True); c.set_defaults(f=cmd_importer)
+    c = sp.add_parser("rattacher"); c.add_argument("article"); c.add_argument("dossier")
+    c.set_defaults(f=cmd_rattacher)
     c = sp.add_parser("rendre"); c.add_argument("article")
     c.add_argument("--annotateur", required=True); c.add_argument("--verdict", required=True)
     c.add_argument("--document", type=int); c.add_argument("--debut"); c.add_argument("--fin")

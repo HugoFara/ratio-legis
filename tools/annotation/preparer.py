@@ -166,7 +166,9 @@ def fiche(ligne: dict, texte_article: str, anciens: list[str],
               "senat.fr/dossier-legislatif et archives.assemblee-nationale.fr ; "
               "le JO du texte sur Légifrance (exposé des motifs des ordonnances, "
               "rapport au Président) ; Wayback pour les pages disparues. "
-              "Un document trouvé s'ajoute avec la commande `e` de annoter.py.", ""]
+              "Un document trouvé s'ajoute (`e` dans annoter.py, `importer` dans "
+              "console.py) ; un dossier que le corpus a déjà se rattache "
+              "(`rattacher` dans console.py).", ""]
 
     parts += ["DOCUMENTS DU CORPUS, tous dossiers de l'historique confondus", "-" * 72]
     if not documents:
@@ -214,8 +216,10 @@ def fiche(ligne: dict, texte_article: str, anciens: list[str],
               "dossier_seulement, sauf passage consacré au dispositif ;",
               "  - non_documente ne se rend qu'après avoir suivi chaque texte de "
               "l'historique ; écrire dans le commentaire ce qui a été consulté.",
-              "", "Commande : python3 tools/annotation/annoter.py <ce répertoire> "
-              "--annotateur <initiales>"]
+              "", "Au clavier : python3 tools/annotation/annoter.py <ce répertoire> "
+              "--annotateur <initiales>",
+              "En commandes : python3 tools/annotation/console.py <ce répertoire> …",
+              "Protocole : tools/annotation/CONSIGNES.md"]
     return "\n".join(parts) + "\n"
 
 
