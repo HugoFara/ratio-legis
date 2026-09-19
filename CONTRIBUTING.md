@@ -141,6 +141,8 @@ python3 tools/prototype/jeu_annotation.py data/golden-set/jeu-annotation-100.csv
 python3 tools/annotation/preparer.py data/golden-set/jeu-annotation-100-prerempli.csv \
         travail/ratio-legis.sqlite travail/corpus/rapports travail/annotation
 python3 tools/annotation/annoter.py travail/annotation --annotateur <vos initiales>
+# ou, commande par commande, sans clavier — consignes dans tools/annotation/CONSIGNES.md :
+python3 tools/annotation/console.py travail/annotation etat --a-faire
 python3 tools/annotation/verifier.py travail/annotation/annotations-100.csv \
         travail/ratio-legis.sqlite travail/corpus/rapports data/mesures/golden-set-100.tsv
 ```

@@ -154,6 +154,11 @@ def main() -> None:
           f"non annotés : {len(lignes) - len(annotees)}")
     if not annotees:
         return
+    par_annotateur = Counter(f["annotateur"] for f in fiches)
+    print(f"   par annotateur : {dict(par_annotateur)}")
+    if any(a.startswith("agent:") for a in par_annotateur):
+        print("   ⚠ des verdicts sont rendus par des agents : ils ne valent pas "
+              "l'évaluation humaine en aveugle qu'exige la phase 3")
     print("\n1. VERDICT (§ 4.3)")
     humains = Counter(f["verdict_humain"] for f in fiches)
     print("   verdicts humains :", dict(humains))

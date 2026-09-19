@@ -100,9 +100,8 @@ def documents_de(ligne: dict, repertoire: Path) -> list[tuple[str, str]]:
     return docs
 
 
-def importer(chemin: str, ligne: dict, repertoire: Path) -> str | None:
-    """Convertit un document trouvé hors corpus et l'indexe ; rend son nom."""
-    source = Path(chemin).expanduser()
+def convertir(source: Path) -> str | None:
+    """Texte brut d'un document trouvé hors corpus (html, txt ou pdf), ou None."""
     if not source.is_file():
         print(f"  fichier introuvable : {source}")
         return None
@@ -120,7 +119,11 @@ def importer(chemin: str, ligne: dict, repertoire: Path) -> str | None:
     if len(texte) < 200:
         print(f"  {len(texte)} signes seulement : ce n'est pas un document")
         return None
-    url = demander("  URL d'où vient ce document (citation résoluble) : ")
+    return texte
+
+
+def indexer(texte: str, source: Path, url: str, ligne: dict, repertoire: Path) -> str:
+    """Écrit le document sous `externe:<article>` et rend son nom."""
     nom = f"externe__{ligne['num_article']}__{source.name}"
     (repertoire / "documents" / nom_texte(nom)).write_text(texte, encoding="utf-8",
                                                            newline="")
@@ -128,6 +131,17 @@ def importer(chemin: str, ligne: dict, repertoire: Path) -> str | None:
         csv.writer(f, delimiter="\t", lineterminator="\n").writerow(
             [f"externe:{ligne['num_article']}", nom, "externe", len(texte),
              hashlib.sha256(texte.encode()).hexdigest(), url])
+    return nom
+
+
+def importer(chemin: str, ligne: dict, repertoire: Path) -> str | None:
+    """Convertit un document trouvé hors corpus et l'indexe ; rend son nom."""
+    source = Path(chemin).expanduser()
+    texte = convertir(source)
+    if texte is None:
+        return None
+    url = demander("  URL d'où vient ce document (citation résoluble) : ")
+    nom = indexer(texte, source, url, ligne, repertoire)
     print(f"  ajouté : {nom} ({len(texte)} signes)")
     return nom
 
@@ -257,25 +271,34 @@ def annoter(ligne: dict, repertoire: Path, annotateur: str) -> bool:
                    "n": "non_documente"}[verbe]
         commentaire = demander("  commentaire (le passage motive-t-il l'article, ou "
                                "le dispositif d'ensemble ?) : ")
-        jugement = JUGEMENTS[verbe] if ligne["proposition_document"] else "aucune"
-        if verbe in ("p", "d") and passage and ligne["proposition_document"] \
-                and passage[0] == ligne["proposition_document"] \
-                and passage[1] == int(ligne["proposition_offset_debut"]) \
-                and passage[2] == int(ligne["proposition_offset_fin"]):
-            jugement = "acceptee"
-
-        ligne.update({"ANNOT_verdict": verdict, "ANNOT_commentaire": commentaire,
-                      "proposition_jugee": jugement, "annotateur": annotateur,
-                      "date": date.today().isoformat(),
-                      "ANNOT_document": "", "ANNOT_offset_debut": "",
-                      "ANNOT_offset_fin": "", "ANNOT_passage_cite": ""})
-        if passage:
-            nom, debut, fin = passage
-            texte = next(t for n, t in docs if n == nom)
-            ligne.update({"ANNOT_document": nom, "ANNOT_offset_debut": debut,
-                          "ANNOT_offset_fin": fin,
-                          "ANNOT_passage_cite": aplatir(texte[debut:fin])[:EXTRAIT]})
+        enregistrer(ligne, docs, verdict, passage, commentaire, annotateur,
+                    JUGEMENTS[verbe])
         return True
+
+
+def enregistrer(ligne: dict, docs: list[tuple[str, str]], verdict: str,
+                passage: tuple[str, int, int] | None, commentaire: str,
+                annotateur: str, jugement: str) -> None:
+    """Écrit le verdict dans la ligne. `jugement` : ce que l'annotateur fait de la
+    proposition ; corrigé en « acceptee » si le passage désigné est la proposition
+    même, en « aucune » s'il n'y avait rien à juger."""
+    if not ligne["proposition_document"]:
+        jugement = "aucune"
+    elif passage and passage[0] == ligne["proposition_document"] \
+            and passage[1] == int(ligne["proposition_offset_debut"]) \
+            and passage[2] == int(ligne["proposition_offset_fin"]):
+        jugement = "acceptee"
+    ligne.update({"ANNOT_verdict": verdict, "ANNOT_commentaire": commentaire,
+                  "proposition_jugee": jugement, "annotateur": annotateur,
+                  "date": date.today().isoformat(),
+                  "ANNOT_document": "", "ANNOT_offset_debut": "",
+                  "ANNOT_offset_fin": "", "ANNOT_passage_cite": ""})
+    if passage:
+        nom, debut, fin = passage
+        texte = next(t for n, t in docs if n == nom)
+        ligne.update({"ANNOT_document": nom, "ANNOT_offset_debut": debut,
+                      "ANNOT_offset_fin": fin,
+                      "ANNOT_passage_cite": aplatir(texte[debut:fin])[:EXTRAIT]})
 
 
 def sauver(lignes: list[dict], chemin: Path) -> None:
