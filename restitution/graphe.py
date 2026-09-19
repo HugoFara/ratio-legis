@@ -346,10 +346,13 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
     # Sous quel article du texte en discussion cet article a-t-il été débattu.
     # `direct` distingue la cible nommée telle quelle de celle atteinte par la
     # chaîne de renumérotation : un texte de 2014 vise L. 121-42, devenu L. 224-43.
+    # `survecu` : LEGI confirme que la loi de ce dossier a écrit l'article. Sans
+    # lui, l'état est une tentative — le projet visait l'article, la loi ne l'a
+    # pas touché — et la restitution le dit plutôt que de le taire.
     d["textes_discutes"] = q("""
-        SELECT chambre, stade, article_du_texte, numero_cite, direct, url
+        SELECT chambre, stade, article_du_texte, numero_cite, direct, survecu, url
         FROM articles_du_texte WHERE article = ?
-        ORDER BY direct DESC, chambre, stade""", numero)
+        ORDER BY survecu DESC, direct DESC, chambre, stade""", numero)
 
     d["cite_par"] = q("""SELECT article_citant,
                                 min((SELECT fenetre FROM preuve WHERE id = preuve_id)) AS extrait
@@ -505,7 +508,8 @@ def en_texte(d: dict) -> str:
         L.append(f"\nSOUS QUEL ARTICLE IL A ÉTÉ DISCUTÉ ({len(d['textes_discutes'])})")
         for x in d["textes_discutes"][:PLAFOND_TEXTES]:
             sous = "" if x["direct"] else f" (visé sous {x['numero_cite']})"
-            L.append(f"  article {x['article_du_texte']}{sous} — {x['stade']}")
+            mort = "" if x["survecu"] else " — ⚠ état intermédiaire : la loi n'a pas touché l'article"
+            L.append(f"  article {x['article_du_texte']}{sous} — {x['stade']}{mort}")
             L.append(f"    {x['url']}")
         reste = len(d["textes_discutes"]) - PLAFOND_TEXTES
         if reste > 0:
@@ -766,12 +770,13 @@ font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-seri
         p.append(f"<h2>Sous quel article il a été discuté "
                  f"({len(d['textes_discutes'])})</h2>")
         p.append("<table><tr><th>Article du texte</th><th>Chambre</th>"
-                 "<th>Stade</th><th>Visé sous</th></tr>")
+                 "<th>Stade</th><th>Visé sous</th><th>Promulgué</th></tr>")
         for x in d["textes_discutes"]:
             p.append(f'<tr><td><a href="{e(x["url"])}">article '
                      f'{e(x["article_du_texte"])}</a></td>'
                      f'<td>{e(x["chambre"])}</td><td>{e(x["stade"])}</td>'
-                     f'<td>{"" if x["direct"] else e(x["numero_cite"])}</td></tr>')
+                     f'<td>{"" if x["direct"] else e(x["numero_cite"])}</td>'
+                     f'<td>{"oui" if x["survecu"] else "⚠ non : état intermédiaire, la loi n’a pas touché l’article"}</td></tr>')
         p.append("</table>")
 
     p.append(f"<h2>Ce qui cite cet article ({len(d['cite_par'])})</h2>")

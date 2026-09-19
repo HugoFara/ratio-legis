@@ -71,10 +71,13 @@ VOIES = {
         JOIN segment g ON g.version_id = v.id_legi
         JOIN suite s ON s.origine = g.id
         JOIN resulte_de rd ON rd.segment_id = s.courant""",
-    # Sous quel article de quel texte il a été discuté.
+    # Sous quel article de quel texte il a été discuté — et promulgué : un état
+    # intermédiaire dont la disposition est morte en séance ne situe rien
+    # (`survecu`, schema/006).
     "a_article_du_texte": """
         SELECT DISTINCT a.id FROM articles_du_texte x
-        JOIN article_courant a ON a.numero = x.article""",
+        JOIN article_courant a ON a.numero = x.article
+        WHERE x.survecu""",
     # Un document qui motive le texte entier : exposé, étude d'impact, avis,
     # rapport au Président. Mais le texte doit avoir **écrit** le dispositif —
     # créé l'article à la racine de sa chaîne de renumérotation, ou modifié une

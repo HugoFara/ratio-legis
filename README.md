@@ -126,18 +126,18 @@ compte pour le produit :
 ### Le verdict
 
 Pour chaque article en vigueur, le graphe rend un verdict — y compris, et surtout,
-quand il est négatif. Le taux global de 36,1 % d'articles sans raison documentée
+quand il est négatif. Le taux global de 36,6 % d'articles sans raison documentée
 ne veut rien dire : il faut séparer les parties, parce qu'un décret n'a ni exposé
 des motifs, ni débat, ni amendement.
 
 | partie | articles | un passage les motive | origine située | motivation du texte | **raison non documentée** |
 |---|---:|---:|---:|---:|---:|
-| **L** | 1 293 | 763 (59,0 %) | 143 | 317 | **70 (5,4 %)** |
-| **R** | 632 | 43 | 12 | 54 | **523 (82,8 %)** |
+| **L** | 1 293 | 763 (59,0 %) | 117 | 334 | **79 (6,1 %)** |
+| **R** | 632 | 43 | 7 | 58 | **524 (82,9 %)** |
 | **D** | 179 | 1 | 0 | 11 | **167 (93,3 %)** |
 
-**La partie législative du code de la consommation est documentée à 94,6 %. La
-partie réglementaire l'est à 14,9 %** — et c'est elle qui porte la masse des
+**La partie législative du code de la consommation est documentée à 93,9 %. La
+partie réglementaire l'est à 14,8 %** — et c'est elle qui porte la masse des
 obligations que rencontre un consommateur.
 
 Ce n'est pas un effet de périmètre. Les parties R et D en étaient exclues depuis
@@ -145,7 +145,7 @@ la phase 0, pour un motif écrit — « rattachement à DOLE mesuré à 0 % » �
 [`docs/27`](docs/27-parties-r-et-d.md) montre faux : 64 articles réglementaires
 sur 811 ont un dossier législatif dans leur ascendance. Le périmètre a été élargi
 aux trois parties, le corpus a suivi, et le nombre d'articles sans raison
-documentée est passé de 701 à **760** — après la scission des lignées, [`docs/38`](docs/38-lignees.md), et la redéfinition de « non documenté », [`docs/39`](docs/39-cent-verdicts-d-agents.md) § 3 : une recodification à droit constant ne documente pas ce que l'article dit. **Le silence de la partie réglementaire est
+documentée est passé de 701 à **770** — après la scission des lignées ([`docs/38`](docs/38-lignees.md)), la redéfinition de « non documenté » ([`docs/39`](docs/39-cent-verdicts-d-agents.md) § 3 : une recodification à droit constant ne documente pas ce que l'article dit) et l'exclusion des états intermédiaires du texte ([`docs/40`](docs/40-etats-intermediaires.md)). **Le silence de la partie réglementaire est
 un état du fonds documentaire français**, et il est désormais mesuré sur un
 périmètre qui ne l'exclut plus.
 
@@ -219,6 +219,7 @@ numéro d'aujourd'hui, et 783 dès qu'on remonte aux numéros d'avant 2016.
 | 31. Dossiers de tout l'historique | le corpus ne suivait que le dossier d'origine ; 94 dossiers, 106 articles L motivés de plus | [`docs/37`](docs/37-dossiers-de-tout-l-historique.md) |
 | 32. Lignées | un numéro n'est pas un article : 285 numéros réutilisés en 2016, 144 « passages motivants » qui expliquaient une autre disposition | [`docs/38`](docs/38-lignees.md) |
 | 33. Cent verdicts d'agents | le jeu annoté par sept modèles pour 72 $ ; `motive` retrouvé au passage 29/72, rapport au Président sans arête 18/72 ; ce que cela ne vaut pas | [`docs/39`](docs/39-cent-verdicts-d-agents.md) |
+| 34. États intermédiaires | 764 arêtes `porte_sur` que la loi promulguée n'a pas confirmées ; 31 « origines situées » qui n'en étaient pas | [`docs/40`](docs/40-etats-intermediaires.md) |
 
 ### Tenir à jour
 

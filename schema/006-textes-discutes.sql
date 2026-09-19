@@ -82,6 +82,15 @@ CREATE INDEX porte_sur_par_texte   ON porte_sur (texte_id, article_du_texte);
 -- elle, 807. C'est la même leçon que pour `motive` (`docs/07`) : sur un corpus
 -- recodifié, la cible nommée par le texte n'existe presque jamais sous ce numéro
 -- aujourd'hui. `direct` dit laquelle des deux voies a servi.
+--
+-- `survecu` dit si LEGI confirme que la loi issue de ce dossier a écrit l'article
+-- — créé ou modifié une version de lui ou d'un ancien numéro. Un texte en
+-- discussion est un **état** : un article du projet peut viser L. 214-3 en
+-- première lecture et disparaître en séance (loi 2011-525, art. 121). Sans ce
+-- contrôle, la base « situait » 31 articles en vigueur sous un article de texte
+-- qui n'a jamais été promulgué (docs/40). Sur 5 705 arêtes internes, 764 ne
+-- sont pas corroborées ; l'arête reste — la tentative a existé, et elle
+-- s'affiche comme telle — mais elle ne fonde plus le verdict « origine située ».
 CREATE VIEW articles_du_texte AS
     WITH RECURSIVE descendance(origine, courant) AS (
         SELECT id, id FROM article
@@ -95,6 +104,12 @@ CREATE VIEW articles_du_texte AS
            p.article_du_texte               AS article_du_texte,
            p.numero_cite                    AS numero_cite,
            (p.article_id = d.courant)       AS direct,
+           EXISTS (SELECT 1 FROM issu_de i
+                   JOIN produite_par pp ON pp.texte_id = i.texte_id
+                   JOIN version_article vv ON vv.id_legi = pp.version_id
+                   WHERE i.dossier_id = t.dossier_id
+                     AND vv.article_id = p.article_id
+                     AND pp.type_lien NOT IN ('ABROGE', 'ABROGATION')) AS survecu,
            t.url                            AS url,
            p.preuve_id                      AS preuve_id
     FROM porte_sur p
