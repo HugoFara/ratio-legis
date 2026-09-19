@@ -1,4 +1,60 @@
 num_article	strate	verdict_humain	verdict_base	concorde	affirmation_non_etayee	passage	aretes_motive	aretes_concordantes	classement_lexical	proposition_jugee	annotateur
+L312-45	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	6	1		corrigee	agent:deepseek-v4p1-flash
+L224-35	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	3	1		corrigee	agent:nemotron-3-ultra-nvfp4
+L412-6	eligible_L12_L15	motive	passage_motivant	1	0	document_atteint_sans_passage	0	0	hors_des_3	aucune	agent:glm-5p3-flash
+L511-22	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	10	1		corrigee	agent:deepseek-v4p1-flash
+L231-1	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	3	1		corrigee	agent:glm-5p3
+L413-3	eligible_L12_L15	dossier_seulement	passage_motivant	0	1		3	0		corrigee	agent:glm-5p3
+L224-43	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	4	1		corrigee	agent:minimax-m3
+L711-5	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	4	1		corrigee	agent:minimax-m3
+L341-40	eligible_L12_L15	motive	passage_motivant	1	0	autre_passage	2	0		corrigee	agent:deepseek-v4p1-flash
+L216-5	eligible_L12_L15	dossier_seulement	origine_situee	1	0		0	0		hors_sujet	agent:minimax-m3
+L341-44	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	2	1		corrigee	agent:minimax-m3
+L312-61	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	3	1		corrigee	agent:nemotron-3-ultra-nvfp4
+L242-36	eligible_L12_L15	motive	origine_situee	0	0	document_atteint_sans_passage	0	0	hors_des_3	corrigee	agent:deepseek-v4p1-flash
+L521-10	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	2	1		corrigee	agent:nemotron-3-ultra-nvfp4
+L453-1	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	2	1		corrigee	agent:glm-5p3-flash
+L224-113	eligible_L12_L15	motive	origine_situee	0	0	document_atteint_sans_passage	0	0	hors_des_3	aucune	agent:minimax-m3
+L111-4-1	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	1	1		corrigee	agent:minimax-m3
+L313-30	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	10	1		corrigee	agent:glm-5p3
+L312-48	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	12	1		corrigee	agent:deepseek-v4p1-flash
+L122-25	eligible_L12_L15	motive	origine_situee	0	0	aucune_arete	0	0		aucune	agent:glm-5p3
+L312-88	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	3	1		corrigee	agent:deepseek-v4p1-flash
+L224-74	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	2	1		hors_sujet	agent:deepseek-v4p1-flash
+L224-99	eligible_L12_L15	motive	passage_motivant	1	0	hors_corpus	1	0		corrigee	agent:glm-5p3-flash
+L312-32	eligible_L12_L15	motive	origine_situee	0	0	document_atteint_sans_passage	0	0	rang_2	corrigee	agent:glm-5p3-flash
+L433-4	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	1	1		corrigee	agent:glm-5p3
+L224-62-1	eligible_L12_L15	motive	absent	0	0	hors_corpus	0	0		aucune	agent:deepseek-v4p1-flash
+L242-14	eligible_L12_L15	motive	passage_motivant	1	0	autre_passage	3	0		corrigee	agent:glm-5p3-flash
+L224-38	eligible_L12_L15	motive	passage_motivant	1	0	autre_passage	4	0		corrigee	agent:minimax-m3
+L111-2	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	6	1		corrigee	agent:deepseek-v4p1-flash
+L722-16	eligible_L12_L15	motive	passage_motivant	1	0	autre_passage	8	0		hors_sujet	agent:deepseek-v4p1-flash
+L224-66	eligible_L12_L15	motive	passage_motivant	1	0	autre_passage	3	0		aucune	agent:glm-5p3
+L211-3	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	3	1		corrigee	agent:minimax-m3
+L312-83	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	13	1		corrigee	agent:nemotron-3-ultra-nvfp4
+L751-6	eligible_L12_L15	motive	origine_situee	0	0	document_atteint_sans_passage	0	0	hors_des_3	corrigee	agent:glm-5p3
+L232-2	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	2	1		corrigee	agent:glm-5p3-flash
+L512-21	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	1	1		corrigee	agent:minimax-m3
+L242-5	eligible_L12_L15	motive	passage_motivant	1	0	autre_passage	1	0		corrigee	agent:minimax-m3
+L451-8	eligible_L12_L15	dossier_seulement	motivation_du_texte	1	0		0	0		hors_sujet	agent:glm-5p3-flash
+L521-7	eligible_L12_L15	motive	passage_motivant	1	0	autre_passage	3	0		corrigee	agent:deepseek-v4p1-flash
+L523-1	eligible_L12_L15	motive	passage_motivant	1	0	autre_passage	10	0		corrigee	agent:glm-5p3-flash
+L522-9	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	10	1		corrigee	agent:glm-5p3-flash
+L222-13	eligible_L12_L15	motive	passage_motivant	1	0	autre_passage	1	0		corrigee	agent:glm-5p3-flash
+L732-2	eligible_L12_L15	motive	passage_motivant	1	0	hors_corpus	9	0		corrigee	agent:glm-5p3
+L341-10	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	3	1		corrigee	agent:glm-5p3-flash
+L511-17	eligible_L12_L15	non_documente	passage_motivant	0	1		1	0		hors_sujet	agent:nemotron-3-ultra-nvfp4
+L242-20	eligible_L12_L15	motive	passage_motivant	1	0	retrouve	6	1		corrigee	agent:minimax-m3
+L532-5	eligible_L16_L17	motive	passage_motivant	1	0	retrouve	1	1		corrigee	agent:minimax-m3
+L521-3-1	eligible_L16_L17	motive	passage_motivant	1	0	autre_passage	1	0		corrigee	agent:deepseek-v4p1-flash
+L512-2-1	eligible_L16_L17	motive	passage_motivant	1	0	retrouve	1	1		aucune	agent:nemotron-3-ultra-nvfp4
+L312-95	eligible_L16_L17	motive	passage_motivant	1	0	autre_passage	1	0		corrigee	agent:glm-5p3-flash
+L242-51	eligible_L16_L17	motive	origine_situee	0	0	document_atteint_sans_passage	0	0	rang_1	corrigee	agent:glm-5p3
+L132-2-2	eligible_L16_L17	motive	passage_motivant	1	0	autre_passage	3	0		corrigee	agent:glm-5p3
+L223-8	eligible_L16_L17	motive	origine_situee	0	0	document_atteint_sans_passage	0	0	hors_des_3	corrigee	agent:nemotron-3-ultra-nvfp4
+L241-1-1	eligible_L16_L17	motive	motivation_du_texte	0	0	document_atteint_sans_passage	0	0	rang_1	aucune	agent:nemotron-3-ultra-nvfp4
+L122-26	eligible_L16_L17	motive	passage_motivant	1	0	hors_corpus	0	0		aucune	agent:glm-5p3
+L132-14-1	eligible_L16_L17	motive	passage_motivant	1	0	hors_corpus	0	0		aucune	agent:glm-5p3
 L313-10	origine_ordonnance	motive	motivation_du_texte	0	0	aucune_arete	0	0		hors_sujet	agent:claude-opus-5
 L224-25-15	origine_ordonnance	dossier_seulement	motivation_du_texte	1	0		0	0		acceptee	agent:kimi-k3
 L224-25-12	origine_ordonnance	motive	motivation_du_texte	0	0	document_atteint_sans_passage	0	0	hors_des_3	corrigee	agent:kimi-k3
@@ -24,3 +80,22 @@ L315-11	origine_ordonnance	motive	motivation_du_texte	0	0	document_atteint_sans_
 L341-47	origine_ordonnance	dossier_seulement	motivation_du_texte	1	0		0	0		corrigee	agent:kimi-k3
 L242-18-2	origine_ordonnance	dossier_seulement	motivation_du_texte	1	0		0	0		acceptee	agent:kimi-k3
 L224-108	origine_ordonnance	motive	motivation_du_texte	0	0	document_atteint_sans_passage	0	0	hors_des_3	corrigee	agent:kimi-k3
+L621-3	loi_hors_open_data	motive	motivation_du_texte	0	0	hors_corpus	0	0		aucune	agent:nemotron-3-ultra-nvfp4
+L413-9	loi_hors_open_data	dossier_seulement	motivation_du_texte	1	0		0	0		aucune	agent:minimax-m3
+L412-2	loi_hors_open_data	dossier_seulement	origine_situee	1	0		0	0		aucune	agent:deepseek-v4p1-flash
+L413-6	loi_hors_open_data	motive	passage_motivant	1	0	retrouve	1	1		acceptee	agent:nemotron-3-ultra-nvfp4
+L431-7	loi_hors_open_data	dossier_seulement	motivation_du_texte	1	0		0	0		aucune	agent:deepseek-v4p1-flash
+L321-2	loi_hors_open_data	non_documente	origine_situee	0	0		0	0		aucune	agent:nemotron-3-ultra-nvfp4
+L621-11	loi_hors_open_data	non_documente	motivation_du_texte	0	0		0	0		aucune	agent:nemotron-3-ultra-nvfp4
+L451-11	loi_hors_open_data	motive	passage_motivant	1	0	retrouve	1	1		corrigee	agent:glm-5p3
+L621-1	loi_hors_open_data	non_documente	motivation_du_texte	0	0		0	0		aucune	agent:nemotron-3-ultra-nvfp4
+L122-12	loi_hors_open_data	motive	motivation_du_texte	0	0	hors_corpus	0	0		aucune	agent:glm-5p3-flash
+L313-39	loi_hors_open_data	non_documente	origine_situee	0	0		0	0		aucune	agent:nemotron-3-ultra-nvfp4
+L451-9	loi_hors_open_data	dossier_seulement	motivation_du_texte	1	0		0	0		aucune	agent:minimax-m3
+L743-2	loi_hors_open_data	motive	passage_motivant	1	0	hors_corpus	0	0		aucune	agent:glm-5p3
+L742-17	loi_hors_open_data	motive	origine_situee	0	0	document_atteint_sans_passage	0	0	rang_1	aucune	agent:nemotron-3-ultra-nvfp4
+L451-10	loi_hors_open_data	dossier_seulement	motivation_du_texte	1	0		0	0		aucune	agent:glm-5p3-flash
+L512-46	reclassement_reglementaire	dossier_seulement	motivation_du_texte	1	0		0	0		aucune	agent:minimax-m3
+L822-2	reclassement_reglementaire	motive	motivation_du_texte	0	0	aucune_arete	0	0		aucune	agent:glm-5p3
+L512-12	reclassement_reglementaire	non_documente	motivation_du_texte	0	0		0	0		aucune	agent:nemotron-3-ultra-nvfp4
+L222-17	sans_origine	dossier_seulement	motivation_du_texte	1	0		0	0		aucune	agent:deepseek-v4p1-flash

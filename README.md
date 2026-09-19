@@ -218,6 +218,7 @@ numéro d'aujourd'hui, et 783 dès qu'on remonte aux numéros d'avant 2016.
 | 30. Jeu d'annotation, prêt | 25 offsets sur 66 ne résolvaient plus, la XVIe législature n'avait pas de corps ; l'outillage de l'annotateur | [`docs/36`](docs/36-jeu-d-annotation-prepare.md) |
 | 31. Dossiers de tout l'historique | le corpus ne suivait que le dossier d'origine ; 94 dossiers, 106 articles L motivés de plus | [`docs/37`](docs/37-dossiers-de-tout-l-historique.md) |
 | 32. Lignées | un numéro n'est pas un article : 285 numéros réutilisés en 2016, 144 « passages motivants » qui expliquaient une autre disposition | [`docs/38`](docs/38-lignees.md) |
+| 33. Cent verdicts d'agents | le jeu annoté par sept modèles pour 72 $ ; `motive` retrouvé au passage 29/72, rapport au Président sans arête 18/72 ; ce que cela ne vaut pas | [`docs/39`](docs/39-cent-verdicts-d-agents.md) |
 
 ### Tenir à jour
 
@@ -413,12 +414,14 @@ revanche une **évaluation humaine en aveugle** sur le golden set, qui suppose l
 jeu d'annotation validé.
 
 **Bloquant, et hors de portée du code.** Faire valider à la main les 100 articles
-du jeu d'annotation. 74 d'entre eux portent déjà un passage proposé et ses
-offsets. Tant que cette validation n'est pas faite, la phase 0 reste ouverte et
-aucune mesure de précision du projet n'est autre chose qu'une auto-évaluation.
-Tout ce qu'il faut pour annoter — fiches, documents, saisie sans compter un
-offset, et la mesure qui confrontera le résultat au graphe — est dans
-`tools/annotation/` ([`docs/36`](docs/36-jeu-d-annotation-prepare.md)).
+du jeu d'annotation. Ils portent désormais **cent verdicts d'agents**
+([`docs/39`](docs/39-cent-verdicts-d-agents.md)) — une pré-annotation, pas une
+vérité terrain : la relecture humaine a devant elle 3 affirmations non
+étayées, 13 « autre passage », 6 `non_documente`, et trois décisions de
+protocole à prendre d'abord. Tant que cette relecture n'est pas faite, la
+phase 0 reste ouverte et aucune mesure de précision du projet n'est autre
+chose qu'une auto-évaluation. L'outillage est dans `tools/annotation/`
+([`docs/36`](docs/36-jeu-d-annotation-prepare.md)).
 
 **Trois couches de motivation ne sont pas construites.**
 
