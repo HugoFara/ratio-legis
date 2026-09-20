@@ -1,29 +1,195 @@
 # Ratio Legis
 
-Graphe de provenance normative du droit français : pour un article de code **en
-vigueur aujourd'hui**, remonter aux matériaux qui expliquent pourquoi il existe
-sous cette forme — exposé des motifs, étude d'impact, avis du Conseil d'État,
-amendements, débats, considérants européens.
+Pour un article de code français **en vigueur aujourd'hui**, répondre à une
+seule question : *pourquoi existe-t-il sous cette forme ?* — en remontant aux
+matériaux publics qui l'expliquent : exposé des motifs, étude d'impact, avis du
+Conseil d'État, commentaire du rapport de commission, amendement qui a écrit
+l'alinéa, considérant de la directive transposée.
 
-Ce n'est pas un moteur de recherche juridique, et cela ne produit ni
-interprétation ni conseil. Le produit est le **chaînage**, plus une couche de
-restitution en langue naturelle strictement ancrée : aucune phrase affirmative
-sans citation résoluble au niveau du passage.
+Le produit est un **graphe de provenance normative** dans une base SQLite, et une
+couche de restitution strictement ancrée : aucune phrase affirmative sans
+citation résoluble au passage. Périmètre actuel : le **Code de la
+consommation**, ses trois parties, 2 104 articles en vigueur.
 
-Spécification complète : [`ratio-legis-feuille-de-route.md`](ratio-legis-feuille-de-route.md).
+Spécification : [`ratio-legis-feuille-de-route.md`](ratio-legis-feuille-de-route.md).
+Contribuer : [`CONTRIBUTING.md`](CONTRIBUTING.md). Attribution des sources :
+[`ATTRIBUTION.md`](ATTRIBUTION.md).
+
+## Pourquoi ce projet existe
+
+Les matériaux sont publics. Ce qui manque est le **chaînage** entre le texte
+consolidé qu'on lit et ces matériaux, et la chaîne est rompue en aval de la
+promulgation : la codification à droit constant renumérote, les lois sans
+rapport thématique modifient, les amendements se justifient en une ligne, la
+raison d'une transposition est à Bruxelles, une ordonnance n'a pas de débat, un
+décret n'a pas d'exposé des motifs.
+
+Sur le code de la consommation, la rupture se mesure. **78 % des articles de la
+partie législative semblent issus d'une ordonnance** — la recodification de
+2016 — et **80,7 % ont une loi dans leur ascendance** dès qu'on franchit un
+saut de renumérotation. Un rapport de 2013 commente L. 121-105, jamais
+L. 224-65 : `motive` atteint 162 articles par leur numéro d'aujourd'hui, 783
+en remontant les numéros d'avant. Le graphe existe pour tenir cette chaîne, et
+pour dire honnêtement où elle s'arrête.
+
+## Ce qu'il fait
+
+Cinq questions, chacune rendue en ligne de commande, en HTML, et par l'API.
+Rien à installer pour voir le résultat : les rendus sont versionnés dans
+[`restitution/exemples/`](restitution/exemples/).
+
+**Pourquoi cet article.** La fiche de provenance, arête par arête, et la note
+« pourquoi cet article » sous le contrat du § 4.3 — toute phrase produite est
+citable, celles qui ne le sont pas sont supprimées et le compte s'affiche en
+pied de page (zéro sur 11 599 constats). Aucun modèle de langue n'intervient :
+la note est assemblée par gabarits, les passages sont verbatim.
+
+```
+python3 restitution/graphe.py travail/ratio-legis.sqlite L224-43
+python3 restitution/note.py   travail/ratio-legis.sqlite L224-43
+python3 restitution/note.py   travail/ratio-legis.sqlite --contrat     # éprouver le contrat
+```
+
+**Qui a écrit chaque alinéa.** Le surlignage : la couleur donne le texte qui a
+introduit l'alinéa, la trame signale qu'il a été retouché depuis, la marque
+nomme l'amendement quand la chaîne y mène. 99,1 % des 7 504 alinéas en vigueur
+ont un texte introducteur ; un article sur six est écrit par deux textes ou
+plus ([`docs/25`](docs/25-surlignage.md)).
+
+```
+python3 restitution/surlignage.py travail/ratio-legis.sqlite L111-1 --html sortie.html
+```
+
+**Ce qu'on a voulu y écrire et qui n'y est pas.** Les 42 142 amendements des
+deux chambres avec leur sort en huit familles comparables, et l'irrecevabilité
+lue là où la chambre l'écrit — sur 2 955 irrecevabilités, 1 269 au titre de
+l'article 40, 896 cavaliers.
+217 articles en vigueur portent au moins une tentative, par trois voies jamais
+confondues : l'alinéa écrit qui subsiste (`resulte_de`), la cible que le
+dispositif déclare (`vise`, la seule ouverte à un amendement rejeté), la
+subdivision du texte sur laquelle il fut déposé (`depose_sur`)
+([`docs/30`](docs/30-sort-des-amendements.md)).
+
+```
+python3 restitution/tentatives.py travail/ratio-legis.sqlite L511-7        # 91 tentatives
+python3 restitution/tentatives.py travail/ratio-legis.sqlite --sommet 25   # les plus disputés
+```
+
+**Ce qui bougerait si je modifiais cet article.** Le retentissement descend le
+graphe des 12 534 renvois, par onde : sur L111-1, 69 articles à relire, dont 20
+dont la raison n'est pas documentée. Il dit ce qu'il faudrait relire ; il ne
+dit pas ce qu'il faudrait y écrire ([`docs/29`](docs/29-retentissement.md)).
+
+```
+python3 restitution/retentissement.py travail/ratio-legis.sqlite L111-1 --profondeur 2
+python3 restitution/retentissement.py travail/ratio-legis.sqlite --sommet 25
+```
+
+**Ce que le fonds documentaire tait.** Pour chaque article en vigueur, un
+verdict — et surtout le verdict négatif, `raison non documentée`, qui distingue
+« nous n'avons pas cherché » de « nous avons cherché dans treize sources et il
+n'y a rien ». Les métriques d'hygiène législative sont dans
+[`data/mesures/hygiene.tsv`](data/mesures/hygiene.tsv) et sous `/mesures`
+([`docs/18`](docs/18-verdict-et-hygiene.md)).
+
+**Pour les outils tiers**, la même chose en API et en dump ouvert :
+
+```
+pip install '.[api]'
+RATIO_LEGIS_BASE=data/diffusion/ratio-legis.sqlite uvicorn restitution.api:app
+# GET /articles/{numero}  /note  /surlignage  /retentissement  /tentatives
+# GET /renvois/sommet  /tentatives/sommet  /mesures  /docs
+python3 tools/diffusion/dump.py travail/ratio-legis.sqlite data/diffusion
+```
+
+12 ms de médiane, 21 ms au 95ᵉ centile. Chaque réponse porte l'attribution et
+l'avertissement de non-interprétation, en en-tête et dans la charge utile
+([`docs/24`](docs/24-api.md), [`docs/23`](docs/23-dump-ouvert.md)).
+
+## Ce qu'il ne fait pas
+
+**Il n'interprète pas.** Il ne dit ni ce qu'un article veut dire, ni s'il
+s'applique à votre cas, ni ce qu'il faudrait y écrire. Il rend des matériaux et
+le chemin qui y mène ; l'usage des travaux préparatoires en interprétation est
+juridiquement discuté et n'est pas la bataille du projet. Ce n'est pas un
+moteur de recherche juridique : consulter le droit positif est un problème que
+Légifrance a résolu.
+
+**Il ne couvre qu'un code.** Le code de la consommation a été choisi pour ses
+défauts utiles — recodifié, très transposé, récent. Tout élargissement passe
+par une nouvelle note de cadrage, pas par une option.
+
+**Il ne contient pas les débats.** Le graphe sait ce que le Parlement a
+**fait** — déposé, adopté, rejeté, déclaré irrecevable —, pas ce qu'il a
+**dit**. « Retiré » ne dit pas si l'auteur a cédé ou obtenu satisfaction, et
+cela se lit dans le compte rendu de séance, qui n'y est pas.
+
+**Il ne rediffuse pas les rapports parlementaires.** Leur corps n'est ni dans
+le dépôt ni dans le dump : le CRPA exclut les documents parlementaires
+(art. L300-2), et les conditions des deux chambres ne se transmettent pas sous
+Licence Ouverte. Restent l'URL, le hachage, les offsets, et des extraits de 400
+caractères au plus ([`ATTRIBUTION.md`](ATTRIBUTION.md)).
+
+**Aucun modèle de langue ne décide d'une arête**, et aucun n'écrit une phrase de
+la restitution. Des agents ont servi de **juges** dans les mesures de précision
+récentes — deux par fiche, en colonnes séparées, arbitre sur désaccord, et le
+fichier dit qui a tranché — jamais de producteurs de lien. La topologie du
+graphe vient de règles déterministes et de correspondances textuelles
+vérifiables.
+
+**Il ne se déclare pas conforme.** Les confiances portées par les arêtes sont
+des bornes inférieures de Wilson à 95 %, calculées sur des tirages
+reproductibles jugés par l'auteur ou par des agents. Le critère de sortie de la
+phase 3 est une évaluation humaine en aveugle sur un jeu d'annotation validé, et
+ce jeu ne l'est pas. **Tant que les 100 articles ne sont pas relus à la main, la
+phase 0 reste ouverte** et chaque mesure du projet est une auto-évaluation.
+
+**Il ne comble pas le silence réglementaire.** La partie législative est
+documentée à 94 % ; la partie réglementaire à 15 %, et c'est elle qui porte la
+masse des obligations qu'un consommateur rencontre. C'est un état du fonds
+documentaire français, pas un défaut du périmètre, et il est mesuré plutôt que
+masqué. Deux gisements le feraient baisser — les circulaires, les avis du
+Conseil d'État sur les décrets — et aucun n'est dans le projet.
+
+## Pour qui
+
+**Le légiste** — qui rédige dans une administration, une commission, un
+cabinet. Avant d'écrire, il consulte ce qui a été tenté sur l'article et ce qui
+l'a bloqué ; après avoir écrit, ce que sa modification déplacerait ; en lisant,
+qui a écrit chaque alinéa et à quel moment de la navette.
+
+**Le chercheur et le journaliste** — les métriques d'hygiène législative
+publiables : part des articles sans aucune motivation traçable, par partie du
+code ; part des amendements adoptés sans objet publié ; fondements
+d'irrecevabilité ; durée de la navette. Tout est dans un TSV versionné et se
+recalcule d'une commande.
+
+**Le juriste praticien, la DGCCRF, l'association de consommateurs** — la fiche
+de provenance d'un article, pour retrouver l'étude d'impact qui l'a chiffré ou
+l'amendement qui l'a écrit. Avec la mise en garde qui s'affiche à chaque page :
+ce sont des matériaux, pas une interprétation.
+
+**L'outilleur** — la base SQLite, l'API, le dump sous Licence Ouverte avec
+l'attribution qui voyage avec la donnée. Le code est sous AGPL-3.0 : un service
+bâti dessus rend son code.
+
+**Ce n'est pas pour** qui cherche le droit applicable à une situation, ni pour
+qui veut une réponse en langue naturelle à « que veut dire cet article ».
+
+### Lire un score
+
+Chaque arête porte une **méthode** — `declaree` (une source dit le lien),
+`derivee` (une correspondance textuelle l'établit), `inferee` (un alignement de
+contenu la désigne) — et une **confiance**, qui n'est pas un ressenti : c'est la
+borne inférieure de Wilson d'un tirage jugé, dont la fiche est versionnée dans
+[`data/mesures/`](data/mesures/) avec le nom du juge. Une arête à 0,76 vient
+d'un tirage de vingt jugé 19 sur 20. Une confiance qui n'a pas de fiche n'existe
+pas dans ce dépôt.
 
 ## Cloner et lancer
 
-**Pour voir ce que ça produit, rien à installer** : les rendus sont versionnés
-dans [`restitution/exemples/`](restitution/exemples/) — le graphe d'un article,
-la note sous contrat, le surlignage alinéa par alinéa, et ce qu'une modification
-déplacerait. Ouvrez un `.html`.
-
-Pour faire tourner le projet, il faut le construire. Le dépôt ne contient **que
-du code, des plans de récupération et des mesures** : ni le fonds, ni les
-corpus, ni la base. C'est délibéré — `travail/` est un cache reconstructible, et
-les rapports de commission qu'il contient n'ont pas de régime de réutilisation
-confirmé ([`ATTRIBUTION.md`](ATTRIBUTION.md)).
+Le dépôt ne contient **que du code, des plans de récupération et des mesures** :
+ni le fonds, ni les corpus, ni la base. `travail/` est un cache reconstructible.
 
 ```bash
 git clone <dépôt> ratio-legis && cd ratio-legis
@@ -38,97 +204,65 @@ python3 restitution/graphe.py travail/ratio-legis.sqlite L224-43
 ```
 
 **Prérequis** : Python ≥ 3.14 (`pipeline.sh` refuse de démarrer en deçà), plus
-`curl`, `tar` et `git`. Rien d'autre : une seule dépendance hors bibliothèque
-standard, `pymupdf`, et elle ne sert qu'à lire les PDF des études d'impact et
-des avis du Conseil d'État.
+`curl`, `tar` et `git`. Une seule dépendance hors bibliothèque standard,
+`pymupdf`, qui ne sert qu'à lire les PDF des études d'impact et des avis du
+Conseil d'État.
 
 **Ce que ça coûte.** Le miroir DILA pèse 6,4 Go et sa première récupération est
-longue ; ensuite elle est incrémentale et prend quelques secondes. Les corpus
-téléchargés par le pipeline — rapports, amendements, textes en discussion —
-ajoutent environ 1,5 Go. L'ingestion elle-même, une fois tout sur le disque,
-prend **environ cinq minutes** ; c'est elle que rejoue `quotidien.sh` chaque
-matin. Comptez 9 Go de disque au total.
+longue ; ensuite elle est incrémentale. Les corpus téléchargés — rapports,
+amendements, textes en discussion — ajoutent 1,5 Go, le miroir EUR-Lex des
+284 actes de l'Union 153 Mo. L'ingestion, une fois tout sur le disque, prend
+**environ quinze minutes** et produit une base de 466 Mo, zéro violation
+d'intégrité. Comptez 9 Go de disque.
 
 **Si quelque chose manque**, le pipeline le dit et s'arrête plutôt que de
-produire une base incomplète en silence. Chaque étape est idempotente : la
-relancer ne refait que ce qui manque.
+produire une base incomplète en silence. Chaque étape est idempotente.
 
-Pour tenir la base à jour ensuite, voir [Tenir à jour](#tenir-à-jour) — un
-minuteur systemd utilisateur, décrit dans [`docs/26-quotidien.md`](docs/26-quotidien.md).
+**Tenir à jour** : `./quotidien.sh` enchaîne miroir, incréments, reconstruction,
+dump et rapport de différences, et s'arrête tôt quand rien n'a bougé. Il est
+déclenché par un minuteur systemd utilisateur ([`deploiement/`](deploiement/),
+[`docs/26`](docs/26-quotidien.md)). L'incrément porte sur la source ; le graphe
+est reconstruit en entier, si bien qu'une base servie un mardi est exactement
+celle qu'on obtiendrait en repartant de zéro.
 
-Contribuer : [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Deux étapes demandent le réseau au-delà des sources : la vérification des
+identifiants CELEX auprès de Cellar, dont le résultat est versionné, et le
+miroir EUR-Lex, stocké hors dépôt avec son manifeste horodaté.
 
-## État : phase 2 close avec deux dérogations écrites, phase 4 entamée, validation humaine de la phase 0 toujours ouverte
+## État
 
-Le graphe est chargé et interrogeable article par article. Les quatre critères de
-sortie de la phase 2 ont été **mesurés contre leurs seuils**, ce qui n'avait
-jamais été fait :
+**Phase 2 close avec deux dérogations écrites, phase 4 entamée, validation
+humaine de la phase 0 toujours ouverte.** Les critères de sortie de la phase 2
+mesurés contre leurs seuils :
 
 | Critère § 4.2 | Seuil | Mesuré | |
 |---|---:|---:|---|
 | couverture `produite_par` | > 95 % | 2 081 / 2 104 — **98,9 %** | atteint |
-| couverture `issu_de` | > 90 % | 66 / 74 lois et ordonnances utiles — **89,2 %** | **repassé sous le seuil**, [`docs/20`](docs/20-dossiers-des-textes.md) |
-| couverture `resulte_de` | > 60 % | 83 / 896 — **9,3 %** | **non atteint**, décision go du § 8 rendue |
-| **précision `resulte_de`** | **> 95 %** | 168 / 179 hors-échantillon — **93,9 %** | **non atteint**, et mesuré |
-
-Les trois couvertures sont re-mesurées sur la base d'aujourd'hui ; la clôture
-d'août 2026 et ses deux dérogations sont enregistrées au § 4.2 de la feuille de
-route, avec les valeurs d'alors. **`issu_de` y était à 68 / 68 et n'y est plus** :
-huit textes entrés depuis par les incréments quotidiens — de l'ordonnance du
-3 septembre 2025 à la loi du 18 août 2026 — produisent une version en vigueur
-sans qu'un dossier DOLE leur soit rattaché. Le fonds avance tous les jours, le
-corpus des dossiers ne suit pas tout seul, et c'est un critère de sortie qui le
-dit.
-
-**Toutes les arêtes `resulte_de` du graphe ont été examinées une à une** — 277
-sur 277, en trois tirages reproductibles. Aucune n'est inconnue, et quinze sont
-identifiées comme fausses ou douteuses, en quatre familles nommées.
-
-La décision go/no-go du § 8, restée ouverte, est rendue dans
-[`docs/21`](docs/21-precision-resulte-de.md) § 7 : **go**, parce que le grain de
-l'article est tenu par le commentaire de rapport (695 articles) et par le texte
-discuté (807), non par l'amendement (79) — l'hypothèse du § 8 sur le chemin était
-fausse, pas le produit.
-
-**La phase 2 est close** avec ces deux dérogations, écrites au § 4.2 de la feuille
-de route plutôt que laissées tacites. La phase 4 est entamée : interroger le
-graphe coûtait 425 ms par article, il en coûte 9.
-
-Ce que le projet ne peut toujours pas faire, c'est se déclarer conforme : les
-confiances portées par les arêtes sont des bornes de Wilson calculées sur mes
-propres échantillons, et le critère de la phase 3 (évaluation humaine en aveugle)
-suppose un jugement extérieur. Tant que les 100 articles du jeu d'annotation ne
-sont pas validés à la main, **la phase 0 reste ouverte**, quoi qu'affichent les
-compteurs.
+| couverture `issu_de` | > 90 % | 66 / 74 lois et ordonnances utiles — **89,2 %** | **repassé sous le seuil** — huit textes entrés par les incréments quotidiens sans dossier DOLE, [`docs/20`](docs/20-dossiers-des-textes.md) |
+| couverture `resulte_de` | > 60 % | 83 / 896 — **9,3 %** | **non atteint**, décision go du § 8 rendue dans [`docs/21`](docs/21-precision-resulte-de.md) § 7 : le grain de l'article est tenu par le commentaire de rapport et par le texte discuté, non par l'amendement |
+| précision `resulte_de` | > 95 % | 168 / 179 hors-échantillon — **93,9 %** | **non atteint**, et mesuré ; les 277 arêtes examinées une à une |
 
 ### Ce que la base contient
-
-Reconstruite d'une commande depuis le miroir et les plans versionnés
-(`pipeline.sh`), 447 Mo, zéro violation d'intégrité.
 
 | Nœuds | | Arêtes | |
 |---|---:|---|---:|
 | Articles — lignées (dont **2 104 en vigueur**) | 3 877 | `produite_par` — quel texte a produit la version | 8 145 |
 | Versions d'articles | 6 362 | `repris_de` — continuité d'un alinéa par-delà la recodification | 6 137 |
-| **Segments (alinéas)** | **28 294** | `renumerote_de` | 1 929 |
+| Segments (alinéas) | 28 294 | `renumerote_de` | 1 929 |
 | Documents (rapports, exposés, études d'impact, avis) | 785 | `motive` — un passage qui motive, avec offsets | 1 557 |
 | Amendements (31 027 Sénat, 11 115 Assemblée) | 42 142 | `renvoie_a` — le graphe de renvois | 12 534 |
-| Acteurs | 1 644 | `resulte_de` — l'amendement qui a écrit l'alinéa | 308 |
-| **Actes de l'Union** | **284** | `cite_acte_ue` / `transpose` | 1 572 / 8 |
-| **Considérants de l'Union** | **7 674** | `article_acte_ue` — articles d'actes déclarés | 6 237 |
-| **Textes en discussion** | **854** | **`porte_sur`** — l'article du texte → l'article du code | **97 676** (6 847 internes, confiance 0,90 ; 234 résolues par le contenu, 0,84) |
-| **Sorts d'amendements, en huit familles** | **42 142** | **`vise`** — l'amendement qui visait l'article, abouti ou non | **581** (confiance 0,87) |
-| Correspondances de texte entre les deux corpus | 163 | **`depose_sur`** — l'article du code que l'amendement touche, par l'alinéa du texte qu'il nomme | **1 093** (confiance 0,76 par l'alinéa) |
-
-Ce que cela donne au grain de l'article en vigueur, qui est le seul grain qui
-compte pour le produit :
+| Acteurs | 1 644 | `resulte_de` — l'amendement qui a écrit l'alinéa | 308 (confiance 0,89) |
+| Actes de l'Union | 284 | `cite_acte_ue` / `transpose` | 1 572 / 8 |
+| Considérants de l'Union | 7 674 | `article_acte_ue` — articles d'actes déclarés | 6 237 |
+| Textes en discussion | 854 | `porte_sur` — l'article du texte → l'article du code | 97 676 (6 847 internes, 0,90 ; 234 résolues par le contenu, 0,84) |
+| Sorts d'amendements, en huit familles | 42 142 | `vise` — l'amendement qui visait l'article, abouti ou non | 581 (0,87) |
+| Correspondances de texte entre les deux corpus | 163 | `depose_sur` — l'article du code que l'amendement touche, par l'alinéa du texte qu'il nomme | 1 093 (0,76 par l'alinéa) |
 
 ### Le verdict
 
-Pour chaque article en vigueur, le graphe rend un verdict — y compris, et surtout,
-quand il est négatif. Le taux global de 36,5 % d'articles sans raison documentée
-ne veut rien dire : il faut séparer les parties, parce qu'un décret n'a ni exposé
-des motifs, ni débat, ni amendement.
+Le taux global d'articles sans raison documentée ne veut rien dire : il faut
+séparer les parties, parce qu'un décret n'a ni exposé des motifs, ni débat, ni
+amendement.
 
 | partie | articles | un passage les motive | origine située | motivation du texte | **raison non documentée** |
 |---|---:|---:|---:|---:|---:|
@@ -136,40 +270,29 @@ des motifs, ni débat, ni amendement.
 | **R** | 632 | 43 | 7 | 58 | **524 (82,9 %)** |
 | **D** | 179 | 1 | 0 | 11 | **167 (93,3 %)** |
 
-**La partie législative du code de la consommation est documentée à 94,0 %. La
-partie réglementaire l'est à 14,8 %** — et c'est elle qui porte la masse des
-obligations que rencontre un consommateur.
+Les parties R et D étaient exclues du périmètre initial pour un motif que
+[`docs/27`](docs/27-parties-r-et-d.md) a montré faux ; le périmètre couvre les
+trois parties et le silence réglementaire est mesuré sur un périmètre qui ne
+l'exclut plus.
 
-Ce n'est pas un effet de périmètre. Les parties R et D en étaient exclues depuis
-la phase 0, pour un motif écrit — « rattachement à DOLE mesuré à 0 % » — que
-[`docs/27`](docs/27-parties-r-et-d.md) montre faux : 64 articles réglementaires
-sur 811 ont un dossier législatif dans leur ascendance. Le périmètre a été élargi
-aux trois parties, le corpus a suivi, et le nombre d'articles sans raison
-documentée est passé de 701 à **769** — après la scission des lignées ([`docs/38`](docs/38-lignees.md)), la redéfinition de « non documenté » ([`docs/39`](docs/39-cent-verdicts-d-agents.md) § 3 : une recodification à droit constant ne documente pas ce que l'article dit) et l'exclusion des états intermédiaires du texte ([`docs/40`](docs/40-etats-intermediaires.md)). **Le silence de la partie réglementaire est
-un état du fonds documentaire français**, et il est désormais mesuré sur un
-périmètre qui ne l'exclut plus.
-
-Détail et mises en garde : [`docs/18`](docs/18-verdict-et-hygiene.md). Toutes les
-métriques : [`data/mesures/hygiene.tsv`](data/mesures/hygiene.tsv).
-
-**Au grain de l'article** — ce qui répond à « pourquoi *cet article* dit ceci » :
+**Au grain de l'article** — « pourquoi *cet article* dit ceci » :
 
 | | |
 |---|---:|
-| **Articles remontant à un passage qui les motive** | **783 (37,2 %)** |
+| Articles remontant à un passage qui les motive | **783 (37,2 %)** |
 | Articles reliés à un article de texte en discussion | 983 (46,7 %) |
 | Articles nommant un acte de l'Union | 117 |
 | Articles remontant à un amendement identifié | 104 |
 | Articles cités par un autre article du fonds | 1 039 (49,4 %) |
 
-**Au grain du texte** — ce qui répond à « pourquoi ce *texte* existe ». Un rapport
-au Président motive une ordonnance de plusieurs centaines d'articles, pas l'alinéa
-qu'on lit ; la restitution affiche l'avertissement chaque fois qu'elle sert l'un
+**Au grain du texte** — « pourquoi ce *texte* existe ». Un rapport au Président
+motive une ordonnance de plusieurs centaines d'articles, pas l'alinéa qu'on
+lit ; la restitution affiche l'avertissement chaque fois qu'elle sert l'un
 faute de l'autre :
 
 | | |
 |---|---:|
-| **Articles atteignant un document motivant le texte** | **1 258 (59,8 %)** |
+| Articles atteignant un document motivant le texte | **1 258 (59,8 %)** |
 | dont par un rapport au Président | 994 |
 | dont par un exposé des motifs | 206 |
 | dont par une étude d'impact | 181 |
@@ -177,11 +300,39 @@ faute de l'autre :
 | Articles atteignant un considérant européen | 117 |
 | Articles atteignant une transposition déclarée | 60 |
 
-Tous ces comptes suivent la **chaîne de renumérotation**. Un compteur qui ne le
-dit pas est ininterprétable sur ce corpus : `motive` couvre 162 articles par leur
-numéro d'aujourd'hui, et 783 dès qu'on remonte aux numéros d'avant 2016.
+Tous ces comptes suivent la chaîne de renumérotation ; un compteur qui ne le
+dit pas est ininterprétable sur ce corpus.
 
-### Les tranches
+### Ce qui reste à faire
+
+**Bloquant, et hors de portée du code : la validation à la main des 100
+articles du jeu d'annotation.** Ils portent cent verdicts d'agents
+([`docs/39`](docs/39-cent-verdicts-d-agents.md)) — une pré-annotation, pas une
+vérité terrain. L'outillage de l'annotateur est prêt
+([`docs/36`](docs/36-jeu-d-annotation-prepare.md)). Après elle, l'évaluation
+humaine en aveugle de la note, critère de sortie de la phase 3.
+
+**Couverture.** Les huit textes récents sans dossier DOLE qui ont fait repasser
+`issu_de` sous son seuil. Les amendements de l'Assemblée pour les législatures
+XV à XVII (103 articles éligibles, mécanique). La XIIIe, jamais publiée en open
+data, reconstructible page par page depuis Wayback — arbitrage à rendre entre
+le coût et un trou déclaré. Les tableaux de concordance annexés aux textes de
+transposition, seul chemin connu vers un lien européen au grain de l'article.
+
+**Les arêtes récentes ont chacune leur maille nommée**, dans la section « ce
+qui n'est pas fait » de leur document — les dernières : le plan propre d'un
+amendement hors glissement, les 124 articles écrits que rien ne contient
+([`docs/47`](docs/47-le-numero-glisse-par-le-contenu.md) § 5).
+
+**Le silence réglementaire** ne baissera que par des corpus qui ne sont pas dans
+le projet : les circulaires, faisables ; les avis du Conseil d'État sur les
+décrets, non publiés — question de droit d'accès, pas d'outillage.
+
+## Les tranches
+
+Le projet avance par tranches, chacune documentée dans `docs/` avec ce qu'elle
+a mesuré et ce qu'elle laisse ouvert. Les chiffres ci-dessus sont ceux
+d'aujourd'hui ; ceux des documents sont ceux de leur date.
 
 | Tranche | Ce qu'elle produit | Document |
 |---|---|---|
@@ -228,533 +379,43 @@ numéro d'aujourd'hui, et 783 dès qu'on remonte aux numéros d'avant 2016.
 | 40. Le code hôte de l'instruction | le numéro nu sous un article multi-codes, rattaché par l'instruction qui le porte ou qui gouverne l'alinéa nommé ; `vise` +40, jugées 19/20 ; la fausse est un numéro glissé que la garde ne voit pas | [`docs/46`](docs/46-le-code-hote-de-l-instruction.md) |
 | 41. Le numéro glissé par le contenu | l'article que le texte écrit sous un numéro que la loi a donné à un autre : 358 contredits, 234 résolus vers la version qui les contient, jugés 20/20 ; `vise` suit sauf plan propre (3/14 avant la garde) | [`docs/47`](docs/47-le-numero-glisse-par-le-contenu.md) |
 
-### Tenir à jour
+## D'où ça vient
 
-```
-./quotidien.sh                # miroir → incréments → reconstruction → dump → rapport
-```
+La phase 0 a produit une note de cadrage, un rapport de vérification des
+sources, un golden set de 25 articles chaînés à la main et un prototype du
+résolveur ([`docs/00`](docs/00-note-de-cadrage.md) à
+[`docs/05`](docs/05-generalisation.md)). Ce qu'elle a établi tient encore :
 
-`pipeline.sh` n'extrayait le code que de l'archive **globale** de la DILA, datée
-du 13 juillet 2025, alors que le miroir recevait un incrément par jour ouvré : le
-fonds avait **un an de retard**, et rien ne le disait. 200 des 406 incréments en
-attente touchaient ce code.
-
-`quotidien.sh` enchaîne miroir, incréments, reconstruction, dump et rapport de
-différences, journalise chaque étape et s'arrête tôt quand rien n'a bougé.
-Déclenché par un minuteur systemd utilisateur ([`deploiement/`](deploiement/)) —
-pas par Dagster : le pipeline est une séquence linéaire de huit étapes, et ce
-qu'il lui faut est un déclencheur, un journal et l'idempotence.
-
-L'incrément porte sur la **source** ; le graphe, lui, est reconstruit en entier.
-Une base servie un mardi est donc exactement celle qu'on obtiendrait en repartant
-de zéro.
-
-### Reconstruire
-
-**Prérequis : Python ≥ 3.14 et `pymupdf`**, déclarés dans `pyproject.toml` — la
-seule dépendance hors bibliothèque standard, et elle ne sert qu'à extraire le
-texte des études d'impact et des avis du Conseil d'État, qui n'existent qu'en
-PDF. `pipeline.sh` refuse de démarrer sur un interpréteur plus ancien : un
-pipeline dont l'interpréteur n'est écrit nulle part n'est rejouable que là où il
-a été écrit.
-
-```
-./pipeline.sh                 # miroir DILA + plans versionnés → base complète
-```
-
-Tout est reconstructible depuis ce qui est versionné : le miroir DILA
-(`data/raw/dila/`, 6,4 Go, hors dépôt), le périmètre, et les plans de récupération
-`data/corpus/*.tsv`. Ce script a été écrit après avoir **perdu tous les corpus
-dérivés** dans un vidage de `/tmp` : la règle « la donnée brute est sacrée » du
-§ 5.2 ne vaut que si l'on sait aussi la retrouver.
-
-Deux étapes demandent le réseau au-delà des téléchargements de sources : la
-vérification des identifiants CELEX auprès de Cellar, dont le résultat est
-versionné, et le miroir EUR-Lex des 284 actes de l'Union (153 Mo), stocké hors
-dépôt comme celui de la DILA, avec son manifeste horodaté.
-
-## Phase 0
-
-Les trois livrables de la phase 0 sont produits.
-
-| Livrable | Fichier |
-|---|---|
-| Note de cadrage et décision de périmètre | [`docs/00-note-de-cadrage.md`](docs/00-note-de-cadrage.md) |
-| Rapport de vérification des sources | [`docs/01-rapport-verification-sources.md`](docs/01-rapport-verification-sources.md) |
-| Golden set de 25 articles | [`docs/02-golden-set.md`](docs/02-golden-set.md) |
-| Prototype du résolveur, jalon go/no-go | [`docs/03-prototype-resolveur.md`](docs/03-prototype-resolveur.md) |
-| Source d'annotation externe | [`docs/04-annotation-externe.md`](docs/04-annotation-externe.md) |
-| Généralisation aux 48 dossiers | [`docs/05-generalisation.md`](docs/05-generalisation.md) |
-| Modèle de données au grain du segment | [`docs/06-modele-de-donnees.md`](docs/06-modele-de-donnees.md) |
-| Schéma SQLite | [`schema/001-graphe-provenance.sql`](schema/001-graphe-provenance.sql) |
-| Ingestion, première tranche | [`ingestion/legi_vers_graphe.py`](ingestion/legi_vers_graphe.py) |
-| Jeu d'annotation humaine, 100 articles | [`data/golden-set/jeu-annotation-100-prerempli.csv`](data/golden-set/jeu-annotation-100-prerempli.csv) |
-| Les cent verdicts, avec passages et relecture | [`data/golden-set/annotations-100.csv`](data/golden-set/annotations-100.csv), index des documents cités [`documents-annotation.tsv`](data/golden-set/documents-annotation.tsv) |
-| Périmètre de phase 0, figé, 1 280 articles L | [`data/perimetre-v1.csv`](data/perimetre-v1.csv) |
-| Périmètre en vigueur, 2 091 articles, les trois parties | [`data/perimetre-v2.csv`](data/perimetre-v2.csv) |
-| Golden set, données machine | [`data/golden-set/golden-set-v1.json`](data/golden-set/golden-set-v1.json) |
-| Chaînes `resulte_de` produites | [`data/prototype/chaines-resulte-de-2014-344.json`](data/prototype/chaines-resulte-de-2014-344.json) |
-| Scripts de mesure et prototype | [`tools/`](tools/) |
-
-**Verticale retenue :** Code de la consommation, partie législative, 1 280
-articles en vigueur.
-
-### Ce que la phase 0 a établi
-
-Mesures sur les données réelles — dumps DILA du 13/07/2025, jeux Améli du Sénat,
-open data de l'Assemblée nationale.
-
-- `produite_par` : **99,0 %** de couverture déclarée, sans inférence.
-- `issu_de` : **100 %** des articles d'origine législative.
-- `renumerote_de` : **76,4 %** déclarée dans LEGI — les tables de concordance PDF
-  prévues au § 4 phase 2 sont largement inutiles.
-- La recodification de 2016 fait apparaître 78 % du code comme issu d'ordonnances.
-  **Un seul saut de concordance rétablit l'origine réelle : 74 % d'origine
-  législative.** C'est la thèse du projet, vérifiée sur son propre périmètre.
-- Golden set : **5 chaînes sur 25** aboutissent à un document qui **nomme**
-  l'article ; 21 sur 25 n'atteignent que le dossier. **0 sur 25** aboutissent à un
-  amendement confirmé.
-
-### Ce que la phase 0 a invalidé
-
-- Le **tableau synoptique du Sénat** du § 2.2, premier échelon de la cascade
-  `resulte_de`, **n'existe pas**.
-- **DuraLex**, deuxième échelon, est **abandonné depuis février 2019**. L'arête
-  critique du projet est donc entièrement à écrire.
-- ~~Les **amendements de l'Assemblée nationale** ne sont en open data que pour les
-  16e et 17e législatures.~~ **Faux, et corrigé depuis** : la XIVe législature est
-  publiée, sous le chemin `amendements_legis_XIV`. La conclusion venait d'une URL
-  périmée recopiée de la page d'archives de l'Assemblée elle-même. Un 404 sur une
-  URL recopiée prouve que l'URL est mauvaise, jamais que la donnée est absente
-  ([`docs/10`](docs/10-amendements-non-adoptes.md) § 4). 11 115 amendements de
-  l'Assemblée sont chargés.
-- Le § 0 suppose les ordonnances sans motivation : **90,6 % d'entre elles ont un
-  rapport au Président de la République**.
+- **Un seul saut de concordance rétablit l'origine réelle.** 78 % du code semble
+  issu d'ordonnances ; 74 % est d'origine législative dès qu'on remonte la
+  recodification de 2016. C'est la thèse du projet, vérifiée sur son périmètre.
 - **Atteindre le dossier n'est pas atteindre la motivation.** L'exposé des motifs
-  ne nomme l'article que dans **6,4 %** des cas, l'étude d'impact dans **24,8 %**,
-  l'un ou l'autre dans **42,2 %** sur les articles à documentation complète. C'est
-  le plafond réel de la restitution ancrée exigée au § 4.3.
-- **L'arête `resulte_de` ne peut pas s'attacher à la version en vigueur.** Sur les
-  307 articles issus de la loi consommation de 2014, **aucun** n'a encore cette loi
-  comme texte producteur de sa version en vigueur : elle est vide par construction
-  sur un corpus recodifié. Elle n'a de sens qu'attachée à la version historique
-  produite par l'amendement — c'est ainsi que le prototype la produit.
+  ne nomme l'article que dans 6,4 % des cas, l'étude d'impact dans 24,8 % : c'est
+  le plafond réel d'une restitution ancrée au grain de l'article, et pourquoi la
+  restitution sépare ce qui porte sur l'article de ce qui porte sur le texte.
+- **L'arête `resulte_de` ne peut pas s'attacher à la version en vigueur** sur un
+  corpus recodifié ; elle s'attache à la version historique que l'amendement a
+  écrite, et le graphe remonte les segments.
+- **Le modèle est au grain du segment**, parce que 39,8 % des articles sont
+  repris du texte déposé entre 10 % et 90 % — ni gouvernementaux ni
+  parlementaires, mais les deux selon l'alinéa ([`docs/06`](docs/06-modele-de-donnees.md)).
 
-### Miroir DILA
+Ce qu'elle a invalidé : le tableau synoptique du Sénat prévu comme premier
+échelon n'existe pas ; DuraLex, deuxième échelon, est abandonné depuis 2019 ;
+les ordonnances ne sont pas sans motivation — 90,6 % ont un rapport au
+Président. Et une conclusion de la phase 0 était fausse : les amendements de
+l'Assemblée de la XIVe législature sont bien en open data ; un 404 sur une URL
+recopiée prouve que l'URL est mauvaise, jamais que la donnée est absente
+([`docs/10`](docs/10-amendements-non-adoptes.md) § 4).
 
-Fait. Les incréments quotidiens ne remontent pas au-delà du dump global du
-**13/07/2025**, seul point de reconstruction existant.
-`tools/phase0/miroir_dila.sh` récupère global et incréments et produit un
-manifeste horodaté avec taille et SHA-256 par fichier. À relancer quotidiennement.
-
-## Jalon go/no-go : go, produit centré article
-
-Le résolveur a été prototypé sur la loi consommation de 2014, qui produit 307 des
-832 articles éligibles ([`docs/03-prototype-resolveur.md`](docs/03-prototype-resolveur.md)).
-
-- **68 % des articles n'ont besoin d'aucune arête `resulte_de`** : leur rédaction
-  figure déjà dans le texte initial du Gouvernement, et l'exposé des motifs y
-  répond. L'arête critique n'est requise que sur les 32 % issus de la navette.
-- Le maillon « article de la loi → article du code » **n'est pas à écrire** :
-  LEGI le déclare, à 100 % sur ce pilote.
-- Ce qui manquait est le rattachement de l'amendement, obtenu par **appariement
-  textuel exact des passages cités**, avec un garde-fou de discriminance qui
-  divise le rappel par deux — le prix de la règle « précision > rappel ».
-- **C1 = 29,3 %** sur les 99 articles issus de la navette, avec une seule chambre
-  sur deux. **10 chaînes complètes** vont de l'article en vigueur jusqu'à un
-  amendement nommé et à sa justification.
-
-L'extracteur d'amendements de l'Assemblée est réactivé : le résolveur fonctionne,
-le goulot est redevenu la disponibilité de la source.
-
-## Généralisation : le pilote était optimiste
-
-Les chiffres du prototype reposaient sur une seule loi, 37 % du périmètre. Repris
-sur les 48 dossiers ([`docs/05-generalisation.md`](docs/05-generalisation.md)) :
-
-| Mesure | Pilote | Périmètre |
-|---|---:|---:|
-| Ancrage par un commentaire de rapport | 94,1 % | **79,1 %** |
-| Part issue de la navette | 32 % | **59,2 %** |
-| C1 — rattachement à un amendement du Sénat | 29,3 % | **13,8 %** |
-
-La population qui a besoin de l'arête critique double. **39 articles portent
-aujourd'hui une chaîne complète** de l'article en vigueur jusqu'à un amendement
-nommé.
-
-Résultat central : **39,8 % des articles sont repris du texte déposé entre 10 % et
-90 %** — ni gouvernementaux ni parlementaires, mais les deux selon l'alinéa. La
-partition n'a pas de sens au grain de l'article.
-
-**Modélisation au segment approuvée et actée.** Au grain du segment, la part
-ambiguë tombe à 20,9 % et surtout change de nature : « alinéa retouché » est une
-catégorie nommable, là où « ni l'un ni l'autre » ne l'était pas. Le découpage en
-alinéas est fiable — 0 % de versions sans segment exploitable, à condition de
-couper sur `<br/>` autant que sur `<p>`, 26,5 % des articles n'ayant aucune
-balise `<p>`. Modèle et schéma : [`docs/06-modele-de-donnees.md`](docs/06-modele-de-donnees.md).
-
-## Phase 1, première tranche : chargée
-
-LEGI → articles, versions, **segments**, et l'arête `repris_de` qui porte la
-continuité d'un alinéa à travers une recodification. 3,5 secondes, 26 Mo, zéro
-violation d'intégrité. Les compteurs de cette tranche figurent dans le tableau
-d'état plus haut.
-
-Les premiers chiffres publiés ici — 3 849 arêtes `renumerote_de`, 9 830
-`repris_de` — étaient **gonflés par un graphe non orienté**. LEGI porte un
-attribut `sens` qui n'est pas fiable et que le projet ignore ; sans lui, 3 848 des
-3 849 arêtes avaient leur réciproque, et la remontée d'ascendance bouclait. La
-direction est désormais reprise de la chronologie des dates d'effet, et les 48
-couples à date égale sont **abandonnés plutôt que devinés** (§ 5.1). Compteurs
-réels : `renumerote_de` 1 877, `repris_de` 5 766.
-
-Base SQLite plutôt que PostgreSQL : le volume ne justifie pas un serveur, et les
-contraintes du schéma ont pu être **réellement testées** — chacune en essayant de
-la violer. Contrepartie à trancher avant la phase 3 : `pg_trgm` et `pgvector`
-disparaissent, remplacés par FTS5 et, pour le rappel vectoriel, un index externe.
-
-## Ce qui reste à faire
-
-**La note est écrite, l'évaluation ne l'est pas.** `restitution/note.py` produit
-la note « pourquoi cet article » sous le contrat du § 4.3 : 11 599 constats sur
-les 2 104 articles, zéro phrase écartée faute de citation, aucune note vide
-([`docs/19`](docs/19-note-phase-3.md)). Le critère de sortie de la phase 3 est en
-revanche une **évaluation humaine en aveugle** sur le golden set, qui suppose le
-jeu d'annotation validé.
-
-**Bloquant, et hors de portée du code.** Faire valider à la main les 100 articles
-du jeu d'annotation. Ils portent désormais **cent verdicts d'agents**
-([`docs/39`](docs/39-cent-verdicts-d-agents.md)) — une pré-annotation, pas une
-vérité terrain : la relecture humaine a devant elle 3 affirmations non
-étayées, 13 « autre passage », 6 `non_documente`, et trois décisions de
-protocole à prendre d'abord. Tant que cette relecture n'est pas faite, la
-phase 0 reste ouverte et aucune mesure de précision du projet n'est autre
-chose qu'une auto-évaluation. L'outillage est dans `tools/annotation/`
-([`docs/36`](docs/36-jeu-d-annotation-prepare.md)).
-
-**Trois couches de motivation ne sont pas construites.**
-
-1. ~~Les considérants européens.~~ **Faite** : 7 674 considérants chargés,
-   117 articles atteints ([`docs/14`](docs/14-considerants.md)). Reste ouvert le
-   seul chemin connu vers un lien au grain de l'article : les tableaux de
-   concordance annexés aux textes de transposition. À défaut d'arête, les
-   considérants sont désormais **classés** par proximité lexicale avec l'article,
-   sous étiquette ([`docs/28`](docs/28-classement-intra-document.md)).
-2. ~~Les études d'impact.~~ ~~Les avis du Conseil d'État.~~ **Chargés** : 27
-   études, 15 avis, 41 exposés des motifs, 135 à 162 articles atteints chacun
-   ([`docs/15`](docs/15-motivation-gouvernementale.md)). Mais **au grain du texte
-   seulement** : aucune de ces trois sources n'emploie la convention de citation
-   en en-tête qui produit une arête au grain de l'article, et le rapprochement par
-   le numéro d'article du projet est faux, les articles étant renumérotés à chaque
-   lecture. Confronter l'impact annoncé au dispositif voté — le second but du
-   produit — suppose d'abord de charger les textes déposés.
-
-**Le chaînon est posé, mais il ne débloque pas ce qu'on en attendait.** 812
-articles en vigueur savent désormais sous quel article de quel texte ils ont été
-discutés ([`docs/16`](docs/16-textes-discutes.md)). En revanche, **aucun des
-dossiers ayant une étude d'impact n'a de texte déposé dans le corpus** : DOLE ne
-lie le texte déposé que pour les propositions de loi, qui n'ont jamais d'étude
-d'impact. ~~Le rapprochement de l'étude d'impact reste donc à faire, et il
-passera par le numéro de dépôt de la chambre, non par DOLE.~~ **Fait**, par ce
-chemin exactement : c'est l'objet des deux paragraphes suivants.
-
-**La table de correspondance des identifiants de texte est écrite, et elle ne
-rattrape pas les amendements orphelins.** C'était l'hypothèse ; elle est fausse.
-106 jeux d'amendements sur 114 sont appariés à leur texte — identité de document,
-pas rapprochement, contrôlée par la concordance du dossier et par la plage
-d'articles (4 368 / 4 449, 98,2 %). Ce qu'elle révèle est ailleurs : sur les
-amendements des jeux appariés, **7 790 portent sur un article additionnel**. Ils
-ne visent aucun
-article existant du code parce qu'ils en créent un, dont le numéro ne sera fixé
-qu'à la codification. Aucune table ne peut leur donner une cible.
-[`docs/31`](docs/31-correspondance-des-textes.md).
-
-**Les textes déposés de l'Assemblée sont chargés**, par le numéro que le rapport
-de commission déclare — « sur le projet de loi … (n° 2060) » — et non par DOLE,
-qui ne lie ce texte que pour les propositions de loi. 55 numéros relevés, 55
-servis. Le fonds passe de 371 à 424 textes en discussion et de 30 337 à 33 772
-arêtes `porte_sur` ; **la partie législative gagne douze articles** qui passent
-d'« origine située » à « un passage les motive », le texte déposé étant un état
-de plus sur lequel les états doivent s'accorder.
-
-**L'étude d'impact est arrivée au grain de l'article**, mais le découpeur n'a pas
-suffi : il rendait trois articles. Le chaînon était plus haut. `porte_sur` était
-**aveugle aux réécritures de section entière** — l'article 5 du projet de loi
-consommation réécrit vingt-huit articles sous la forme `« Art. L. 121-16. – »`, et
-aucun n'était vu, précisément ceux dont l'étude d'impact parle. L'en-tête d'un
-alinéa cité n'est pas une référence à du droit existant : c'est la désignation de
-l'article qu'on écrit.
-
-Les articles en vigueur reliés à un article de texte passent de 819 à **964**, et
-**79 articles de la partie législative montent d'un rang** dans le verdict. Le
-code hôte étant implicite dans une citation, cette voie porte une garde propre —
-LEGI doit confirmer que la loi du dossier a bien produit l'article — et sa
-confiance mesurée à part, 0,796 contre 0,839.
-
-**La voix du Gouvernement existe enfin au grain de l'article** : quinze articles
-portent un passage de l'étude d'impact qui les chiffre, là où `motive` ne venait
-que des rapports de commission. Quinze, et le plafond est mesuré : sur les 2 016
-articles de texte des dossiers ayant une étude d'impact, 220 seulement touchent ce
-code. [`docs/32`](docs/32-textes-deposes-assemblee.md),
-[`docs/33`](docs/33-article-ecrit-dans-la-citation.md).
-
-**Le code hôte est réparé à la source, et il rapportait surtout du rappel.** Deux
-contrôles à la main avaient trouvé la même cause à un mois d'intervalle — un code
-nommé **dans une citation** gouvernait tout ce qui suivait, alors qu'il n'est
-qu'un morceau des mots insérés — et chaque fois la garde avait protégé l'arête
-nouvelle sans réparer l'ancienne. La règle du § 4 de [`docs/16`](docs/16-textes-discutes.md),
-« le texte cité n'est pas le texte qui cite », est désormais appliquée aux noms de
-code comme elle l'était aux références. Sur la population qu'elle touche, mesurée
-avant correction : **8 arêtes justes sur 15**. Après : 58 arêtes internes s'en
-vont, **1 817 arrivent** — la dérive coûtait trente fois plus en rappel qu'en
-précision, et cela ne se voyait pas, parce qu'une arête `externe` sort du produit
-sans bruit. Les articles en vigueur reliés à un article de texte passent de 964 à
-**1 066**, ceux qu'un passage motive de 701 à **806**, et les deux précisions sont
-re-mesurées sur pièces neuves — 20/20 et 15/15, mêmes bornes qu'avant, sur une
-population qui, elle, a changé. [`docs/34`](docs/34-hote-du-code-cite.md).
-
-**Réparer un maillon oblige à re-mesurer ce qui repose dessus.** `depose_sur`
-compose deux liens de `porte_sur` ; sa confiance, écrite en constante et mesurée
-à 15/15 par `docs/31`, ne s'est pas mise à jour toute seule quand la population
-sous elle a changé. **Sa précision réelle était tombée à 3 sur 15.** La garde qui
-la protégeait — la fenêtre de preuve doit nommer le code — n'avait plus de fausses
-cibles à retirer : elle retirait des cibles vraies, et faisait ainsi passer pour
-unique un article de texte qui en réécrit douze. 501 des 906 arêtes en venaient,
-et leur accord avec la cible que l'amendement déclare lui-même tombait à 2 sur 17,
-contre 12 sur 15 pour les arêtes légitimes. La garde est retirée, le numéro de
-subdivision est enfin lu en entier — « Article 60 bis A » n'est pas l'article
-60 bis, « Article 5 sexdecies » n'est pas l'article 5 —, et l'arête vaut de
-nouveau **15 sur 15**, pour 476 arêtes au lieu de 906 et **deux articles en
-vigueur de plus**. [`docs/35`](docs/35-depose-sur-apres-la-reparation.md).
-
-**Trous de couverture dans ce qui existe.** Les amendements de l'Assemblée pour
-les législatures XV à XVII (103 articles éligibles, mécanique). La XIIIe, jamais
-publiée en open data, reconstructible seulement page par page depuis Wayback —
-arbitrage à rendre entre le coût et un trou déclaré. Les textes déposés, dont
-l'absence laisse subsister le dernier mode d'échec de `resulte_de`. Les débats en
-séance : le graphe sait ce que le Parlement a **fait**, pas ce qu'il a **dit**.
-
-**Le régime de réutilisation des rapports parlementaires est établi** — il n'est
-plus un préalable. Vérification faite aux sources en août 2026 : le CRPA exclut
-les documents parlementaires (art. L300-2), et chaque chambre a publié ses
-conditions. Elles diffèrent, et aucune ne permet de replacer le corps d'un rapport
-sous Licence Ouverte : l'Assemblée interdit l'usage commercial, le Sénat exige la
-gratuité de la diffusion. Le corps reste donc hors du dépôt et hors du dump, dont
-la table `regime_de_reutilisation` porte l'écart entre les deux chambres. Les
-extraits de 400 caractères, eux, sont couverts deux fois plutôt qu'une : soit le
-rapport n'est pas protégé — position des deux chambres —, soit il l'est et
-l'exception de courte citation s'applique.
-
-**Deux gisements pourraient faire baisser le silence réglementaire, et aucun
-n'est dans le projet.** Les **circulaires et instructions** publiées sur
-Légifrance, qui commentent souvent le décret qu'elles appliquent : c'est un
-chantier de corpus, faisable. Les **avis du Conseil d'État sur les projets de
-décret**, non publiés à ce jour : c'est une question de droit d'accès, pas
-d'outillage. Tant qu'ils manquent, 83,4 % et 93,3 % ne sont pas des bornes
-définitives, et [`docs/27`](docs/27-parties-r-et-d.md) le dit.
-
-## Le dump ouvert
-
-```
-python3 tools/diffusion/dump.py travail/ratio-legis.sqlite data/diffusion
-python3 tools/diffusion/dump.py travail/ratio-legis.sqlite data/diffusion --strict
-```
-
-141 Mo, plus les mêmes arêtes en TSV, un dictionnaire des tables et un manifeste
-haché. Le **texte des 252 rapports de commission n'y est pas** : leur régime de
-réutilisation n'est pas confirmé par les assemblées. URL, hachage et offsets
-restent, ce qui suffit à refaire le lien depuis la source ; les fenêtres de preuve
-qui en viennent sont ramenées aux soixante caractères que le schéma exige au
-minimum — la preuve irréductible, pas de l'extrait. `--strict` rend l'arbitrage
-inverse et recalcule le verdict pour que la base reste cohérente avec elle-même.
-
-Le dump n'est pas versionné : il se refait d'une commande, et seuls son manifeste
-et sa notice le sont — comme pour les miroirs.
-
-## Le surlignage
-
-```
-python3 restitution/surlignage.py base.sqlite L111-1 --html sortie.html
-```
-
-Sur le texte d'un article, la **couleur** donne le texte qui a introduit l'alinéa,
-la **trame** signale qu'il a été retouché depuis, la **marque** nomme l'amendement
-quand la chaîne y mène. 99,1 % des 7 504 alinéas en vigueur ont un texte
-introducteur ; **un article sur six est composite**, écrit par deux textes ou plus.
-Exemples dans [`restitution/exemples/surlignage/`](restitution/exemples/surlignage/).
-
-## L'API
-
-```
-pip install '.[api]'
-RATIO_LEGIS_BASE=data/diffusion/ratio-legis.sqlite uvicorn restitution.api:app
-```
-
-`GET /articles/{numero}` rend la fiche de provenance, `/note` la note sous
-contrat, `/surlignage` l'origine de chaque alinéa,
-`/retentissement` ce qu'une modification déplacerait, `/tentatives` ce qui a été
-tenté sur l'article et ce qui l'a fait échouer, `/renvois/sommet` les articles
-que le plus d'autres articles citent, `/tentatives/sommet` les plus disputés,
-`/mesures` les métriques, `/docs` la documentation OpenAPI. **12 ms de médiane, 21 ms au 95ᵉ centile**, bout en
-bout. Chaque réponse porte l'attribution et l'avertissement de non-interprétation
-— en en-tête et dans la charge utile, parce qu'une API se consomme sans lire ce
-fichier.
-
-## Le retentissement
-
-```
-python3 restitution/retentissement.py base.sqlite L111-1            # ce qui bougerait
-python3 restitution/retentissement.py base.sqlite L111-1 --profondeur 2
-python3 restitution/retentissement.py base.sqlite --sommet 25       # les articles les plus cités
-```
-
-La question du légiste n'est pas celle du chercheur. `graphe.py` remonte à
-l'origine ; celui-ci descend aux conséquences, par onde : le rang 1 cite
-l'article, le rang 2 cite un article du rang 1. **Sur L111-1, 69 articles
-bougeraient, dont 20 dont la raison n'est pas documentée** — c'est le coût que la
-métrique d'hygiène chiffre à l'échelle du code, rendu au grain d'une décision.
-
-Il dit ce qu'il faudrait relire ; il ne dit pas ce qu'il faudrait y écrire, et il
-ne le dira jamais. Exemples dans
-[`restitution/exemples/retentissement/`](restitution/exemples/retentissement/),
-détail dans [`docs/29`](docs/29-retentissement.md).
-
-## Ce qui a été tenté
-
-```
-python3 restitution/tentatives.py base.sqlite L511-7        # ce qu'on a tenté, et ce qui l'a bloqué
-python3 restitution/tentatives.py base.sqlite --sommet 25   # les articles les plus disputés
-```
-
-Le graphe dit ce qui a écrit le droit. Il sait aussi dire **ce qu'on a voulu y
-écrire et qui n'y est pas** : sur les amendements du corpus, une petite minorité a
-produit un alinéa qui subsiste ; tout le reste est du droit qui n'existe pas, et
-c'est ce corpus-là qu'un légiste consulte avant de rédiger.
-
-Le sort était en base depuis onze tranches, et la fiche en portait une table — mal
-lue. Le tri comparait le libellé à la chaîne « Adopté », si bien qu'« Adopté -
-vote unique » passait pour un échec. Le libellé était rendu brut, si bien
-qu'« Irrecevable art. 45, al. 1 C (cavalier) » n'apprenait rien. Et surtout,
-**l'Assemblée affichait zéro irrecevabilité quand le Sénat en affichait 1 735** :
-son sort, vide pour 1 149 amendements, est écrit dans la colonne voisine — 694
-retirés, 447 irrecevables, 8 réellement en attente.
-
-Les huit familles de sort sont désormais comparables, et **aucun des 33 217
-amendements n'a plus de libellé illisible** — 63 en avaient un, fragments de
-feuille de style Word que les tabulations d'Améli avaient poussés dans la colonne
-du sort.
-
-| | Assemblée | Sénat |
-|---|---:|---:|
-| **déclaré irrecevable** | **447** *(0 avant)* | 1 735 |
-| retiré | **1 885** *(1 191 avant)* | 5 810 |
-| rejeté · adopté | 3 280 · 2 677 | 6 655 · 5 112 |
-| sort illisible | 0 | 0 *(63 avant)* |
-
-Sur les 2 182 amendements écartés sans discussion : **905 au titre de l'article
-40** — ils aggravaient une charge publique —, 603 comme cavaliers, 117 au titre
-de la règle de l'entonnoir, 93 comme relevant du décret.
-
-Au grain de l'article en vigueur, **165 articles sur 2 104 portent au moins une
-tentative** — 457 tentatives rendues, dont 254 non abouties. Les jeux
-d'amendements de l'Assemblée sont appariés à leur texte **39 sur 39**.
-
-Trois voies de rattachement, jamais confondues : l'**alinéa écrit** (`resulte_de`,
-confiance 0,893), la **cible déclarée** par le dispositif (`vise`, 0,621), la
-seule ouverte à un amendement rejeté, et la **subdivision déposée** (`depose_sur`,
-0,796) — l'amendement fut discuté sur l'article du texte qui a réécrit celui-ci,
-et cet article du texte n'en a réécrit aucun autre. Cette dernière a été
-**re-mesurée après la réparation de son maillon** : la garde qui la protégeait
-était devenue une fabrique d'unicité, sa précision réelle était tombée à 3 sur 15,
-et elle est revenue à 15 sur 15 pour 476 arêtes au lieu de 906
-([`docs/35`](docs/35-depose-sur-apres-la-reparation.md)). Le sort est nommé, jamais
-interprété : « retiré » ne dit pas si l'auteur a cédé ou obtenu satisfaction, et
-cela se lit dans le compte rendu de séance, que le graphe ne contient pas.
-[`docs/30`](docs/30-sort-des-amendements.md),
-[`docs/31`](docs/31-correspondance-des-textes.md).
-
-## Classer sans rattacher
-
-Un rapport au Président, une étude d'impact, un acte de l'Union motivent le
-**texte entier**. Aucune arête ne désigne le passage qui concerne tel article, et
-deux méthodes pour en fabriquer une ont été mesurées puis écartées. La restitution
-en tirait la conséquence qu'il ne fallait rien choisir — et affichait donc le
-document depuis l'offset 0, c'est-à-dire l'adresse au Président.
-
-Or afficher un document depuis son début n'est pas s'abstenir de choisir : c'est
-choisir l'ordre du document, qui est le pire des ordres pour la question posée.
-Les passages sont désormais **classés par recouvrement lexical** avec le texte de
-l'article, chaque terme pesé par sa rareté dans ce document-là, les trois
-meilleurs affichés avec leurs offsets et **les termes communs qui ont produit le
-classement**. L'étiquette est portée à l'écran :
-
-> classé par proximité lexicale avec le texte de l'article — aucun lien déclaré,
-> aucune arête créée
-
-Aucun corpus extérieur, aucun apprentissage, aucun vecteur : tout est calculé sur
-le document interrogé, le classement se rejoue à l'identique et s'explique en
-montrant ce qui l'a produit. Sous deux termes communs, rien n'est classé et la
-page le dit. [`docs/28`](docs/28-classement-intra-document.md).
+Les écarts pris sur la stack recommandée — SQLite plutôt que PostgreSQL, un
+minuteur systemd plutôt que Dagster, des expressions régulières plutôt que lxml
+— sont écrits au § 6 bis de la feuille de route, pour qu'ils soient des
+décisions et non des dérives.
 
 ## Licence et attribution
 
 Code sous [AGPL-3.0](LICENSE). Les données amont sont sous Licence Ouverte /
-Etalab 2.0 et leur attribution est obligatoire.
-
-**Une exception, et elle est documentée** : le corps des rapports de commission ne
-relève ni du CRPA — l'article L300-2 en exclut les documents parlementaires — ni
-de la Licence Ouverte des portails, qui n'ouvrent que les métadonnées. Il obéit
-aux conditions propres à chaque chambre, incompatibles avec une rediffusion sous
-Licence Ouverte. Il n'est donc ni versionné, ni rediffusé : voir
-[`ATTRIBUTION.md`](ATTRIBUTION.md).
-
-## Voir le graphe
-
-`restitution/graphe.py` interroge la base et restitue, pour un article en vigueur,
-tout ce que le graphe sait dire de lui : les passages qui le motivent, la
-provenance de chaque alinéa jusqu'à l'amendement qui l'a écrit, ce qui le cite, et
-ce qui a été tenté sur lui sans aboutir.
-
-```
-python3 restitution/graphe.py base.sqlite L224-43              # le graphe, arête par arête
-python3 restitution/note.py   base.sqlite L224-43              # la note, sous contrat § 4.3
-python3 restitution/note.py   base.sqlite --contrat            # éprouver le contrat
-python3 restitution/graphe.py base.sqlite L111-1 --html out.html
-```
-
-Sept notes versionnées dans `restitution/exemples/notes/`. **Aucun modèle de
-langue n'intervient** : la note est composée par assemblage de gabarits
-déterministes, les passages cités sont verbatim. L'article 50 du règlement (UE)
-2024/1689 vise le contenu synthétique produit par un système d'IA ; il ne trouve
-pas à s'appliquer, et la note l'écrit plutôt que d'afficher une étiquette
-trompeuse.
-
-Douze rendus versionnés dans `restitution/exemples/`, choisis pour ce qu'ils
-montrent : **L224-43** une chaîne complète jusqu'à l'amendement et son but déclaré,
-**L111-1** un article très cité, **L511-7** un article que le droit de l'Union
-sature, **L112-1-1** un article sans aucune motivation parlementaire dont la seule
-raison connue est une directive, **L122-23** les quatre paroles du § 4.3 côte à
-côte — Gouvernement, chiffrage, Conseil d'État, Parlement —, **L521-2** un article
-suivi à travers la navette et la recodification, **L722-10** un article dont la
-seule motivation vient d'une section que rien ne rattachait avant la douzième
-tranche, **L224-109** l'un des cinq articles de la partie législative dont le
-verdict est *raison non documentée*, **R121-1** un article réglementaire que son
-ascendance législative documente encore, **D824-3** le seul article D du code
-qu'un rapport de commission explique, **R512-31** la réponse ordinaire de la
-partie réglementaire — *raison non documentée*, alors que sept articles le
-citent —, **D120-7** un article dont la seule raison connue vient de quatre
-règlements de l'Union.
-
-Cinq tentatives versionnées dans `restitution/exemples/tentatives/`, et le
-classement des articles les plus disputés : **L732-3** trois amendements écartés
-comme cavaliers, dont celui du Gouvernement ; **L312-9** la délégation d'assurance
-emprunteur ; **L113-3** les deux chambres et un sort lu dans l'état procédural ;
-**L224-43** quatre amendements adoptés dont l'alinéa subsiste ; **L511-7**
-l'article le plus travaillé du fonds, 91 tentatives, que chaque loi de
-consommation vient allonger.
-
-La restitution n'ajoute aucune donnée : elle applique les règles § 5.1 (provenance
-ou silence), § 5.4 (la confiance est une donnée) et § 4.3 (toute phrase produite
-est citable). Elle distingue à l'écran ce qui porte sur **l'article** de ce qui ne
-porte que sur le **texte entier** — un rapport au Président ou une transposition
-déclarée motivent une ordonnance, pas l'alinéa qu'on lit.
+Etalab 2.0 et leur attribution est obligatoire — dans l'interface, dans l'API,
+dans tout export. Une exception, documentée : le corps des rapports de
+commission, qui n'est ni versionné ni rediffusé ([`ATTRIBUTION.md`](ATTRIBUTION.md)).
