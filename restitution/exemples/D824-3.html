@@ -1,59 +1,67 @@
 <!doctype html><html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>D824-3 — provenance</title><style>
-:root{--fond:#fbfaf8;--encre:#1c1a17;--doux:#6b655c;--trait:#ddd8ce;--acc:#7a3b2e;
---vert:#3d5a45;--carte:#fff}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--fond:#16151a;
---encre:#e9e6df;--doux:#9a938a;--trait:#2f2c33;--acc:#d98b76;--vert:#8fbb9c;--carte:#1d1c22}}
+:root{--fond:#f9f6ef;--encre:#1b1916;--doux:#6a635a;--trait:#d9d2c4;--acc:#7a2a24;
+--vert:#3b5743;--carte:#fffdf8;
+--legi:#6a635a;--gouv:#7a2a24;--parl:#3b5743;--ce:#4a4374;--ue:#1e5f74}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--fond:#17161a;
+--encre:#e8e4db;--doux:#9b948a;--trait:#302d34;--acc:#d9907c;--vert:#8fbb9c;
+--carte:#1e1d22;--legi:#9b948a;--gouv:#d9907c;--parl:#8fbb9c;--ce:#a9a2d8;--ue:#7fc4d8}}
 *{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--fond);color:var(--encre);
-font:16px/1.6 "Iowan Old Style",Palatino,Georgia,serif;padding:2.5rem 1.25rem}
-main{max-width:56rem;margin:0 auto}
-h1{font-size:1.9rem;margin:0 0 .2rem;letter-spacing:-.01em}
-h2{font-size:.78rem;letter-spacing:.13em;text-transform:uppercase;color:var(--doux);
-font-family:ui-sans-serif,system-ui,sans-serif;margin:2.5rem 0 .9rem;
-border-bottom:1px solid var(--trait);padding-bottom:.4rem}
-.chapeau{color:var(--doux);font-size:.92rem;margin-bottom:.4rem}
+font:17px/1.6 "Iowan Old Style","Libertinus Serif","Linux Libertine O","Palatino Linotype",Palatino,"Book Antiqua","Charis SIL","Source Serif 4","Source Serif Pro",Georgia,"DejaVu Serif",serif;padding:2.5rem 1.25rem;
+font-feature-settings:"onum","kern","liga"}
+main{max-width:48rem;margin:0 auto}
+.rubrique{font-variant-caps:small-caps;letter-spacing:.14em;color:var(--doux);
+font-size:.9rem;margin:0 0 .35rem}
+h1{font-weight:normal;font-size:1.9rem;line-height:1.2;margin:0 0 .4rem;
+letter-spacing:-.005em}
+.chapeau{color:var(--doux);font-size:.95rem;margin:0 0 1.6rem;
+padding-bottom:.9rem;border-bottom:3px double var(--trait)}
+h2{font-weight:normal;font-size:1rem;font-variant-caps:small-caps;letter-spacing:.12em;
+color:var(--encre);margin:2.4rem 0 .9rem;padding-bottom:.35rem;
+border-bottom:1px solid var(--trait)}
+.tx,.al,.cit,.passage,.objet,.raison>div:first-of-type{text-align:justify;hyphens:auto}
+.meta,.src,.leg,.bilan,.alerte,.etiquette,.sort,.amend{font-family:ui-sans-serif,system-ui,"Segoe UI",Cantarell,"Noto Sans","DejaVu Sans",sans-serif}
+.num,.preuve,code,.puces,.onde b,.tent b{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono","DejaVu Sans Mono",monospace}
+code{font-size:.85em}
+.num{font-size:.72rem;color:var(--doux);letter-spacing:.04em}
+.conf,td,th{font-variant-numeric:tabular-nums}
+.silence{color:var(--doux);font-style:italic;font-size:.92rem;margin:.4rem 0}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+td,th{text-align:left;padding:.4rem .5rem;border-bottom:1px solid var(--trait);vertical-align:top}
+th{font-weight:normal;font-variant-caps:small-caps;letter-spacing:.1em;color:var(--doux)}
+a{color:var(--acc);text-decoration-thickness:1px;text-underline-offset:.15em}
+footer{margin-top:3rem;padding-top:1rem;border-top:3px double var(--trait);
+font-size:.82rem;color:var(--doux);text-align:justify;hyphens:auto}
+@media print{body{background:#fff;color:#000;padding:0}a{color:inherit}}
+
+main{max-width:56rem}
 .al{border-left:3px solid var(--trait);padding:.1rem 0 .1rem 1rem;margin:1.4rem 0}
 .al.tracee{border-left-color:var(--acc)}
-.num{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.72rem;color:var(--doux)}
 .tx{margin:.25rem 0 .6rem}
 .arete{background:var(--carte);border:1px solid var(--trait);border-radius:2px;
-padding:.65rem .8rem;margin:.5rem 0;font-size:.9rem}
+padding:.65rem .8rem;margin:.5rem 0;font-size:.92rem}
 .arete b{color:var(--acc)}
-.meta{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.75rem;color:var(--doux);
-display:flex;gap:.9rem;flex-wrap:wrap;margin-top:.35rem}
-.conf{font-variant-numeric:tabular-nums}
-.but{margin-top:.55rem;font-size:.88rem;border-top:1px solid var(--trait);padding-top:.5rem}
-.alerte{margin-top:.5rem;font-size:.82rem;color:var(--acc);
-font-family:ui-sans-serif,system-ui,sans-serif}
-.preuve{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.76rem;
-color:var(--doux);margin-top:.4rem;overflow-x:auto;white-space:pre-wrap}
-.silence{color:var(--doux);font-style:italic;font-size:.87rem;margin:.4rem 0}
+.meta{font-size:.75rem;color:var(--doux);display:flex;gap:.9rem;flex-wrap:wrap;margin-top:.35rem}
+.but{margin-top:.55rem;font-size:.9rem;border-top:1px solid var(--trait);padding-top:.5rem}
+.alerte{margin-top:.5rem;font-size:.82rem;color:var(--acc)}
+.preuve{font-size:.76rem;color:var(--doux);margin-top:.4rem;overflow-x:auto;white-space:pre-wrap}
 .verdict{border:1px solid var(--trait);border-left:3px solid var(--vert);
 background:var(--carte);padding:.8rem 1rem;margin:1.4rem 0}
 .verdict.muet{border-left-color:var(--acc)}
 .verdict b{font-size:1.05rem}
-.cons{font-size:.85rem;margin:.5rem 0;padding-left:.8rem;
-border-left:1px solid var(--trait)}
-.etiquette{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.74rem;
-letter-spacing:.04em;color:var(--doux);margin:.7rem 0 .3rem;
+.cons{font-size:.88rem;margin:.5rem 0;padding-left:.8rem;border-left:1px solid var(--trait)}
+.etiquette{font-size:.74rem;letter-spacing:.04em;color:var(--doux);margin:.7rem 0 .3rem;
 border-top:1px dashed var(--trait);padding-top:.5rem}
 .passage{background:var(--fond);border:1px solid var(--trait);border-radius:2px;
-padding:.6rem .75rem;margin:.45rem 0;font-size:.9rem}
-details summary{cursor:pointer;font-size:.82rem;color:var(--acc);margin-top:.5rem;
-font-family:ui-sans-serif,system-ui,sans-serif}
+padding:.6rem .75rem;margin:.45rem 0;font-size:.92rem}
+details summary{cursor:pointer;font-size:.85rem;color:var(--acc);margin-top:.5rem}
 .raison{background:var(--carte);border:1px solid var(--trait);border-left:3px solid var(--vert);
 padding:.9rem 1rem;margin:.8rem 0}
-.puces{display:flex;flex-wrap:wrap;gap:.35rem;font-family:ui-monospace,monospace;font-size:.8rem}
+.puces{display:flex;flex-wrap:wrap;gap:.35rem;font-size:.8rem}
 .puces span{border:1px solid var(--trait);padding:.12rem .45rem;border-radius:2px}
-table{width:100%;border-collapse:collapse;font-size:.85rem;
-font-family:ui-sans-serif,system-ui,sans-serif}
-td,th{text-align:left;padding:.35rem .5rem;border-bottom:1px solid var(--trait);vertical-align:top}
-th{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--doux)}
-a{color:var(--acc)}
-footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--trait);
-font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-serif}
-</style></head><body><main>
+</style></head><body><main><p class="rubrique">Code de la consommation</p>
 <h1>Article D824-3</h1>
-<p class="chapeau">En vigueur depuis le 2016-07-01 · anciennement L541-1 · 1 texte(s) modificateur(s)</p><div class="verdict"><div class="num">verdict</div><b>un passage des travaux préparatoires explique cet article</b><p class="silence">Il est cité ci-dessous, avec sa source et ses offsets.</p></div><h2>Pourquoi cet article existe</h2><div class="raison"><div>« Article 17 (articles L. 111-5 et L. 230-1 du code rural et de la pêche maritime, L. 541-1 du code de la consommation, L. 3231-1 du code de la santé publique) Renforcement et clarification de la politique de l’alimentation Les objectifs généraux et les modalités d’élaboration de la politique publique de l’alimentation sont actuellement contenus à l’article L. 230-1 du code rural et de la pêche mari… »</div><div class="meta"><span>rapport_commission</span><span class="conf">confiance 0.839</span><span>derivee</span><span>offsets 984450–987040</span><a href="http://www.assemblee-nationale.fr/14/rapports/r1639.asp">document</a></div></div><div class="raison"><div>« Article 17 (articles L. 111-5 et L. 230-1 du code rural et de la pêche maritime, L. 541-1 du code de la consommation et L. 3231-1 du code de la santé publique) - Coordinations rédactionnelles Objet : cet article tire les conséquences du reclassement des dispositions législatives relatives à la politique publique de l&#x27;alimentation au sein du nouvel article L. 1 du code rural et de la pêche maritime… »</div><div class="meta"><span>rapport_commission</span><span class="conf">confiance 0.839</span><span>derivee</span><span>offsets 477148–479848</span><a href="http://www.senat.fr/rap/l13-386-1/l13-386-1_mono.html">document</a></div></div><h2>Alinéas et provenance (2)</h2><div class="al"><div class="num">alinéa 1</div><div class="tx">La politique publique de l&#x27;alimentation est définie à l&#x27;article L. 1 du code rural et de la pêche maritime.</div><p class="silence">Aucun amendement rattaché à cet alinéa.</p></div><div class="al"><div class="num">alinéa 2</div><div class="tx">Le programme national relatif à la nutrition et à la santé est défini à l&#x27;article L. 3231-1 du code de la santé publique.</div><p class="silence">Aucun amendement rattaché à cet alinéa.</p></div><h2>Sous quel article il a été discuté (7)</h2><table><tr><th>Article du texte</th><th>Chambre</th><th>Stade</th><th>Visé sous</th></tr><tr><td><a href="https://www.assemblee-nationale.fr/13/projets/pl2559.asp">article 1er</a></td><td>assemblee</td><td>Projet de loi n° 2559 déposé à l&#x27;Assemblée nationale</td><td>L541-1</td></tr><tr><td><a href="http://www.assemblee-nationale.fr/13/ta/ta0522.asp">article 1er</a></td><td>assemblee</td><td>Texte adopté en CMP par l&#x27;Assemblée nationale le 12 juillet 2010</td><td>L541-1</td></tr><tr><td><a href="http://www.assemblee-nationale.fr/13/ta-commission/r2636-a0.asp">article 1er</a></td><td>assemblee</td><td>Texte de la commission déposé le 17 juin 2010</td><td>L541-1</td></tr><tr><td><a href="http://www.assemblee-nationale.fr/13/ta/ta0510.asp">article 1er</a></td><td>assemblee</td><td>Texte modifié en 1ère lecture par l&#x27;Assemblée nationale le 6 juillet 2010</td><td>L541-1</td></tr><tr><td><a href="http://www.senat.fr/petite-loi-ameli/2009-2010/437.html">article 1er</a></td><td>senat</td><td>Texte adopté en 1ère lecture par le Sénat le 29 mai 2010</td><td>L541-1</td></tr><tr><td><a href="http://www.senat.fr/petite-loi-ameli/2009-2010/654.html">article 1er</a></td><td>senat</td><td>Texte adopté en CMP par le Sénat le 13 juillet 2010</td><td>L541-1</td></tr><tr><td><a href="http://www.senat.fr/leg/pjl09-437.html">article 1 er</a></td><td>senat</td><td>Texte de la commission déposé le 6 mai 2010</td><td>L541-1</td></tr></table><h2>Ce qui cite cet article (0)</h2><p class="silence">Aucun article du fonds ne le cite.</p><footer>Ratio Legis — graphe de provenance normative. Aucune arête sans source résoluble. Les confiances sont des bornes inférieures mesurées à la main, documentées dans <code>docs/</code>. Sources : DILA (LEGI, JORF, DOLE), Assemblée nationale, Sénat.</footer></main></body></html>
+<p class="chapeau">En vigueur depuis le 2016-07-01 · anciennement L541-1 · 1 texte(s) modificateur(s)</p><div class="verdict"><div class="num">verdict</div><b>un passage des travaux préparatoires explique cet article</b><p class="silence">Il est cité ci-dessous, avec sa source et ses offsets.</p></div><h2>Pourquoi cet article existe</h2><div class="raison"><div>« Article 17 (articles L. 111-5 et L. 230-1 du code rural et de la pêche maritime, L. 541-1 du code de la consommation, L. 3231-1 du code de la santé publique) Renforcement et clarification de la politique de l’alimentation Les objectifs généraux et les modalités d’élaboration de la politique publique de l’alimentation sont actuellement contenus à l’article L. 230-1 du code rural et de la pêche mari… »</div><div class="meta"><span>rapport_commission</span><span class="conf">confiance 0.839</span><span>derivee</span><span>offsets 984450–987040</span><a href="http://www.assemblee-nationale.fr/14/rapports/r1639.asp">document</a></div></div><div class="raison"><div>« Article 17 (articles L. 111-5 et L. 230-1 du code rural et de la pêche maritime, L. 541-1 du code de la consommation et L. 3231-1 du code de la santé publique) - Coordinations rédactionnelles Objet : cet article tire les conséquences du reclassement des dispositions législatives relatives à la politique publique de l&#x27;alimentation au sein du nouvel article L. 1 du code rural et de la pêche maritime… »</div><div class="meta"><span>rapport_commission</span><span class="conf">confiance 0.839</span><span>derivee</span><span>offsets 477148–479848</span><a href="http://www.senat.fr/rap/l13-386-1/l13-386-1_mono.html">document</a></div></div><h2>Alinéas et provenance (2)</h2><div class="al"><div class="num">alinéa 1</div><div class="tx">La politique publique de l&#x27;alimentation est définie à l&#x27;article L. 1 du code rural et de la pêche maritime.</div><p class="silence">Aucun amendement rattaché à cet alinéa.</p></div><div class="al"><div class="num">alinéa 2</div><div class="tx">Le programme national relatif à la nutrition et à la santé est défini à l&#x27;article L. 3231-1 du code de la santé publique.</div><p class="silence">Aucun amendement rattaché à cet alinéa.</p></div><h2>Sous quel article il a été discuté (13)</h2><table><tr><th>Article du texte</th><th>Chambre</th><th>Stade</th><th>Visé sous</th><th>Promulgué</th></tr><tr><td><a href="https://www.assemblee-nationale.fr/14/projets/pl1548.asp">article 17</a></td><td>assemblee</td><td>Projet de loi n° 1548 déposé à l&#x27;Assemblée nationale</td><td>L541-1</td><td>oui</td></tr><tr><td><a href="https://www.assemblee-nationale.fr/13/projets/pl2559.asp">article 1er</a></td><td>assemblee</td><td>Projet de loi n° 2559 déposé à l&#x27;Assemblée nationale</td><td>L541-1</td><td>oui</td></tr><tr><td><a href="http://www.assemblee-nationale.fr/14/ta/ta0273.asp">article 17</a></td><td>assemblee</td><td>Texte adopté en 1ère lecture par l&#x27;Assemblée nationale le 14 janvier 2014</td><td>L541-1</td><td>oui</td></tr><tr><td><a href="http://www.assemblee-nationale.fr/14/ta/ta0402.asp">article 39</a></td><td>assemblee</td><td>Texte adopté en CMP par l &#x27;Assemblée nationale le 11 septembre 2014</td><td>L541-1</td><td>oui</td></tr><tr><td><a href="http://www.assemblee-nationale.fr/13/ta/ta0522.asp">article 1er</a></td><td>assemblee</td><td>Texte adopté en CMP par l&#x27;Assemblée nationale le 12 juillet 2010</td><td>L541-1</td><td>oui</td></tr><tr><td><a href="http://www.assemblee-nationale.fr/14/ta-commission/r1639-a0.asp">article 17</a></td><td>assemblee</td><td>Texte de la commission déposé le 13 décembre 2013</td><td>L541-1</td><td>oui</td></tr><tr><td><a href="http://www.assemblee-nationale.fr/13/ta-commission/r2636-a0.asp">article 1er</a></td><td>assemblee</td><td>Texte de la commission déposé le 17 juin 2010</td><td>L541-1</td><td>oui</td></tr><tr><td><a href="http://www.assemblee-nationale.fr/13/ta/ta0510.asp">article 1er</a></td><td>assemblee</td><td>Texte modifié en 1ère lecture par l&#x27;Assemblée nationale le 6 juillet 2010</td><td>L541-1</td><td>oui</td></tr><tr><td><a href="http://www.senat.fr/petite-loi-ameli/2009-2010/437.html">article 1er</a></td><td>senat</td><td>Texte adopté en 1ère lecture par le Sénat le 29 mai 2010</td><td>L541-1</td><td>oui</td></tr><tr><td><a href="http://www.senat.fr/petite-loi-ameli/2009-2010/654.html">article 1er</a></td><td>senat</td><td>Texte adopté en CMP par le Sénat le 13 juillet 2010</td><td>L541-1</td><td>oui</td></tr><tr><td><a href="http://www.senat.fr/petite-loi-ameli/2013-2014/775.html">article 17</a></td><td>senat</td><td>Texte adopté en CMP par le Sénat le 24 juillet 2014</td><td>L541-1</td><td>oui</td></tr><tr><td><a href="http://www.senat.fr/leg/pjl09-437.html">article 1 er</a></td><td>senat</td><td>Texte de la commission déposé le 6 mai 2010</td><td>L541-1</td><td>oui</td></tr><tr><td><a href="http://www.senat.fr/leg/pjl13-387.html">article 17</a></td><td>senat</td><td>Texte de la commission n° 387 déposé le 19 février 2014</td><td>L541-1</td><td>oui</td></tr></table><h2>Ce qui cite cet article (0)</h2><p class="silence">Aucun article du fonds ne le cite.</p><footer>Ratio Legis — graphe de provenance normative. Aucune arête sans source résoluble. Les confiances sont des bornes inférieures mesurées à la main, documentées dans <code>docs/</code>. Sources : DILA (LEGI, JORF, DOLE), Assemblée nationale, Sénat.</footer></main></body></html>

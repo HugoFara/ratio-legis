@@ -49,6 +49,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from citation import extrait  # noqa: E402
+from style import RUBRIQUE, SOCLE  # noqa: E402
 
 PROFONDEUR = 3
 # Au-delà, la liste cesse d'être une liste de relecture et devient un extrait du
@@ -219,41 +220,18 @@ def e(x) -> str:
     return html.escape(str(x if x is not None else ""))
 
 
-STYLE = """
-:root{--fond:#fbfaf8;--encre:#1c1a17;--doux:#6b655c;--trait:#ddd8ce;--acc:#7a3b2e;
---vert:#3d5a45;--carte:#fff}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--fond:#16151a;
---encre:#e9e6df;--doux:#9a938a;--trait:#2f2c33;--acc:#d98b76;--vert:#8fbb9c;--carte:#1d1c22}}
-*{box-sizing:border-box}
-body{margin:0;background:var(--fond);color:var(--encre);
-font:16px/1.6 "Iowan Old Style",Palatino,Georgia,serif;padding:2.5rem 1.25rem}
-main{max-width:52rem;margin:0 auto}
-h1{font-size:1.8rem;margin:0 0 .2rem;letter-spacing:-.01em}
-h2{font-size:.78rem;letter-spacing:.13em;text-transform:uppercase;color:var(--doux);
-font-family:ui-sans-serif,system-ui,sans-serif;margin:2.4rem 0 .9rem;
-border-bottom:1px solid var(--trait);padding-bottom:.4rem}
-.chapeau{color:var(--doux);font-size:.92rem;margin-bottom:1.2rem}
-.bilan{display:flex;flex-wrap:wrap;gap:.6rem;margin:.8rem 0 1.4rem;
-font-family:ui-sans-serif,system-ui,sans-serif;font-size:.8rem}
+STYLE = SOCLE + """
+main{max-width:52rem}
+.bilan{display:flex;flex-wrap:wrap;gap:.6rem;margin:.8rem 0 1.4rem;font-size:.8rem}
 .bilan span{border:1px solid var(--trait);background:var(--carte);
 padding:.3rem .6rem;border-radius:2px}
 .bilan .muet{border-color:var(--acc);color:var(--acc)}
 .onde{border-left:3px solid var(--trait);padding:.35rem 0 .35rem .9rem;margin:.7rem 0}
 .onde.direct{border-left-color:var(--acc)}
-.onde b{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.95rem}
-.meta{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.74rem;
-color:var(--doux);display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.2rem}
+.onde b{font-size:.95rem}
+.meta{font-size:.74rem;color:var(--doux);display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.2rem}
 .meta .muet{color:var(--acc)}
-.preuve{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.76rem;
-color:var(--doux);margin-top:.3rem;white-space:pre-wrap}
-.silence{color:var(--doux);font-style:italic;font-size:.88rem}
-table{width:100%;border-collapse:collapse;font-size:.85rem;
-font-family:ui-sans-serif,system-ui,sans-serif}
-td,th{text-align:left;padding:.35rem .5rem;border-bottom:1px solid var(--trait)}
-th{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--doux)}
-a{color:var(--acc)}
-footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--trait);
-font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-serif}
+.preuve{font-size:.76rem;color:var(--doux);margin-top:.3rem;white-space:pre-wrap}
 """
 
 PIED = ("""<footer>Ratio Legis — arête <code>renvoie_a</code>, dérivée du texte des
@@ -271,6 +249,7 @@ def en_html(d: dict) -> str:
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(d['numero'])} — retentissement</title><style>{STYLE}</style></head>
 <body><main>
+{RUBRIQUE}
 <h1>Si je modifie l'article {e(d['numero'])}</h1>
 <p class="chapeau">Version en vigueur depuis le {e(d['version']['date_debut'])} ·
 onde suivie jusqu'au rang {d['profondeur']}</p>
@@ -324,7 +303,7 @@ def sommet_en_html(lignes: list[dict]) -> str:
     p = [f"""<!doctype html><html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Les articles les plus cités</title><style>{STYLE}</style></head>
-<body><main><h1>Les articles les plus cités du fonds</h1>
+<body><main>{RUBRIQUE}<h1>Les articles les plus cités du fonds</h1>
 <p class="chapeau">Nombre d'articles en vigueur qui renvoient à celui-ci, au
 rang 1. Mesure de structure : elle ne dit pas qu'un article compte, elle dit
 combien d'autres le nomment.</p>

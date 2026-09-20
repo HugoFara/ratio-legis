@@ -16,6 +16,9 @@ import html
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from style import RUBRIQUE, SOCLE  # noqa: E402
+
 # Un rendu par article, dans l'ordre où on conseille de les lire. La phrase dit
 # pourquoi cet article-là a été choisi, pas ce qu'il contient.
 FICHES = {
@@ -26,7 +29,7 @@ FICHES = {
     "L112-1-1": "aucune motivation parlementaire ; la seule raison connue est une directive",
     "L521-2": "un article suivi à travers la navette et la recodification",
     "L722-10": "une motivation venue d'une section de rapport que rien ne rattachait",
-    "L224-109": "l'un des rares articles de la partie législative dont la raison n'est pas documentée",
+    "L411-1": "l'obligation générale de conformité des produits — l'un des 78 articles de la partie législative dont la raison n'est pas documentée",
     "R121-1": "un article réglementaire que son ascendance législative documente encore",
     "D824-3": "le seul article D du code qu'un rapport de commission explique",
     "R512-31": "la réponse ordinaire de la partie réglementaire — raison non documentée, alors que sept articles le citent",
@@ -38,7 +41,7 @@ TENTATIVES = {
     "L312-9": "la délégation d'assurance emprunteur",
     "L113-3": "les deux chambres, et un sort lu dans l'état procédural",
     "L224-43": "quatre amendements adoptés dont l'alinéa subsiste",
-    "L511-7": "l'article le plus travaillé du fonds, que chaque loi de consommation vient allonger",
+    "L111-3": "l'article le plus disputé du fonds : 67 tentatives, 56 non abouties",
     "sommet": "les articles les plus disputés",
 }
 
@@ -59,29 +62,17 @@ SECTIONS = [
     ("retentissement", "Si je modifie cet article", "ce qu'il faudrait relire, par onde de renvois ; pas ce qu'il faudrait y écrire", RETENTISSEMENT),
 ]
 
-STYLE = """
-:root{--fond:#fbfaf8;--encre:#1c1a17;--doux:#6b655c;--trait:#ddd8ce;--acc:#7a3b2e;--carte:#fff}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--fond:#16151a;
---encre:#e9e6df;--doux:#9a938a;--trait:#2f2c33;--acc:#d98b76;--carte:#1d1c22}}
-*{box-sizing:border-box}
-body{margin:0;background:var(--fond);color:var(--encre);
-font:16px/1.6 "Iowan Old Style",Palatino,Georgia,serif;padding:2.5rem 1.25rem}
-main{max-width:56rem;margin:0 auto}
-h1{font-size:1.9rem;margin:0 0 .2rem;letter-spacing:-.01em}
-h2{font-size:.78rem;letter-spacing:.13em;text-transform:uppercase;color:var(--doux);
-font-family:ui-sans-serif,system-ui,sans-serif;margin:2.5rem 0 .3rem;
-border-bottom:1px solid var(--trait);padding-bottom:.4rem}
-.chapeau{color:var(--doux);font-size:.92rem;margin:0 0 1rem}
+STYLE = SOCLE + """
 p{max-width:44rem}
 ul{list-style:none;padding:0;margin:0}
 li{background:var(--carte);border:1px solid var(--trait);border-radius:2px;
-padding:.55rem .8rem;margin:.4rem 0;font-size:.92rem}
-li a{color:var(--acc);font-family:ui-monospace,SFMono-Regular,monospace;font-size:.85rem;
+padding:.55rem .8rem;margin:.4rem 0;font-size:.95rem}
+li a{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.85rem;
 text-decoration:none;margin-right:.6rem}
 li a:hover{text-decoration:underline}
-footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--trait);
-font-size:.8rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-serif}
-a.depot{color:var(--acc)}
+h2{margin-bottom:.3rem}
+.chapeau{border-bottom:0;padding-bottom:0;margin-bottom:1rem}
+.en-tete{border-bottom:3px double var(--trait);margin-bottom:1.6rem}
 """
 
 AVERTISSEMENT = (
@@ -120,10 +111,10 @@ def page(dossier: Path) -> str:
         '<!doctype html><html lang="fr"><head><meta charset="utf-8">'
         '<meta name="viewport" content="width=device-width,initial-scale=1">'
         f"<title>Ratio Legis — ce que ça produit</title><style>{STYLE}</style></head>"
-        "<body><main><h1>Ratio Legis</h1>"
+        "<body><main><div class=en-tete>" + RUBRIQUE + "<h1>Ce que le graphe produit</h1>"
         "<p class=chapeau>Pour un article du code de la consommation en vigueur : "
         "pourquoi existe-t-il sous cette forme ? Les rendus ci-dessous sont ceux "
-        "que le dépôt versionne, tels que le graphe les produit.</p>"
+        "que le dépôt versionne, tels que le graphe les produit.</p></div>"
         f"<p>{html.escape(AVERTISSEMENT)}</p>"
         f"{corps}"
         "<footer>Ratio Legis — graphe de provenance normative. Aucune arête sans "

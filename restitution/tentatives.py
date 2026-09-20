@@ -58,6 +58,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "ingestion"))
 from citation import cite, extrait  # noqa: E402
 from sort_des_amendements import ECHEC, EN_FRANCAIS  # noqa: E402
+from style import RUBRIQUE, SOCLE  # noqa: E402
 
 SOMMET = 25
 
@@ -297,22 +298,9 @@ def e(x) -> str:
     return html.escape(str(x if x is not None else ""))
 
 
-STYLE = """
-:root{--fond:#fbfaf8;--encre:#1c1a17;--doux:#6b655c;--trait:#ddd8ce;--acc:#7a3b2e;
---vert:#3d5a45;--carte:#fff}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--fond:#16151a;
---encre:#e9e6df;--doux:#9a938a;--trait:#2f2c33;--acc:#d98b76;--vert:#8fbb9c;--carte:#1d1c22}}
-*{box-sizing:border-box}
-body{margin:0;background:var(--fond);color:var(--encre);
-font:16px/1.6 "Iowan Old Style",Palatino,Georgia,serif;padding:2.5rem 1.25rem}
-main{max-width:52rem;margin:0 auto}
-h1{font-size:1.8rem;margin:0 0 .2rem;letter-spacing:-.01em}
-h2{font-size:.78rem;letter-spacing:.13em;text-transform:uppercase;color:var(--doux);
-font-family:ui-sans-serif,system-ui,sans-serif;margin:2.4rem 0 .9rem;
-border-bottom:1px solid var(--trait);padding-bottom:.4rem}
-.chapeau{color:var(--doux);font-size:.92rem;margin-bottom:1.2rem}
-.bilan{display:flex;flex-wrap:wrap;gap:.6rem;margin:.8rem 0 1.4rem;
-font-family:ui-sans-serif,system-ui,sans-serif;font-size:.8rem}
+STYLE = SOCLE + """
+main{max-width:52rem}
+.bilan{display:flex;flex-wrap:wrap;gap:.6rem;margin:.8rem 0 1.4rem;font-size:.8rem}
 .bilan span{border:1px solid var(--trait);background:var(--carte);
 padding:.3rem .6rem;border-radius:2px}
 .bilan .abouti{border-color:var(--vert);color:var(--vert)}
@@ -320,23 +308,13 @@ padding:.3rem .6rem;border-radius:2px}
 .tent{border-left:3px solid var(--trait);padding:.45rem 0 .5rem .9rem;margin:.9rem 0}
 .tent.abouti{border-left-color:var(--vert)}
 .tent.bloque{border-left-color:var(--acc)}
-.tent b{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.95rem}
-.sort{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.72rem;
-letter-spacing:.09em;text-transform:uppercase;padding:.1rem .45rem;
+.tent b{font-size:.95rem}
+.sort{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;padding:.1rem .45rem;
 border:1px solid var(--trait);border-radius:2px;margin-left:.5rem}
 .sort.abouti{border-color:var(--vert);color:var(--vert)}
 .sort.bloque{border-color:var(--acc);color:var(--acc)}
-.meta{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.74rem;
-color:var(--doux);display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.25rem}
-.objet{font-size:.9rem;margin-top:.45rem;color:var(--encre)}
-.silence{color:var(--doux);font-style:italic;font-size:.88rem}
-table{width:100%;border-collapse:collapse;font-size:.85rem;
-font-family:ui-sans-serif,system-ui,sans-serif}
-td,th{text-align:left;padding:.35rem .5rem;border-bottom:1px solid var(--trait)}
-th{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--doux)}
-a{color:var(--acc)}
-footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--trait);
-font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-serif}
+.meta{font-size:.74rem;color:var(--doux);display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.25rem}
+.objet{font-size:.92rem;margin-top:.45rem;color:var(--encre)}
 """
 
 PIED = ("""<footer>Ratio Legis — le sort d'un amendement est celui que la chambre
@@ -363,6 +341,7 @@ def en_html(d: dict) -> str:
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(d['numero'])} — ce qui a été tenté</title><style>{STYLE}</style></head>
 <body><main>
+{RUBRIQUE}
 <h1>Ce qui a été tenté sur l'article {e(d['numero'])}</h1>
 <p class="chapeau">Version en vigueur depuis le {e(d['version']['date_debut'])}</p>"""]
 
@@ -428,7 +407,7 @@ def sommet_en_html(lignes: list[dict]) -> str:
     p = [f"""<!doctype html><html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Les articles les plus disputés</title><style>{STYLE}</style></head>
-<body><main><h1>Les articles les plus disputés du fonds</h1>
+<body><main>{RUBRIQUE}<h1>Les articles les plus disputés du fonds</h1>
 <p class="chapeau">Nombre de tentatives déclarées qui n'ont pas abouti — rejetées,
 retirées, non soutenues, tombées ou déclarées irrecevables. La mesure porte sur le
 corpus chargé, non sur le droit français.</p>

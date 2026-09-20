@@ -42,6 +42,7 @@ from union_europeenne import ANCRE  # noqa: E402
 from citation import ABSENT, PLAFOND_EXTRAIT, cite  # noqa: E402
 from sort_des_amendements import EN_FRANCAIS  # noqa: E402
 import proximite  # noqa: E402
+from style import RUBRIQUE, SOCLE  # noqa: E402
 
 PLAFOND_TEXTES = 8                 # en texte seulement : le HTML les rend tous
 # Le repli des considérants est borné, et la borne est **dite**. Elle ne coûte
@@ -564,61 +565,33 @@ def en_html(d: dict) -> str:
         return "<p>Article introuvable.</p>"
     p = [f"""<!doctype html><html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{e(d['numero'])} — provenance</title><style>
-:root{{--fond:#fbfaf8;--encre:#1c1a17;--doux:#6b655c;--trait:#ddd8ce;--acc:#7a3b2e;
---vert:#3d5a45;--carte:#fff}}
-@media(prefers-color-scheme:dark){{:root:not([data-theme=light]){{--fond:#16151a;
---encre:#e9e6df;--doux:#9a938a;--trait:#2f2c33;--acc:#d98b76;--vert:#8fbb9c;--carte:#1d1c22}}}}
-*{{box-sizing:border-box}}
-body{{margin:0;background:var(--fond);color:var(--encre);
-font:16px/1.6 "Iowan Old Style",Palatino,Georgia,serif;padding:2.5rem 1.25rem}}
-main{{max-width:56rem;margin:0 auto}}
-h1{{font-size:1.9rem;margin:0 0 .2rem;letter-spacing:-.01em}}
-h2{{font-size:.78rem;letter-spacing:.13em;text-transform:uppercase;color:var(--doux);
-font-family:ui-sans-serif,system-ui,sans-serif;margin:2.5rem 0 .9rem;
-border-bottom:1px solid var(--trait);padding-bottom:.4rem}}
-.chapeau{{color:var(--doux);font-size:.92rem;margin-bottom:.4rem}}
+<title>{e(d['numero'])} — provenance</title><style>{SOCLE}
+main{{max-width:56rem}}
 .al{{border-left:3px solid var(--trait);padding:.1rem 0 .1rem 1rem;margin:1.4rem 0}}
 .al.tracee{{border-left-color:var(--acc)}}
-.num{{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.72rem;color:var(--doux)}}
 .tx{{margin:.25rem 0 .6rem}}
 .arete{{background:var(--carte);border:1px solid var(--trait);border-radius:2px;
-padding:.65rem .8rem;margin:.5rem 0;font-size:.9rem}}
+padding:.65rem .8rem;margin:.5rem 0;font-size:.92rem}}
 .arete b{{color:var(--acc)}}
-.meta{{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.75rem;color:var(--doux);
-display:flex;gap:.9rem;flex-wrap:wrap;margin-top:.35rem}}
-.conf{{font-variant-numeric:tabular-nums}}
-.but{{margin-top:.55rem;font-size:.88rem;border-top:1px solid var(--trait);padding-top:.5rem}}
-.alerte{{margin-top:.5rem;font-size:.82rem;color:var(--acc);
-font-family:ui-sans-serif,system-ui,sans-serif}}
-.preuve{{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.76rem;
-color:var(--doux);margin-top:.4rem;overflow-x:auto;white-space:pre-wrap}}
-.silence{{color:var(--doux);font-style:italic;font-size:.87rem;margin:.4rem 0}}
+.meta{{font-size:.75rem;color:var(--doux);display:flex;gap:.9rem;flex-wrap:wrap;margin-top:.35rem}}
+.but{{margin-top:.55rem;font-size:.9rem;border-top:1px solid var(--trait);padding-top:.5rem}}
+.alerte{{margin-top:.5rem;font-size:.82rem;color:var(--acc)}}
+.preuve{{font-size:.76rem;color:var(--doux);margin-top:.4rem;overflow-x:auto;white-space:pre-wrap}}
 .verdict{{border:1px solid var(--trait);border-left:3px solid var(--vert);
 background:var(--carte);padding:.8rem 1rem;margin:1.4rem 0}}
 .verdict.muet{{border-left-color:var(--acc)}}
 .verdict b{{font-size:1.05rem}}
-.cons{{font-size:.85rem;margin:.5rem 0;padding-left:.8rem;
-border-left:1px solid var(--trait)}}
-.etiquette{{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.74rem;
-letter-spacing:.04em;color:var(--doux);margin:.7rem 0 .3rem;
+.cons{{font-size:.88rem;margin:.5rem 0;padding-left:.8rem;border-left:1px solid var(--trait)}}
+.etiquette{{font-size:.74rem;letter-spacing:.04em;color:var(--doux);margin:.7rem 0 .3rem;
 border-top:1px dashed var(--trait);padding-top:.5rem}}
 .passage{{background:var(--fond);border:1px solid var(--trait);border-radius:2px;
-padding:.6rem .75rem;margin:.45rem 0;font-size:.9rem}}
-details summary{{cursor:pointer;font-size:.82rem;color:var(--acc);margin-top:.5rem;
-font-family:ui-sans-serif,system-ui,sans-serif}}
+padding:.6rem .75rem;margin:.45rem 0;font-size:.92rem}}
+details summary{{cursor:pointer;font-size:.85rem;color:var(--acc);margin-top:.5rem}}
 .raison{{background:var(--carte);border:1px solid var(--trait);border-left:3px solid var(--vert);
 padding:.9rem 1rem;margin:.8rem 0}}
-.puces{{display:flex;flex-wrap:wrap;gap:.35rem;font-family:ui-monospace,monospace;font-size:.8rem}}
+.puces{{display:flex;flex-wrap:wrap;gap:.35rem;font-size:.8rem}}
 .puces span{{border:1px solid var(--trait);padding:.12rem .45rem;border-radius:2px}}
-table{{width:100%;border-collapse:collapse;font-size:.85rem;
-font-family:ui-sans-serif,system-ui,sans-serif}}
-td,th{{text-align:left;padding:.35rem .5rem;border-bottom:1px solid var(--trait);vertical-align:top}}
-th{{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--doux)}}
-a{{color:var(--acc)}}
-footer{{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--trait);
-font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-serif}}
-</style></head><body><main>
+</style></head><body><main>{RUBRIQUE}
 <h1>Article {e(d['numero'])}</h1>
 <p class="chapeau">En vigueur depuis le {e(d['version']['date_debut'])}"""]
     if d["anciens"]:

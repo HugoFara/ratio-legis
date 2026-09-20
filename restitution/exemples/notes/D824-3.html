@@ -1,26 +1,50 @@
 <!doctype html><html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>D824-3 — pourquoi cet article</title><style>
-:root{--fond:#fbfaf8;--encre:#1c1a17;--doux:#6b655c;--trait:#ddd8ce;--carte:#fff;
---legi:#6b655c;--gouv:#7a3b2e;--parl:#3d5a45;--ce:#4a4374;--ue:#1e5f74}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--fond:#16151a;
---encre:#e9e6df;--doux:#9a938a;--trait:#2f2c33;--carte:#1d1c22;--legi:#9a938a;
---gouv:#d98b76;--parl:#8fbb9c;--ce:#a9a2d8;--ue:#7fc4d8}}
+:root{--fond:#f9f6ef;--encre:#1b1916;--doux:#6a635a;--trait:#d9d2c4;--acc:#7a2a24;
+--vert:#3b5743;--carte:#fffdf8;
+--legi:#6a635a;--gouv:#7a2a24;--parl:#3b5743;--ce:#4a4374;--ue:#1e5f74}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--fond:#17161a;
+--encre:#e8e4db;--doux:#9b948a;--trait:#302d34;--acc:#d9907c;--vert:#8fbb9c;
+--carte:#1e1d22;--legi:#9b948a;--gouv:#d9907c;--parl:#8fbb9c;--ce:#a9a2d8;--ue:#7fc4d8}}
 *{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--fond);color:var(--encre);
-font:17px/1.65 "Iowan Old Style",Palatino,Georgia,serif;padding:2.5rem 1.25rem}
-main{max-width:44rem;margin:0 auto}
-h1{font-size:1.7rem;margin:0 0 1.2rem;letter-spacing:-.01em}
-h2{font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;
-font-family:ui-sans-serif,system-ui,sans-serif;margin:2.4rem 0 .8rem}
+font:17px/1.6 "Iowan Old Style","Libertinus Serif","Linux Libertine O","Palatino Linotype",Palatino,"Book Antiqua","Charis SIL","Source Serif 4","Source Serif Pro",Georgia,"DejaVu Serif",serif;padding:2.5rem 1.25rem;
+font-feature-settings:"onum","kern","liga"}
+main{max-width:48rem;margin:0 auto}
+.rubrique{font-variant-caps:small-caps;letter-spacing:.14em;color:var(--doux);
+font-size:.9rem;margin:0 0 .35rem}
+h1{font-weight:normal;font-size:1.9rem;line-height:1.2;margin:0 0 .4rem;
+letter-spacing:-.005em}
+.chapeau{color:var(--doux);font-size:.95rem;margin:0 0 1.6rem;
+padding-bottom:.9rem;border-bottom:3px double var(--trait)}
+h2{font-weight:normal;font-size:1rem;font-variant-caps:small-caps;letter-spacing:.12em;
+color:var(--encre);margin:2.4rem 0 .9rem;padding-bottom:.35rem;
+border-bottom:1px solid var(--trait)}
+.tx,.al,.cit,.passage,.objet,.raison>div:first-of-type{text-align:justify;hyphens:auto}
+.meta,.src,.leg,.bilan,.alerte,.etiquette,.sort,.amend{font-family:ui-sans-serif,system-ui,"Segoe UI",Cantarell,"Noto Sans","DejaVu Sans",sans-serif}
+.num,.preuve,code,.puces,.onde b,.tent b{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono","DejaVu Sans Mono",monospace}
+code{font-size:.85em}
+.num{font-size:.72rem;color:var(--doux);letter-spacing:.04em}
+.conf,td,th{font-variant-numeric:tabular-nums}
+.silence{color:var(--doux);font-style:italic;font-size:.92rem;margin:.4rem 0}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+td,th{text-align:left;padding:.4rem .5rem;border-bottom:1px solid var(--trait);vertical-align:top}
+th{font-weight:normal;font-variant-caps:small-caps;letter-spacing:.1em;color:var(--doux)}
+a{color:var(--acc);text-decoration-thickness:1px;text-underline-offset:.15em}
+footer{margin-top:3rem;padding-top:1rem;border-top:3px double var(--trait);
+font-size:.82rem;color:var(--doux);text-align:justify;hyphens:auto}
+@media print{body{background:#fff;color:#000;padding:0}a{color:inherit}}
+
+main{max-width:44rem}
+h1{font-size:1.7rem;padding-bottom:.9rem;margin-bottom:1.4rem;border-bottom:3px double var(--trait)}
 .etat{background:var(--carte);border:1px solid var(--trait);padding:.9rem 1.1rem;
 margin:1.2rem 0;font-size:.95rem}
 .etat b{display:block;margin-bottom:.3rem}
 .ph{margin:1.1rem 0;padding-left:1rem;border-left:3px solid var(--trait)}
 .cit{margin:.45rem 0;font-size:.95rem;color:var(--encre)}
-.src{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.72rem;
-color:var(--doux);margin-top:.35rem}
-.src code{font-family:ui-monospace,monospace}
+.src{font-size:.72rem;color:var(--doux);margin-top:.35rem}
 .legi{border-left-color:var(--legi)} .gouvernement{border-left-color:var(--gouv)}
 .parlement{border-left-color:var(--parl)} .conseil_etat{border-left-color:var(--ce)}
 .union{border-left-color:var(--ue)}
@@ -28,9 +52,7 @@ h2.legi{color:var(--legi)} h2.gouvernement{color:var(--gouv)}
 h2.parlement{color:var(--parl)} h2.conseil_etat{color:var(--ce)}
 h2.union{color:var(--ue)}
 a{color:inherit}
-footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--trait);
-font-size:.76rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-serif}
-</style></head><body><main>
+</style></head><body><main><p class="rubrique">Code de la consommation</p>
 <h1>Pourquoi l'article D824-3 est ce qu'il est</h1><div class="etat"><b>État du dossier</b>Verdict : un passage des travaux préparatoires explique cet article. 2 alinéa(s) sur 2 ne sont rattachés à aucun amendement dans les corpus dépouillés.</div><h2 class="legi">le fonds consolidé</h2><div class="ph legi"><div>L&#x27;article D824-3 est en vigueur depuis le 1er juillet 2016.</div><div class="src">LEGI — <code>LEGIARTI000032809158</code></div></div><div class="ph legi"><div>Il a porté auparavant le numéro L541-1 ; la concordance est déclarée par le fonds, non déduite.</div><div class="src">LEGI — <code>LEGIARTI000032809158</code></div></div><div class="ph legi"><div>Sa rédaction en vigueur a été produite par « Décret n°2016-884 du 29 juin 2016 ». 1 texte(s) l&#x27;ont modifié.</div><div class="src">LEGI — <code>LEGIARTI000032809158</code></div></div><h2 class="parlement">le Parlement</h2><div class="ph parlement"><div>Un rapport de commission de l&#x27;Assemblée nationale commente cet article. Il le commente sous l&#x27;article 17 du texte alors en discussion.</div><div class="cit">« Article 17 (articles L. 111-5 et L. 230-1 du code rural et de la pêche maritime, L. 541-1 du code de la consommation, L. 3231-1 du code de la santé publique) Renforcement et clarification de la politique de l’alimentation Les objectifs généraux et les modalités d’élaboration de la politique publique de l’alimentation sont actuellement contenus à l’article L. 230-1 du code rural et de la pêche mari… »</div><div class="src"><a href="http://www.assemblee-nationale.fr/14/rapports/r1639.asp">rapport de commission</a> · offsets 984450–987040 · confiance 0.839</div></div><div class="ph parlement"><div>Un rapport de commission du Sénat commente cet article. Il le commente sous l&#x27;article 17 du texte alors en discussion.</div><div class="cit">« Article 17 (articles L. 111-5 et L. 230-1 du code rural et de la pêche maritime, L. 541-1 du code de la consommation et L. 3231-1 du code de la santé publique) - Coordinations rédactionnelles Objet : cet article tire les conséquences du reclassement des dispositions législatives relatives à la politique publique de l&#x27;alimentation au sein du nouvel article L. 1 du code rural et de la pêche maritime… »</div><div class="src"><a href="http://www.senat.fr/rap/l13-386-1/l13-386-1_mono.html">rapport de commission</a> · offsets 477148–479848 · confiance 0.839</div></div><div class="ph parlement"><div>Un rapport de commission du Sénat commente cet article. Il le commente sous l&#x27;article 17 du texte alors en discussion.</div><div class="cit">« Article 17 (articles L. 111-2-2 [nouveau], L. 111-5 et L. 230-1 du code rural et de la pêche maritime, L. 541-1 du code de la consommation, L. 3231-1 du code de la santé publique) - Renforcement et clarification de la politique de l&#x27;alimentation Commentaire : cet article, qui contenait à l&#x27;origine uniquement des dispositions de clarification rédactionnelle, a été enrichi pour donner une base légal… »</div><div class="src"><a href="http://www.senat.fr/rap/l13-743/l13-743_mono.html">rapport de commission</a> · offsets 209700–213084 · confiance 0.839</div></div><footer>
 6 phrase(s) retenue(s), 0 écartée(s) faute de citation
 résoluble — le contrat du § 4.3 est un filtre exécuté, non une intention.

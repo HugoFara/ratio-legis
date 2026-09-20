@@ -43,7 +43,7 @@ versionnés dans [`restitution/exemples/`](restitution/exemples/).
 **Pourquoi cet article.** La fiche de provenance, arête par arête, et la note
 « pourquoi cet article » sous le contrat du § 4.3 — toute phrase produite est
 citable, celles qui ne le sont pas sont supprimées et le compte s'affiche en
-pied de page (zéro sur 11 599 constats). Aucun modèle de langue n'intervient :
+pied de page (zéro sur 11 642 constats). Aucun modèle de langue n'intervient :
 la note est assemblée par gabarits, les passages sont verbatim.
 
 ```
@@ -73,7 +73,7 @@ subdivision du texte sur laquelle il fut déposé (`depose_sur`)
 ([`docs/30`](docs/30-sort-des-amendements.md)).
 
 ```
-python3 restitution/tentatives.py travail/ratio-legis.sqlite L511-7        # 91 tentatives
+python3 restitution/tentatives.py travail/ratio-legis.sqlite L111-3        # 67 tentatives, 56 non abouties
 python3 restitution/tentatives.py travail/ratio-legis.sqlite --sommet 25   # les plus disputés
 ```
 

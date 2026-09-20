@@ -51,6 +51,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from graphe import interroger, nommer  # noqa: E402
 from citation import ABSENT, PLAFOND_EXTRAIT, extrait  # noqa: E402
 import proximite  # noqa: E402
+from style import RUBRIQUE, SOCLE  # noqa: E402
 
 # Les quatre voix que le § 4.3 impose de distinguer à l'écran, plus le fonds
 # lui-même, qui n'est la voix de personne.
@@ -325,27 +326,15 @@ def en_html(d: dict) -> str:
     constats, etat, ecartees = composer(d)
     p = [f"""<!doctype html><html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{e(d['numero'])} — pourquoi cet article</title><style>
-:root{{--fond:#fbfaf8;--encre:#1c1a17;--doux:#6b655c;--trait:#ddd8ce;--carte:#fff;
---legi:#6b655c;--gouv:#7a3b2e;--parl:#3d5a45;--ce:#4a4374;--ue:#1e5f74}}
-@media(prefers-color-scheme:dark){{:root:not([data-theme=light]){{--fond:#16151a;
---encre:#e9e6df;--doux:#9a938a;--trait:#2f2c33;--carte:#1d1c22;--legi:#9a938a;
---gouv:#d98b76;--parl:#8fbb9c;--ce:#a9a2d8;--ue:#7fc4d8}}}}
-*{{box-sizing:border-box}}
-body{{margin:0;background:var(--fond);color:var(--encre);
-font:17px/1.65 "Iowan Old Style",Palatino,Georgia,serif;padding:2.5rem 1.25rem}}
-main{{max-width:44rem;margin:0 auto}}
-h1{{font-size:1.7rem;margin:0 0 1.2rem;letter-spacing:-.01em}}
-h2{{font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;
-font-family:ui-sans-serif,system-ui,sans-serif;margin:2.4rem 0 .8rem}}
+<title>{e(d['numero'])} — pourquoi cet article</title><style>{SOCLE}
+main{{max-width:44rem}}
+h1{{font-size:1.7rem;padding-bottom:.9rem;margin-bottom:1.4rem;border-bottom:3px double var(--trait)}}
 .etat{{background:var(--carte);border:1px solid var(--trait);padding:.9rem 1.1rem;
 margin:1.2rem 0;font-size:.95rem}}
 .etat b{{display:block;margin-bottom:.3rem}}
 .ph{{margin:1.1rem 0;padding-left:1rem;border-left:3px solid var(--trait)}}
 .cit{{margin:.45rem 0;font-size:.95rem;color:var(--encre)}}
-.src{{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.72rem;
-color:var(--doux);margin-top:.35rem}}
-.src code{{font-family:ui-monospace,monospace}}
+.src{{font-size:.72rem;color:var(--doux);margin-top:.35rem}}
 .legi{{border-left-color:var(--legi)}} .gouvernement{{border-left-color:var(--gouv)}}
 .parlement{{border-left-color:var(--parl)}} .conseil_etat{{border-left-color:var(--ce)}}
 .union{{border-left-color:var(--ue)}}
@@ -353,9 +342,7 @@ h2.legi{{color:var(--legi)}} h2.gouvernement{{color:var(--gouv)}}
 h2.parlement{{color:var(--parl)}} h2.conseil_etat{{color:var(--ce)}}
 h2.union{{color:var(--ue)}}
 a{{color:inherit}}
-footer{{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--trait);
-font-size:.76rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-serif}}
-</style></head><body><main>
+</style></head><body><main>{RUBRIQUE}
 <h1>Pourquoi l'article {e(d['numero'])} est ce qu'il est</h1>"""]
     if etat:
         p.append('<div class="etat"><b>État du dossier</b>'

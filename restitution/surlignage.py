@@ -35,6 +35,9 @@ import sqlite3
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from style import RUBRIQUE, SOCLE  # noqa: E402
+
 # Palette assignée par ordre chronologique du texte introducteur. Volontairement
 # peu saturée : ce n'est pas une carte de chaleur, c'est un texte de loi.
 PALETTE = ["#7a3b2e", "#3d5a45", "#4a4374", "#1e5f74", "#7a5c1e",
@@ -182,37 +185,22 @@ def en_html(d: dict) -> str:
         return "<p>Article introuvable.</p>"
     p = [f"""<!doctype html><html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{e(d['numero'])} — qui a écrit quoi</title><style>
-:root{{--fond:#fbfaf8;--encre:#1c1a17;--doux:#6b655c;--trait:#ddd8ce;--carte:#fff}}
-@media(prefers-color-scheme:dark){{:root:not([data-theme=light]){{--fond:#16151a;
---encre:#e9e6df;--doux:#9a938a;--trait:#2f2c33;--carte:#1d1c22}}}}
-*{{box-sizing:border-box}}
-body{{margin:0;background:var(--fond);color:var(--encre);
-font:17px/1.65 "Iowan Old Style",Palatino,Georgia,serif;padding:2.5rem 1.25rem}}
-main{{max-width:46rem;margin:0 auto}}
-h1{{font-size:1.7rem;margin:0 0 .4rem;letter-spacing:-.01em}}
-.sous{{color:var(--doux);font-size:.9rem;margin-bottom:1.6rem}}
-h2{{font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;
-font-family:ui-sans-serif,system-ui,sans-serif;margin:2.2rem 0 .8rem;color:var(--doux)}}
-.leg{{display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;margin-bottom:1.6rem;
-font-family:ui-sans-serif,system-ui,sans-serif;font-size:.8rem}}
+<title>{e(d['numero'])} — qui a écrit quoi</title><style>{SOCLE}
+main{{max-width:46rem}}
+.leg{{display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;margin-bottom:1.6rem;font-size:.8rem}}
 .leg span{{display:flex;align-items:center;gap:.45rem}}
 .pastille{{width:.85rem;height:.85rem;border-radius:.2rem;flex:none}}
 .al{{margin:0 0 1.15rem;padding:.7rem .95rem;background:var(--carte);
 border-left:5px solid var(--trait);border-radius:0 .25rem .25rem 0}}
 .al.retouche{{background-image:repeating-linear-gradient(135deg,transparent,
 transparent 7px,rgba(128,128,128,.09) 7px,rgba(128,128,128,.09) 14px)}}
-.src{{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.73rem;
-color:var(--doux);margin-top:.5rem}}
-.amend{{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.76rem;
-margin-top:.4rem;padding:.35rem .6rem;border:1px dashed var(--trait);
+.src{{font-size:.73rem;color:var(--doux);margin-top:.5rem;text-align:left}}
+.amend{{font-size:.76rem;margin-top:.4rem;padding:.35rem .6rem;border:1px dashed var(--trait);
 border-radius:.25rem;display:inline-block}}
 a{{color:inherit}}
-footer{{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--trait);
-font-size:.76rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-serif}}
-</style></head><body><main>
+</style></head><body><main>{RUBRIQUE}
 <h1>Article {e(d['numero'])} — qui a écrit quoi</h1>
-<div class="sous">Version en vigueur depuis le {e(d['version']['date_debut'])}.
+<div class="chapeau">Version en vigueur depuis le {e(d['version']['date_debut'])}.
 La couleur donne le texte qui a <b>introduit</b> l'alinéa, la trame signale qu'il a
 été <b>retouché</b> depuis, et la marque nomme l'<b>amendement</b> quand la chaîne y
 mène.</div>

@@ -1,21 +1,44 @@
 <!doctype html><html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>L732-3 — ce qui a été tenté</title><style>
-:root{--fond:#fbfaf8;--encre:#1c1a17;--doux:#6b655c;--trait:#ddd8ce;--acc:#7a3b2e;
---vert:#3d5a45;--carte:#fff}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--fond:#16151a;
---encre:#e9e6df;--doux:#9a938a;--trait:#2f2c33;--acc:#d98b76;--vert:#8fbb9c;--carte:#1d1c22}}
+:root{--fond:#f9f6ef;--encre:#1b1916;--doux:#6a635a;--trait:#d9d2c4;--acc:#7a2a24;
+--vert:#3b5743;--carte:#fffdf8;
+--legi:#6a635a;--gouv:#7a2a24;--parl:#3b5743;--ce:#4a4374;--ue:#1e5f74}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--fond:#17161a;
+--encre:#e8e4db;--doux:#9b948a;--trait:#302d34;--acc:#d9907c;--vert:#8fbb9c;
+--carte:#1e1d22;--legi:#9b948a;--gouv:#d9907c;--parl:#8fbb9c;--ce:#a9a2d8;--ue:#7fc4d8}}
 *{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--fond);color:var(--encre);
-font:16px/1.6 "Iowan Old Style",Palatino,Georgia,serif;padding:2.5rem 1.25rem}
-main{max-width:52rem;margin:0 auto}
-h1{font-size:1.8rem;margin:0 0 .2rem;letter-spacing:-.01em}
-h2{font-size:.78rem;letter-spacing:.13em;text-transform:uppercase;color:var(--doux);
-font-family:ui-sans-serif,system-ui,sans-serif;margin:2.4rem 0 .9rem;
-border-bottom:1px solid var(--trait);padding-bottom:.4rem}
-.chapeau{color:var(--doux);font-size:.92rem;margin-bottom:1.2rem}
-.bilan{display:flex;flex-wrap:wrap;gap:.6rem;margin:.8rem 0 1.4rem;
-font-family:ui-sans-serif,system-ui,sans-serif;font-size:.8rem}
+font:17px/1.6 "Iowan Old Style","Libertinus Serif","Linux Libertine O","Palatino Linotype",Palatino,"Book Antiqua","Charis SIL","Source Serif 4","Source Serif Pro",Georgia,"DejaVu Serif",serif;padding:2.5rem 1.25rem;
+font-feature-settings:"onum","kern","liga"}
+main{max-width:48rem;margin:0 auto}
+.rubrique{font-variant-caps:small-caps;letter-spacing:.14em;color:var(--doux);
+font-size:.9rem;margin:0 0 .35rem}
+h1{font-weight:normal;font-size:1.9rem;line-height:1.2;margin:0 0 .4rem;
+letter-spacing:-.005em}
+.chapeau{color:var(--doux);font-size:.95rem;margin:0 0 1.6rem;
+padding-bottom:.9rem;border-bottom:3px double var(--trait)}
+h2{font-weight:normal;font-size:1rem;font-variant-caps:small-caps;letter-spacing:.12em;
+color:var(--encre);margin:2.4rem 0 .9rem;padding-bottom:.35rem;
+border-bottom:1px solid var(--trait)}
+.tx,.al,.cit,.passage,.objet,.raison>div:first-of-type{text-align:justify;hyphens:auto}
+.meta,.src,.leg,.bilan,.alerte,.etiquette,.sort,.amend{font-family:ui-sans-serif,system-ui,"Segoe UI",Cantarell,"Noto Sans","DejaVu Sans",sans-serif}
+.num,.preuve,code,.puces,.onde b,.tent b{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono","DejaVu Sans Mono",monospace}
+code{font-size:.85em}
+.num{font-size:.72rem;color:var(--doux);letter-spacing:.04em}
+.conf,td,th{font-variant-numeric:tabular-nums}
+.silence{color:var(--doux);font-style:italic;font-size:.92rem;margin:.4rem 0}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+td,th{text-align:left;padding:.4rem .5rem;border-bottom:1px solid var(--trait);vertical-align:top}
+th{font-weight:normal;font-variant-caps:small-caps;letter-spacing:.1em;color:var(--doux)}
+a{color:var(--acc);text-decoration-thickness:1px;text-underline-offset:.15em}
+footer{margin-top:3rem;padding-top:1rem;border-top:3px double var(--trait);
+font-size:.82rem;color:var(--doux);text-align:justify;hyphens:auto}
+@media print{body{background:#fff;color:#000;padding:0}a{color:inherit}}
+
+main{max-width:52rem}
+.bilan{display:flex;flex-wrap:wrap;gap:.6rem;margin:.8rem 0 1.4rem;font-size:.8rem}
 .bilan span{border:1px solid var(--trait);background:var(--carte);
 padding:.3rem .6rem;border-radius:2px}
 .bilan .abouti{border-color:var(--vert);color:var(--vert)}
@@ -23,27 +46,18 @@ padding:.3rem .6rem;border-radius:2px}
 .tent{border-left:3px solid var(--trait);padding:.45rem 0 .5rem .9rem;margin:.9rem 0}
 .tent.abouti{border-left-color:var(--vert)}
 .tent.bloque{border-left-color:var(--acc)}
-.tent b{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.95rem}
-.sort{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.72rem;
-letter-spacing:.09em;text-transform:uppercase;padding:.1rem .45rem;
+.tent b{font-size:.95rem}
+.sort{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;padding:.1rem .45rem;
 border:1px solid var(--trait);border-radius:2px;margin-left:.5rem}
 .sort.abouti{border-color:var(--vert);color:var(--vert)}
 .sort.bloque{border-color:var(--acc);color:var(--acc)}
-.meta{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.74rem;
-color:var(--doux);display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.25rem}
-.objet{font-size:.9rem;margin-top:.45rem;color:var(--encre)}
-.silence{color:var(--doux);font-style:italic;font-size:.88rem}
-table{width:100%;border-collapse:collapse;font-size:.85rem;
-font-family:ui-sans-serif,system-ui,sans-serif}
-td,th{text-align:left;padding:.35rem .5rem;border-bottom:1px solid var(--trait)}
-th{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--doux)}
-a{color:var(--acc)}
-footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--trait);
-font-size:.78rem;color:var(--doux);font-family:ui-sans-serif,system-ui,sans-serif}
+.meta{font-size:.74rem;color:var(--doux);display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.25rem}
+.objet{font-size:.92rem;margin-top:.45rem;color:var(--encre)}
 </style></head>
 <body><main>
+<p class="rubrique">Code de la consommation</p>
 <h1>Ce qui a été tenté sur l'article L732-3</h1>
-<p class="chapeau">Version en vigueur depuis le 2018-01-01</p><h2>3 tentative(s)</h2><div class="bilan"><span class="abouti">0 aboutie(s)</span><span>3 non aboutie(s)</span><span>déclaré irrecevable — 3</span><span class="bloque">article 45 — 3</span></div><h2>LOI n°2016-1691 du 9 décembre 2016</h2><div class="tent bloque"><b>amendement 279 rect. bis</b><span class="sort bloque">déclaré irrecevable</span><div class="meta"><span>Sénat</span><span>Mme LÉTARD</span><span>Article 25 bis (Supprimé) du texte discuté</span><span>cible déclarée par le dispositif · confiance 0.621</span></div><div class="meta"><span class="bloque">sans lien avec le texte — cavalier, article 45 de la Constitution</span></div><div class="objet">« Cet amendement vise à rétablir un dispositif adopté par l’Assemblée Nationale qui résulte d’une réflexion engagée par les administrations concernées et la Banque de France, responsable du réseau des Commissions de surendettement, et soutenue par de grandes associations de consommateurs et de lutte contre l’exclusion, en particulier le Secours Catholique et la Fédération des Familles rurales. Il a … »</div><div class="meta"><a href="https://www.senat.fr/amendements/2015-2016/713/Amdt_279.html">l'amendement au Sénat</a></div></div><div class="tent bloque"><b>amendement 452</b><span class="sort bloque">déclaré irrecevable</span><div class="meta"><span>Sénat</span><span>M. LE SCOUARNEC <span class="silence">(groupe CRC)</span></span><span>Article 25 bis (Supprimé) du texte discuté</span><span>cible déclarée par le dispositif · confiance 0.621</span></div><div class="meta"><span class="bloque">sans lien avec le texte — cavalier, article 45 de la Constitution</span></div><div class="objet">« Cet amendement propose de revenir à la rédaction issue des travaux de l’Assemblée nationale et qui avait pour objet de rendre la procédure de surendettement plus efficace en permettant à la commission de surendettement d’imposer des mesures aux parties sans passer préalablement par une phase de négociation amiable, dès lors que le débiteur n’est pas propriétaire d’un bien immobilier. Il poursuit e… »</div><div class="meta"><a href="https://www.senat.fr/amendements/2015-2016/713/Amdt_452.html">l'amendement au Sénat</a></div></div><div class="tent bloque"><b>amendement 628</b><span class="sort bloque">déclaré irrecevable</span><div class="meta"><span>Sénat</span><span>LE GOUVERNEMENT</span><span>Article 25 bis (Supprimé) du texte discuté</span><span>cible déclarée par le dispositif · confiance 0.621</span></div><div class="meta"><span class="bloque">sans lien avec le texte — cavalier, article 45 de la Constitution</span></div><div class="objet">« Le présent amendement vise à rétablir l’article 25 bis de la loi telle que votée par l’Assemblée nationale. Le présent amendement rétablit, tout d’abord, les termes « montant des remboursement » en lieu et place de l’expression « capacité de remboursement ». En effet, ces termes sont source de confusion pour l’ensemble des acteurs de la lutte contre le surendettement. Cet amendement vise, ensuite … »</div><div class="meta"><a href="https://www.senat.fr/amendements/2015-2016/713/Amdt_628.html">l'amendement au Sénat</a></div></div><footer>Ratio Legis — le sort d'un amendement est celui que la chambre
+<p class="chapeau">Version en vigueur depuis le 2018-01-01</p><h2>4 tentative(s)</h2><div class="bilan"><span class="abouti">0 aboutie(s)</span><span>4 non aboutie(s)</span><span>déclaré irrecevable — 4</span><span class="bloque">article 45 — 4</span></div><h2>LOI n°2016-1691 du 9 décembre 2016</h2><div class="tent bloque"><b>amendement 279 rect. bis</b><span class="sort bloque">déclaré irrecevable</span><div class="meta"><span>Sénat</span><span>Mme LÉTARD</span><span>Article 25 bis (Supprimé) du texte discuté</span><span>cible déclarée par le dispositif · confiance 0.871</span></div><div class="meta"><span class="bloque">sans lien avec le texte — cavalier, article 45 de la Constitution</span></div><div class="objet">« Cet amendement vise à rétablir un dispositif adopté par l’Assemblée Nationale qui résulte d’une réflexion engagée par les administrations concernées et la Banque de France, responsable du réseau des Commissions de surendettement, et soutenue par de grandes associations de consommateurs et de lutte contre l’exclusion, en particulier le Secours Catholique et la Fédération des Familles rurales. Il a … »</div><div class="meta"><a href="https://www.senat.fr/amendements/2015-2016/713/Amdt_279.html">l'amendement au Sénat</a></div></div><div class="tent bloque"><b>amendement 404</b><span class="sort bloque">déclaré irrecevable</span><div class="meta"><span>Sénat</span><span>M. BOUVARD</span><span>Article 25 bis (Supprimé) du texte discuté</span><span>cible déclarée par le dispositif · confiance 0.871</span></div><div class="meta"><span class="bloque">sans lien avec le texte — cavalier, article 45 de la Constitution</span></div><div class="objet">« Voté à l’Assemblée nationale et supprimé en commission, cet article permet de rendre la procédure de surendettement plus efficace en donnant à la commission de surendettement la possibilité d’imposer des mesures aux parties sans passer préalablement par une phase de négociation amiable dès lors que le débiteur n’est pas propriétaire d’un bien immobilier. Il poursuit en cela la réforme engagée par … »</div><div class="meta"><a href="https://www.senat.fr/amendements/2015-2016/713/Amdt_404.html">l'amendement au Sénat</a></div></div><div class="tent bloque"><b>amendement 452</b><span class="sort bloque">déclaré irrecevable</span><div class="meta"><span>Sénat</span><span>M. LE SCOUARNEC <span class="silence">(groupe CRC)</span></span><span>Article 25 bis (Supprimé) du texte discuté</span><span>cible déclarée par le dispositif · confiance 0.871</span></div><div class="meta"><span class="bloque">sans lien avec le texte — cavalier, article 45 de la Constitution</span></div><div class="objet">« Cet amendement propose de revenir à la rédaction issue des travaux de l’Assemblée nationale et qui avait pour objet de rendre la procédure de surendettement plus efficace en permettant à la commission de surendettement d’imposer des mesures aux parties sans passer préalablement par une phase de négociation amiable, dès lors que le débiteur n’est pas propriétaire d’un bien immobilier. Il poursuit e… »</div><div class="meta"><a href="https://www.senat.fr/amendements/2015-2016/713/Amdt_452.html">l'amendement au Sénat</a></div></div><div class="tent bloque"><b>amendement 628</b><span class="sort bloque">déclaré irrecevable</span><div class="meta"><span>Sénat</span><span>LE GOUVERNEMENT</span><span>Article 25 bis (Supprimé) du texte discuté</span><span>cible déclarée par le dispositif · confiance 0.871</span></div><div class="meta"><span class="bloque">sans lien avec le texte — cavalier, article 45 de la Constitution</span></div><div class="objet">« Le présent amendement vise à rétablir l’article 25 bis de la loi telle que votée par l’Assemblée nationale. Le présent amendement rétablit, tout d’abord, les termes « montant des remboursement » en lieu et place de l’expression « capacité de remboursement ». En effet, ces termes sont source de confusion pour l’ensemble des acteurs de la lutte contre le surendettement. Cet amendement vise, ensuite … »</div><div class="meta"><a href="https://www.senat.fr/amendements/2015-2016/713/Amdt_628.html">l'amendement au Sénat</a></div></div><footer>Ratio Legis — le sort d'un amendement est celui que la chambre
 publie, jamais un jugement porté sur lui : « retiré » ne dit pas si l'auteur a cédé
 ou obtenu satisfaction. Les tentatives sont rattachées soit par l'alinéa qu'elles
 ont écrit (arête <code>resulte_de</code>), soit par la cible que leur dispositif

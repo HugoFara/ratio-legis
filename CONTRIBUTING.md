@@ -86,10 +86,16 @@ python3 restitution/note.py travail/ratio-legis.sqlite --contrat
 python3 ingestion/verdict.py travail/ratio-legis.sqlite
 python3 tools/mesures/hygiene.py travail/ratio-legis.sqlite \
         data/perimetre-v2.csv data/mesures/hygiene.tsv
+restitution/regenerer_les_exemples.sh                    # si la restitution ou la base a changé
 ```
 
 Le contrat du § 4.3 doit rester à **zéro phrase écartée faute de citation**, et
-`PRAGMA foreign_key_check` doit rester vide. Si votre changement fait bouger un
+`PRAGMA foreign_key_check` doit rester vide. Les rendus de `restitution/exemples/`
+sont ce que GitHub Pages publie : un rendu versionné qui ne correspond plus à ce
+que le code produit est un chiffre périmé comme un autre. La feuille de style
+est écrite une fois, dans [`restitution/style.py`](restitution/style.py), et
+elle ne charge rien du réseau — pas de police tierce, pas de script : une page
+qui appelle un serveur à l'ouverture dit à ce serveur ce que le lecteur consulte. Si votre changement fait bouger un
 chiffre publié dans le README ou dans `docs/`, mettez-le à jour dans le même
 commit : un chiffre périmé est un bug.
 
