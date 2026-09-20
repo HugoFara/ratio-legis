@@ -192,7 +192,7 @@ Le dépôt ne contient **que du code, des plans de récupération et des mesures
 ni le fonds, ni les corpus, ni la base. `travail/` est un cache reconstructible.
 
 ```bash
-git clone <dépôt> ratio-legis && cd ratio-legis
+git clone https://github.com/HugoFara/ratio-legis.git && cd ratio-legis
 python3 -m venv .venv && . .venv/bin/activate
 pip install -e .              # pymupdf, la seule dépendance
 pip install -e ".[api]"       # + fastapi et uvicorn, si vous servez l'API

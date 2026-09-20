@@ -19,3 +19,7 @@ travail/
 # comme pour les miroirs DILA et EUR-Lex.
 data/diffusion/*.sqlite
 data/diffusion/tsv/
+
+# Verrous d'écriture de `tools/mesures/juger.py` : un fichier vide par fiche
+# ouverte, sans contenu à conserver.
+data/mesures/.*.verrou
