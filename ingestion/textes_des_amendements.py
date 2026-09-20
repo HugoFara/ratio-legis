@@ -148,9 +148,19 @@ CONFIANCE = 0.2481            # composition seule, population d'avant les voies,
 #                   l'instruction lue dans le texte à toutes ses occurrences,
 #                   bornée par le paragraphe de tête, les lignes de statut du
 #                   Sénat exclues du compte : 17 / 20 sur un troisième tirage
-#                   disjoint (docs/44), Wilson 0,6396 — les trois fausses sont
-#                   des sous-instructions (a bis), 2°) que le parseur ne borne
-#                   pas encore.
+#                   disjoint (docs/44), Wilson 0,6396 — les trois fausses
+#                   étaient données pour des sous-instructions que le parseur
+#                   ne bornait pas. Elles ne l'étaient pas (docs/45) : deux
+#                   comptaient la pastille du Sénat comme un alinéa, la
+#                   troisième était déjà réparée par la ligne de statut ; et
+#                   la « sous-instruction » — « a ter) Au début du premier
+#                   alinéa de l'article L. 223-5, les mots : « … » sont
+#                   remplacés » — était invisible parce que `porte_sur`
+#                   s'arrêtait au deux-points de l'incise. Numérotation
+#                   déclarée par la pastille, ancres d'amendements en garde,
+#                   petite loi écartée : la population a changé, la constante
+#                   est celle du troisième tirage en attendant le quatrième
+#                   (`precision-depose-sur-alinea-4.tsv`, tiré, non jugé).
 #   visee            7 / 10 (docs/42), puis 13 / 15 après les gardes de vise —
 #                   ancre d'insertion, code hôte, numéro glissé, « L. 312-9-… ».
 #                   Wilson 0,6212.
@@ -189,14 +199,119 @@ STATUT = re.compile(r"^\s*\(?\s*(?:non modifiée?s?|supprimée?s?|conformes?|"
                     r"suppression (?:maintenue|conforme))\s*\)?\s*$", re.I)
 
 
-def alineas_de(texte: str, debut: int, fin: int) -> list[tuple[int, int]]:
-    """Bornes de chaque alinéa de l'article du texte : une ligne non vide."""
-    bornes, position = [], debut
+# **Le Sénat numérote lui-même ses alinéas, et le numéro est dans le texte.**
+# Depuis 2017 environ, chaque alinéa d'un texte du Sénat est précédé d'une
+# « pastille » : un `<span>` en police « Numero », `aria-label="pastille 12"`,
+# dont le contenu est un glyphe de la zone privée d'Unicode. `texte_brut` garde
+# le glyphe et perd l'attribut ; le glyphe seul suffit, parce que la police est
+# un chiffrement régulier : de 1 à 9, une lettre de L à T ; au-delà, le chiffre
+# des dizaines (ou des centaines) en chiffre, puis A à J pour les dizaines et
+# a à j pour les unités — « 1Aa » se lit 100. Vérifié contre l'attribut sur les
+# 873 glyphes distincts des 126 textes qui en portent : zéro écart.
+#
+# Avant cette lecture, la pastille était comptée comme un alinéa : chaque
+# ligne de texte en valait deux, et « l'alinéa 22 » tombait au onzième. Deux
+# des trois `alinea` fausses du troisième tirage (docs/44) venaient de là — le
+# « a ter) » sur L. 223-5, le « d) » du 2° sur L. 512-18 — et la cause avait
+# été nommée « sous-instruction ». Elle ne l'était pas.
+PASTILLE = re.compile(r"^\s*([\ue000-\uf8ff]{1,3})\s*$")
+# Ce qui ouvre un alinéa : un guillemet, une numérotation — « 1° », « a) »,
+# « II. », « A. – » —, un tiret, une parenthèse ou un crochet.
+MARQUE_DE_TETE = re.compile(
+    r"^\s*(?:[«“]|\d+\s*[°)]|[a-z]{1,2}(?:\s+(?:bis|ter|quater))?\)"
+    r"|[IVXL]+(?:\s*(?:bis|ter|quater))?\s*[.)]|[A-H]\s*\.\s*[–-]|[–-]\s|[(\[])")
+# **L'amendement qui ancre lui-même le numéro.** « Alinéa 67 : Rédiger ainsi cet
+# alinéa : « Art. L. 121-20. – … » » dit quel alinéa porte quel article écrit,
+# et c'est une vérité déclarée sur la numérotation, gratuite. Elle sert de
+# garde, article de texte par article de texte : si une seule ancre contredit
+# le compte, aucun alinéa de cet article n'est lu. Deux causes connues : la
+# petite loi, qui est le texte **adopté**, où les alinéas insérés en séance ont
+# décalé ceux que les amendements numérotaient ; et le texte de commission
+# amendé sur un état antérieur, que rien dans le corpus ne signale.
+ANCRE = re.compile(
+    r"^\s*(?:I\.\s*[–-]\s*)?alin[ée]a\s+(\d{1,3})\s*(?:,\s*[^R]{0,40})?\s*"
+    r"r[ée]diger ainsi cet alin[ée]a\s*:?\s*[«“]\s*(art\.?\s*[LRD]\.?\s*\d+(?:[-‑]\d+)+)",
+    re.I | re.S)
+
+
+def sans_espaces(texte: str) -> str:
+    return re.sub(r"\s+", "", texte).lower().replace("‑", "-").lstrip("«“")
+
+
+def numero_de_pastille(glyphes: str) -> int | None:
+    lettres = "".join(chr(ord(c) - 0xF000) for c in glyphes)
+    if len(lettres) == 1:
+        return "LMNOPQRST".index(lettres) + 1 if lettres in "LMNOPQRST" else None
+    if lettres[0].isdigit() and lettres[-1] in "abcdefghij" and (
+            len(lettres) == 2 or (len(lettres) == 3 and lettres[1] in "ABCDEFGHIJ")):
+        dizaines = "ABCDEFGHIJ".index(lettres[1]) if len(lettres) == 3 else 0
+        return int(lettres[0]) * (100 if len(lettres) == 3 else 10) \
+            + dizaines * 10 + "abcdefghij".index(lettres[-1])
+    return None
+
+
+def alineas_de(texte: str, debut: int, fin: int) -> dict[int, tuple[int, int]]:
+    """Numéro d'alinéa → bornes, dans l'article du texte.
+
+    Numérotation **déclarée** quand le texte porte des pastilles : l'alinéa n
+    est la ligne de texte qui suit la pastille n, et rien d'autre n'est un
+    alinéa — ni la ligne de statut au-dessus de la première pastille, ni le
+    titre de chapitre après la dernière. La lecture s'arrête au premier écart
+    à cette forme : une pastille qui ne suit pas la précédente (un article
+    que `ENTETE` n'a pas reconnu commence, et sa numérotation repart à 1), ou
+    deux lignes de texte sous une même pastille (le tableau comparatif d'une
+    petite loi, qui imprime les deux colonnes). Ce qui suit l'écart n'est pas
+    numéroté plutôt que numéroté faux.
+
+    Numérotation **comptée** sinon : une ligne non vide vaut un alinéa, la
+    ligne de statut exclue, et un intitulé cité que le HTML coupe en deux —
+    « IDENTIFICATION DES IMMEUBLES » / « RELEVANT DU STATUT DE LA
+    COPROPRIÉTÉ » — recollé : une ligne sans marque de tête, entre deux lignes
+    citées, continue la précédente. Sur les 76 amendements qui ancrent
+    eux-mêmes un numéro d'alinéa (« Alinéa 67 : rédiger ainsi cet alinéa :
+    « Art. L. 121-20 ») dans un texte sans pastille, le compte juste passe de
+    56 à 63.
+    """
+    lignes, position = [], debut
     for ligne in texte[debut:fin].split("\n"):
-        if ligne.strip() and not STATUT.match(ligne):
-            bornes.append((position, position + len(ligne)))
+        if ligne.strip():
+            lignes.append((position, position + len(ligne), ligne))
         position += len(ligne) + 1
-    return bornes
+    pastilles = [(i, numero_de_pastille(m.group(1)))
+                 for i, (_, _, ligne) in enumerate(lignes)
+                 if (m := PASTILLE.match(ligne))]
+    if not pastilles:
+        recollees: list[tuple[int, int, str]] = []
+        for i, (d, f, ligne) in enumerate(lignes):
+            if (recollees and not MARQUE_DE_TETE.match(ligne)
+                    and recollees[-1][2].lstrip().startswith(("«", "“"))
+                    and i + 1 < len(lignes)
+                    and lignes[i + 1][2].lstrip().startswith(("«", "“"))):
+                recollees[-1] = (recollees[-1][0], f, recollees[-1][2] + " " + ligne)
+                continue
+            recollees.append((d, f, ligne))
+        return {rang: (d, f) for rang, (d, f, ligne) in
+                enumerate((l for l in recollees if not STATUT.match(l[2])), 1)}
+    # Au-dessus de la première pastille, rien d'autre que la ligne de statut ou
+    # la note de procédure entre crochets — « [Article examiné dans le cadre de
+    # la législation partielle en commission] ». Une ligne de texte y dit que la
+    # forme n'est pas celle-là : la petite loi en tableau comparatif imprime
+    # l'alinéa **avant** sa pastille, et un article que `ENTETE` n'a pas
+    # reconnu y laisse sa fin. Dans les deux cas la numérotation n'est pas lue.
+    if any(not STATUT.match(ligne) and not ligne.lstrip().startswith("[")
+           for _, _, ligne in lignes[:pastilles[0][0]]):
+        return {}
+    alineas: dict[int, tuple[int, int]] = {}
+    for rang, (i, numero) in enumerate(pastilles):
+        if numero is None or numero != len(alineas) + 1:
+            break
+        suivante = pastilles[rang + 1][0] if rang + 1 < len(pastilles) else len(lignes)
+        sous_la_pastille = lignes[i + 1:suivante]
+        if len(sous_la_pastille) != 1 and not (rang + 1 == len(pastilles)
+                                               and len(sous_la_pastille) >= 1):
+            break
+        alineas[numero] = sous_la_pastille[0][:2]
+    return alineas
 
 
 class Textes:
@@ -205,6 +320,7 @@ class Textes:
     def __init__(self, base: sqlite3.Connection, corpus: Path) -> None:
         self.base, self.corpus = base, corpus
         self.cache: dict[str, tuple[str, dict[str, tuple[int, int]]]] = {}
+        self.alineas_lus: dict[tuple[str, str], dict[int, tuple[int, int]]] = {}
 
     def charger(self, texte_id: str) -> tuple[str, dict[str, tuple[int, int]]] | None:
         if texte_id in self.cache:
@@ -248,6 +364,26 @@ class Textes:
             trouvees.append((debut + m.start(), ""))
         return sorted(trouvees)
 
+    def alineas(self, texte_id: str, numero: str) -> dict[int, tuple[int, int]]:
+        cle = (texte_id, numero)
+        if cle not in self.alineas_lus:
+            texte, articles = self.charger(texte_id)
+            self.alineas_lus[cle] = alineas_de(texte, *articles[numero])
+        return self.alineas_lus[cle]
+
+    def ancre_contredite(self, texte_id: str, numero: str, dispositif: str) -> bool | None:
+        """None si le dispositif n'ancre rien ; sinon, l'ancre contredit-elle le
+        compte des alinéas de cet article du texte."""
+        ancre = ANCRE.match(dispositif)
+        if not ancre:
+            return None
+        alineas = self.alineas(texte_id, numero)
+        rang, attendu = int(ancre.group(1)), sans_espaces(ancre.group(2))
+        if rang not in alineas:
+            return True
+        texte = self.charger(texte_id)[0]
+        return not sans_espaces(texte[slice(*alineas[rang])]).startswith(attendu)
+
     def gouvernant(self, texte_id: str, numero: str, alinea: int,
                    mentions: dict[str, int | None]) -> int | None | str:
         """L'article du code que le texte réécrit à l'alinéa `alinea` de l'article
@@ -260,10 +396,10 @@ class Textes:
         if not charge or numero not in charge[1]:
             return "illisible"
         texte, articles = charge
-        bornes = alineas_de(texte, *articles[numero])
-        if not 1 <= alinea <= len(bornes):
+        alineas = self.alineas(texte_id, numero)
+        if alinea not in alineas:
             return "illisible"
-        fin_alinea = bornes[alinea - 1][1]
+        fin_alinea = alineas[alinea][1]
         precedentes = [i for i in self.instructions(texte, *articles[numero])
                        if i[0] <= fin_alinea]
         if not precedentes:
@@ -381,9 +517,23 @@ def construire(base: sqlite3.Connection, schema: Path, corpus_textes: Path) -> d
         etendue = base.execute("SELECT articles FROM texte_discute WHERE id = ?",
                                (texte_id,)).fetchone()[0]
         distinctes, dans_la_plage = set(), 0
-        for amendement_id, subdivision, dispositif in base.execute(
-                "SELECT id, subdivision, coalesce(dispositif, '') FROM amendement "
-                "WHERE chambre = ? AND texte_discute = ?", (chambre, corpus)):
+        jeu = base.execute(
+            "SELECT id, subdivision, coalesce(dispositif, '') FROM amendement "
+            "WHERE chambre = ? AND texte_discute = ?", (chambre, corpus)).fetchall()
+        # La numérotation d'un article du texte se vérifie avant de s'en servir :
+        # chaque ancre d'amendement de ce jeu la confirme ou la contredit.
+        contredits: set[str] = set()
+        charge = textes.charger(texte_id)
+        for _, subdivision, dispositif in jeu:
+            numero = numero_de_subdivision(subdivision)
+            if charge and numero in charge[1] \
+                    and not ARTICLE_ADDITIONNEL.search(subdivision or ""):
+                verdict = textes.ancre_contredite(texte_id, numero, dispositif)
+                if verdict is not None:
+                    compte["ancre_contredite" if verdict else "ancre_confirmee"] += 1
+                if verdict:
+                    contredits.add(numero)
+        for amendement_id, subdivision, dispositif in jeu:
             numero = numero_de_subdivision(subdivision)
             if numero and numero not in distinctes:
                 distinctes.add(numero)
@@ -424,6 +574,13 @@ def construire(base: sqlite3.Connection, schema: Path, corpus_textes: Path) -> d
             #    alinéa dans le texte dit quel article du code est réécrit là.
             trouve = ALINEA.search(dispositif)
             if trouve:
+                # La petite loi est le texte adopté : les alinéas qu'une
+                # insertion adoptée en séance a décalés ne portent plus le
+                # numéro que les amendements leur donnaient. Sa numérotation
+                # n'est pas celle sur laquelle ils ont été déposés.
+                if "petite-loi" in texte_id or numero in contredits:
+                    compte["alinea_numerotation_contredite"] += 1
+                    continue
                 cible = textes.gouvernant(texte_id, numero, int(trouve.group(1)),
                                           mentions.get((texte_id, numero), {}))
                 if cible == "illisible":
@@ -500,6 +657,10 @@ def main() -> None:
           f"{compte['alinea_hors_du_code']}")
     print(f"  l'alinéa nommé est illisible dans le texte           : "
           f"{compte['alinea_illisible']}")
+    print(f"  numérotation contredite par une ancre, ou petite loi  : "
+          f"{compte['alinea_numerotation_contredite']}")
+    print(f"  ancres d'amendements — confirmant / contredisant le compte : "
+          f"{compte['ancre_confirmee']} / {compte['ancre_contredite']}")
     print(f"  un paragraphe ajouté en fin d'article, cible inconnue : "
           f"{compte['ajout_en_fin_de_l_article']}")
     print("\narêtes par voie")

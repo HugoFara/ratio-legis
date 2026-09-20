@@ -296,11 +296,40 @@ def dans_une_citation(texte: str, debuts: list[int], position: int) -> bool:
     return False
 
 
+# Le deux-points qui ouvre une incise citée sur la même ligne — « les mots :
+# « X » sont remplacés par » — n'est pas une fin de phrase : c'est la forme la
+# plus courante de la légistique, et la borne s'y arrêtait. 22 604 références
+# hors citation sur 123 162 étaient suivies d'un verbe modificatif que la borne
+# cachait — « Au 3° de l'article L. 511-5, les mots : « , II et III » sont
+# remplacés par les mots : « à III bis » » n'était pas une cible. Le
+# deux-points suivi d'un retour à la ligne, lui, reste une borne : « est ainsi
+# rédigé :\n« … » ferme l'instruction, et le verbe la précède.
+INCISE = re.compile(r":[ \xa0]*[«“]")
+FIN_D_INCISE = re.compile(r"[»”]")
+
+
+def phrase_hors_incises(texte: str, fin: int, limite: int) -> list[tuple[int, int]]:
+    """Les morceaux de la phrase qui suit `fin`, jusqu'à sa borne, les incises
+    citées retirées : le verbe qu'on y cherche doit être celui de
+    l'instruction, pas un mot de la citation."""
+    morceaux, position = [], fin
+    while (borne := BORNE.search(texte, position, limite)):
+        if borne.group(0) != ":" or not INCISE.match(texte, borne.start()):
+            morceaux.append((position, borne.start()))
+            return morceaux
+        morceaux.append((position, borne.start()))
+        fermeture = FIN_D_INCISE.search(texte, borne.end(), limite)
+        if not fermeture:
+            return morceaux
+        position = fermeture.end()
+    morceaux.append((position, limite))
+    return morceaux
+
+
 def est_une_cible(texte: str, debut: int, fin: int) -> bool:
     """Vrai si un verbe modificatif suit la référence, dans la même phrase."""
-    borne = BORNE.search(texte, fin)
-    limite = min(borne.start() if borne else len(texte), fin + 300)
-    return bool(ACTION.search(texte, fin, limite))
+    return any(ACTION.search(texte, a, b)
+               for a, b in phrase_hors_incises(texte, fin, min(len(texte), fin + 300)))
 
 
 def bornes(texte: str, debut: int, fin: int) -> tuple[int, int]:

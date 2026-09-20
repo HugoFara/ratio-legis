@@ -5,10 +5,10 @@ verdict	partie D — origine située seulement	0	179	0.0
 verdict	partie D — motivation du texte seule	11	179	6.1	
 verdict	partie D — RAISON NON DOCUMENTÉE	167	179	93.3	
 verdict	partie L — articles en vigueur	1293			
-verdict	partie L — un passage les motive	763	1293	59.0	
-verdict	partie L — origine située seulement	117	1293	9.0	
-verdict	partie L — motivation du texte seule	334	1293	25.8	
-verdict	partie L — RAISON NON DOCUMENTÉE	79	1293	6.1	
+verdict	partie L — un passage les motive	781	1293	60.4	
+verdict	partie L — origine située seulement	128	1293	9.9	
+verdict	partie L — motivation du texte seule	306	1293	23.7	
+verdict	partie L — RAISON NON DOCUMENTÉE	78	1293	6.0	
 verdict	partie R — articles en vigueur	632			
 verdict	partie R — un passage les motive	43	632	6.8	
 verdict	partie R — origine située seulement	7	632	1.1	
@@ -46,13 +46,13 @@ irrecevabilite	fondement — article 41	170	2955	5.8
 irrecevabilite	fondement — article 44 bis	135	2955	4.6	
 irrecevabilite	fondement — LOLF	10	2955	0.3	
 irrecevabilite	fondement — LOLFSS	6	2955	0.2	
-tentatives	articles en vigueur portant une tentative, les trois voies	207	2104	9.8	cible déclarée, alinéa écrit ou subdivision déposée
-tentatives	dont par la cible déclarée du dispositif	132	207	63.8	
-tentatives	dont par un alinéa écrit qui subsiste	83	207	40.1	
-tentatives	dont par la subdivision déposée	31	207	15.0	
+tentatives	articles en vigueur portant une tentative, les trois voies	217	2104	10.3	cible déclarée, alinéa écrit ou subdivision déposée
+tentatives	dont par la cible déclarée du dispositif	132	217	60.8	
+tentatives	dont par un alinéa écrit qui subsiste	83	217	38.2	
+tentatives	dont par la subdivision déposée	47	217	21.7	
 tentatives	tentatives déclarées sur un article en vigueur	304			voie de la cible déclarée seule ; le détail par sort suit
-depot	amendements positionnés sur un article en vigueur	188			
-depot	articles en vigueur atteints	31	2104	1.5	
+depot	amendements positionnés sur un article en vigueur	227			
+depot	articles en vigueur atteints	47	2104	2.2	
 depot	assemblee — jeux d'amendements appariés à leur texte	39	39	100.0	
 depot	senat — jeux d'amendements appariés à leur texte	124	143	86.7	
 depot	subdivisions tombant dans la plage d'articles du texte	5488	5712	96.1	contrôle de l'appariement ; un texte faux s'y verrait en premier
