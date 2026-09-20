@@ -135,9 +135,12 @@ AVAL = 140                    # portée du regard en aval, dans la même phrase
 
 # Précision mesurée à la main sur 20 rattachements tirés au sort (`docs/16`
 # § 4, 20/20), puis par deux juges indépendants sur 15 de plus le 19 septembre
-# 2026, population d'aujourd'hui (`docs/41`) : 14 justes sur 15. Les deux
-# tirages réunis, 34 sur 35 ; borne inférieure de Wilson à 95 %.
-CONFIANCE = 0.8558
+# 2026 (`docs/41`) : 14 justes sur 15. Puis, le 20 septembre 2026, sur 20
+# arêtes tirées parmi celles que la règle de l'incise a créées — un cinquième
+# de la population interne, jamais mesuré — : 20 sur 20, deux juges d'accord
+# sur chacune (`docs/45` § 6). Les trois tirages réunis, 54 sur 55 ; borne
+# inférieure de Wilson à 95 %.
+CONFIANCE = 0.9039
 # La voie de la citation est mesurée à part, parce qu'elle ne vaut pas la même
 # chose : 15 arêtes justes sur 15 vérifiées à la main **après** la garde de
 # corroboration (`docs/33` § 4), puis 3 sur 5 le 19 septembre 2026 — dont une

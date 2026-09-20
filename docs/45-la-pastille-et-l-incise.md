@@ -6,8 +6,8 @@ nommée n'était pas la cause.
 **Date : 20 septembre 2026.**
 **Code :** `ingestion/textes_deposes.py` (`est_une_cible`),
 `ingestion/textes_des_amendements.py` (`alineas_de`, `Textes`).
-**Données :** `precision-depose-sur-alinea-4.tsv`,
-`precision-porte-sur-incise.tsv` — tirés, **non jugés**.
+**Données :** `precision-porte-sur-incise.tsv`,
+`precision-depose-sur-alinea-4.tsv`, `precision-depose-sur-alinea-5.tsv`.
 
 ---
 
@@ -140,16 +140,73 @@ Sur les fiches `visee` et `article_entier`, rien de ce qui était juste n'a
 bougé, et quatre `article_entier` fausses sont retirées — l'article du texte
 avait une seconde cible que le deux-points cachait.
 
-## 5. Ce qui n'est pas fait
+## 5. Ce qui a été mesuré, et ce qu'on en a fait
 
-**Rien n'est jugé.** Les deux fiches sont tirées, disjointes de toutes les
-précédentes, et vides : `alinea-4` sur vingt arêtes de la population
-d'aujourd'hui, `porte-sur-incise` sur vingt arêtes que la règle de l'incise a
-créées. La constante `alinea` reste 0,6396 — celle du troisième tirage, qui
-ne décrit plus exactement cette arête —, et `porte_sur` garde 0,8558 sur une
-population qui a grossi d'un cinquième. Les deux sont à re-mesurer avant
-d'être crues.
+Protocole de `docs/43` § 2, les juges changés : deux agents Sonnet 5 sur
+chaque fiche, en colonnes séparées, sans se lire ; un troisième en arbitrage
+sur les seuls désaccords. Chaque juge lit le texte en discussion lui-même,
+pas la fenêtre de la fiche, et rend un commentaire qui dit ce qu'il a
+vérifié.
 
-**Le décalage de deux** de l'alinéa 110 n'est pas expliqué. Le texte 283 de
-2013-2014 n'a pas de pastille, et rien dans ses lignes ne dit ce que le Sénat
-comptait alors.
+| arête | tirage | n | juge A | juge B | accord | arbitrage | verdict | Wilson | constante |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `porte_sur` · incise | arêtes créées par la règle | 20 | 20 | 20 | 20 | — | **20 / 20** | 0,8389 | 0,8558 → **0,9039** (54 / 55, trois tirages réunis) |
+| `depose_sur` · `alinea` | 4e, disjoint | 20 | 16 | 16 | 20 | — | **16 / 20** | 0,5840 | — |
+| `depose_sur` · `alinea` | 5e, disjoint, après les gardes ci-dessous | 20 | 19 | 18 | 19 | 1 → juste | **19 / 20** | **0,7639** | 0,6396 → **0,7639** |
+
+**`porte_sur`.** Les vingt arêtes que le deux-points cachait sont toutes
+justes, et les deux juges ont remonté chaque chaîne « du même code » jusqu'à
+son chapeau. La population interne a grossi d'un cinquième sans que la
+précision bouge ; les trois tirages réunis donnent 54 sur 55.
+
+**`alinea`, quatrième tirage : 16 sur 20, et les quatre fausses ont deux
+causes.** Trois sont des insertions — « Après l'alinéa 9, insérer : « Art.
+L. 423-1-1. – … » », « … : « III bis. – Le cinquième alinéa de l'article 2
+de la loi n° 90-449 … » » : ce qu'on insère après l'alinéa N n'est pas
+toujours dans l'article qui gouverne N. Un article écrit, une division, ou
+une instruction qui nomme son propre article : la cible est ailleurs, et
+l'arête n'est plus posée. L'Assemblée citant tout ce qu'elle insère,
+instructions comprises, le guillemet ne dit rien ; c'est la forme de la tête
+qui parle, et pour un numéro ou une lettre, le verbe **et** l'article
+nommé — « 3° Il est complété par quatre alinéas » prolonge le bloc,
+« …) Le premier alinéa de l'article L. 223-5 est complété » en ouvre un
+autre. La quatrième comptait « (division et intitulé nouveaux) » comme un
+alinéa : toute ligne qui n'est qu'une mention entre parenthèses est
+retirée du compte — 90 formes, 1 853 lignes, aucune n'est un alinéa.
+
+**Cinquième tirage, sur la population gardée : 19 sur 20.** La fausse
+supprimait « les alinéas 22 à 26 » — la section 2 bis et L. 423-4-1 — et
+l'arête ne lisait que le 22, gouverné par L. 423-4. Une plage se lit en
+entier et doit relever d'une seule instruction ; une division citée et son
+intitulé ne sont pas rattachés à l'instruction d'avant ; « alinéas 2 et 4 »
+rend une arête par article touché. Le désaccord arbitré était un compte :
+un intitulé coupé par un `<br>` dans un texte de 2013, que l'arbitre a
+tranché par les autres amendements du même jeu, qui numérotent comme lui.
+
+**Sur les cinq tirages jugés, après toutes les gardes** : les 14 fausses
+sont retirées (9) ou ramenées à l'article des juges (5) ; 7 des 85 justes
+sont perdues — trois insertions d'un article nouveau après le dernier
+alinéa d'un autre, que les juges du quatrième tirage ont dites fausses sur
+la même forme, trois sous-instructions sur L. 223-5 que `vise` devrait
+tenir et ne tient pas (le numéro nu sous un article de texte multi-codes,
+la maille de `docs/43` § 2), une instruction créant L. 112-12 jugée juste
+pour L. 111-6, ce qui est douteux.
+
+Ce que cela fait au graphe : `alinea` 1 122 → **1 015**, `depose_sur`
+1 214 → **1 107** — moins d'arêtes, et chacune vaut 0,76 là où elle en
+valait 0,58 le matin.
+
+## 6. Ce qui n'est pas fait
+
+**Le décalage de deux** de l'alinéa 110 (`docs/44`, texte 283 de 2013-2014)
+reste inexpliqué ; le cinquième tirage a montré la même famille — un
+intitulé coupé — tranchée par les ancres, et c'est probablement elle.
+
+**`vise` sous un article multi-codes** : trois amendements qui nomment
+« l'article L. 223-5 » sans nommer le code, sous un article de texte qui
+modifie aussi le code de commerce, n'ont pas de `vise`. La règle qui écarte
+le numéro nu là est la bonne ; c'est le code hôte de l'*instruction* qui
+les tiendrait, pas celui de l'article du texte.
+
+**Rien de ceci n'est humain.** Cinq juges Sonnet et un arbitre ; `verdict`
+dit qui a tranché.

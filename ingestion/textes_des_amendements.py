@@ -158,20 +158,90 @@ CONFIANCE = 0.2481            # composition seule, population d'avant les voies,
 #                   remplacés » — était invisible parce que `porte_sur`
 #                   s'arrêtait au deux-points de l'incise. Numérotation
 #                   déclarée par la pastille, ancres d'amendements en garde,
-#                   petite loi écartée : la population a changé, la constante
-#                   est celle du troisième tirage en attendant le quatrième
-#                   (`precision-depose-sur-alinea-4.tsv`, tiré, non jugé).
+#                   petite loi écartée : 16 / 20 sur un quatrième tirage
+#                   disjoint, deux juges d'accord sur tout — trois fausses
+#                   inséraient un article ou une instruction nouvelle après
+#                   l'alinéa, une comptait une mention entre parenthèses.
+#                   Les deux gardes posées, 19 / 20 sur un cinquième tirage
+#                   disjoint, un arbitrage (docs/45 § 6) : Wilson 0,7639.
 #   visee            7 / 10 (docs/42), puis 13 / 15 après les gardes de vise —
 #                   ancre d'insertion, code hôte, numéro glissé, « L. 312-9-… ».
 #                   Wilson 0,6212.
 #   article_entier   7 / 10, puis 6 / 7 — Wilson 0,4869 : « N ne réécrit que A »
 #                   repose sur porte_sur, qui ne voit pas tout ce que N réécrit.
 # Deux juges (deepseek-v4p1-flash, glm-5p3-flash), qwen3p8-max en arbitrage.
-CONFIANCE_PAR_VOIE = {"visee": 0.6212, "alinea": 0.6396, "article_entier": 0.4869}
+CONFIANCE_PAR_VOIE = {"visee": 0.6212, "alinea": 0.7639, "article_entier": 0.4869}
 
 PARAGRAPHE = re.compile(r"^[ \t]*[IVXL]{1,6}(?:\s*(?:bis|ter|quater|quinquies|sexies))?\s*\.\s*[–-]",
                         re.M)
-ALINEA = re.compile(r"\b(?:l['’]\s*)?alin[ée]as?\s+(\d{1,3})\b", re.I)
+# « Alinéa 29 », « Après l'alinéa 9 », et la plage : « Alinéas 22 à 26 ». La
+# plage se lit en entier — supprimer les alinéas 22 à 26 quand 22 ouvre la
+# section 2 bis et 24 écrit L. 423-4-1, ce n'est pas toucher l'article qui
+# gouvernait le 21 (docs/45 § 6).
+ALINEA = re.compile(r"\b(?:l['’]\s*)?alin[ée]as?\s+(\d{1,3})(?:\s*(à|et)\s+(\d{1,3}))?\b", re.I)
+
+
+def alineas_nommes(trouve: re.Match) -> list[int]:
+    """« Alinéa 29 » → [29] ; « Alinéas 22 à 26 » → 22…26 ; « Alinéas 2 et 4 » → [2, 4]."""
+    premier = int(trouve.group(1))
+    if not trouve.group(3):
+        return [premier]
+    dernier = int(trouve.group(3))
+    if trouve.group(2).lower() == "et":
+        return [premier, dernier]
+    return list(range(premier, dernier + 1)) if dernier >= premier else [premier]
+# Une division citée — « Section 2 bis », « Chapitre III » — et son intitulé,
+# qui la suit, annoncent ce qui vient : l'instruction qui les gouverne est la
+# suivante, pas la précédente, et elle n'est pas lue ici.
+DIVISION = re.compile(r"^[«“]?\s*(?:(?:sous-)?section|chapitre|titre|livre)\s+[\divxl]", re.I)
+# **Ce qu'on insère après l'alinéa N n'est pas toujours dans l'article qui
+# gouverne N.** « Après l'alinéa 9, insérer : « Art. L. 423-1-1. – … » » crée un
+# article ; « … : « III bis. – Le cinquième alinéa de l'article 2 de la loi
+# n° 90-449 … » » ouvre une instruction sur une autre loi ; « … : …) Le
+# premier alinéa de l'article L. 223-5 est complété » ouvre une
+# sous-instruction dont la cible est la sienne. Trois des quatre `alinea`
+# fausses du quatrième tirage (docs/45 § 6) étaient de ce type. L'Assemblée
+# cite tout ce qu'elle insère, instructions comprises : le guillemet ne dit
+# donc rien, c'est la forme de la tête qui parle — un article écrit, un
+# paragraphe, un numéro en points de suspension, une division ; ou un
+# numéro, une lettre suivis d'un verbe modificatif, qui distinguent
+# « 3° À la première phrase, les mots … sont remplacés » de « 1° bis Les
+# modalités de paiement », qui est du contenu.
+INSERTION = re.compile(
+    r"apr[èe]s\s+l['’]\s*alin[ée]a\s+\d{1,3}\s*,?\s*(?:ins[ée]rer|ajouter)[^:]{0,80}:\s*"
+    r"([«“]?\s*[^\n]{0,240})", re.I | re.S)
+ARTICLE_OU_DIVISION = re.compile(
+    r"^[«“]?\s*(?:art\.|(?:sous-)?section\b|chapitre\b|titre\b|livre\b)", re.I)
+# Un paragraphe, un numéro, une lettre : « VIII bis. – Le recours de pleine
+# juridiction… » est un paragraphe de l'article qu'on écrit, « 1° bis Il est
+# complété par les mots… » une sous-instruction qui prolonge le bloc sur le
+# même article, « …) Le premier alinéa de l'article L. 223-5 est complété »
+# une sous-instruction sur un autre. Le verbe et l'article nommé tranchent :
+# les deux ensemble, la cible est ailleurs.
+PARAGRAPHE_NUMERO_OU_LETTRE = re.compile(
+    r"^[«“]?\s*(?:[IVX]+(?:\s*(?:bis|ter|quater|quinquies))?\s*\.?\s*[–‑-]"
+    r"|(?:\d{1,2}|\.\.\.|…)\s*°(?:\s*(?:bis|ter|quater))?|(?:[a-z]{1,2}|\.\.\.|…)\)"
+    r"|(?:\.\.\.|…)\s*[–‑-])\s", re.I)
+NOMME_UN_ARTICLE = re.compile(r"\barticles?\s+(?:[LRD]\.?\s?)?\d", re.I)
+VERBE_MODIFICATIF = re.compile(
+    r"\b(?:est|sont)\s+(?:ainsi\s+(?:modifiée?s?|rédigée?s?|complétée?s?)|abrogée?s?"
+    r"|supprimée?s?|remplacée?s?|complétée?s?|insérée?s?|rétablie?s?|ajoutée?s?)"
+    r"|\bil\s+est\s+(?:inséré|ajouté|rétabli)\b", re.I)
+
+
+def insere_une_instruction(dispositif: str) -> bool:
+    """Vrai si l'amendement insère, après un alinéa, une instruction nouvelle —
+    dont la cible n'est pas celle de l'alinéa qui précède."""
+    trouve = INSERTION.search(dispositif)
+    if not trouve:
+        return False
+    tete = trouve.group(1)
+    if ARTICLE_OU_DIVISION.match(tete):
+        return True
+    if not PARAGRAPHE_NUMERO_OU_LETTRE.match(tete):
+        return False
+    hors_incises = re.sub(r"[«“][^»”]*[»”]", " ", tete[1:])
+    return bool(VERBE_MODIFICATIF.search(hors_incises) and NOMME_UN_ARTICLE.search(hors_incises))
 ARTICLE_ENTIER = re.compile(r"^\s*(?:I\.\s*[–-]\s*)?(supprimer|r[ée]diger ainsi|r[ée]tablir)\s+cet\s+article",
                             re.I)
 AJOUT_EN_FIN = re.compile(r"^\s*(?:I\.\s*[–-]\s*)?compl[ée]ter\s+cet\s+article", re.I)
@@ -195,8 +265,14 @@ def tete_numerique(numero: str) -> int | None:
 # La ligne de statut que le Sénat imprime sous le titre — « (Non modifié) »,
 # « (Supprimé) », « (Conforme) » — n'est pas un alinéa : la numérotation des
 # amendements l'exclut, et la compter décalait tout d'un cran (docs/44).
+# Et toute ligne qui n'est qu'une mention entre parenthèses — « (division et
+# intitulé nouveaux) », « (procédure accélérée) », « (pour coordination) » :
+# 90 formes, 1 853 lignes dans le corpus, aucune n'est un alinéa. Celle-là
+# comptée sous l'intitulé de la section 15 décalait d'un cran tout l'article
+# 11 du texte de commission de la loi consommation (docs/45 § 6).
 STATUT = re.compile(r"^\s*\(?\s*(?:non modifiée?s?|supprimée?s?|conformes?|"
-                    r"suppression (?:maintenue|conforme))\s*\)?\s*$", re.I)
+                    r"suppression (?:maintenue|conforme))\s*\)?\s*$"
+                    r"|^\s*\([^()]{1,80}\)\s*$", re.I)
 
 
 # **Le Sénat numérote lui-même ses alinéas, et le numéro est dans le texte.**
@@ -384,30 +460,41 @@ class Textes:
         texte = self.charger(texte_id)[0]
         return not sans_espaces(texte[slice(*alineas[rang])]).startswith(attendu)
 
-    def gouvernant(self, texte_id: str, numero: str, alinea: int,
-                   mentions: dict[str, int | None]) -> int | None | str:
-        """L'article du code que le texte réécrit à l'alinéa `alinea` de l'article
-        `numero` : la dernière instruction du texte avant la fin de cet alinéa,
-        résolue par ce que `porte_sur` en sait. `mentions` : numéro cité →
-        article_id, ou None si hors du code. Rend l'identifiant, None si
-        l'instruction porte sur un autre code, 'illisible' si l'alinéa n'existe
-        pas ou si l'instruction qui le gouverne n'est pas connue."""
+    def gouvernant(self, texte_id: str, numero: str, nommes: list[int],
+                   mentions: dict[str, int | None]) -> list[int] | None | str:
+        """Les articles du code que le texte réécrit aux alinéas `nommes` de
+        l'article `numero` : pour chaque alinéa, la dernière instruction du
+        texte avant sa fin, résolue par ce que `porte_sur` en sait. `mentions` :
+        numéro cité → article_id, ou None si hors du code. Rend les
+        identifiants distincts — « Alinéas 2 et 4 » peut en toucher deux —,
+        None si l'une des instructions porte sur un autre code, 'illisible' si
+        un alinéa n'existe pas, ouvre une division, ou si l'instruction qui le
+        gouverne n'est pas connue."""
         charge = self.charger(texte_id)
         if not charge or numero not in charge[1]:
             return "illisible"
         texte, articles = charge
         alineas = self.alineas(texte_id, numero)
-        if alinea not in alineas:
-            return "illisible"
-        fin_alinea = alineas[alinea][1]
-        precedentes = [i for i in self.instructions(texte, *articles[numero])
-                       if i[0] <= fin_alinea]
-        if not precedentes:
-            return "illisible"
-        cle = precedentes[-1][1]
-        if not cle or cle not in mentions:
-            return "illisible"       # instruction sans numéro, ou non relevée
-        return mentions[cle]
+        instructions = self.instructions(texte, *articles[numero])
+        cibles: list[int] = []
+        for alinea in nommes:
+            if alinea not in alineas:
+                return "illisible"
+            debut, fin_alinea = alineas[alinea]
+            ligne = texte[debut:fin_alinea]
+            precedent = texte[slice(*alineas[alinea - 1])] if alinea - 1 in alineas else ""
+            if DIVISION.match(ligne) or (DIVISION.match(precedent)
+                                         and not ARTICLE_OU_DIVISION.match(ligne)):
+                return "illisible"   # une division, ou son intitulé
+            precedentes = [i for i in instructions if i[0] <= fin_alinea]
+            cle = precedentes[-1][1] if precedentes else ""
+            if not cle or cle not in mentions:
+                return "illisible"   # instruction sans numéro, ou non relevée
+            if mentions[cle] is None:
+                return None
+            if mentions[cle] not in cibles:
+                cibles.append(mentions[cle])
+        return cibles
 
 
 def correspondances(base: sqlite3.Connection) -> list[tuple[str, str, str]]:
@@ -581,16 +668,20 @@ def construire(base: sqlite3.Connection, schema: Path, corpus_textes: Path) -> d
                 if "petite-loi" in texte_id or numero in contredits:
                     compte["alinea_numerotation_contredite"] += 1
                     continue
-                cible = textes.gouvernant(texte_id, numero, int(trouve.group(1)),
+                if insere_une_instruction(dispositif):
+                    compte["insertion_d_une_instruction"] += 1
+                    continue
+                cible = textes.gouvernant(texte_id, numero, alineas_nommes(trouve),
                                           mentions.get((texte_id, numero), {}))
                 if cible == "illisible":
                     compte["alinea_illisible"] += 1
                 elif cible is None:
                     compte["alinea_hors_du_code"] += 1
                 else:
-                    aretes.append((amendement_id, cible, texte_id, numero,
-                                   "alinea", "derivee", CONFIANCE_PAR_VOIE["alinea"]))
-                    compte["voie_alinea"] += 1
+                    for article_id in cible:
+                        aretes.append((amendement_id, article_id, texte_id, numero,
+                                       "alinea", "derivee", CONFIANCE_PAR_VOIE["alinea"]))
+                        compte["voie_alinea"] += 1
                 continue
 
             # 3. Tout l'article du texte, ou rien qu'on sache lire : la composition
@@ -657,6 +748,8 @@ def main() -> None:
           f"{compte['alinea_hors_du_code']}")
     print(f"  l'alinéa nommé est illisible dans le texte           : "
           f"{compte['alinea_illisible']}")
+    print(f"  ce qui est inséré après l'alinéa ouvre une instruction : "
+          f"{compte['insertion_d_une_instruction']}")
     print(f"  numérotation contredite par une ancre, ou petite loi  : "
           f"{compte['alinea_numerotation_contredite']}")
     print(f"  ancres d'amendements — confirmant / contredisant le compte : "
