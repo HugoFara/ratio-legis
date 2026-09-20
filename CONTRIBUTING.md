@@ -87,7 +87,15 @@ python3 ingestion/verdict.py travail/ratio-legis.sqlite
 python3 tools/mesures/hygiene.py travail/ratio-legis.sqlite \
         data/perimetre-v2.csv data/mesures/hygiene.tsv
 restitution/regenerer_les_exemples.sh                    # si la restitution ou la base a changé
+python3 tools/mesures/rejouer.py travail/ratio-legis.sqlite  # le harnais : les fiches jugées contre la base
 ```
+
+**Le harnais** rejoue les sept cents verdicts des fiches contre la base du jour
+et échoue si une arête jugée fausse y est. Il en trouve dix au premier passage,
+nommées dans [`docs/48`](docs/48-classement-harnais-accueil.md) ; une
+contribution n'en ajoute pas, et celle qui en retire une le dit dans son
+commit. Les « perdues » — jugées justes, absentes — ne font pas échouer : c'est
+du rappel qui s'en va, à expliquer.
 
 Le contrat du § 4.3 doit rester à **zéro phrase écartée faute de citation**, et
 `PRAGMA foreign_key_check` doit rester vide. Les rendus de `restitution/exemples/`
