@@ -32,7 +32,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools" / "proto
 from resolveur import sans_balises  # noqa: E402
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lignees import Resolveur  # noqa: E402
-from textes_des_amendements import correspondances, numero_de_subdivision  # noqa: E402
+from textes_des_amendements import (ALINEA, Textes, alineas_nommes,  # noqa: E402
+                                    correspondances, numero_de_subdivision)
 from collections import defaultdict  # noqa: E402
 
 
@@ -118,7 +119,12 @@ def vise_un_autre_code(texte: str, debut: int, fin: int) -> bool:
 # règle « hôte inconnu = pas de rattachement » : **20 sur 20** (docs/44),
 # Wilson 0,8389. Réunis, 36 justes sur 40 ; la constante prend le dernier
 # tirage, comme pour toutes les arêtes dont la population a changé entre deux.
-CONFIANCE = 0.8389
+# Le 20 septembre 2026, le numéro nu sous un article multi-codes rattaché par
+# l'instruction (docs/46) ajoute 40 arêtes sans en retirer : 20 d'entre
+# elles jugées par deux agents Sonnet, **19 sur 20**, un arbitrage — la
+# fausse est un numéro glissé que la garde ne voit pas (§ 4 de docs/46). Les
+# deux tirages décrivent ensemble la population d'aujourd'hui : 39 sur 40.
+CONFIANCE = 0.8712
 
 
 def code_nomme(texte: str, debut: int, fin: int) -> bool:
@@ -189,14 +195,46 @@ def main() -> None:
     # nomme pas son code hérite de celui-là ; s'il n'est pas le nôtre, ou si
     # l'article du texte en modifie plusieurs, le numéro nu ne se rattache pas.
     hote: dict[tuple[str, str], set[str]] = defaultdict(set)
-    for texte_id, article_du_texte, portee in base.execute(
-            "SELECT texte_id, lower(article_du_texte), portee FROM porte_sur"):
+    # Et, plus fin que l'article du texte, **l'instruction** (docs/45 § 6).
+    # Sous un article de texte qui modifie le code de commerce au I et le
+    # nôtre au II, « l'article L. 223-5 » sans code n'était pas rattaché :
+    # l'hôte de l'article est double. Mais l'hôte de l'instruction ne l'est
+    # pas, et deux choses le disent. Le numéro lui-même, quand `porte_sur` l'a
+    # relevé dans cet article du texte comme une cible de notre code et de nul
+    # autre : le texte modifie notre L. 223-5 là, l'amendement qui le nomme y
+    # parle de lui. Sinon l'alinéa que le dispositif nomme, dont l'instruction
+    # gouvernante est connue de `porte_sur` avec sa portée : « Après l'alinéa 8,
+    # insérer : « …° À l'article L. 111-3, … » » sous une instruction sur
+    # notre code s'y trouve, sous une instruction sur un autre code, non.
+    mentions: dict[tuple[str, str], dict[str, set[str]]] = defaultdict(lambda: defaultdict(set))
+    mentions_id: dict[tuple[str, str], dict[str, int | None]] = defaultdict(dict)
+    for texte_id, article_du_texte, portee, cle, article_id in base.execute(
+            "SELECT texte_id, lower(article_du_texte), portee, numero_cite, article_id "
+            "FROM porte_sur"):
         hote[(texte_id, article_du_texte)].add("interne" if portee == "interne" else "autre")
+        mentions[(texte_id, article_du_texte)][cle.replace(" ", "")].add(portee)
+        mentions_id[(texte_id, article_du_texte)][cle.replace(" ", "")] = (
+            article_id if portee == "interne" else None)
+    textes = Textes(base, Path(__file__).resolve().parent.parent / "travail" / "corpus" / "textes")
+
+    def hote_de_l_instruction(texte_id: str, numero: str, n: str, dispositif: str) -> bool:
+        """Le numéro nu `n` désigne-t-il notre code, à en juger par l'instruction
+        du texte qui le porte ou qui gouverne l'alinéa nommé ?"""
+        portees = mentions.get((texte_id, numero), {}).get(n)
+        if portees:
+            return portees == {"interne"}
+        trouve = ALINEA.search(dispositif)
+        if not trouve:
+            return False
+        cible = textes.gouvernant(texte_id, numero, alineas_nommes(trouve),
+                                  mentions_id.get((texte_id, numero), {}))
+        return isinstance(cible, list)
     textes_du_corpus = corpus_vers_texte(base)
     # Un article que le dispositif **crée** sous un numéro (« Art. L. 121-105. – »)
     # n'est le nôtre que si la loi du dossier a bien écrit ce numéro : la
     # numérotation proposée par un projet glisse en navette (docs/41 § 2).
     aretes, sans_cible, hors_dossier, hote_etranger, numero_glisse = [], 0, 0, 0, 0
+    par_l_instruction = 0
     for amendement_id, dossier, dispositif, chambre, corpus, subdivision in base.execute(
             "SELECT id, dossier_id, dispositif, chambre, texte_discute, subdivision "
             "FROM amendement WHERE dispositif IS NOT NULL"):
@@ -216,8 +254,12 @@ def main() -> None:
             # arête, dont celui qui complétait « L. 131-4 » du code de
             # l'environnement (docs/43 § 2) ; c'est le prix de la règle § 5.3.
             if not nomme and codes_de_l_hote != {"interne"}:
-                hote_etranger += 1
-                continue
+                if codes_de_l_hote and "interne" in codes_de_l_hote and texte_id \
+                        and hote_de_l_instruction(texte_id, numero, n, dispositif):
+                    par_l_instruction += 1
+                else:
+                    hote_etranger += 1
+                    continue
             article_id = resolveur.du_dossier(n, dossier)
             if article_id is None:
                 continue
@@ -255,6 +297,8 @@ def main() -> None:
     print(f"  sans cible dans ce code  : {sans_cible}")
     print(f"  dossiers ne touchant pas ce code : {hors_dossier}")
     print(f"  numéro nu, article du texte hors de ce code ou multi-codes : {hote_etranger}")
+    print(f"  numéro nu sous un article multi-codes, rattaché par l'instruction : "
+          f"{par_l_instruction}")
     print(f"  article créé sous un numéro que la loi n'a pas écrit : {numero_glisse}")
     print(f"articles du code visés     : {touches}")
     print(f"  dont en vigueur          : {en_vigueur}")

@@ -117,8 +117,8 @@ Reconstruite d'une commande depuis le miroir et les plans versionnés
 | **Actes de l'Union** | **284** | `cite_acte_ue` / `transpose` | 1 572 / 8 |
 | **Considérants de l'Union** | **7 674** | `article_acte_ue` — articles d'actes déclarés | 6 237 |
 | **Textes en discussion** | **854** | **`porte_sur`** — l'article du texte → l'article du code | **97 676** (6 971 internes, confiance 0,90) |
-| **Sorts d'amendements, en huit familles** | **42 142** | **`vise`** — l'amendement qui visait l'article, abouti ou non | **564** (confiance 0,84) |
-| Correspondances de texte entre les deux corpus | 163 | **`depose_sur`** — l'article du code que l'amendement touche, par l'alinéa du texte qu'il nomme | **1 107** (confiance 0,76 par l'alinéa) |
+| **Sorts d'amendements, en huit familles** | **42 142** | **`vise`** — l'amendement qui visait l'article, abouti ou non | **604** (confiance 0,87) |
+| Correspondances de texte entre les deux corpus | 163 | **`depose_sur`** — l'article du code que l'amendement touche, par l'alinéa du texte qu'il nomme | **1 104** (confiance 0,76 par l'alinéa) |
 
 Ce que cela donne au grain de l'article en vigueur, qui est le seul grain qui
 compte pour le produit :
@@ -225,6 +225,7 @@ numéro d'aujourd'hui, et 783 dès qu'on remonte aux numéros d'avant 2016.
 | 37. `vise` et `porte_sur` corrigés | l'ancre, le code hôte, le numéro glissé, les quatre chiffres ; `vise` mesurée pour la première fois : 9/20 avant, 16/20 après | [`docs/43`](docs/43-vise-et-porte-sur-corriges.md) |
 | 38. L'instruction qui gouverne l'alinéa | lue dans le texte à toutes ses occurrences, bornée par le paragraphe de tête ; `alinea` 17/20, `vise` 20/20 | [`docs/44`](docs/44-l-instruction-qui-gouverne-l-alinea.md) |
 | 39. La pastille et l'incise | la « sous-instruction » n'en était pas une : la pastille du Sénat comptait pour un alinéa, et le deux-points de « les mots : « … » sont remplacés » cachait 22 604 cibles à `porte_sur` ; +1 269 internes jugées 20/20 ; `alinea` 16/20 puis 19/20 après deux gardes, jugée par des agents Sonnet | [`docs/45`](docs/45-la-pastille-et-l-incise.md) |
+| 40. Le code hôte de l'instruction | le numéro nu sous un article multi-codes, rattaché par l'instruction qui le porte ou qui gouverne l'alinéa nommé ; `vise` +40, jugées 19/20 ; la fausse est un numéro glissé que la garde ne voit pas | [`docs/46`](docs/46-le-code-hote-de-l-instruction.md) |
 
 ### Tenir à jour
 
