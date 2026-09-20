@@ -1,0 +1,35 @@
+# Publie les rendus d'exemple tels quels sur GitHub Pages. Rien n'est construit
+# ici : les fichiers de `restitution/exemples/` sont versionnés, autonomes, et
+# `index.html` est régénéré par `restitution/index_des_exemples.py` avant d'être
+# commité. Le workflow ne fait que les servir.
+name: pages
+
+on:
+  push:
+    branches: [main]
+    paths: ["restitution/exemples/**", ".github/workflows/pages.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publier:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: restitution/exemples
+      - id: deploiement
+        uses: actions/deploy-pages@v4

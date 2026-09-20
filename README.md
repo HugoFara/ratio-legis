@@ -35,8 +35,10 @@ pour dire honnêtement où elle s'arrête.
 ## Ce qu'il fait
 
 Cinq questions, chacune rendue en ligne de commande, en HTML, et par l'API.
-Rien à installer pour voir le résultat : les rendus sont versionnés dans
-[`restitution/exemples/`](restitution/exemples/).
+**Rien à installer pour voir le résultat** : les rendus d'exemple sont
+publiés à [hugofara.github.io/ratio-legis](https://hugofara.github.io/ratio-legis/)
+— une page d'entrée dit lequel regarder pour quoi. Les mêmes fichiers sont
+versionnés dans [`restitution/exemples/`](restitution/exemples/).
 
 **Pourquoi cet article.** La fiche de provenance, arête par arête, et la note
 « pourquoi cet article » sous le contrat du § 4.3 — toute phrase produite est
