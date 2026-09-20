@@ -43,6 +43,7 @@ from citation import ABSENT, PLAFOND_EXTRAIT, cite  # noqa: E402
 from sort_des_amendements import EN_FRANCAIS  # noqa: E402
 import proximite  # noqa: E402
 from style import RUBRIQUE, SOCLE  # noqa: E402
+from signalement import lien as signaler  # noqa: E402
 
 PLAFOND_TEXTES = 8                 # en texte seulement : le HTML les rend tous
 # Le repli des considérants est borné, et la borne est **dite**. Elle ne coûte
@@ -626,13 +627,20 @@ padding:.9rem 1rem;margin:.8rem 0}}
                  f'<span class="conf">confiance {r["confiance"]:.3f}</span>'
                  f'<span>{e(r["methode"])}</span>'
                  f'<span>offsets {r["offset_debut"]}–{r["offset_fin"]}</span>'
-                 f'<a href="{e(r["url"])}">document</a></div></div>')
+                 f'<a href="{e(r["url"])}">document</a>'
+                 + signaler("motive", d["numero"],
+                            f'{r["type"]} {r["url"]} offsets {r["offset_debut"]}–{r["offset_fin"]}',
+                            cite(r["extrait"])[:200])
+                 + "</div></div>")
 
     for m in d["motivation_du_texte"]:
         p.append(f'<div class="raison"><div class="meta">'
                  f'<span>{e(LIBELLE_DOCUMENT[m["type"]])}</span><span>lien déclaré</span>'
                  f'<span>{m["taille"]} caractères</span>'
-                 f'<a href="{e(m["url"])}">document</a></div>'
+                 f'<a href="{e(m["url"])}">document</a>'
+                 + signaler("document du texte", d["numero"],
+                            f'{LIBELLE_DOCUMENT[m["type"]]} {m["url"]}')
+                 + '</div>'
                  f'<p class="silence">Ce document motive « {e(m["titre"])} » dans '
                  "son entier, et non cet article en particulier. Rien n'y désigne "
                  "le passage qui le concerne.</p>")
@@ -656,7 +664,9 @@ padding:.9rem 1rem;margin:.8rem 0}}
         p.append(f'<div class="raison"><div class="meta">'
                  f'<span>transposition déclarée</span>'
                  f'<span>{e(tr["methode"])}</span>'
-                 f'<a href="{e(tr["url"])}">acte de l\'Union</a></div>'
+                 f'<a href="{e(tr["url"])}">acte de l\'Union</a>'
+                 + signaler("transpose", d["numero"], nommer(tr), tr["fenetre"] or "")
+                 + '</div>'
                  f'<div>{e(nommer(tr))}</div>'
                  f'<p class="silence">Déclarée par l\'intitulé de « {e(tr["titre"])} », '
                  "qui porte sur le texte entier, non sur cet article. "
@@ -676,7 +686,11 @@ padding:.9rem 1rem;margin:.8rem 0}}
                      f'<div class="meta"><span>{e(m["chambre"])}</span>'
                      f'<span>{e(m["sort"])}</span><span>{e(m["loi"] or "loi non résolue")}</span>'
                      f'<span class="conf">confiance {m["confiance"]:.3f}</span>'
-                     f'<span>{e(m["methode"])}</span></div>'
+                     f'<span>{e(m["methode"])}</span>'
+                     + signaler("resulte_de", d["numero"],
+                                f'amendement {m["numero"]} ({m["chambre"]}) → alinéa {a["rang"]}',
+                                m["fenetre"][:140].strip())
+                     + '</div>'
                      f'<div class="preuve">preuve : …{e(m["fenetre"][:140].strip())}…</div>'
                      + (f'<div class="but"><b>But déclaré par l\'auteur.</b> '
                         f'{e(m["objet"][:520].strip())}…</div>' if m["objet"] else "")
@@ -750,7 +764,11 @@ padding:.9rem 1rem;margin:.8rem 0}}
                      f'{e(x["article_du_texte"])}</a></td>'
                      f'<td>{e(x["chambre"])}</td><td>{e(x["stade"])}</td>'
                      f'<td>{"" if x["direct"] else e(x["numero_cite"])}</td>'
-                     f'<td>{"oui" if x["survecu"] else "⚠ non : état intermédiaire, la loi n’a pas touché l’article"}</td></tr>')
+                     f'<td>{"oui" if x["survecu"] else "⚠ non : état intermédiaire, la loi n’a pas touché l’article"} '
+                     + signaler("porte_sur", d["numero"],
+                                f'article {x["article_du_texte"]} de {x["url"]}'
+                                + (f' (visé sous {x["numero_cite"]})' if not x["direct"] else ""))
+                     + "</td></tr>")
         p.append("</table>")
 
     p.append(f"<h2>Ce qui cite cet article ({len(d['cite_par'])})</h2>")
@@ -768,7 +786,9 @@ padding:.9rem 1rem;margin:.8rem 0}}
                                                      if t["motif"] else "")
             p.append(f'<tr><td>{e(t["amendement"])}</td><td>{marque}</td>'
                      f'<td>{e(t["auteur"])}</td><td>{e(t["loi"])}</td>'
-                     f'<td>{e(t["formule"])}</td></tr>')
+                     f'<td>{e(t["formule"])} '
+                     + signaler("vise", d["numero"], f'amendement {t["amendement"]} ({t["loi"]})')
+                     + "</td></tr>")
         p.append("</table>")
     if d["tentatives_par_depot"]:
         autres = " autre(s)" if d["tentatives"] else ""

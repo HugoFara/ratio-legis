@@ -27,4 +27,4 @@ for n in L111-1 L221-5 R512-31 D412-51; do
     python3 restitution/retentissement.py "$BASE" "$n" --html "$EX/retentissement/$n.html"
 done
 python3 restitution/retentissement.py "$BASE" --sommet --html "$EX/retentissement/sommet.html"
-python3 restitution/index_des_exemples.py "$EX"
+python3 restitution/index_des_exemples.py "$EX" data/mesures/hygiene.tsv

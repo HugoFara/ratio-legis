@@ -15,6 +15,21 @@ Spécification : [`ratio-legis-feuille-de-route.md`](ratio-legis-feuille-de-rout
 Contribuer : [`CONTRIBUTING.md`](CONTRIBUTING.md). Attribution des sources :
 [`ATTRIBUTION.md`](ATTRIBUTION.md).
 
+**Ce que le graphe vaut, en deux chiffres, et par qui ils ont été mesurés.**
+Sur les 100 articles du jeu d'annotation, annotés indépendamment par sept
+modèles de langue ([`docs/39`](docs/39-cent-verdicts-d-agents.md)), le graphe
+désigne **le bon document 65 fois sur 74**, et quand il affirme qu'un passage
+motive l'article, **c'est le passage annoté 30 fois sur 53** — 56,6 %, borne de
+Wilson 0,43 ; sur les 73 articles que l'annotateur a motivés, il retrouve le
+passage 30 fois. Il trouve le rapport qui explique l'article ; il ne trouve
+qu'une fois sur deux le paragraphe qui l'explique (rejoué sur la base du jour
+par `tools/annotation/verifier.py`). **Aucun de ces
+verdicts n'est humain**, et aucune confiance de ce dépôt ne l'est : le
+producteur des arêtes est déterministe, l'instrument qui les mesure est
+l'auteur ou des agents, jugeant sur des tirages reproductibles. Tant que le jeu
+d'annotation n'est pas relu à la main, tout chiffre de ce fichier est une
+auto-évaluation, et il est présenté comme tel.
+
 ## Pourquoi ce projet existe
 
 Les matériaux sont publics. Ce qui manque est le **chaînage** entre le texte
@@ -94,6 +109,21 @@ n'y a rien ». Les métriques d'hygiène législative sont dans
 [`data/mesures/hygiene.tsv`](data/mesures/hygiene.tsv) et sous `/mesures`
 ([`docs/18`](docs/18-verdict-et-hygiene.md)).
 
+**Ce qu'on peut lui dire.** Chaque arête de chaque page porte un lien
+*signaler*, qui ouvre un rapport pré-rempli — article, arête, cible, preuve —
+dans les issues du dépôt. Un lien faux coûte plus que dix liens manquants, et
+le lecteur qui en voit un est le seul juge humain que le projet ait.
+
+**Ce qui est classé, non affirmé.** Un rapport au Président, une étude
+d'impact, une directive motivent le texte entier ; aucune arête ne désigne le
+passage qui concerne l'article, et le graphe n'en fabrique pas. Il *classe* les
+passages par le vocabulaire qu'ils partagent avec l'article, pesé par sa
+rareté dans le code, montre les termes qui ont produit le classement, et se
+tait quand rien ne partage un terme propre à l'article. Mesuré : le passage
+attendu dans les trois montrés 12 fois sur 17 rapports au Président, 17 fois
+sur 21 couples (article, considérant) ([`docs/28`](docs/28-classement-intra-document.md),
+[`docs/48`](docs/48-classement-harnais-accueil.md)).
+
 **Pour les outils tiers**, la même chose en API et en dump ouvert :
 
 ```
@@ -141,10 +171,14 @@ vérifiables.
 
 **Il ne se déclare pas conforme.** Les confiances portées par les arêtes sont
 des bornes inférieures de Wilson à 95 %, calculées sur des tirages
-reproductibles jugés par l'auteur ou par des agents. Le critère de sortie de la
-phase 3 est une évaluation humaine en aveugle sur un jeu d'annotation validé, et
-ce jeu ne l'est pas. **Tant que les 100 articles ne sont pas relus à la main, la
-phase 0 reste ouverte** et chaque mesure du projet est une auto-évaluation.
+reproductibles jugés par l'auteur ou par des agents — celles de `porte_sur`,
+`vise` et `depose_sur` dans le tableau ci-dessous viennent toutes de juges
+Sonnet, deux par fiche, un arbitre sur désaccord ; la fiche dit qui a tranché.
+Le critère de sortie de la phase 3 est une évaluation humaine en aveugle sur un
+jeu d'annotation validé, et ce jeu ne l'est pas. **Tant que les 100 articles ne
+sont pas relus à la main, la phase 0 reste ouverte** et chaque mesure du projet
+est une auto-évaluation. Les agents ont rendu ce bloquant moins visible, pas
+plus petit.
 
 **Il ne comble pas le silence réglementaire.** La partie législative est
 documentée à 94 % ; la partie réglementaire à 15 %, et c'est elle qui porte la
@@ -321,6 +355,13 @@ data, reconstructible page par page depuis Wayback — arbitrage à rendre entre
 le coût et un trou déclaré. Les tableaux de concordance annexés aux textes de
 transposition, seul chemin connu vers un lien européen au grain de l'article.
 
+**Dix arêtes jugées fausses sont dans la base**, et le harnais
+(`tools/mesures/rejouer.py`) les nomme à chaque passage : un numéro nu
+rattaché à notre L411-1 quand le dispositif dit « du code de la mutualité »,
+un article barré « suppression maintenue en CMP » lu comme modificateur,
+quatre `resulte_de` d'avant les gardes de [`docs/21`](docs/21-precision-resulte-de.md)
+([`docs/48`](docs/48-classement-harnais-accueil.md) § 3).
+
 **Les arêtes récentes ont chacune leur maille nommée**, dans la section « ce
 qui n'est pas fait » de leur document — les dernières : le plan propre d'un
 amendement hors glissement, les 124 articles écrits que rien ne contient
@@ -380,6 +421,7 @@ d'aujourd'hui ; ceux des documents sont ceux de leur date.
 | 39. La pastille et l'incise | la « sous-instruction » n'en était pas une : la pastille du Sénat comptait pour un alinéa, et le deux-points de « les mots : « … » sont remplacés » cachait 22 604 cibles à `porte_sur` ; +1 269 internes jugées 20/20 ; `alinea` 16/20 puis 19/20 après deux gardes, jugée par des agents Sonnet | [`docs/45`](docs/45-la-pastille-et-l-incise.md) |
 | 40. Le code hôte de l'instruction | le numéro nu sous un article multi-codes, rattaché par l'instruction qui le porte ou qui gouverne l'alinéa nommé ; `vise` +40, jugées 19/20 ; la fausse est un numéro glissé que la garde ne voit pas | [`docs/46`](docs/46-le-code-hote-de-l-instruction.md) |
 | 41. Le numéro glissé par le contenu | l'article que le texte écrit sous un numéro que la loi a donné à un autre : 358 contredits, 234 résolus vers la version qui les contient, jugés 20/20 ; `vise` suit sauf plan propre (3/14 avant la garde) | [`docs/47`](docs/47-le-numero-glisse-par-le-contenu.md) |
+| 42. Classement, harnais, accueil | le classement pèse par la rareté dans le fonds et sait se taire, mesuré 17/21 ; le harnais rejoue 700 verdicts contre la base et trouve dix fausses servies ; « signaler cette arête » sur chaque arête | [`docs/48`](docs/48-classement-harnais-accueil.md) |
 
 ## D'où ça vient
 

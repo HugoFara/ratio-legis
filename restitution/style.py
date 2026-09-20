@@ -67,6 +67,9 @@ table{{width:100%;border-collapse:collapse;font-size:.9rem}}
 td,th{{text-align:left;padding:.4rem .5rem;border-bottom:1px solid var(--trait);vertical-align:top}}
 th{{font-weight:normal;font-variant-caps:small-caps;letter-spacing:.1em;color:var(--doux)}}
 a{{color:var(--acc);text-decoration-thickness:1px;text-underline-offset:.15em}}
+a.signaler{{color:var(--doux);font-family:{SANS};font-size:.72rem;letter-spacing:.04em;
+text-decoration:none;border-bottom:1px dotted var(--doux);margin-left:auto}}
+a.signaler:hover{{color:var(--acc);border-bottom-color:var(--acc)}}
 footer{{margin-top:3rem;padding-top:1rem;border-top:3px double var(--trait);
 font-size:.82rem;color:var(--doux);text-align:justify;hyphens:auto}}
 @media print{{body{{background:#fff;color:#000;padding:0}}a{{color:inherit}}}}

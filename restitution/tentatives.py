@@ -59,6 +59,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "ingestion"))
 from citation import cite, extrait  # noqa: E402
 from sort_des_amendements import ECHEC, EN_FRANCAIS  # noqa: E402
 from style import RUBRIQUE, SOCLE  # noqa: E402
+from signalement import lien as signaler  # noqa: E402
 
 SOMMET = 25
 
@@ -378,7 +379,10 @@ def en_html(d: dict) -> str:
                  + (f'<span>{e(t["article_du_texte"])} du texte discuté</span>'
                     if t["article_du_texte"] else "")
                  + f'<span>{e(VOIES[t["voie"]])} · confiance '
-                   f'{t["confiance"]:.3f}</span></div>')
+                   f'{t["confiance"]:.3f}</span>'
+                 + signaler(t["voie"], d["numero"],
+                            f'amendement {t["amendement"]} ({CHAMBRES.get(t["chambre"], "?")})')
+                 + '</div>')
         if t["portee_du_motif"]:
             p.append(f'<div class="meta"><span class="bloque">'
                      f'{e(t["portee_du_motif"])}</span></div>')

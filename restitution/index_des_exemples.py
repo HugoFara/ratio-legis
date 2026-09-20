@@ -7,11 +7,16 @@ il liste des fichiers qui existent et dit, pour chacun, ce qu'il montre — la
 phrase vient d'ici, et un rendu que ce script ne connaît pas est listé quand
 même, sans phrase, plutôt que tu.
 
-    python3 restitution/index_des_exemples.py restitution/exemples
+    python3 restitution/index_des_exemples.py restitution/exemples [data/mesures/hygiene.tsv]
+
+La page ouvre sur ce que le graphe répond, pas sur ce qu'il contient : le
+verdict par partie du code — lu dans `hygiene.tsv`, jamais recopié —, parce
+qu'un visiteur qui accorde trente secondes doit repartir avec un chiffre.
 """
 
 from __future__ import annotations
 
+import csv
 import html
 import sys
 from pathlib import Path
@@ -73,7 +78,63 @@ li a:hover{text-decoration:underline}
 h2{margin-bottom:.3rem}
 .chapeau{border-bottom:0;padding-bottom:0;margin-bottom:1rem}
 .en-tete{border-bottom:3px double var(--trait);margin-bottom:1.6rem}
+table{margin:.6rem 0}
+.part{color:var(--doux);font-size:.85em}
+.note{font-size:.92rem;color:var(--doux)}
 """
+
+LIGNES_DU_VERDICT = [
+    ("un passage les motive", "un passage les motive"),
+    ("origine située seulement", "origine située"),
+    ("motivation du texte seule", "motivation du texte"),
+    ("RAISON NON DOCUMENTÉE", "raison non documentée"),
+]
+
+
+def milliers(valeur: str) -> str:
+    return f"{int(valeur):,}".replace(",", "\u202f")
+
+
+def verdict_par_partie(hygiene: Path | None) -> str:
+    """Le tableau du verdict par partie, depuis la fiche d'hygiène versionnée."""
+    if hygiene is None or not hygiene.exists():
+        return ""
+    mesures = {(l["famille"], l["mesure"]): l
+               for l in csv.DictReader(hygiene.open(encoding="utf-8"), delimiter="\t")}
+    lignes = []
+    for partie in "LRD":
+        total = mesures.get(("verdict", f"partie {partie} — articles en vigueur"))
+        if not total:
+            continue
+        cellules = [f"<td><b>{partie}</b></td><td>{milliers(total['valeur'])}</td>"]
+        for mesure, _ in LIGNES_DU_VERDICT:
+            l = mesures.get(("verdict", f"partie {partie} — {mesure}"))
+            cellules.append(f"<td>{milliers(l['valeur'])} <span class=part>"
+                            f"({l['part_pourcent'].replace('.', ',')}&nbsp;%)</span></td>"
+                            if l else "<td></td>")
+        lignes.append("<tr>" + "".join(cellules) + "</tr>")
+    if not lignes:
+        return ""
+    irrecevables = mesures.get(("irrecevabilite", "fondement — article 40"))
+    entete = "".join(f"<th>{html.escape(t)}</th>" for _, t in LIGNES_DU_VERDICT)
+    return (
+        "<h2>Ce que le fonds documentaire tait</h2>"
+        "<p class=chapeau>Pour chaque article en vigueur, un verdict — et surtout le "
+        "verdict négatif : aucune des sources dépouillées n'explique cet article. "
+        "Un décret n'a ni exposé des motifs, ni débat, ni amendement ; les parties se "
+        "lisent séparément.</p>"
+        f"<table><tr><th>partie</th><th>articles</th>{entete}</tr>{''.join(lignes)}</table>"
+        "<p class=note>La partie législative est documentée à 94 % ; la partie "
+        "réglementaire à 15 %, et c'est elle qui porte la masse des obligations qu'un "
+        "consommateur rencontre. Ce n'est pas un défaut du périmètre, c'est un état du "
+        "fonds documentaire français, mesuré."
+        + (f" Sur les amendements du corpus, {milliers(irrecevables['sur'])} ont été déclarés "
+           f"irrecevables, dont {milliers(irrecevables['valeur'])} au titre de l'article 40 "
+           "de la Constitution." if irrecevables else "")
+        + " Le détail et la méthode : <code>data/mesures/hygiene.tsv</code>, "
+        "<code>docs/18</code>.</p>"
+    )
+
 
 AVERTISSEMENT = (
     "Ces pages rendent des matériaux et le chemin qui y mène. Elles n'interprètent "
@@ -105,8 +166,8 @@ def section(dossier: Path, sous: str | None, titre: str, rend: str, phrases: dic
     )
 
 
-def page(dossier: Path) -> str:
-    corps = "".join(section(dossier, *s) for s in SECTIONS)
+def page(dossier: Path, hygiene: Path | None) -> str:
+    corps = verdict_par_partie(hygiene) + "".join(section(dossier, *s) for s in SECTIONS)
     return (
         '<!doctype html><html lang="fr"><head><meta charset="utf-8">'
         '<meta name="viewport" content="width=device-width,initial-scale=1">'
@@ -115,7 +176,9 @@ def page(dossier: Path) -> str:
         "<p class=chapeau>Pour un article du code de la consommation en vigueur : "
         "pourquoi existe-t-il sous cette forme ? Les rendus ci-dessous sont ceux "
         "que le dépôt versionne, tels que le graphe les produit.</p></div>"
-        f"<p>{html.escape(AVERTISSEMENT)}</p>"
+        f"<p>{html.escape(AVERTISSEMENT)} Chaque arête de chaque page porte un lien "
+        "<i>signaler</i> : un lien faux coûte plus que dix liens manquants, et le dire "
+        "est la contribution la plus utile au projet.</p>"
         f"{corps}"
         "<footer>Ratio Legis — graphe de provenance normative. Aucune arête sans "
         "source résoluble. Les confiances sont des bornes inférieures mesurées, "
@@ -127,12 +190,13 @@ def page(dossier: Path) -> str:
 
 
 def main(argv: list[str]) -> int:
-    if len(argv) != 2:
+    if len(argv) not in (2, 3):
         print(__doc__, file=sys.stderr)
         return 2
     dossier = Path(argv[1])
+    hygiene = Path(argv[2]) if len(argv) == 3 else Path("data/mesures/hygiene.tsv")
     sortie = dossier / "index.html"
-    sortie.write_text(page(dossier), encoding="utf-8")
+    sortie.write_text(page(dossier, hygiene), encoding="utf-8")
     print(f"écrit : {sortie}")
     return 0
 

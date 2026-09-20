@@ -37,6 +37,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from style import RUBRIQUE, SOCLE  # noqa: E402
+from signalement import lien as signaler  # noqa: E402
 
 # Palette assignée par ordre chronologique du texte introducteur. Volontairement
 # peu saturée : ce n'est pas une carte de chaleur, c'est un texte de loi.
@@ -236,7 +237,10 @@ mène.</div>
                     if am["url"] else f'amendement {e(am["numero"])}')
             p.append(f'<div class="amend">✎ {lien} ({e(am["chambre"])}, '
                      f'{e(am["sort"] or "sort inconnu")}) de {e(am["auteur"])} — '
-                     f'confiance {am["confiance"]:.3f}</div>')
+                     f'confiance {am["confiance"]:.3f} '
+                     + signaler("resulte_de", d["numero"],
+                                f'amendement {am["numero"]} ({am["chambre"]}) → alinéa {a["rang"]}')
+                     + '</div>')
         p.append("</div>")
 
     p.append(f"""<footer>

@@ -50,6 +50,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from citation import extrait  # noqa: E402
 from style import RUBRIQUE, SOCLE  # noqa: E402
+from signalement import lien as signaler  # noqa: E402
 
 PROFONDEUR = 3
 # Au-delà, la liste cesse d'être une liste de relecture et devient un extrait du
@@ -277,7 +278,10 @@ onde suivie jusqu'au rang {d['profondeur']}</p>
                  f'<div class="meta"><span>rang {x["rang"]}</span>'
                  f'<span>partie {e(x["partie"] or partie_de(x["numero"]))}</span>'
                  f'<span class="{"muet" if muet else ""}">'
-                 f'{e(VERDICT_COURT.get(x["verdict"], "hors verdict"))}</span></div>'
+                 f'{e(VERDICT_COURT.get(x["verdict"], "hors verdict"))}</span>'
+                 + signaler("renvoie_a", x["numero"], f'{d["numero"]} (rang {x["rang"]})',
+                            (x["fenetre"] or "")[:200])
+                 + '</div>'
                  + (f'<div class="preuve">{e(extrait(x["fenetre"], 300))}</div>'
                     if x["fenetre"] else "") + "</div>")
 
