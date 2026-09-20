@@ -51,7 +51,7 @@ RACINE = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(RACINE / "tools" / "prototype"))
 sys.path.insert(0, str(RACINE / "restitution"))
 from commentaires_rapports import texte_brut  # noqa: E402
-from proximite import classer_fenetres  # noqa: E402
+from proximite import classer_fenetres, rarete  # noqa: E402
 
 # Ce que chaque verdict humain attend du verdict de la base.
 ATTENDU = {"motive": {"passage_motivant"},
@@ -178,7 +178,7 @@ def main() -> None:
                     fiche["passage"] = "document_atteint_sans_passage"
                     texte_doc = base.execute("SELECT texte FROM document WHERE id = ?",
                                              (document_id,)).fetchone()[0]
-                    classes = classer_fenetres(texte_en_vigueur(base, numero), texte_doc)
+                    classes = classer_fenetres(texte_en_vigueur(base, numero), texte_doc, rarete(base))
                     rangs = [r for r, c in enumerate(classes, 1)
                              if c.debut < fin and debut < c.fin]
                     fiche["classement_lexical"] = (f"rang_{rangs[0]}" if rangs else

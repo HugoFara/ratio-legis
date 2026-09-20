@@ -286,9 +286,10 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
     # qui est le pire des ordres pour la question posée. Les passages sont
     # classés par recouvrement lexical, étiquetés comme tels, et le corps est
     # relâché aussitôt : il pèse jusqu'à 600 Ko et n'a rien à faire en sortie.
+    poids = proximite.rarete(base)
     for m in d["motivation_du_texte"]:
         corps = m.pop("corps")
-        m["passages"] = proximite.classer_fenetres(reference, corps)
+        m["passages"] = proximite.classer_fenetres(reference, corps, poids)
         m["extrait"] = corps[:PLAFOND_EXTRAIT]
 
     # La transposition n'est retenue que si le texte français la déclare dans son
@@ -341,7 +342,7 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
     d["considerants_classes"] = {
         celex: [{**liste[i], "score": score, "termes": list(termes)}
                 for i, score, termes in proximite.classer_unites(
-                    reference, [c["texte"] for c in liste])]
+                    reference, [c["texte"] for c in liste], poids)]
         for celex, liste in d["considerants"].items()}
 
     # Sous quel article du texte en discussion cet article a-t-il été débattu.
