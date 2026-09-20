@@ -5,9 +5,9 @@ verdict	partie D — origine située seulement	0	179	0.0
 verdict	partie D — motivation du texte seule	11	179	6.1	
 verdict	partie D — RAISON NON DOCUMENTÉE	167	179	93.3	
 verdict	partie L — articles en vigueur	1293			
-verdict	partie L — un passage les motive	781	1293	60.4	
-verdict	partie L — origine située seulement	128	1293	9.9	
-verdict	partie L — motivation du texte seule	306	1293	23.7	
+verdict	partie L — un passage les motive	780	1293	60.3	
+verdict	partie L — origine située seulement	127	1293	9.8	
+verdict	partie L — motivation du texte seule	308	1293	23.8	
 verdict	partie L — RAISON NON DOCUMENTÉE	78	1293	6.0	
 verdict	partie R — articles en vigueur	632			
 verdict	partie R — un passage les motive	43	632	6.8	
@@ -49,10 +49,10 @@ irrecevabilite	fondement — LOLFSS	6	2955	0.2
 tentatives	articles en vigueur portant une tentative, les trois voies	217	2104	10.3	cible déclarée, alinéa écrit ou subdivision déposée
 tentatives	dont par la cible déclarée du dispositif	135	217	62.2	
 tentatives	dont par un alinéa écrit qui subsiste	83	217	38.2	
-tentatives	dont par la subdivision déposée	46	217	21.2	
+tentatives	dont par la subdivision déposée	48	217	22.1	
 tentatives	tentatives déclarées sur un article en vigueur	318			voie de la cible déclarée seule ; le détail par sort suit
-depot	amendements positionnés sur un article en vigueur	221			
-depot	articles en vigueur atteints	46	2104	2.2	
+depot	amendements positionnés sur un article en vigueur	231			
+depot	articles en vigueur atteints	48	2104	2.3	
 depot	assemblee — jeux d'amendements appariés à leur texte	39	39	100.0	
 depot	senat — jeux d'amendements appariés à leur texte	124	143	86.7	
 depot	subdivisions tombant dans la plage d'articles du texte	5488	5712	96.1	contrôle de l'appariement ; un texte faux s'y verrait en premier

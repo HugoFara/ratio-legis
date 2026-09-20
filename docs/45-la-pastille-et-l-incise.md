@@ -79,7 +79,7 @@ Ce que cela fait au graphe, pipeline rejoué de zéro :
 |---|---:|---:|
 | `porte_sur` | 77 182 | **97 676** |
 | dont internes | 5 702 | **6 971** |
-| articles en vigueur reliés à un article de texte | 949 | **987** |
+| articles en vigueur reliés à un article de texte | 949 | **987** (983 après docs/47) |
 | `vise` | 569 | 564 |
 | `depose_sur` | 1 115 | **1 214** |
 | dont `alinea` / `visee` / `article_entier` | 1 051 / 51 / 13 | 1 122 / 76 / 16 |

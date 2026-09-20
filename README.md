@@ -116,9 +116,9 @@ Reconstruite d'une commande depuis le miroir et les plans versionnés
 | Acteurs | 1 644 | `resulte_de` — l'amendement qui a écrit l'alinéa | 308 |
 | **Actes de l'Union** | **284** | `cite_acte_ue` / `transpose` | 1 572 / 8 |
 | **Considérants de l'Union** | **7 674** | `article_acte_ue` — articles d'actes déclarés | 6 237 |
-| **Textes en discussion** | **854** | **`porte_sur`** — l'article du texte → l'article du code | **97 676** (6 971 internes, confiance 0,90) |
-| **Sorts d'amendements, en huit familles** | **42 142** | **`vise`** — l'amendement qui visait l'article, abouti ou non | **604** (confiance 0,87) |
-| Correspondances de texte entre les deux corpus | 163 | **`depose_sur`** — l'article du code que l'amendement touche, par l'alinéa du texte qu'il nomme | **1 104** (confiance 0,76 par l'alinéa) |
+| **Textes en discussion** | **854** | **`porte_sur`** — l'article du texte → l'article du code | **97 676** (6 847 internes, confiance 0,90 ; 234 résolues par le contenu, 0,84) |
+| **Sorts d'amendements, en huit familles** | **42 142** | **`vise`** — l'amendement qui visait l'article, abouti ou non | **581** (confiance 0,87) |
+| Correspondances de texte entre les deux corpus | 163 | **`depose_sur`** — l'article du code que l'amendement touche, par l'alinéa du texte qu'il nomme | **1 093** (confiance 0,76 par l'alinéa) |
 
 Ce que cela donne au grain de l'article en vigueur, qui est le seul grain qui
 compte pour le produit :
@@ -132,7 +132,7 @@ des motifs, ni débat, ni amendement.
 
 | partie | articles | un passage les motive | origine située | motivation du texte | **raison non documentée** |
 |---|---:|---:|---:|---:|---:|
-| **L** | 1 293 | 781 (60,4 %) | 128 | 306 | **78 (6,0 %)** |
+| **L** | 1 293 | 780 (60,3 %) | 127 | 308 | **78 (6,0 %)** |
 | **R** | 632 | 43 | 7 | 58 | **524 (82,9 %)** |
 | **D** | 179 | 1 | 0 | 11 | **167 (93,3 %)** |
 
@@ -157,7 +157,7 @@ métriques : [`data/mesures/hygiene.tsv`](data/mesures/hygiene.tsv).
 | | |
 |---|---:|
 | **Articles remontant à un passage qui les motive** | **783 (37,2 %)** |
-| Articles reliés à un article de texte en discussion | 987 (46,9 %) |
+| Articles reliés à un article de texte en discussion | 983 (46,7 %) |
 | Articles nommant un acte de l'Union | 117 |
 | Articles remontant à un amendement identifié | 104 |
 | Articles cités par un autre article du fonds | 1 039 (49,4 %) |
@@ -226,6 +226,7 @@ numéro d'aujourd'hui, et 783 dès qu'on remonte aux numéros d'avant 2016.
 | 38. L'instruction qui gouverne l'alinéa | lue dans le texte à toutes ses occurrences, bornée par le paragraphe de tête ; `alinea` 17/20, `vise` 20/20 | [`docs/44`](docs/44-l-instruction-qui-gouverne-l-alinea.md) |
 | 39. La pastille et l'incise | la « sous-instruction » n'en était pas une : la pastille du Sénat comptait pour un alinéa, et le deux-points de « les mots : « … » sont remplacés » cachait 22 604 cibles à `porte_sur` ; +1 269 internes jugées 20/20 ; `alinea` 16/20 puis 19/20 après deux gardes, jugée par des agents Sonnet | [`docs/45`](docs/45-la-pastille-et-l-incise.md) |
 | 40. Le code hôte de l'instruction | le numéro nu sous un article multi-codes, rattaché par l'instruction qui le porte ou qui gouverne l'alinéa nommé ; `vise` +40, jugées 19/20 ; la fausse est un numéro glissé que la garde ne voit pas | [`docs/46`](docs/46-le-code-hote-de-l-instruction.md) |
+| 41. Le numéro glissé par le contenu | l'article que le texte écrit sous un numéro que la loi a donné à un autre : 358 contredits, 234 résolus vers la version qui les contient, jugés 20/20 ; `vise` suit sauf plan propre (3/14 avant la garde) | [`docs/47`](docs/47-le-numero-glisse-par-le-contenu.md) |
 
 ### Tenir à jour
 

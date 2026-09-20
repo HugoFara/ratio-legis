@@ -648,7 +648,14 @@ def construire(base: sqlite3.Connection, schema: Path, corpus_textes: Path) -> d
             #    l'une des cibles de l'article du texte (chaîne comprise).
             declarees = visees.get(amendement_id, set())
             if declarees:
-                communes = {c for c in internes if chaine[c] & declarees}
+                # L'article déclaré lui-même d'abord ; la chaîne de
+                # renumérotation ensuite. La recodification de 2016 a tiré
+                # L. 223-1 à L. 223-5 d'un même article d'avant : par la
+                # chaîne, ils se valent tous, et « L. 223-5 » déclaré sous un
+                # article de texte qui les réécrit tous contredisait tout.
+                communes = internes & declarees
+                if len(communes) != 1:
+                    communes = {c for c in internes if chaine[c] & declarees}
                 if len(communes) == 1:
                     aretes.append((amendement_id, communes.pop(), texte_id, numero,
                                    "visee", "derivee", CONFIANCE_PAR_VOIE["visee"]))

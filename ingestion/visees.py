@@ -32,8 +32,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools" / "proto
 from resolveur import sans_balises  # noqa: E402
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lignees import Resolveur  # noqa: E402
-from textes_des_amendements import (ALINEA, Textes, alineas_nommes,  # noqa: E402
-                                    correspondances, numero_de_subdivision)
+from textes_des_amendements import (ALINEA, ARTICLE_ENTIER, Textes,  # noqa: E402
+                                    alineas_nommes, correspondances,
+                                    numero_de_subdivision)
 from collections import defaultdict  # noqa: E402
 
 
@@ -215,6 +216,21 @@ def main() -> None:
         mentions[(texte_id, article_du_texte)][cle.replace(" ", "")].add(portee)
         mentions_id[(texte_id, article_du_texte)][cle.replace(" ", "")] = (
             article_id if portee == "interne" else None)
+    # Le numéro que le texte écrit et que la loi n'a pas gardé (docs/47) : le
+    # premier alinéa écrit sous « Art. L. 423-8 » est celui du L. 423-16
+    # promulgué, `porte_sur` l'a vu au contenu — et l'a résolu quand une seule
+    # version produite par la loi le contient, tenu pour non résolu sinon. Un
+    # amendement qui rédige « Art. L. 423-8 » sur ce texte rédige le même
+    # article mal numéroté : il vise L. 423-16, ou rien.
+    glisses: dict[tuple[str, str, str], int | None] = {}
+    for texte_id, article_du_texte, cle, article_id, portee in base.execute(
+            "SELECT ps.texte_id, lower(ps.article_du_texte), ps.numero_cite, "
+            "       ps.article_id, ps.portee "
+            "FROM porte_sur ps JOIN preuve p ON p.id = ps.preuve_id "
+            "WHERE p.methode = 'article_cree' "
+            "  AND (ps.portee = 'non_resolue' OR ps.methode = 'inferee')"):
+        glisses[(texte_id, article_du_texte, cle.replace(" ", ""))] = (
+            article_id if portee == "interne" else None)
     textes = Textes(base, Path(__file__).resolve().parent.parent / "travail" / "corpus" / "textes")
 
     def hote_de_l_instruction(texte_id: str, numero: str, n: str, dispositif: str) -> bool:
@@ -234,7 +250,8 @@ def main() -> None:
     # n'est le nôtre que si la loi du dossier a bien écrit ce numéro : la
     # numérotation proposée par un projet glisse en navette (docs/41 § 2).
     aretes, sans_cible, hors_dossier, hote_etranger, numero_glisse = [], 0, 0, 0, 0
-    par_l_instruction = 0
+    par_l_instruction, glisse_dans_le_texte, suivi_par_le_contenu = 0, 0, 0
+    plan_propre = 0
     for amendement_id, dossier, dispositif, chambre, corpus, subdivision in base.execute(
             "SELECT id, dossier_id, dispositif, chambre, texte_discute, subdivision "
             "FROM amendement WHERE dispositif IS NOT NULL"):
@@ -266,6 +283,25 @@ def main() -> None:
             if formule == "rédigé" and article_id not in resolveur.ecrits.get(dossier, ()):
                 numero_glisse += 1
                 continue
+            if formule == "rédigé" and texte_id and numero \
+                    and (texte_id, numero, n) in glisses:
+                # Suivre le glissement suppose que l'amendement numérote
+                # comme le texte : vrai quand il réécrit un alinéa du texte
+                # (« Rédiger ainsi l'alinéa 41 : « Art. L. 423-8. – … » »),
+                # faux quand il réécrit tout l'article du texte selon son
+                # propre plan — les amendements 3661 et 4495 de 2013 écrivent
+                # L. 423-1 à L. 423-17 avec un autre contenu à chaque numéro.
+                # Onze arêtes sur quatorze jugées fausses pour cette seule
+                # cause (docs/47 § 4) : sous un article du texte dont la
+                # numérotation a glissé, le plan propre ne se rattache pas.
+                if ARTICLE_ENTIER.search(dispositif):
+                    plan_propre += 1
+                    continue
+                article_id = glisses[(texte_id, numero, n)]
+                if article_id is None:
+                    glisse_dans_le_texte += 1
+                    continue
+                suivi_par_le_contenu += 1
             retenues.append((article_id, formule))
         if not retenues:
             sans_cible += 1
@@ -300,6 +336,10 @@ def main() -> None:
     print(f"  numéro nu sous un article multi-codes, rattaché par l'instruction : "
           f"{par_l_instruction}")
     print(f"  article créé sous un numéro que la loi n'a pas écrit : {numero_glisse}")
+    print(f"  article rédigé sous un numéro que le texte écrit et que la loi a "
+          f"donné à un autre : {glisse_dans_le_texte} non résolus, "
+          f"{suivi_par_le_contenu} suivis vers l'article que le contenu désigne, "
+          f"{plan_propre} écartés — l'article du texte réécrit en entier, plan propre")
     print(f"articles du code visés     : {touches}")
     print(f"  dont en vigueur          : {en_vigueur}")
     print("\npar sort :")

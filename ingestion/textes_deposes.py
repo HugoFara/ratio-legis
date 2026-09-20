@@ -148,6 +148,84 @@ CONFIANCE = 0.9039
 # « Art. L. 423-5 », promulgué L. 423-6. Réunis, 18 sur 20 ; Wilson à 95 %.
 CONFIANCE_CREE = 0.6996
 
+# **Corroborer par le contenu, pas seulement par le numéro.** La garde
+# ci-dessous demande à LEGI si la loi du dossier a produit une version de
+# l'article que le texte écrit sous ce numéro. Elle laisse passer le numéro
+# glissé en navette quand la loi a écrit *un* article sous ce numéro — une
+# autre disposition : le texte de commission de 2013 écrit « Art. L. 423-8. –
+# Tout accord négocié au nom du groupe… », promulgué L. 423-16 ; le L. 423-8
+# promulgué parle de provision. Une fausse de docs/45 § 2 et une de docs/46
+# § 3 sont de cette famille.
+#
+# Le premier alinéa que le texte écrit se compare donc à la version que la
+# loi a produite : part des trigrammes de mots de l'alinéa écrit que la
+# version contient. Sur les 1 616 articles écrits à contenu lisible, la
+# distribution est bimodale — 334 sous 0,2, 1 258 au-dessus de 0,6, 24 entre
+# les deux — et le seuil tombe dans le vide. C'est de la correspondance
+# textuelle vérifiable (§ 5.5), pas de l'inférence : la version et l'alinéa
+# sont tous deux dans la base, et la preuve est la fenêtre. En deçà du
+# seuil, l'article écrit n'est pas celui-là ; il en est un autre du même
+# code, sous un numéro que le texte ne dit pas — `non_resolue`, cible
+# comptée mais non nommée. Un alinéa de moins de huit mots — « (Non
+# modifié) », un intitulé — ne se compare pas, et garde la seule garde du
+# numéro.
+MOTS_MINI, SEUIL_CONTENU = 8, 0.5
+# Et quand le contenu contredit le numéro, il désigne souvent le bon : parmi
+# les versions que la loi du dossier a produites, celle qui contient l'alinéa
+# écrit — à 0,6 au moins, aucune autre à 0,5 — est l'article que le texte
+# écrivait sous un autre numéro. « Art. L. 423-9. – Tout accord négocié au
+# nom du groupe… » → L. 423-16, « Art. L. 311-45 » → L. 311-46. C'est le
+# troisième échelon de la cascade du § 3 — alignement textuel, `inferee`,
+# confiance calculée à part — et il est mesuré à part (docs/47).
+SEUIL_RESOLUTION, SEUIL_SECOND = 0.6, 0.5
+# Vingt arêtes tirées parmi les 234 résolues, deux juges Sonnet 5 le
+# 20 septembre 2026 : 20 sur 20, d'accord sur chacune (docs/47 § 4). Borne
+# inférieure de Wilson à 95 %.
+CONFIANCE_CREE_CONTENU = 0.8389
+TETE_ECRITE = re.compile(
+    r"^[«“\"]\s*Art\.?\s*[LRD]\.?\s?[\d-]+(?:\s*[A-H]{1,2})?\s*(?:\((?:nouveau|non modifié)\))?"
+    r"\s*[.\s]*[–‑-]?\s*", re.I)
+
+
+def mots(texte: str) -> list[str]:
+    texte = re.sub(r"<[^>]+>", " ", texte or "").lower().replace("’", " ").replace("'", " ")
+    return re.sub(r"[^a-zà-ÿ0-9]+", " ", texte).split()
+
+
+def trigrammes(suite: list[str]) -> set[tuple[str, ...]]:
+    return {tuple(suite[i:i + 3]) for i in range(len(suite) - 2)}
+
+
+def alinea_ecrit(texte: str, position: int) -> list[str]:
+    """Les mots du premier alinéa que le texte écrit sous l'en-tête à `position`."""
+    fin = texte.find("\n", position)
+    return mots(TETE_ECRITE.sub("", texte[position:fin if fin > 0 else len(texte)]))
+
+
+def resolu_par_le_contenu(ecrit: list[str], versions: dict[int, set[tuple[str, ...]]]
+                          ) -> int | None:
+    """L'article, parmi ceux que la loi a produits, dont la version contient
+    l'alinéa écrit — seul au-dessus du seuil ; None si aucun ou plusieurs."""
+    tg = trigrammes(ecrit)
+    if not tg:
+        return None
+    scores = sorted(((len(tg & tv) / len(tg), article_id)
+                     for article_id, tv in versions.items()), reverse=True)
+    if not scores or scores[0][0] < SEUIL_RESOLUTION:
+        return None
+    if len(scores) > 1 and scores[1][0] >= SEUIL_SECOND:
+        return None
+    return scores[0][1]
+
+
+def contenu_corrobore(ecrit: list[str], version: str | None) -> bool | None:
+    """None si rien ne se compare ; sinon, la version produite par la loi
+    contient-elle ce que le texte écrit."""
+    if len(ecrit) < MOTS_MINI or version is None:
+        return None
+    tg = trigrammes(ecrit)
+    return len(tg & trigrammes(mots(version))) / len(tg) >= SEUIL_CONTENU
+
 
 def sans_controles(texte: str) -> str:
     """Remplace les caractères de contrôle par une espace, sans décaler les offsets.
@@ -385,18 +463,24 @@ def main() -> None:
     # La voie déclarée, elle, n'y est pas soumise : son code est nommé dans la
     # même phrase, et `docs/16` § 4 en mesure la précision à 20/20.
     produits = defaultdict(set)
-    for dossier_id, article_id in base.execute(
-            "SELECT i.dossier_id, v.article_id FROM issu_de i "
+    versions_produites: dict[tuple[str, int], str] = {}
+    for dossier_id, article_id, date_debut, texte_version in base.execute(
+            "SELECT i.dossier_id, v.article_id, v.date_debut, v.texte FROM issu_de i "
             "JOIN produite_par p ON p.texte_id = i.texte_id "
-            "JOIN version_article v ON v.id_legi = p.version_id"):
+            "JOIN version_article v ON v.id_legi = p.version_id ORDER BY v.date_debut"):
         produits[dossier_id].add(article_id)
+        versions_produites.setdefault((dossier_id, article_id), texte_version)
+    trigrammes_produits: dict[str, dict[int, set[tuple[str, ...]]]] = defaultdict(dict)
+    for (dossier_id, article_id), texte_version in versions_produites.items():
+        trigrammes_produits[dossier_id][article_id] = trigrammes(mots(texte_version))
     suivant = (base.execute("SELECT COALESCE(MAX(id), 0) FROM preuve").fetchone()[0]) + 1
 
     textes, liens, preuves = [], [], []
     compte = {"interne": 0, "externe": 0, "non_resolue": 0, "absents": 0,
               "hors_perimetre": 0, "sans_preuve": 0, "cite": 0,
               "citee_sans_action": 0, "cree": 0, "cree_deja_declare": 0,
-              "cree_non_corrobore": 0}
+              "cree_non_corrobore": 0, "cree_contredit": 0, "cree_corrobore": 0,
+              "cree_resolu_par_le_contenu": 0}
 
     lues = [ligne for chemin in plans
             for ligne in csv.DictReader(chemin.open(encoding="utf-8"),
@@ -479,6 +563,22 @@ def main() -> None:
                         and article_id not in produits.get(ligne["dossier"], ())):
                     compte["cree_non_corrobore"] += 1
                     continue
+                methode, confiance = "derivee", CONFIANCE_CREE
+                if portee == "interne":
+                    ecrit = alinea_ecrit(contenu, creation.start())
+                    accord = contenu_corrobore(
+                        ecrit, versions_produites.get((ligne["dossier"], article_id)))
+                    if accord is False:
+                        compte["cree_contredit"] += 1
+                        article_id = resolu_par_le_contenu(
+                            ecrit, trigrammes_produits[ligne["dossier"]])
+                        if article_id is None:
+                            portee = "non_resolue"
+                        else:
+                            compte["cree_resolu_par_le_contenu"] += 1
+                            methode, confiance = "inferee", CONFIANCE_CREE_CONTENU
+                    elif accord:
+                        compte["cree_corrobore"] += 1
                 extrait = fenetre(contenu, creation.start(), creation.end())
                 if extrait is None:
                     compte["sans_preuve"] += 1
@@ -488,7 +588,7 @@ def main() -> None:
                 compte["cree"] += 1
                 preuves.append((suivant, "article_cree", extrait, creation.start()))
                 liens.append((identifiant, article_du_texte, article_id, cle,
-                              code, portee, "derivee", CONFIANCE_CREE, suivant))
+                              code, portee, methode, confiance, suivant))
                 suivant += 1
 
     base.executemany("INSERT INTO texte_discute (id, dossier_id, chambre, stade, "
@@ -522,6 +622,10 @@ def main() -> None:
     print(f"\narticles écrits dans la citation, relevés : {compte['cree']}")
     print(f"  déjà déclarés par l'instruction : {compte['cree_deja_declare']}")
     print(f"  écartés, non corroborés par LEGI : {compte['cree_non_corrobore']}")
+    print(f"  contenu comparé à la version promulguée — concordant : "
+          f"{compte['cree_corrobore']}, contredit (numéro glissé) : "
+          f"{compte['cree_contredit']}, dont résolus par le contenu : "
+          f"{compte['cree_resolu_par_le_contenu']}")
     print(f"\narticles en vigueur reliés à un article de texte : {couverts} "
           f"({100 * couverts / en_vigueur:.1f} %)")
     print(f"\nintégrité : {len(violations)} violation(s) de clef étrangère")
