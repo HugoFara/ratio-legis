@@ -19,6 +19,15 @@ Deux résolutions, et rien entre les deux :
   qui entrent en vigueur en juillet. À défaut, `a_la_date(numero, date)` : la
   lignée dont la période couvre la date du texte du dossier ; avant la
   première, la première ; après la dernière, la dernière.
+
+La date du dossier est celle de la loi promulguée. Pour un amendement, c'est
+trop tard : il est écrit sur un texte en discussion, des mois avant, et il
+nomme l'article tel qu'il est ce jour-là. « L. 141-3 du code de la
+consommation est complété » déposé au Sénat en novembre 2015 sous un dossier
+promulgué en novembre 2016 désignait l'article de 2005, abrogé par la
+recodification de juillet 2016 — non le L141-3 créé en 2024, seule lignée
+ouverte à la date de la loi. `du_dossier` prend donc une date facultative,
+celle du texte discuté quand l'appelant la connaît (`docs/49`).
 """
 
 from __future__ import annotations
@@ -30,10 +39,14 @@ from collections import defaultdict
 class Resolveur:
     def __init__(self, base: sqlite3.Connection) -> None:
         self.lignees: dict[str, list[tuple[int, int, str, str]]] = defaultdict(list)
+        # Une lignée dont toutes les versions sont mort-nées ou annulées n'a
+        # jamais été en vigueur : rien ne peut la viser, la modifier ni la
+        # commenter. `periode_article` l'ignore, et la jointure interne
+        # l'écarte ici — un amendement de 2019 sur L. 217-9 se résolvait vers
+        # la lignée d'une version mort-née de 2022 (docs/49 § 8).
         for id_, numero, lignee, debut, fin in base.execute("""
-                SELECT a.id, a.numero, a.lignee,
-                       coalesce(p.debut, '0000-00-00'), coalesce(p.fin, '9999-12-31')
-                FROM article a LEFT JOIN periode_article p ON p.article_id = a.id
+                SELECT a.id, a.numero, a.lignee, p.debut, p.fin
+                FROM article a JOIN periode_article p ON p.article_id = a.id
                 ORDER BY a.numero, a.lignee"""):
             self.lignees[numero.replace(" ", "")].append((lignee, id_, debut, fin))
         self.dates: dict[str, str] = dict(base.execute("""
@@ -46,7 +59,8 @@ class Resolveur:
             SELECT DISTINCT i.dossier_id, v.article_id FROM issu_de i
             JOIN produite_par p ON p.texte_id = i.texte_id
             JOIN version_article v ON v.id_legi = p.version_id
-            WHERE p.type_lien NOT IN ('ABROGE', 'ABROGATION')"""):
+            WHERE p.type_lien NOT IN ('ABROGE', 'ABROGATION')
+              AND v.etat NOT IN ('MODIFIE_MORT_NE', 'ANNULE')"""):
             self.ecrits[dossier].add(article_id)
 
     def courant(self, numero: str) -> int | None:
@@ -64,7 +78,8 @@ class Resolveur:
                 return id_
         return lignees[-1][1]
 
-    def du_dossier(self, numero: str, dossier: str | None) -> int | None:
+    def du_dossier(self, numero: str, dossier: str | None,
+                   date: str | None = None) -> int | None:
         lignees = self.lignees.get(numero.replace(" ", ""))
         if not lignees:
             return None
@@ -72,7 +87,7 @@ class Resolveur:
             ecrites = [id_ for _, id_, _, _ in lignees if id_ in self.ecrits.get(dossier, ())]
             if len(ecrites) == 1:
                 return ecrites[0]
-        return self.a_la_date(numero, self.dates.get(dossier or ""))
+        return self.a_la_date(numero, date or self.dates.get(dossier or ""))
 
     def courants(self) -> dict[str, int]:
         """numero → identifiant de la lignée la plus haute, pour les boucles."""

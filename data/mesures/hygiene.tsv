@@ -5,9 +5,9 @@ verdict	partie D — origine située seulement	0	179	0.0
 verdict	partie D — motivation du texte seule	11	179	6.1	
 verdict	partie D — RAISON NON DOCUMENTÉE	167	179	93.3	
 verdict	partie L — articles en vigueur	1293			
-verdict	partie L — un passage les motive	780	1293	60.3	
+verdict	partie L — un passage les motive	781	1293	60.4	
 verdict	partie L — origine située seulement	127	1293	9.8	
-verdict	partie L — motivation du texte seule	308	1293	23.8	
+verdict	partie L — motivation du texte seule	307	1293	23.7	
 verdict	partie L — RAISON NON DOCUMENTÉE	78	1293	6.0	
 verdict	partie R — articles en vigueur	632			
 verdict	partie R — un passage les motive	43	632	6.8	
@@ -46,30 +46,30 @@ irrecevabilite	fondement — article 41	170	2955	5.8
 irrecevabilite	fondement — article 44 bis	135	2955	4.6	
 irrecevabilite	fondement — LOLF	10	2955	0.3	
 irrecevabilite	fondement — LOLFSS	6	2955	0.2	
-tentatives	articles en vigueur portant une tentative, les trois voies	217	2104	10.3	cible déclarée, alinéa écrit ou subdivision déposée
-tentatives	dont par la cible déclarée du dispositif	135	217	62.2	
-tentatives	dont par un alinéa écrit qui subsiste	83	217	38.2	
-tentatives	dont par la subdivision déposée	48	217	22.1	
-tentatives	tentatives déclarées sur un article en vigueur	318			voie de la cible déclarée seule ; le détail par sort suit
-depot	amendements positionnés sur un article en vigueur	231			
+tentatives	articles en vigueur portant une tentative, les trois voies	195	2104	9.3	cible déclarée, alinéa écrit ou subdivision déposée
+tentatives	dont par la cible déclarée du dispositif	112	195	57.4	
+tentatives	dont par un alinéa écrit qui subsiste	83	195	42.6	
+tentatives	dont par la subdivision déposée	48	195	24.6	
+tentatives	tentatives déclarées sur un article en vigueur	262			voie de la cible déclarée seule ; le détail par sort suit
+depot	amendements positionnés sur un article en vigueur	232			
 depot	articles en vigueur atteints	48	2104	2.3	
 depot	assemblee — jeux d'amendements appariés à leur texte	39	39	100.0	
 depot	senat — jeux d'amendements appariés à leur texte	124	143	86.7	
-depot	subdivisions tombant dans la plage d'articles du texte	5488	5712	96.1	contrôle de l'appariement ; un texte faux s'y verrait en premier
+depot	subdivisions tombant dans la plage d'articles du texte	5540	5712	97.0	contrôle de l'appariement ; un texte faux s'y verrait en premier
 depot	amendements portant sur un article additionnel	9088			ils ne visent aucun article existant du code : c'est le plafond de la voie du dépôt
-tentatives	dont rejete	123	318	38.7	
-tentatives	dont retire	66	318	20.8	
-tentatives	dont adopte	62	318	19.5	
-tentatives	dont irrecevable	42	318	13.2	
-tentatives	dont non_soutenu	20	318	6.3	
-tentatives	dont tombe	5	318	1.6	
+tentatives	dont rejete	95	262	36.3	
+tentatives	dont retire	60	262	22.9	
+tentatives	dont adopte	50	262	19.1	
+tentatives	dont irrecevable	42	262	16.0	
+tentatives	dont non_soutenu	11	262	4.2	
+tentatives	dont tombe	4	262	1.5	
 navette	dossiers ayant au moins deux états datés	110			
 navette	durée médiane, en jours	131			
 navette	durée la plus courte, en jours	1			
 navette	durée la plus longue, en jours	897			
-chambres	segments écrits par un amendement — assemblee	99			dénominateur faible : voir docs/09
-chambres	segments écrits par un amendement — senat	167			dénominateur faible : voir docs/09
-chambres	articles dont un alinéa est tracé jusqu'à un amendement	123			sans remonter la chaîne des segments
+chambres	segments écrits par un amendement — assemblee	100			dénominateur faible : voir docs/09
+chambres	segments écrits par un amendement — senat	148			dénominateur faible : voir docs/09
+chambres	articles dont un alinéa est tracé jusqu'à un amendement	117			sans remonter la chaîne des segments
 sources	documents — avis_conseil_etat	27			
 sources	documents — etude_impact	46			
 sources	documents — expose_des_motifs	77			

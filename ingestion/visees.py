@@ -35,6 +35,8 @@ from lignees import Resolveur  # noqa: E402
 from textes_des_amendements import (ALINEA, ARTICLE_ENTIER, Textes,  # noqa: E402
                                     alineas_nommes, correspondances,
                                     numero_de_subdivision)
+from textes_deposes import (contenu_corrobore, mots,  # noqa: E402
+                            resolu_par_le_contenu, trigrammes)
 from collections import defaultdict  # noqa: E402
 
 
@@ -72,6 +74,23 @@ ANCRE = re.compile(r"\b(?:apr[èe]s|avant|à la suite de)\s+(?:le|la|l['’])?\s
 # dossiers les plus lourds du périmètre — ceux qui écrivent le code — étaient
 # précisément ceux qu'on ne voyait pas.
 CREATION = re.compile(r"[«\"]\s*(?:art|article)\.?\s*$", re.I)
+# Ce qui suit le numéro dans l'en-tête d'un article écrit — « Art. L. 423-17.
+# – » —, avant le premier alinéa.
+TETE = re.compile(r"\s*(?:\((?:nouveau|non modifié)\))?\s*[.\s]*[–‑-]?\s*", re.I)
+# Un amendement qui écrit une division entière — « Section 14 « Appellation
+# « artisan restaurateur » « Art. L. 121-97 … » — numérote ses articles
+# lui-même, comme celui qui réécrit tout l'article du texte : le numéro n'est
+# que le sien. L'amendement 17406 de 2013 met sous « Art. L. 121-99 » la
+# recherche des infractions à son appellation ; la loi y a mis les métaux
+# précieux, par une autre section adoptée le même jour. Jugée fausse en
+# arbitrage (docs/49 § 8).
+DIVISION_ECRITE = re.compile(r"«\s*(?:section|sous-section|chapitre|titre)\s+\d", re.I)
+# « Rédiger ainsi le premier alinéa : « I. – L'article L. 115-16 est ainsi
+# modifié : » » — un chapeau réécrit pour y mettre « I. – », et rien après le
+# deux-points. La formule y est, la modification non : deux juges l'ont dite
+# fausse (docs/49 § 8). La formule suivie du deux-points et de la fin du
+# dispositif n'est pas une cible.
+CHAPEAU_VIDE = re.compile(r"\s*:\s*[»\"]?\s*$")
 TIRETS = str.maketrans({"\u2011": "-", "\u2010": "-", "\u00a0": " ", "\u202f": " "})
 
 # Le numéro seul ne dit pas le code : L. 152-1 existe au code de l'environnement,
@@ -87,26 +106,111 @@ BORNE = re.compile(r"(?<![LRD])(?<!art)(?<!n°)[.;]")
 # modifications d'autres codes dont un numéro existe aussi dans le nôtre.
 CODE_NOMME = re.compile(
     r"\b(?:du|le|la|au|dans le|de ce|ce|même)\s+(?:présent\s+)?code(?:\s+[^,;.:)]{3,45})?", re.I)
+# La date d'un texte en discussion, telle que son stade l'écrit : « Texte de
+# la commission déposé le 28 octobre 2015 ». Un projet déposé n'en porte pas.
+MOIS = {m: i + 1 for i, m in enumerate(
+    "janvier février mars avril mai juin juillet août septembre octobre "
+    "novembre décembre".split())}
+DATE = re.compile(r"(\d{1,2})(?:er)?\s+(" + "|".join(MOIS) + r")\s+(\d{4})", re.I)
 
 
-def clause(texte: str, debut: int, fin: int) -> str:
+def dates_des_textes(base: sqlite3.Connection) -> tuple[dict[str, str], dict[str, str]]:
+    """Par texte discuté, sa date ; par dossier, la plus ancienne de ses textes.
+
+    C'est à cette date qu'un amendement nomme un article, et non à celle de la
+    loi promulguée, des mois après — le temps d'une recodification (`lignees`).
+    """
+    par_texte, par_dossier = {}, {}
+    for texte_id, dossier, stade in base.execute(
+            "SELECT id, dossier_id, stade FROM texte_discute"):
+        trouve = DATE.search(stade)
+        if not trouve:
+            continue
+        date = f"{trouve.group(3)}-{MOIS[trouve.group(2).lower()]:02d}-{int(trouve.group(1)):02d}"
+        par_texte[texte_id] = date
+        if date < par_dossier.get(dossier, "9999"):
+            par_dossier[dossier] = date
+    return par_texte, par_dossier
+
+
+def bornes(texte: str, debut: int, fin: int) -> tuple[int, int]:
+    """La clause qui contient la référence : d'une borne à la suivante."""
     gauche = max((m.end() for m in BORNE.finditer(texte, 0, debut)), default=0)
     droite = BORNE.search(texte, fin)
-    return texte[gauche:droite.start() if droite else len(texte)]
+    return gauche, droite.start() if droite else len(texte)
 
 
-def vise_un_autre_code(texte: str, debut: int, fin: int) -> bool:
+class Instruction:
+    """Les noms de code d'un dispositif, avec le bloc guillemeté qui les porte.
+
+    Ce qu'un dispositif met entre « » est le texte qu'il insère ; un code nommé
+    là ne qualifie pas un numéro écrit hors de ce bloc. « Après le deuxième
+    alinéa de l'article L. 411-1 du code de la mutualité, sont insérés deux
+    alinéas : « … régis par le présent code. » » se rattachait à notre L. 411-1
+    par ce « présent code », qui est celui de la mutualité ; « Le code des
+    assurances est ainsi modifié : … « p) … L. 531-1 du code de la
+    consommation ; » 3° L'article L. 512-1 est ainsi rédigé » rattachait
+    L. 512-1 à notre code par la liste citée au p). Deux arêtes jugées fausses
+    (`docs/48` § 3), une seule cause.
+
+    Mais le bloc n'est pas un masque : un amendement de l'Assemblée qui
+    complète un article du projet de loi met **tout** entre guillemets —
+    « V. – Le livre Ier du code de la consommation est ainsi modifié : « 2°
+    L'article L. 113-9 est abrogé » — et le code nommé en tête du bloc
+    gouverne les numéros du même bloc. La règle est donc : un nom de code
+    vaut pour un numéro si le bloc qui contient le nom contient aussi le
+    numéro, ou si le nom n'est dans aucun bloc.
+
+    Les blocs suivent la convention de légistique : chaque alinéa inséré
+    ouvre un guillemet, seul le dernier le ferme. Un « qui suit un point ou
+    un point-virgule, à l'intérieur d'un bloc, continue ce bloc ; tout autre
+    « en ouvre un, imbriqué ; un » ferme le plus récent. Un bloc jamais fermé
+    court jusqu'à la fin.
+    """
+
+    def __init__(self, texte: str) -> None:
+        blocs: list[list[int]] = []          # [ouverture, fermeture]
+        pile: list[list[int]] = []
+        for i, c in enumerate(texte):
+            if c == "«":
+                j = i - 1
+                while j >= 0 and texte[j].isspace():
+                    j -= 1
+                if pile and j >= 0 and texte[j] in ".;":
+                    continue
+                bloc = [i, len(texte)]
+                blocs.append(bloc)
+                pile.append(bloc)
+            elif c == "»" and pile:
+                pile.pop()[1] = i
+        # (début, fin, nom, bloc englobant le plus étroit)
+        self.noms: list[tuple[int, int, str, tuple[int, int] | None]] = []
+        for m in CODE_NOMME.finditer(texte):
+            dedans = [b for b in blocs if b[0] < m.start() < b[1]]
+            bloc = max(dedans, key=lambda b: b[0]) if dedans else None
+            self.noms.append((m.start(), m.end(), m.group(0).lower(),
+                              tuple(bloc) if bloc else None))
+
+    def visibles(self, position: int, gauche: int = 0, droite: int | None = None
+                 ) -> list[tuple[int, str]]:
+        """Les noms entre `gauche` et `droite` qui valent pour `position`."""
+        return [(d, nom) for d, f, nom, bloc in self.noms
+                if d >= gauche and (droite is None or f <= droite)
+                and (bloc is None or bloc[0] < position < bloc[1])]
+
+
+def vise_un_autre_code(texte: str, debut: int, fin: int, instruction: Instruction) -> bool:
     """Vrai si la clause nomme un code, et que ce n'est pas celui-ci."""
-    noms = [m.group(0).lower() for m in CODE_NOMME.finditer(clause(texte, debut, fin))]
+    noms = [nom for _, nom in instruction.visibles(debut, *bornes(texte, debut, fin))]
     if not noms:
         # Le code est souvent nommé une seule fois, en tête du bloc modificateur :
         # « Le code de l'énergie est ainsi modifié : 1° … "Art. L. 241-2-…" ». La
         # clause ne le contient pas, mais il gouverne tout ce qui suit. Même
         # convention que « du même code » dans la tranche des renvois.
-        amont = list(CODE_NOMME.finditer(texte, 0, debut))
+        amont = instruction.visibles(debut, 0, debut)
         if not amont:
             return False
-        noms = [amont[-1].group(0).lower()]
+        noms = [amont[-1][1]]
     return not any("consommation" in n or "présent code" in n for n in noms)
 
 
@@ -125,46 +229,71 @@ def vise_un_autre_code(texte: str, debut: int, fin: int) -> bool:
 # elles jugées par deux agents Sonnet, **19 sur 20**, un arbitrage — la
 # fausse est un numéro glissé que la garde ne voit pas (§ 4 de docs/46). Les
 # deux tirages décrivent ensemble la population d'aujourd'hui : 39 sur 40.
-CONFIANCE = 0.8712
+# Le 21 septembre 2026 (docs/49), le bloc guillemeté, la date du texte et le
+# contenu de l'article écrit retirent 86 arêtes et en ajoutent 13. Re-mesurée
+# le même jour sur la population d'aujourd'hui, deux juges Sonnet 5 par fiche
+# et un arbitre : un tirage disjoint de 20, les 11 nouvelles, puis un second
+# tirage disjoint de 20 après les corrections que les deux premiers ont
+# dictées (lignée mort-née, division écrite, chapeau vide) — **47 justes sur
+# 50**, réunis et dédoublonnés, Wilson 0,8378. Les trois fausses sont chacune
+# la cause d'une garde ; la population d'après n'a pas de tirage à elle.
+CONFIANCE = 0.8378
 
 
-def code_nomme(texte: str, debut: int, fin: int) -> bool:
+def code_nomme(texte: str, debut: int, fin: int, instruction: Instruction) -> bool:
     """Le dispositif nomme-t-il un code — le nôtre — pour cette référence ?"""
-    if CODE_NOMME.search(clause(texte, debut, fin)):
-        return True
-    return bool(list(CODE_NOMME.finditer(texte, 0, debut)))
+    return bool(instruction.visibles(debut, *bornes(texte, debut, fin))
+                or instruction.visibles(debut, 0, debut))
 
 
-def cibles(dispositif: str) -> list[tuple[str, tuple[str, bool]]]:
-    """Articles visés par une formule de modification : (numéro, (formule, code nommé)).
+def alinea_ecrit(texte: str, position: int) -> list[str]:
+    """Les mots du premier alinéa qu'un amendement écrit sous l'en-tête dont
+    le numéro finit à `position` : jusqu'au guillemet suivant, qui ouvre
+    l'alinéa d'après ou ferme le bloc."""
+    debut = TETE.match(texte, position).end()
+    fin = min((i for i in (texte.find("«", debut), texte.find("»", debut)) if i >= 0),
+              default=len(texte))
+    return mots(texte[debut:fin])
+
+
+def cibles(dispositif: str) -> list[tuple[str, tuple[str, bool, list[str] | None]]]:
+    """Articles visés par une formule de modification :
+    (numéro, (formule, code nommé, alinéa écrit)).
 
     `code nommé` dit si le dispositif désigne lui-même le code de la
     consommation. Sans cela, « L. 122-3 » d'un amendement au code forestier se
     rattachait à notre L. 122-3 : le dispositif ne nomme pas son code quand
     l'article du texte le dit pour lui. Neuf arêtes sur vingt du premier
     tirage (docs/43) : c'est la voie non nommée qui les portait toutes.
+
+    `alinéa écrit` n'est là que pour l'article que le dispositif rédige sous
+    un numéro — « Art. L. 121-104. – Lorsque… » — : ce qu'il met sous ce
+    numéro, pour le comparer à ce que la loi y a mis.
     """
     # Tirets insécables et espaces fines des sites des chambres : « L. 223‑1 »
     # n'était pas lu.
     texte = sans_balises(dispositif).translate(TIRETS)
-    trouves: dict[str, tuple[str, bool]] = {}
+    instruction = Instruction(texte)
+    trouves: dict[str, tuple[str, bool, list[str] | None]] = {}
     for m in ARTICLE.finditer(texte):
         cle = f"{m.group(1)}{m.group(2)}-{m.group(3)}" + (f"-{m.group(4)}" if m.group(4) else "")
-        if vise_un_autre_code(texte, m.start(), m.end()):
+        if vise_un_autre_code(texte, m.start(), m.end(), instruction):
             continue
         if ANCRE.search(texte[max(0, m.start() - 40):m.start()]):
             continue
-        nomme = code_nomme(texte, m.start(), m.end())
+        nomme = code_nomme(texte, m.start(), m.end(), instruction)
         suite = APRES.match(texte[m.end():m.end() + 80])
         if suite:
-            trouves.setdefault(cle, (suite.group(1).lower(), nomme))
+            if CHAPEAU_VIDE.match(texte, m.end() + suite.end()):
+                continue
+            trouves.setdefault(cle, (suite.group(1).lower(), nomme, None))
             continue
         amont = AVANT.search(texte[max(0, m.start() - 40):m.start()])
         if amont:
-            trouves.setdefault(cle, (amont.group(1).lower(), nomme))
+            trouves.setdefault(cle, (amont.group(1).lower(), nomme, None))
             continue
         if CREATION.search(texte[max(0, m.start() - 20):m.start()]):
-            trouves.setdefault(cle, ("rédigé", nomme))
+            trouves.setdefault(cle, ("rédigé", nomme, alinea_ecrit(texte, m.end())))
     return list(trouves.items())
 
 
@@ -232,6 +361,39 @@ def main() -> None:
         glisses[(texte_id, article_du_texte, cle.replace(" ", ""))] = (
             article_id if portee == "interne" else None)
     textes = Textes(base, Path(__file__).resolve().parent.parent / "travail" / "corpus" / "textes")
+    # **Ce que l'amendement écrit sous le numéro, comparé à ce que la loi y a
+    # mis** — la corroboration par le contenu de `textes_deposes`, portée à
+    # l'amendement lui-même (`docs/46` § 4 l'annonçait, `docs/49` le fait).
+    # Trois familles, que la part des trigrammes de l'alinéa écrit sépare :
+    #
+    # - **le numéro a glissé** : l'amendement 4384 de 2013 rédige « Art.
+    #   L. 121-109 », et la loi a mis ce texte sous L. 121-110 — à 1,0, et
+    #   0,0 sous L. 121-109. Le contenu désigne un autre article de la même
+    #   loi, seul au-dessus du seuil : le numéro ne vaut rien, l'arête n'est
+    #   pas posée. Elle n'est pas non plus résolue vers l'article désigné —
+    #   ce serait une population nouvelle, non mesurée ; elle est comptée ;
+    # - **le plan propre** : l'amendement 4495 réécrit tout l'article 1er de
+    #   2013 selon son propre plan, et met sous « Art. L. 423-17 » un texte
+    #   que la loi n'a mis nulle part — 0,0 partout. Sous un article du
+    #   texte réécrit en entier, le numéro n'est que celui de l'amendement ;
+    #   il ne vaut que corroboré par le contenu. Onze arêtes sur quatorze
+    #   jugées fausses pour cette cause (`docs/47` § 4) ; la garde d'alors
+    #   n'attrapait que les numéros que `porte_sur` savait glissés, et
+    #   L. 423-17 ← 4495, jugée fausse, revenait dès que le nom de code cité
+    #   qui l'écartait par hasard cessait de compter ;
+    # - **l'autre rédaction** : l'amendement 3146 rédige « Art. L. 121-104 »
+    #   à sa façon, sous le plan du texte, et sa version ressemble à rien de
+    #   promulgué — c'est un amendement rejeté, sa rédaction diffère par
+    #   construction. Il vise bien L. 121-104 : le numéro tient.
+    versions_produites: dict[tuple[str, int], str] = {}
+    for dossier_id, article_id, texte_version in base.execute(
+            "SELECT i.dossier_id, v.article_id, v.texte FROM issu_de i "
+            "JOIN produite_par p ON p.texte_id = i.texte_id "
+            "JOIN version_article v ON v.id_legi = p.version_id ORDER BY v.date_debut"):
+        versions_produites.setdefault((dossier_id, article_id), texte_version)
+    trigrammes_produits: dict[str, dict[int, set[tuple[str, ...]]]] = defaultdict(dict)
+    for (dossier_id, article_id), texte_version in versions_produites.items():
+        trigrammes_produits[dossier_id][article_id] = trigrammes(mots(texte_version))
 
     def hote_de_l_instruction(texte_id: str, numero: str, n: str, dispositif: str) -> bool:
         """Le numéro nu `n` désigne-t-il notre code, à en juger par l'instruction
@@ -246,12 +408,13 @@ def main() -> None:
                                   mentions_id.get((texte_id, numero), {}))
         return isinstance(cible, list)
     textes_du_corpus = corpus_vers_texte(base)
+    date_du_texte, date_du_dossier = dates_des_textes(base)
     # Un article que le dispositif **crée** sous un numéro (« Art. L. 121-105. – »)
     # n'est le nôtre que si la loi du dossier a bien écrit ce numéro : la
     # numérotation proposée par un projet glisse en navette (docs/41 § 2).
     aretes, sans_cible, hors_dossier, hote_etranger, numero_glisse = [], 0, 0, 0, 0
     par_l_instruction, glisse_dans_le_texte, suivi_par_le_contenu = 0, 0, 0
-    plan_propre = 0
+    plan_propre, corrobore, glisse_par_le_contenu, plan_propre_non_corrobore = 0, 0, 0, 0
     for amendement_id, dossier, dispositif, chambre, corpus, subdivision in base.execute(
             "SELECT id, dossier_id, dispositif, chambre, texte_discute, subdivision "
             "FROM amendement WHERE dispositif IS NOT NULL"):
@@ -264,7 +427,7 @@ def main() -> None:
         if texte_id and numero:
             codes_de_l_hote = hote.get((texte_id, numero))
         retenues = []
-        for n, (formule, nomme) in cibles(dispositif):
+        for n, (formule, nomme, ecrit) in cibles(dispositif):
             # Sans code nommé, le numéro ne vaut que par son hôte ; hôte étranger,
             # hôte multi-codes, ou hôte inconnu — jeu d'amendements non apparié à
             # un texte — : on ne rattache pas. Dix amendements y perdent leur
@@ -277,7 +440,11 @@ def main() -> None:
                 else:
                     hote_etranger += 1
                     continue
-            article_id = resolveur.du_dossier(n, dossier)
+            # À la date du texte discuté ; à défaut, du plus ancien texte du
+            # dossier ; à défaut, de la loi. Sans cela « L. 141-3 » de 2015
+            # se résolvait vers la lignée de 2024 (`docs/48` § 3).
+            article_id = resolveur.du_dossier(
+                n, dossier, date_du_texte.get(texte_id or "") or date_du_dossier.get(dossier))
             if article_id is None:
                 continue
             if formule == "rédigé" and article_id not in resolveur.ecrits.get(dossier, ()):
@@ -302,6 +469,18 @@ def main() -> None:
                     glisse_dans_le_texte += 1
                     continue
                 suivi_par_le_contenu += 1
+            elif ecrit is not None:
+                accord = contenu_corrobore(ecrit, versions_produites.get((dossier, article_id)))
+                if accord:
+                    corrobore += 1
+                else:
+                    autre = resolu_par_le_contenu(ecrit, trigrammes_produits[dossier])
+                    if autre is not None and autre != article_id:
+                        glisse_par_le_contenu += 1
+                        continue
+                    if ARTICLE_ENTIER.search(dispositif) or DIVISION_ECRITE.search(dispositif):
+                        plan_propre_non_corrobore += 1
+                        continue
             retenues.append((article_id, formule))
         if not retenues:
             sans_cible += 1
@@ -340,6 +519,10 @@ def main() -> None:
           f"donné à un autre : {glisse_dans_le_texte} non résolus, "
           f"{suivi_par_le_contenu} suivis vers l'article que le contenu désigne, "
           f"{plan_propre} écartés — l'article du texte réécrit en entier, plan propre")
+    print(f"  article rédigé sous un numéro que la loi a écrit : {corrobore} au contenu "
+          f"de la loi ; {glisse_par_le_contenu} dont le contenu désigne un autre article "
+          f"de la loi, {plan_propre_non_corrobore} sous un plan propre que rien ne "
+          f"corrobore — non rattachés")
     print(f"articles du code visés     : {touches}")
     print(f"  dont en vigueur          : {en_vigueur}")
     print("\npar sort :")

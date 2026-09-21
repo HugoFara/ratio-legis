@@ -91,10 +91,15 @@ python3 tools/mesures/rejouer.py travail/ratio-legis.sqlite  # le harnais : les 
 ```
 
 **Le harnais** rejoue les sept cents verdicts des fiches contre la base du jour
-et échoue si une arête jugée fausse y est. Il en trouve dix au premier passage,
-nommées dans [`docs/48`](docs/48-classement-harnais-accueil.md) ; une
-contribution n'en ajoute pas, et celle qui en retire une le dit dans son
-commit. Les « perdues » — jugées justes, absentes — ne font pas échouer : c'est
+et échoue si une arête jugée fausse y est. Il en trouvait dix au premier
+passage ([`docs/48`](docs/48-classement-harnais-accueil.md)) ; neuf ont été
+réparées à la source ; la dixième et quatre autres, révélées quand le harnais
+a su reconnaître une arête dont l'identifiant a glissé, sont des verdicts
+humains contestés sur pièces ([`docs/49`](docs/49-les-dix-du-harnais.md)
+§ 6). Une contribution n'en ajoute
+pas, et celle qui en retire une le dit dans son commit. Une arête jugée sur
+une lignée ou par une voie que la base ne porte plus est comptée à part, non
+jugée. Les « perdues » — jugées justes, absentes — ne font pas échouer : c'est
 du rappel qui s'en va, à expliquer.
 
 Le contrat du § 4.3 doit rester à **zéro phrase écartée faute de citation**, et

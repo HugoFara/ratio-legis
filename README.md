@@ -58,7 +58,7 @@ versionnés dans [`restitution/exemples/`](restitution/exemples/).
 **Pourquoi cet article.** La fiche de provenance, arête par arête, et la note
 « pourquoi cet article » sous le contrat du § 4.3 — toute phrase produite est
 citable, celles qui ne le sont pas sont supprimées et le compte s'affiche en
-pied de page (zéro sur 11 642 constats). Aucun modèle de langue n'intervient :
+pied de page (zéro sur 11 641 constats). Aucun modèle de langue n'intervient :
 la note est assemblée par gabarits, les passages sont verbatim.
 
 ```
@@ -81,7 +81,7 @@ python3 restitution/surlignage.py travail/ratio-legis.sqlite L111-1 --html sorti
 deux chambres avec leur sort en huit familles comparables, et l'irrecevabilité
 lue là où la chambre l'écrit — sur 2 955 irrecevabilités, 1 269 au titre de
 l'article 40, 896 cavaliers.
-217 articles en vigueur portent au moins une tentative, par trois voies jamais
+195 articles en vigueur portent au moins une tentative, par trois voies jamais
 confondues : l'alinéa écrit qui subsiste (`resulte_de`), la cible que le
 dispositif déclare (`vise`, la seule ouverte à un amendement rejeté), la
 subdivision du texte sur laquelle il fut déposé (`depose_sur`)
@@ -276,7 +276,7 @@ mesurés contre leurs seuils :
 | couverture `produite_par` | > 95 % | 2 081 / 2 104 — **98,9 %** | atteint |
 | couverture `issu_de` | > 90 % | 66 / 74 lois et ordonnances utiles — **89,2 %** | **repassé sous le seuil** — huit textes entrés par les incréments quotidiens sans dossier DOLE, [`docs/20`](docs/20-dossiers-des-textes.md) |
 | couverture `resulte_de` | > 60 % | 83 / 896 — **9,3 %** | **non atteint**, décision go du § 8 rendue dans [`docs/21`](docs/21-precision-resulte-de.md) § 7 : le grain de l'article est tenu par le commentaire de rapport et par le texte discuté, non par l'amendement |
-| précision `resulte_de` | > 95 % | 168 / 179 hors-échantillon — **93,9 %** | **non atteint**, et mesuré ; les 277 arêtes examinées une à une |
+| précision `resulte_de` | > 95 % | 35 / 37 hors-échantillon — **94,6 %**, Wilson 0,8230 | **non atteint**, et re-mesuré le 21 septembre 2026 sur la population d'aujourd'hui, deux juges par arête ([`docs/49`](docs/49-les-dix-du-harnais.md) § 8) ; 168 / 179 sur la population d'avant |
 
 ### Ce que la base contient
 
@@ -302,7 +302,7 @@ amendement.
 
 | partie | articles | un passage les motive | origine située | motivation du texte | **raison non documentée** |
 |---|---:|---:|---:|---:|---:|
-| **L** | 1 293 | 780 (60,3 %) | 127 | 308 | **78 (6,0 %)** |
+| **L** | 1 293 | 781 (60,4 %) | 127 | 307 | **78 (6,0 %)** |
 | **R** | 632 | 43 | 7 | 58 | **524 (82,9 %)** |
 | **D** | 179 | 1 | 0 | 11 | **167 (93,3 %)** |
 
@@ -355,12 +355,14 @@ data, reconstructible page par page depuis Wayback — arbitrage à rendre entre
 le coût et un trou déclaré. Les tableaux de concordance annexés aux textes de
 transposition, seul chemin connu vers un lien européen au grain de l'article.
 
-**Dix arêtes jugées fausses sont dans la base**, et le harnais
-(`tools/mesures/rejouer.py`) les nomme à chaque passage : un numéro nu
-rattaché à notre L411-1 quand le dispositif dit « du code de la mutualité »,
-un article barré « suppression maintenue en CMP » lu comme modificateur,
-quatre `resulte_de` d'avant les gardes de [`docs/21`](docs/21-precision-resulte-de.md)
-([`docs/48`](docs/48-classement-harnais-accueil.md) § 3).
+**Cinq arêtes jugées fausses sont dans la base**, et le harnais
+(`tools/mesures/rejouer.py`) les nomme à chaque passage : L136-2 ← amendement
+624 et quatre L121-91-1, jugées fausses à la main en
+[`docs/21`](docs/21-precision-resulte-de.md), alors que le texte adopté porte
+l'amendement mot pour mot sous ce numéro — des verdicts humains, contestés sur
+pièces, qu'un humain doit relire ([`docs/49`](docs/49-les-dix-du-harnais.md)
+§ 6). Les neuf autres du premier passage ont été réparées à la source, et les
+tirages de re-mesure en ont trouvé cinq de plus, réparées de même.
 
 **Les arêtes récentes ont chacune leur maille nommée**, dans la section « ce
 qui n'est pas fait » de leur document — les dernières : le plan propre d'un
@@ -422,6 +424,7 @@ d'aujourd'hui ; ceux des documents sont ceux de leur date.
 | 40. Le code hôte de l'instruction | le numéro nu sous un article multi-codes, rattaché par l'instruction qui le porte ou qui gouverne l'alinéa nommé ; `vise` +40, jugées 19/20 ; la fausse est un numéro glissé que la garde ne voit pas | [`docs/46`](docs/46-le-code-hote-de-l-instruction.md) |
 | 41. Le numéro glissé par le contenu | l'article que le texte écrit sous un numéro que la loi a donné à un autre : 358 contredits, 234 résolus vers la version qui les contient, jugés 20/20 ; `vise` suit sauf plan propre (3/14 avant la garde) | [`docs/47`](docs/47-le-numero-glisse-par-le-contenu.md) |
 | 42. Classement, harnais, accueil | le classement pèse par la rareté dans le fonds et sait se taire, mesuré 17/21 ; le harnais rejoue 700 verdicts contre la base et trouve dix fausses servies ; « signaler cette arête » sur chaque arête | [`docs/48`](docs/48-classement-harnais-accueil.md) |
+| 43. Les dix du harnais, et la re-mesure | neuf réparées à la source : le bloc guillemeté et la date du texte pour `vise`, l'en-tête de la petite loi pour `porte_sur` (2 837 en-têtes rendus), la destination du passage et l'hôte de l'alinéa pour `resulte_de` ; le harnais voit les lignées, les voies, et reconnaît une arête dont l'identifiant a glissé ; re-mesuré par dix juges Sonnet 5 : `vise` 47/50, `resulte_de` 35/37, `porte_sur` 20/20 ; cinq verdicts humains contestés | [`docs/49`](docs/49-les-dix-du-harnais.md) |
 
 ## D'où ça vient
 

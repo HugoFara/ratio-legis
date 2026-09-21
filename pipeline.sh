@@ -179,7 +179,10 @@ ingere "$RACINE/ingestion/rapports_vers_motive.py" "$TRAVAIL/corpus/rapports" \
 ingere "$RACINE/ingestion/renvois.py" "$BASE"
 ingere "$RACINE/ingestion/an_vers_amendements.py" "$TRAVAIL/an/amendements_14.csv" \
         "$TRAVAIL/an/acteurs_historique.json.zip" "$BASE"
-ingere "$RACINE/ingestion/amendements_vers_resulte_de.py" "$TRAVAIL/corpus/ameli" "$BASE"
+# Les nœuds seulement : l'arête `resulte_de` se construit plus bas, après
+# `porte_sur` et `depose_sur`, dont elle lit l'hôte de l'alinéa que
+# l'amendement nomme (docs/49).
+ingere "$RACINE/ingestion/amendements_vers_resulte_de.py" "$TRAVAIL/corpus/ameli" "$BASE" --noeuds
 # DOLE ne lie pas le texte déposé d'un projet de loi ; son numéro se lit dans le
 # rapport qui le rapporte, et les textes de commission dans la référence des
 # amendements. Les deux plans sont chargés en une seule passe : ce script
@@ -201,6 +204,10 @@ ingere "$RACINE/ingestion/sort_des_amendements.py" "$BASE"
 # Doit suivre `textes_deposes` — il lui faut `porte_sur` —, `visees` et
 # `sort_des_amendements`, dont sa vue reprend les familles.
 ingere "$RACINE/ingestion/textes_des_amendements.py" "$BASE"
+# L'arête critique, en dernier des amendements : un amendement de l'Assemblée
+# ne nomme pas le code, il nomme un alinéa du texte, et c'est `porte_sur` qui
+# sait sous quel code cet alinéa est écrit.
+ingere "$RACINE/ingestion/amendements_vers_resulte_de.py" "$TRAVAIL/corpus/ameli" "$BASE" --aretes
 # Doit suivre les deux précédents : il lui faut les documents et `porte_sur`.
 ingere "$RACINE/ingestion/sections_vers_motive.py" "$TRAVAIL/corpus/rapports" \
         "$PERIMETRE" "$RAPPORTS" "$BASE" "$IMPACTS"

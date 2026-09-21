@@ -69,15 +69,36 @@ from lignees import Resolveur  # noqa: E402
 # « ter » puis « decies » — n'ont pas besoin d'entrée propre ; les autres si.
 ORDINAL = (r"(?:er|bis|ter|quater|quinquies|sexies|septies|octies|nonies|decies"
            r"|undecies|duodecies|quindecies|sexdecies|septdecies|octodecies"
-           r"|novodecies|vicies|unvicies|duovicies|tervicies)")
+           r"|novodecies|vicies|unvicies|duovicies|tervicies|quatervicies"
+           r"|quinvicies|sexvicies|septvicies|octovicies|novovicies|tricies)")
 # L'en-tête peut porter deux lettres — « Article 4 bis BB » — et une mention de
 # navette entre parenthèses — « Article 18 B (nouveau) », « Article 27 quater
 # (Non modifié) ». Une première version n'admettait ni l'une ni l'autre : les
 # articles concernés n'étaient pas reconnus comme des en-têtes, et **leur contenu
 # était rattaché à l'article précédent**. C'est le défaut le plus grave possible
 # ici, puisqu'il produit un rattachement faux plutôt qu'une absence.
-ENTETE = re.compile(r"^[ \t]*Article\s+(\d{1,3}(?:\s*" + ORDINAL + r")*"
-                    r"(?:\s*[A-H]{1,2})?)[ \t]*"
+#
+# **La petite loi du Sénat marque chaque article de sa lecture d'origine et le
+# renumérote** : « (AN1) Article 6 8 », « (CMP) Article 21 48 », « Article
+# 31 37 ». Le premier numéro est celui du texte discuté — celui sur lequel
+# les amendements sont déposés : « après l'article 26 » vise « (AN1) Article
+# 26 31 », vérifié sur la proposition de loi n° 130 de 2010 —, le second
+# celui du texte définitif. Ni la marque ni le second numéro n'étaient admis,
+# et 2 837 en-têtes de 131 textes n'étaient pas des en-têtes : « Article
+# 21 A (Suppression maintenue en C.M.P.) » recevait tout l'article 48 qui
+# suivait, l'article 5 de la petite loi n° 211 de 2015 recevait le texte
+# entier. Deux arêtes jugées fausses pour cette cause (`docs/48` § 3), et
+# `porte_sur` ne les voyait pas parce que le tirage n'avait pas encore
+# atteint ces textes.
+#
+# La lettre peut dépasser H et aller à trois — « Article 6 N » de la loi du
+# 5 mars 2007, « Article 3 bis AAA » — ; elle est en majuscules quoi qu'il en
+# soit du reste, sans quoi « Article 5 et 6 » se lirait « article 5 et,
+# renuméroté 6 ».
+ENTETE = re.compile(r"^[ \t]*(?:\((?:CMP|AN|S)[^)\n]{0,6}\)[ \t]*)?"
+                    r"Article\s+(\d{1,3}(?:\s*" + ORDINAL + r")*"
+                    r"(?:\s*(?-i:[A-Z]{1,3}))?)"
+                    r"(?:\s*\d{1,3}(?:\s*" + ORDINAL + r")*(?:\s*(?-i:[A-Z]{1,3}))?)?[ \t]*"
                     r"(?:\(?\s*(?:nouveau|non\s+modifié|supprimé|conforme)"
                     r"[^\n]{0,24}\)?)?[ \t]*$", re.M | re.I)
 # Le verbe modificatif de la légistique. Il suit la référence dans la même phrase :
@@ -138,9 +159,12 @@ AVAL = 140                    # portée du regard en aval, dans la même phrase
 # 2026 (`docs/41`) : 14 justes sur 15. Puis, le 20 septembre 2026, sur 20
 # arêtes tirées parmi celles que la règle de l'incise a créées — un cinquième
 # de la population interne, jamais mesuré — : 20 sur 20, deux juges d'accord
-# sur chacune (`docs/45` § 6). Les trois tirages réunis, 54 sur 55 ; borne
+# sur chacune (`docs/45` § 6). Les trois tirages réunis, 54 sur 55. Puis, le
+# 21 septembre 2026, 20 arêtes tirées parmi les 161 internes que les en-têtes
+# de la petite loi ont rendues (`docs/49` § 3 et § 8) : 20 sur 20, deux juges
+# Sonnet 5 d'accord sur chacune. Les quatre tirages réunis, 74 sur 75 ; borne
 # inférieure de Wilson à 95 %.
-CONFIANCE = 0.9039
+CONFIANCE = 0.9283
 # La voie de la citation est mesurée à part, parce qu'elle ne vaut pas la même
 # chose : 15 arêtes justes sur 15 vérifiées à la main **après** la garde de
 # corroboration (`docs/33` § 4), puis 3 sur 5 le 19 septembre 2026 — dont une

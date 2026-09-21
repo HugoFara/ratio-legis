@@ -322,7 +322,7 @@ def tentatives_article(numero: str,
                       "Le sort est celui que la chambre publie, jamais un jugement "
                       "porté sur lui : « retiré » ne dit pas si l'auteur a cédé ou "
                       "obtenu satisfaction. Deux voies de rattachement, de "
-                      "confiances différentes : l'alinéa écrit (resulte_de, 0,8933) "
+                      "confiances différentes : l'alinéa écrit (resulte_de, 0,8230) "
                       "et la cible déclarée par le dispositif (vise, 0,6212). "
                       "L'absence de tentative est une absence dans le corpus "
                       "chargé, non une absence au Parlement."})

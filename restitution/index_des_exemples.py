@@ -45,7 +45,7 @@ TENTATIVES = {
     "L732-3": "trois amendements écartés comme cavaliers, dont celui du Gouvernement",
     "L312-9": "la délégation d'assurance emprunteur",
     "L113-3": "les deux chambres, et un sort lu dans l'état procédural",
-    "L224-43": "quatre amendements adoptés dont l'alinéa subsiste",
+    "L224-43": "trois amendements adoptés dont l'alinéa subsiste",
     "L111-3": "l'article le plus disputé du fonds : 67 tentatives, 56 non abouties",
     "sommet": "les articles les plus disputés",
 }

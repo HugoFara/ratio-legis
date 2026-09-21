@@ -154,7 +154,7 @@ phase est close avec les dérogations suivantes, prises en connaissance de cause
 | couverture `produite_par` | > 95 % | 98,8 % | — |
 | couverture `issu_de` | > 90 % | 100 % | — |
 | couverture `resulte_de` | > 60 % | 9,5 % | **seuil déclaré inatteignable** |
-| précision `resulte_de` | > 95 % | 93,9 % | **écart accepté** |
+| précision `resulte_de` | > 95 % | 93,9 %, puis 94,6 % re-mesuré | **écart accepté** |
 
 **La couverture** est plafonnée par les sources, non par l'implémentation : le
 premier échelon de la cascade du § 3 — le tableau synoptique du Sénat — n'existe
@@ -167,7 +167,10 @@ rapport et par le texte discuté (`docs/21` § 7).
 0,8933. Les 277 arêtes du graphe ont été examinées une à une : l'écart au seuil
 est d'environ un point, il est ventilé en quatre familles nommées, et il est
 porté par la valeur de `confiance` de chaque arête, comme l'exige le § 5.4. Le
-critère reste la cible ; il n'est plus bloquant.
+critère reste la cible ; il n'est plus bloquant. Re-mesurée le 21 septembre
+2026 sur la population d'après les gardes de `docs/49` : 35 sur 37, Wilson
+0,8230 — moins d'arêtes tirées, la borne descend sans que la précision
+ponctuelle bouge (`docs/49` § 8).
 
 ### Phase 3 — Couche de restitution (4 semaines)
 
