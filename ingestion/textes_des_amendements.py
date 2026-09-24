@@ -170,10 +170,33 @@ CONFIANCE = 0.2481            # composition seule, population d'avant les voies,
 #   article_entier   7 / 10, puis 6 / 7 — Wilson 0,4869 : « N ne réécrit que A »
 #                   repose sur porte_sur, qui ne voit pas tout ce que N réécrit.
 # Deux juges (deepseek-v4p1-flash, glm-5p3-flash), qwen3p8-max en arbitrage.
-CONFIANCE_PAR_VOIE = {"visee": 0.6212, "alinea": 0.7639, "article_entier": 0.4869}
+#
+# Re-mesurée le 24 septembre 2026 (docs/51) sur les 141 arêtes que les
+# législatures XVI et XVII, la loi Hamon complète et onze dossiers ont
+# ajoutées ; deux juges Sonnet 5 par fiche, un arbitre Opus 5 sur désaccord.
+#   alinea          10 / 20 — neuf fausses d'une seule cause : « VI (nouveau). – »
+#                   n'était pas une borne de paragraphe, et l'instruction du
+#                   III sur L. 141-1 gouvernait les VI, VII et VIII nouveaux.
+#                   Borne réparée, 20 / 20 sur un second tirage disjoint.
+#                   Réunie au tirage de docs/45 : 39 / 40, Wilson 0,8712.
+#   article_entier   3 / 20 — `porte_sur` ne relève que des articles de code, et
+#                   l'article du texte qui réécrit la loi n° 71-1130 passait pour
+#                   ne réécrire que L. 141-1. Garde de l'autre norme, qui retire
+#                   les 17 fausses et aucune des 18 justes jugées de toutes les
+#                   fiches ; 12 / 15 sur un second tirage disjoint — deux
+#                   « Rédiger ainsi cet article » qui écrivent un article voisin,
+#                   un amendement d'un autre texte rangé sous le même numéro par
+#                   la source. Réunie aux 6 / 7 d'avant : 18 / 22, Wilson 0,6148.
+#   visee            8 / 8 ; réunie aux 13 / 15 d'avant : 21 / 23, Wilson 0,7320.
+CONFIANCE_PAR_VOIE = {"visee": 0.7320, "alinea": 0.8712, "article_entier": 0.6148}
 
-PARAGRAPHE = re.compile(r"^[ \t]*[IVXL]{1,6}(?:\s*(?:bis|ter|quater|quinquies|sexies))?\s*\.\s*[–-]",
-                        re.M)
+# La mention de navette entre le numéro et le point — « VI (nouveau). – »,
+# « II bis (nouveau). – », « III (Supprimé). – » — est encore une borne. Elle ne
+# l'était pas : l'instruction du III qui réécrit L. 141-1 gouvernait les VI,
+# VII et VIII nouveaux de l'article 32 bis, et neuf arêtes `alinea` fausses sur
+# vingt en venaient (docs/51).
+PARAGRAPHE = re.compile(r"^[ \t]*[IVXL]{1,6}(?:\s*(?:bis|ter|quater|quinquies|sexies))?"
+                        r"(?:\s*\([^)\n]{1,20}\))?\s*\.\s*[–-]", re.M)
 # « Alinéa 29 », « Après l'alinéa 9 », et la plage : « Alinéas 22 à 26 ». La
 # plage se lit en entier — supprimer les alinéas 22 à 26 quand 22 ouvre la
 # section 2 bis et 24 écrit L. 423-4-1, ce n'est pas toucher l'article qui
@@ -245,6 +268,31 @@ def insere_une_instruction(dispositif: str) -> bool:
 ARTICLE_ENTIER = re.compile(r"^\s*(?:I\.\s*[–-]\s*)?(supprimer|r[ée]diger ainsi|r[ée]tablir)\s+cet\s+article",
                             re.I)
 AJOUT_EN_FIN = re.compile(r"^\s*(?:I\.\s*[–-]\s*)?compl[ée]ter\s+cet\s+article", re.I)
+# Un autre texte normatif nommé par l'article du texte, hors citation : une loi,
+# une ordonnance, un décret, ou un code qui n'est pas le nôtre. `porte_sur` ne
+# relève que des articles de code ; l'article 13 du projet Macron réécrit la
+# loi n° 71-1130 sur les avocats et touche L. 141-1 en passant, et passait pour
+# ne réécrire que L. 141-1. Dix-sept arêtes sur vingt de la voie `article_entier`
+# étaient de ce genre (docs/51).
+AUTRE_NORME = re.compile(
+    r"\b(?:loi|ordonnance|d[ée]cret)\s+(?:organique\s+)?n[°º]"
+    r"|\bordonnance\s+du\s+\d"
+    r"|\bcode\s+(?!de\s+la\s+consommation)"
+    r"(?:de|des|du|d['’]|g[ée]n[ée]ral|mon[ée]taire|rural|civil|p[ée]nal|la|l['’])",
+    re.I)
+
+
+def autre_norme_dans_l_article(charge, numero: str) -> bool:
+    """L'article du texte nomme-t-il, hors citation, une autre norme que notre
+    code ? Illisible vaut oui : la voie ne tient que si l'on a lu l'article."""
+    if not charge or numero not in charge[1]:
+        return True
+    texte, articles = charge
+    debut, fin = articles[numero]
+    segment = texte[debut:fin]
+    debuts = index_des_lignes(segment)
+    return any(not dans_une_citation(segment, debuts, m.start())
+               for m in AUTRE_NORME.finditer(segment))
 
 
 def numero_de_subdivision(subdivision: str | None) -> str | None:
@@ -270,6 +318,11 @@ def tete_numerique(numero: str) -> int | None:
 # 90 formes, 1 853 lignes dans le corpus, aucune n'est un alinéa. Celle-là
 # comptée sous l'intitulé de la section 15 décalait d'un cran tout l'article
 # 11 du texte de commission de la loi consommation (docs/45 § 6).
+# Le paragraphe qui n'est que son statut — « III et III bis. – (Non modifiés) » —
+# reste compté. Ne pas le compter réparait une arête fausse (docs/51) et en
+# décalait 29 autres ; les ancres des amendements le démentaient : 89 confirmant
+# et 19 contredisant le compte, contre 92 et 16, et 34 articles à numérotation
+# contredite au lieu de 11. L'Assemblée compte ces lignes.
 STATUT = re.compile(r"^\s*\(?\s*(?:non modifiée?s?|supprimée?s?|conformes?|"
                     r"suppression (?:maintenue|conforme))\s*\)?\s*$"
                     r"|^\s*\([^()]{1,80}\)\s*$", re.I)
@@ -704,6 +757,16 @@ def construire(base: sqlite3.Connection, schema: Path, corpus_textes: Path) -> d
             if len(vises) > 1:
                 compte["cible_non_unique"] += 1
                 continue
+            # Le dispositif aussi, quand il ne porte pas sur l'article entier :
+            # « Dans le III de l'article L. 863-8 du code de la sécurité sociale
+            # créé par le I de cet article » dit lui-même où il agit, et ce n'est
+            # pas A. Un « Rédiger ainsi cet article » qui récrit l'article dans une
+            # autre loi porte bien sur N, donc sur A — jugé juste (L141-6 ← 8 du Sénat).
+            if autre_norme_dans_l_article(charge, numero) \
+                    or (not ARTICLE_ENTIER.search(dispositif)
+                        and AUTRE_NORME.search(re.sub(r"«[^»]*»", " ", dispositif))):
+                compte["article_touchant_une_autre_norme"] += 1
+                continue
             aretes.append((amendement_id, next(iter(vises)), texte_id, numero,
                            "article_entier", "derivee", CONFIANCE_PAR_VOIE["article_entier"]))
             compte["voie_article_entier" if ARTICLE_ENTIER.search(dispositif)
@@ -771,6 +834,8 @@ def main() -> None:
     print("\narêtes par voie")
     print(f"  visee — le dispositif nomme l'article                : {compte['voie_visee']}")
     print(f"  alinea — l'instruction gouvernant l'alinéa           : {compte['voie_alinea']}")
+    print(f"  article_entier — écarté, l'article touche une autre norme : "
+          f"{compte['article_touchant_une_autre_norme']}")
     print(f"  article_entier — supprimer / rédiger cet article     : {compte['voie_article_entier']}")
     print(f"  article_entier — dispositif non lu, cible unique     : "
           f"{compte['voie_article_entier_par_defaut']}")

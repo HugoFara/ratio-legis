@@ -49,11 +49,11 @@ irrecevabilite	fondement — LOLF	15	11800	0.1
 irrecevabilite	fondement — LOLFSS	6	11800	0.1	
 tentatives	articles en vigueur portant une tentative, les trois voies	248	2104	11.8	cible déclarée, alinéa écrit ou subdivision déposée
 tentatives	dont par la cible déclarée du dispositif	139	248	56.0	
-tentatives	dont par un alinéa écrit qui subsiste	119	248	48.0	
-tentatives	dont par la subdivision déposée	54	248	21.8	
+tentatives	dont par un alinéa écrit qui subsiste	120	248	48.4	
+tentatives	dont par la subdivision déposée	52	248	21.0	
 tentatives	tentatives déclarées sur un article en vigueur	341			voie de la cible déclarée seule ; le détail par sort suit
-depot	amendements positionnés sur un article en vigueur	276			
-depot	articles en vigueur atteints	54	2104	2.6	
+depot	amendements positionnés sur un article en vigueur	260			
+depot	articles en vigueur atteints	52	2104	2.5	
 depot	assemblee — jeux d'amendements appariés à leur texte	113	192	58.9	
 depot	senat — jeux d'amendements appariés à leur texte	130	150	86.7	
 depot	subdivisions tombant dans la plage d'articles du texte	7801	7983	97.7	contrôle de l'appariement ; un texte faux s'y verrait en premier
@@ -69,8 +69,8 @@ navette	durée médiane, en jours	136
 navette	durée la plus courte, en jours	1			
 navette	durée la plus longue, en jours	897			
 chambres	segments écrits par un amendement — assemblee	215			dénominateur faible : voir docs/09
-chambres	segments écrits par un amendement — senat	152			dénominateur faible : voir docs/09
-chambres	articles dont un alinéa est tracé jusqu'à un amendement	166			sans remonter la chaîne des segments
+chambres	segments écrits par un amendement — senat	153			dénominateur faible : voir docs/09
+chambres	articles dont un alinéa est tracé jusqu'à un amendement	167			sans remonter la chaîne des segments
 sources	documents — avis_conseil_etat	30			
 sources	documents — etude_impact	49			
 sources	documents — expose_des_motifs	81			

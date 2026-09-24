@@ -249,8 +249,9 @@ l'article L. 232-3 du code de l'énergie — l'amendement 18 rédigerait alors l
 même alinéa, retouché ensuite, et l'arête serait juste. Le verdict n'est pas
 retouché ici ; il est signalé pour la relecture humaine.
 
-**`depose_sur` n'est pas re-mesurée.** Sa population passe de 1 093 à 1 237
-arêtes ; ses constantes par voie sont celles de `docs/45`.
+**`depose_sur` n'est pas re-mesurée ici.** Sa population passe de 1 093 à
+1 237 arêtes ; la re-mesure, et les deux défauts qu'elle a trouvés, sont en
+`docs/51`.
 
 ## 8. Ce qui n'est pas fait
 

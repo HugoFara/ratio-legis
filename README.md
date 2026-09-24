@@ -287,12 +287,12 @@ mesurés contre leurs seuils :
 | Segments (alinéas) | 28 294 | `renumerote_de` | 1 929 |
 | Documents (rapports, exposés, études d'impact, avis) | 834 | `motive` — un passage qui motive, avec offsets | 1 721 |
 | Amendements (33 199 Sénat, 64 027 Assemblée, législatures XIV, XVI et XVII) | 97 226 | `renvoie_a` — le graphe de renvois | 12 534 |
-| Acteurs | 2 656 | `resulte_de` — l'amendement qui a écrit l'alinéa | 447 (confiance 0,81) |
+| Acteurs | 2 656 | `resulte_de` — l'amendement qui a écrit l'alinéa | 448 (confiance 0,81) |
 | Actes de l'Union | 284 | `cite_acte_ue` / `transpose` | 1 572 / 8 |
 | Considérants de l'Union | 7 674 | `article_acte_ue` — articles d'actes déclarés | 6 237 |
 | Textes en discussion | 925 | `porte_sur` — l'article du texte → l'article du code | 101 915 (6 967 internes, 0,90 ; 234 résolues par le contenu, 0,84) |
 | Sorts d'amendements, en huit familles | 97 226 | `vise` — l'amendement qui visait l'article, abouti ou non | 632 (622 par le numéro, 0,83 ; 10 par le contenu, 0,72) |
-| Correspondances de texte entre les deux corpus | 243 | `depose_sur` — l'article du code que l'amendement touche, par l'alinéa du texte qu'il nomme | 1 237 (0,76 par l'alinéa, non re-mesurée) |
+| Correspondances de texte entre les deux corpus | 243 | `depose_sur` — l'article du code que l'amendement touche, par l'alinéa du texte qu'il nomme | 1 156 (0,87 par l'alinéa, 0,73 par l'article nommé, 0,61 par l'article entier) |
 
 ### Le verdict
 
@@ -357,17 +357,20 @@ prendra au premier passage où il la sert ; les constantes seront alors à
 re-mesurer ([`docs/50`](docs/50-increments-doublons-legislatures.md) § 8). Les
 textes des XVIe et XVIIe législatures que le corpus n'a pas : 79 jeux
 d'amendements de l'Assemblée sur 192 n'ont pas de texte discuté, donc pas de
-`depose_sur`. `depose_sur`, dont la population a grandi de 144 arêtes, n'est
-pas re-mesurée. La XIIIe, jamais publiée en open
+`depose_sur`. La XIIIe, jamais publiée en open
 data, reconstructible page par page depuis Wayback — arbitrage à rendre entre
 le coût et un trou déclaré. Les tableaux de concordance annexés aux textes de
 transposition, seul chemin connu vers un lien européen au grain de l'article.
 
-**Huit arêtes jugées fausses sont dans la base**, et le harnais
-(`tools/mesures/rejouer.py`) les nomme à chaque passage. Trois sont les
-fausses `resulte_de` du tirage de [`docs/50`](docs/50-increments-doublons-legislatures.md)
-§ 7, dont aucune garde n'est sortie — et l'une, l'agrément « Mon
-Accompagnateur Rénov' », est peut-être juste. Cinq sont L136-2 ← amendement
+**Douze arêtes jugées fausses sont dans la base**, et le harnais
+(`tools/mesures/rejouer.py`) les nomme à chaque passage. Quatre sont des
+`depose_sur` des tirages de [`docs/51`](docs/51-depose-sur-re-mesuree.md), sans
+garde : un amendement que la source range sous un autre texte, deux
+réécritures entières qui écrivent un article voisin, un alinéa mal cité.
+Trois sont les fausses `resulte_de` du tirage de
+[`docs/50`](docs/50-increments-doublons-legislatures.md) § 7, dont aucune garde
+n'est sortie — et l'une, l'agrément « Mon Accompagnateur Rénov' », est
+peut-être juste. Cinq sont L136-2 ← amendement
 624 et quatre L121-91-1, jugées fausses à la main en
 [`docs/21`](docs/21-precision-resulte-de.md), alors que le texte adopté porte
 l'amendement mot pour mot sous ce numéro — des verdicts humains, contestés sur
@@ -437,6 +440,7 @@ d'aujourd'hui ; ceux des documents sont ceux de leur date.
 | 42. Classement, harnais, accueil | le classement pèse par la rareté dans le fonds et sait se taire, mesuré 17/21 ; le harnais rejoue 700 verdicts contre la base et trouve dix fausses servies ; « signaler cette arête » sur chaque arête | [`docs/48`](docs/48-classement-harnais-accueil.md) |
 | 43. Les dix du harnais, et la re-mesure | neuf réparées à la source : le bloc guillemeté et la date du texte pour `vise`, l'en-tête de la petite loi pour `porte_sur` (2 837 en-têtes rendus), la destination du passage et l'hôte de l'alinéa pour `resulte_de` ; le harnais voit les lignées, les voies, et reconnaît une arête dont l'identifiant a glissé ; re-mesuré par dix juges Sonnet 5 : `vise` 47/50, `resulte_de` 35/37, `porte_sur` 20/20 ; cinq verdicts humains contestés | [`docs/49`](docs/49-les-dix-du-harnais.md) |
 | 44. Incréments DOLE, doublons, législatures XVI et XVII | les incréments DOLE et JORF enfin lus (`issu_de` 70/70) ; un même amendement de l'Assemblée publié deux fois, 6 112 copies fondues ; le projet de loi Hamon perdu par un saut de ligne ; 55 000 amendements de plus ; `vise` résolue par le contenu vers un article que la loi a créé, 10/10 ; re-mesuré : `vise` 64/70, `resulte_de` 52/57 | [`docs/50`](docs/50-increments-doublons-legislatures.md) |
+| 45. `depose_sur` re-mesurée | sur les arêtes nouvelles : `alinea` 10/20, « VI (nouveau). – » n'était pas une borne ; `article_entier` 3/20, l'article qui réécrit une autre loi passait pour mono-cible ; réparées, 20/20 et 12/15 sur un second tirage disjoint ; la reconstruction reprend 15 minutes | [`docs/51`](docs/51-depose-sur-re-mesuree.md) |
 
 ## D'où ça vient
 
