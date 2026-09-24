@@ -288,7 +288,7 @@ mesurés contre leurs seuils :
 | Documents (rapports, exposés, études d'impact, avis) | 834 | `motive` — un passage qui motive, avec offsets | 1 733 |
 | Amendements (33 199 Sénat, 64 027 Assemblée, législatures XIV, XVI et XVII) | 97 226 | `renvoie_a` — le graphe de renvois | 12 535 |
 | Acteurs | 2 656 | `resulte_de` — l'amendement qui a écrit l'alinéa | 446 (confiance 0,82) |
-| Actes de l'Union | 284 | `cite_acte_ue` / `transpose` | 1 572 / 8 |
+| Actes de l'Union | 284 | `cite_acte_ue` / `transpose` / `transpose_article` — l'article de la directive que l'article du code transpose, lu dans les tableaux de concordance | 1 572 / 8 / 33 (0,90) |
 | Considérants de l'Union | 7 674 | `article_acte_ue` — articles d'actes déclarés | 6 237 |
 | Textes en discussion | 925 | `porte_sur` — l'article du texte → l'article du code | 128 723 (7 833 internes, 0,91 ; 236 résolues par le contenu, 0,84) |
 | Sorts d'amendements, en huit familles | 97 226 | `vise` — l'amendement qui visait l'article, abouti ou non | 663 (652 par le numéro, 0,86 ; 11 par le contenu, 0,74) |
@@ -321,6 +321,7 @@ verdict, dans [`data/mesures/grain.tsv`](data/mesures/grain.tsv) :
 | Articles remontant à un passage qui les motive | **800 (38,0 %)** |
 | Articles reliés à un article de texte en discussion | 964 (45,8 %) |
 | Articles nommant un acte de l'Union | 117 |
+| Articles reliés à un article d'acte de l'Union par un tableau de concordance | 35 |
 | Articles remontant à un amendement identifié | 142 |
 | Articles cités par un autre article du fonds | 1 031 (49,0 %) |
 
@@ -364,8 +365,9 @@ re-mesurer ([`docs/50`](docs/50-increments-doublons-legislatures.md) § 8). Les
 192 jeux d'amendements de l'Assemblée trouvent tous leur texte discuté
 ([`docs/52`](docs/52-projets-deposes-et-trait-insecable.md)). La XIIIe, jamais publiée en open
 data, reconstructible page par page depuis Wayback — arbitrage à rendre entre
-le coût et un trou déclaré. Les tableaux de concordance annexés aux textes de
-transposition, seul chemin connu vers un lien européen au grain de l'article.
+le coût et un trou déclaré. Les tableaux de concordance sont lus dans deux
+études d'impact ([`docs/54`](docs/54-tableaux-de-concordance.md)) ; sept autres
+en portent, pour des actes que la base ne charge pas ou pour d'autres codes.
 
 **Quinze arêtes jugées fausses sont dans la base**, et le harnais
 (`tools/mesures/rejouer.py`) les nomme à chaque passage. Quatre sont des
@@ -392,7 +394,10 @@ pièces, qu'un humain doit relire ([`docs/49`](docs/49-les-dix-du-harnais.md)
 **Les arêtes récentes ont chacune leur maille nommée**, dans la section « ce
 qui n'est pas fait » de leur document — les dernières : le plan propre d'un
 amendement hors glissement, les 124 articles écrits que rien ne contient
-([`docs/47`](docs/47-le-numero-glisse-par-le-contenu.md) § 5).
+([`docs/47`](docs/47-le-numero-glisse-par-le-contenu.md) § 5), laissés pour
+les raisons de [`docs/54`](docs/54-tableaux-de-concordance.md) § 4 ; les
+formules banales de `resulte_de`, dont aucune règle mesurée ne sépare les
+justes (`docs/54` § 1).
 
 **Le silence réglementaire** ne baissera que par des corpus qui ne sont pas dans
 le projet : les circulaires, faisables ; les avis du Conseil d'État sur les
@@ -454,6 +459,7 @@ d'aujourd'hui ; ceux des documents sont ceux de leur date.
 | 45. `depose_sur` re-mesurée | sur les arêtes nouvelles : `alinea` 10/20, « VI (nouveau). – » n'était pas une borne ; `article_entier` 3/20, l'article qui réécrit une autre loi passait pour mono-cible ; réparées, 20/20 et 12/15 sur un second tirage disjoint ; la reconstruction reprend 15 minutes | [`docs/51`](docs/51-depose-sur-re-mesuree.md) |
 | 46. Projets déposés et trait insécable | les 79 jeux de l'Assemblée sans texte l'étaient faute de lire `projets-pl` : 192 sur 192 ; les textes de l'Assemblée depuis 2017 écrivent « L. 123‑9 » avec un trait insécable, que `porte_sur` ne lisait pas — 866 arêtes internes de plus ; « L. 121-84-10-1 » lu « L121-84-1 » ; deux gardes `article_entier` ; `depose_sur` 1 156 → 1 836, mesurée 19/20, 13/15, 18/19, 20/20 | [`docs/52`](docs/52-projets-deposes-et-trait-insecable.md) |
 | 47. Le trait insécable à la lecture | U+2011 ramené à « - » par les deux `texte_brut`, textes et rapports — 37 490 numéros lus dans les rapports au lieu de 34 988, `motive` +2 / −1 ; `vise` re-mesurée 20/20 et 1/1, `resulte_de` 18/20 : 0,8621, 0,7412, 0,8240 | [`docs/53`](docs/53-trait-insecable-a-la-lecture.md) |
+| 48. Tableaux de concordance | l'article de la directive que l'article du code transpose, lu dans les annexes des études d'impact avec la position des blocs du PDF : 33 arêtes, 33/33, 35 articles en vigueur ; deux gardes `resulte_de` mesurées et abandonnées ; les fiches montrent la version écrite par la loi du dossier | [`docs/54`](docs/54-tableaux-de-concordance.md) |
 
 ## D'où ça vient
 

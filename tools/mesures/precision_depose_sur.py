@@ -44,7 +44,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from precision_porte_sur import coupe, wilson      # noqa: E402
+from precision_porte_sur import coupe, etat_pour_le_juge, wilson  # noqa: E402
 
 EFFECTIF = 15
 COLONNES = ["verdict", "cle", "chambre", "amendement", "sort", "auteur",
@@ -69,11 +69,12 @@ def echantillon(base: sqlite3.Connection, sauf: set[tuple[str, str]],
             SELECT origine, courant FROM d;""")
     lignes = []
     for (amendement, numero, chambre, sort, auteur, article, texte_id,
-         article_du_texte, subdivision, dispositif, url, combien, texte_article,
+         article_du_texte, subdivision, dispositif, url, combien, dossier, article_id,
          fenetre, voie_arete) in base.execute("""
             SELECT d.amendement_id, am.numero, am.chambre, am.sort, ac.nom,
                    a.numero, d.texte_id, d.article_du_texte, am.subdivision,
-                   am.dispositif, am.url, c.combien, v.texte, pr.fenetre, d.voie
+                   am.dispositif, am.url, c.combien, am.dossier_id, d.article_id,
+                   pr.fenetre, d.voie
             FROM depose_sur d
             JOIN amendement am ON am.id = d.amendement_id
             LEFT JOIN acteur ac ON ac.id = am.auteur_id
@@ -83,9 +84,7 @@ def echantillon(base: sqlite3.Connection, sauf: set[tuple[str, str]],
             LEFT JOIN porte_sur p ON p.texte_id = d.texte_id
                               AND lower(p.article_du_texte) = lower(d.article_du_texte)
                               AND p.article_id = d.article_id
-            LEFT JOIN preuve pr ON pr.id = p.preuve_id
-            LEFT JOIN (SELECT article_id, min(date_debut) AS d0, texte FROM version_article
-                       GROUP BY article_id) v ON v.article_id = d.article_id"""):
+            LEFT JOIN preuve pr ON pr.id = p.preuve_id"""):
         accord = base.execute(
             "SELECT count(*), sum(v.article_id = ?), "
             "       sum(EXISTS(SELECT 1 FROM chaine c WHERE c.courant = v.article_id "
@@ -110,7 +109,7 @@ def echantillon(base: sqlite3.Connection, sauf: set[tuple[str, str]],
             "texte": texte_id, "article_du_texte": article_du_texte,
             "subdivision": coupe(subdivision, 90), "fenetre": coupe(fenetre, 220),
             "dispositif": coupe(dispositif, 420),
-            "article_du_fonds": coupe(texte_article, 320), "url": url or "",
+            "article_du_fonds": etat_pour_le_juge(base, article_id, dossier), "url": url or "",
         })
     lignes = [l for l in lignes if (l["amendement"], l["article"]) not in sauf]
     lignes.sort(key=lambda l: l["cle"])

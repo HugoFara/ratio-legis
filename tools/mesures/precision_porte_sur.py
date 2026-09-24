@@ -97,6 +97,48 @@ def coupe(texte: str, limite: int = 400) -> str:
     return texte if len(texte) <= limite else texte[:limite] + " […]"
 
 
+def etat_pour_le_juge(base: sqlite3.Connection, article_id: int, dossier: str | None,
+                      limite: int = 320) -> str:
+    """L'article tel que le juge doit le lire : la version que la loi du dossier
+    a produite, et celle qu'elle a remplacée — non la première de la lignée.
+
+    Les fiches montraient le premier état connu de l'article. Un amendement de
+    2016 sur L. 111-5 était ainsi confronté au L. 111-5 de la lignée, non à
+    celui que le texte de 2016 réécrivait (docs/51 § 7). Le préfixe
+    « L111-5 (date de lignée) » est gardé : le harnais y lit la lignée montrée.
+    Sans version produite par le dossier, la version en vigueur à la date de sa
+    loi ; sans loi datée, la dernière.
+    """
+    numero, d0 = base.execute(
+        "SELECT a.numero, min(v.date_debut) FROM article a "
+        "JOIN version_article v ON v.article_id = a.id WHERE a.id = ?",
+        (article_id,)).fetchone()
+    versions = base.execute(
+        "SELECT id_legi, date_debut, texte FROM version_article WHERE article_id = ? "
+        "ORDER BY date_debut", (article_id,)).fetchall()
+    if not versions:
+        return f"{numero} ({d0})"
+    produites = {v for (v,) in base.execute(
+        "SELECT p.version_id FROM issu_de i JOIN produite_par p ON p.texte_id = i.texte_id "
+        "WHERE i.dossier_id = ?", (dossier,))} if dossier else set()
+    rang = next((i for i, v in enumerate(versions) if v[0] in produites), None)
+    if rang is not None:
+        _, date, texte = versions[rang]
+        tete = f"{numero} ({d0}) — écrit par la loi du dossier, {date} : {texte}"
+        if rang:
+            _, avant, ancien = versions[rang - 1]
+            moitie = limite // 2
+            return coupe(tete, moitie) + " ‖ avant, " + coupe(f"{avant} : {ancien}", moitie)
+        return coupe(tete, limite)
+    date_loi = base.execute(
+        "SELECT max(t.date_texte) FROM issu_de i JOIN texte_normatif t ON t.id_jorf = i.texte_id "
+        "WHERE i.dossier_id = ?", (dossier,)).fetchone()[0] if dossier else None
+    en_vigueur = [v for v in versions if date_loi and v[1] <= date_loi]
+    _, date, texte = en_vigueur[-1] if en_vigueur else versions[-1]
+    quand = "en vigueur à la loi du dossier" if en_vigueur else "dernière version"
+    return coupe(f"{numero} ({d0}) — {quand}, {date} : {texte}", limite)
+
+
 def articles_produits(base: sqlite3.Connection) -> set[tuple[str, int]]:
     """(dossier, article) que la loi issue du dossier a effectivement produits."""
     return {(d, a) for d, a in base.execute(

@@ -39,6 +39,9 @@ import sqlite3
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from precision_porte_sur import etat_pour_le_juge  # noqa: E402
+
 EFFECTIF = 20
 COLONNES = ["verdict", "cle", "chambre", "amendement", "sort", "auteur", "article",
             "formule", "dossier", "subdivision", "dispositif", "article_du_fonds", "url"]
@@ -63,12 +66,9 @@ def echantillon(base: sqlite3.Connection, sauf: set[tuple[str, str]],
                 effectif: int, methode: str | None = None) -> list[dict]:
     lignes = []
     for (amendement, numero, chambre, sort, auteur, article, formule, dossier,
-         subdivision, dispositif, url, d0, texte_article) in base.execute("""
+         subdivision, dispositif, url, article_id) in base.execute("""
             SELECT v.amendement_id, am.numero, am.chambre, am.sort, ac.nom, a.numero,
-                   v.formule, am.dossier_id, am.subdivision, am.dispositif, am.url,
-                   (SELECT min(date_debut) FROM version_article WHERE article_id = a.id),
-                   (SELECT texte FROM version_article WHERE article_id = a.id
-                    ORDER BY date_debut LIMIT 1)
+                   v.formule, am.dossier_id, am.subdivision, am.dispositif, am.url, a.id
             FROM vise v
             JOIN amendement am ON am.id = v.amendement_id
             LEFT JOIN acteur ac ON ac.id = am.auteur_id
@@ -83,7 +83,7 @@ def echantillon(base: sqlite3.Connection, sauf: set[tuple[str, str]],
             "auteur": auteur or "", "article": article, "formule": formule,
             "dossier": dossier, "subdivision": coupe(subdivision, 90),
             "dispositif": coupe(dispositif, 600),
-            "article_du_fonds": f"{article} ({d0}) " + coupe(texte_article, 320),
+            "article_du_fonds": etat_pour_le_juge(base, article_id, dossier),
             "url": url or ""})
     lignes.sort(key=lambda l: l["cle"])
     return lignes[:effectif]

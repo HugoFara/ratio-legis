@@ -262,6 +262,11 @@ EURLEX="$RACINE/data/raw/eurlex"
 python3 "$RACINE/tools/ue/recuperer_actes.py" "$BASE" "$EURLEX"
 ingere "$RACINE/ingestion/considerants.py" "$BASE" "$EURLEX"
 
+# L'article de la directive que l'article du code transpose : les tableaux de
+# concordance annexés aux études d'impact (docs/54). Après les considérants,
+# qui chargent les articles des actes contre lesquels chaque ligne se vérifie.
+ingere "$RACINE/ingestion/concordances.py" "$TRAVAIL/corpus/impacts" "$IMPACTS" "$BASE"
+
 # --------------------------------------------------- 7. verdict et métriques
 etape "7. Verdict et métriques d'hygiène"
 ingere "$RACINE/ingestion/verdict.py" "$BASE"

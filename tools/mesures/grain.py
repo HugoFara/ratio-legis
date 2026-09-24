@@ -59,6 +59,12 @@ REQUETES = {
     "transposition": "SELECT DISTINCT v.article_id FROM version_article v "
                      "JOIN produite_par p ON p.version_id = v.id_legi "
                      "JOIN transpose t ON t.texte_id = p.texte_id",
+    # Rattaché à un article d'acte de l'Union par un tableau de concordance
+    # (docs/54) : le numéro est celui du projet de loi, suivi par la chaîne de
+    # renumérotation jusqu'à l'article d'aujourd'hui.
+    "concordance": "WITH RECURSIVE s(id) AS (SELECT article_id FROM transpose_article "
+                   "UNION SELECT r.article_id FROM renumerote_de r JOIN s ON r.ancien_id = s.id) "
+                   "SELECT id FROM s",
     # Cité par un autre article en vigueur ; un article qui se cite lui-même
     # ne compte pas.
     "cite": "SELECT DISTINCT r.article_id FROM renvoie_a r "
@@ -86,6 +92,8 @@ def mesurer(base: sqlite3.Connection) -> list[tuple[str, str, int, int | None]]:
         ("article", "reliés à un article de texte en discussion",
          colonne("a_article_du_texte"), total),
         ("article", "nommant un acte de l'Union", compte(REQUETES["acte_cite"]), total),
+        ("article", "reliés à un article d'acte de l'Union par un tableau de concordance",
+         compte(REQUETES["concordance"]), total),
         ("article", "remontant à un amendement identifié", colonne("a_amendement"), total),
         ("article", "cités par un autre article du fonds", compte(REQUETES["cite"]), total),
         ("texte", "atteignant un document motivant le texte",

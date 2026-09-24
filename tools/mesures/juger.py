@@ -39,6 +39,12 @@ Ce que chaque arête affirme, et donc ce que « juste » veut dire :
     cet article », « Rédiger ainsi… »), et N ne réécrit que A. Faux si N
     réécrit aussi d'autres articles ou d'autres codes.
   Douteux si la ligne et le texte ne permettent pas de trancher.
+- `transpose_article` : **l'article A du code transpose la disposition de
+  l'acte de l'Union** que la ligne nomme, parce que le tableau de concordance
+  de l'étude d'impact les met sur la même ligne. Faux si les deux cellules
+  sont sur des lignes différentes, si le numéro n'est que cité dans le corps
+  d'une cellule, s'il est d'un autre code, ou si l'article du fonds est sans
+  rapport avec la cellule. La page se relit dans le PDF (`pdf`, `page`).
 - `vise` : **le dispositif de l'amendement modifie, crée, abroge ou réécrit
   l'article A du code de la consommation.** Faux s'il ne fait que le citer,
   le nomme comme ancre (« après l'article A, il est inséré… »), ou vise un

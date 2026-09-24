@@ -118,12 +118,20 @@ def aretes_de(base: sqlite3.Connection) -> dict[str, dict[str, tuple[str, str]]]
         valeur = (article, debut.get(article_id, ""))
         familles["resulte-de"][cle(segment, amendement)[:16]] = valeur
         familles["resulte-de"]["stable:" + cle(segment, chambre, dossier, numero)] = valeur
+    # transpose_article : la ligne du tableau de concordance (docs/54). Toutes
+    # ses composantes sont des numéros publiés, la clef ne glisse pas.
+    if base.execute("SELECT 1 FROM sqlite_master WHERE name = 'transpose_article'").fetchone():
+        for celex, article_acte, paragraphe, article_id, article in base.execute(
+                "SELECT t.celex, t.article_acte, t.paragraphe, a.id, a.numero "
+                "FROM transpose_article t JOIN article a ON a.id = t.article_id"):
+            familles["concordances"][cle(celex, article_acte, paragraphe, article)[:16]] = (
+                article, debut.get(article_id, ""))
     return familles
 
 
 def famille_de(fiche: Path) -> str | None:
     nom = fiche.name.removeprefix("precision-")
-    for f in ("depose-sur", "porte-sur", "resulte-de", "vise"):
+    for f in ("depose-sur", "porte-sur", "resulte-de", "vise", "concordances"):
         if nom.startswith(f):
             return f
     return None
