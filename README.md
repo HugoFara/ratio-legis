@@ -366,8 +366,8 @@ re-mesurer ([`docs/50`](docs/50-increments-doublons-legislatures.md) § 8). Les
 ([`docs/52`](docs/52-projets-deposes-et-trait-insecable.md)). La XIIIe, jamais publiée en open
 data, reconstructible page par page depuis Wayback — arbitrage à rendre entre
 le coût et un trou déclaré. Les tableaux de concordance sont lus dans deux
-études d'impact ([`docs/54`](docs/54-tableaux-de-concordance.md)) ; sept autres
-en portent, pour des actes que la base ne charge pas ou pour d'autres codes.
+études d'impact ([`docs/54`](docs/54-tableaux-de-concordance.md)) ; les autres
+ne transposent vers notre code aucune disposition.
 
 **Quinze arêtes jugées fausses sont dans la base**, et le harnais
 (`tools/mesures/rejouer.py`) les nomme à chaque passage. Quatre sont des

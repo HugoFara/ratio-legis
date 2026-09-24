@@ -107,10 +107,11 @@ l'ancien L. 121-17, en est l'exemple.
 
 ## 4. Ce qui n'est pas fait
 
-**Les autres tableaux.** Sept études d'impact portent des tableaux pour des
-actes absents de `acte_ue` ou pour d'autres codes ; les rapports de
-commission en reproduisent parfois. Les actes de l'Union ne sont chargés que
-s'ils sont cités par un article du fonds.
+**Les autres tableaux.** Relus en admettant tous les actes, y compris ceux
+que `acte_ue` ne charge pas, les autres études d'impact ne donnent **aucune**
+ligne pour le code de la consommation : leurs tableaux transposent vers
+d'autres codes. Il n'y a rien à gagner à charger d'autres actes. Les
+rapports de commission reproduisent parfois un tableau ; ils ne sont pas lus.
 
 **Les mailles de `porte_sur` (`docs/47` § 5)** : le plan propre hors
 glissement ne touche que `vise`, mesurée 20 sur 20 en `docs/53` ; les 124
