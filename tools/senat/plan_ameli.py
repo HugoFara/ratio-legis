@@ -21,13 +21,13 @@ Usage :
 from __future__ import annotations
 
 import re
-import subprocess
 import sys
 import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "dila"))
 from dossiers_du_perimetre import lire  # noqa: E402
+from fonds import deployer  # noqa: E402
 
 PETITE_LOI = re.compile(r"petite-loi-ameli/(\d{4}-\d{4})/(\d+)\.html")
 # Deuxième forme, plus fréquente : les liens vers le texte lui-même. Le préfixe
@@ -51,16 +51,10 @@ def main() -> None:
     miroir, liste, sortie = (Path(a) for a in sys.argv[1:])
 
     dossiers = sorted({l["id_dole"] for l in lire(liste)})
-    archives = sorted(miroir.glob("DOLE/Freemium_dole_global_*.tar.gz"))
-    if not archives:
-        sys.exit("archive DOLE globale absente du miroir")
-
     with tempfile.TemporaryDirectory() as tmp:
         # Une seule passe sur l'archive : elle fait plusieurs centaines de Mo et
         # la parcourir une fois par dossier coûterait des heures.
-        subprocess.run(["tar", "xzf", str(archives[-1]), "-C", tmp, "--wildcards"]
-                       + [f"*{d}.xml" for d in dossiers],
-                       stderr=subprocess.DEVNULL, check=False)
+        deployer(miroir, "dole", Path(tmp), [f"*{d}.xml" for d in dossiers])
         lignes, sans_ameli = [], []
         for dossier in dossiers:
             trouves = list(Path(tmp).rglob(f"{dossier}.xml"))

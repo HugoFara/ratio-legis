@@ -70,10 +70,12 @@ FAMILLES: tuple[tuple[str, re.Pattern[str]], ...] = (
 # 41 l'empiètement sur le domaine réglementaire ; l'article 44 bis du règlement du
 # Sénat est la règle de l'entonnoir. L'Assemblée écrit « Irrecevable » sans
 # motif : la colonne reste alors vide, et n'est pas devinée.
+# Depuis la XVe législature, l'état de l'Assemblée porte parfois le motif sous
+# une forme courte : « Irrecevable 40 ».
 MOTIFS: tuple[tuple[str, re.Pattern[str]], ...] = (
-    ("article 40",     re.compile(r"art\.?\s*40", re.I)),
-    ("article 45",     re.compile(r"art\.?\s*45", re.I)),
-    ("article 41",     re.compile(r"art\.?\s*41", re.I)),
+    ("article 40",     re.compile(r"(?:art\.?|irrecevable)\s*40", re.I)),
+    ("article 45",     re.compile(r"(?:art\.?|irrecevable)\s*45", re.I)),
+    ("article 41",     re.compile(r"(?:art\.?|irrecevable)\s*41", re.I)),
     ("article 44 bis", re.compile(r"art\.?\s*44\s*bis", re.I)),
     ("LOLFSS",         re.compile(r"lolfss", re.I)),
     ("LOLF",           re.compile(r"lolf", re.I)),

@@ -29,13 +29,13 @@ from __future__ import annotations
 
 import html
 import re
-import subprocess
 import sys
 import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from dossiers_du_perimetre import lire  # noqa: E402
+from fonds import deployer  # noqa: E402
 
 EXPOSE = re.compile(r"<EXPOSE_MOTIF>(.*?)</EXPOSE_MOTIF>", re.S)
 MINIMUM = 200          # en deçà, la balise est présente mais vide
@@ -49,13 +49,6 @@ def sans_balises(fragment: str) -> str:
                             for l in texte.split("\n"))).strip()
 
 
-def extraire(archive: Path, motifs: list[str], destination: str) -> None:
-    for depart in range(0, len(motifs), 200):     # limite de longueur de commande
-        subprocess.run(["tar", "xzf", str(archive), "-C", destination,
-                        "--wildcards"] + motifs[depart:depart + 200],
-                       stderr=subprocess.DEVNULL, check=False)
-
-
 def main() -> None:
     if len(sys.argv) != 4:
         sys.exit(__doc__)
@@ -63,13 +56,9 @@ def main() -> None:
     destination.mkdir(parents=True, exist_ok=True)
     dossiers = sorted({l["id_dole"] for l in lire(liste)})
 
-    archives = sorted(miroir.glob("DOLE/Freemium_dole_global_*.tar.gz"))
-    if not archives:
-        sys.exit("archive globale DOLE absente du miroir")
-
     ecrits, vides = 0, 0
     with tempfile.TemporaryDirectory() as tmp:
-        extraire(archives[-1], [f"*{d}.xml" for d in dossiers], tmp)
+        deployer(miroir, "dole", Path(tmp), [f"*{d}.xml" for d in dossiers])
         for dossier in dossiers:
             for fichier in Path(tmp).rglob(f"{dossier}.xml"):
                 trouve = EXPOSE.search(fichier.read_text(encoding="utf-8",

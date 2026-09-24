@@ -270,7 +270,16 @@ def passages_inseres(dispositif: str) -> list[tuple[tuple[str | None, str | None
 # dédoublonnés, Wilson 0,8230. Les deux fausses — des fenêtres de citation
 # partagée, « l'article L. 32 du code des postes », « la loi n° 78-17 » — sont
 # chacune la cause d'une garde. Le seuil de 95 % du § 4.2 n'est pas atteint.
-CONFIANCE = 0.8230
+#
+# Le 24 septembre 2026 (docs/50), les législatures XVI et XVII, la loi Hamon
+# enfin complète et onze dossiers nouveaux ajoutent 163 arêtes aux 284 d'avant,
+# qui restent toutes. Vingt des 163, deux juges Sonnet 5 d'accord partout :
+# **17 sur 20**. Deux fausses sont une formule administrative partagée par un
+# passage destiné à un autre texte — la suspension d'un agrément du code de
+# l'énergie, le plafond en chiffre d'affaires mondial d'une sanction de
+# l'Arcom —, la troisième une rédaction dont le barème n'a pas été retenu.
+# Aucune garde n'en sort ici. Réunis : **52 sur 57**, Wilson 0,8105.
+CONFIANCE = 0.8105
 
 
 def charger_amendements(base: sqlite3.Connection, racine: Path) -> dict:

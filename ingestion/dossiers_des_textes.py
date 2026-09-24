@@ -40,11 +40,13 @@ from __future__ import annotations
 
 import re
 import sqlite3
-import subprocess
 import sys
 import tempfile
 from collections import defaultdict
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools" / "dila"))
+from fonds import deployer  # noqa: E402
 
 TITRE = re.compile(r"<TITRE>(.*?)</TITRE>", re.S)
 # `<LEGISLATURE>` est un conteneur, pas une valeur : il porte `<NUMERO>` et
@@ -69,15 +71,12 @@ def espaces(fragment: str) -> str:
 def lire_dossiers(miroir: Path) -> tuple[dict[str, tuple[str, int | None]],
                                          dict[str, list[str]], dict[str, str]]:
     """Rend les dossiers lus, l'index inverse texte → dossiers, et leurs numéros."""
-    archives = sorted(miroir.glob("DOLE/Freemium_dole_global_*.tar.gz"))
-    if not archives:
-        sys.exit("archive globale DOLE absente du miroir")
-
     dossiers: dict[str, tuple[str, int | None]] = {}       # id -> (titre, législature)
     numeros: dict[str, str] = {}                           # id -> numéro du texte
     listent: dict[str, list[str]] = defaultdict(list)      # JORFTEXT -> [dossiers]
     with tempfile.TemporaryDirectory() as tmp:
-        subprocess.run(["tar", "xzf", str(archives[-1]), "-C", tmp], check=True)
+        # Le global seul ne voit aucun dossier ouvert depuis juillet 2025.
+        deployer(miroir, "dole", Path(tmp))
         for fichier in Path(tmp).rglob("JORFDOLE*.xml"):
             brut = fichier.read_text(encoding="utf-8", errors="replace")
             trouve = TITRE.search(brut)

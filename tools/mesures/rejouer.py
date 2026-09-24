@@ -69,6 +69,9 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from precision_vise import coupe  # noqa: E402
+
 
 def cle(*parts) -> str:
     return hashlib.sha256("|".join(str(p) for p in parts).encode()).hexdigest()
@@ -81,9 +84,14 @@ def aretes_de(base: sqlite3.Connection) -> dict[str, dict[str, tuple[str, str]]]
     familles: dict[str, dict[str, tuple[str, str]]] = defaultdict(dict)
     debut = dict(base.execute(
         "SELECT article_id, min(date_debut) FROM version_article GROUP BY article_id"))
-    for amendement, article_id, article in base.execute(
-            "SELECT v.amendement_id, a.id, a.numero FROM vise v JOIN article a ON a.id = v.article_id"):
-        familles["vise"][cle(amendement, article)[:16]] = (article, debut.get(article_id, ""))
+    for amendement, article_id, article, chambre, dossier, dispositif in base.execute(
+            "SELECT v.amendement_id, a.id, a.numero, am.chambre, am.dossier_id, "
+            "am.dispositif FROM vise v JOIN article a ON a.id = v.article_id "
+            "JOIN amendement am ON am.id = v.amendement_id"):
+        valeur = (article, debut.get(article_id, ""))
+        familles["vise"][cle(amendement, article)[:16]] = valeur
+        familles["vise"]["stable:" + cle(chambre, dossier, coupe(dispositif, 600),
+                                         article)] = valeur
     for amendement, article_id, article, voie, chambre, texte, numero in base.execute(
             "SELECT d.amendement_id, a.id, a.numero, d.voie, am.chambre, d.texte_id, "
             "am.numero FROM depose_sur d JOIN article a ON a.id = d.article_id "
@@ -128,6 +136,13 @@ def cle_stable(famille: str, ligne: dict[str, str]) -> str | None:
     if famille == "resulte-de" and ligne.get("segment"):
         return "stable:" + cle(ligne["segment"], ligne["chambre"], ligne["dossier"],
                                ligne["amendement"])
+    # Les fiches `vise` ne portent que l'identifiant interne de l'amendement,
+    # qui glisse dès qu'un chargement en insère d'autres avant lui : l'ajout
+    # des législatures XV à XVII les a tous décalés. Ce que le juge a lu — le
+    # dispositif, tel que la fiche l'a coupé — et le dossier font la clef.
+    if famille == "vise" and ligne.get("dispositif"):
+        return "stable:" + cle(ligne["chambre"], ligne["dossier"], ligne["dispositif"],
+                               ligne["article"])
     if famille == "depose-sur" and ligne.get("texte"):
         return "stable:" + cle(ligne["chambre"], ligne["texte"], ligne["amendement"],
                                ligne["article"])

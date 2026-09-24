@@ -17,11 +17,11 @@ voie par laquelle la tentative est rattachée.
 l'écran, comme l'exige la règle § 5.4 :
 
 - `alinéa écrit` — l'amendement a écrit un alinéa qui subsiste dans la version en
-  vigueur, la chaîne `resulte_de` puis `repris_de` le porte. Confiance 0,8230.
+  vigueur, la chaîne `resulte_de` puis `repris_de` le porte. Confiance 0,8105.
 - `cible déclarée` — le dispositif de l'amendement nomme cet article et la
   formule qui le modifie. C'est la seule voie ouverte à un amendement rejeté, qui
-  par construction n'a écrit aucun texte. Confiance 0,6212, la plus basse du
-  graphe (`docs/10` § 3).
+  par construction n'a écrit aucun texte. Confiance 0,8253 par le numéro,
+  0,7225 quand le contenu désigne l'article (`docs/50` § 7).
 - `subdivision déposée` — l'amendement a été discuté sur l'article du texte qui a
   réécrit celui-ci, et cet article du texte n'en a réécrit aucun autre.
   Confiance 0,7961 (`docs/31`, re-mesurée par `docs/35`). Elle ne dit pas que

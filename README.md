@@ -77,11 +77,11 @@ plus ([`docs/25`](docs/25-surlignage.md)).
 python3 restitution/surlignage.py travail/ratio-legis.sqlite L111-1 --html sortie.html
 ```
 
-**Ce qu'on a voulu y écrire et qui n'y est pas.** Les 42 142 amendements des
+**Ce qu'on a voulu y écrire et qui n'y est pas.** Les 97 226 amendements des
 deux chambres avec leur sort en huit familles comparables, et l'irrecevabilité
-lue là où la chambre l'écrit — sur 2 955 irrecevabilités, 1 269 au titre de
-l'article 40, 896 cavaliers.
-195 articles en vigueur portent au moins une tentative, par trois voies jamais
+lue là où la chambre l'écrit — sur 11 800 irrecevabilités, 3 097 au titre de
+l'article 40, 1 218 cavaliers.
+248 articles en vigueur portent au moins une tentative, par trois voies jamais
 confondues : l'alinéa écrit qui subsiste (`resulte_de`), la cible que le
 dispositif déclare (`vise`, la seule ouverte à un amendement rejeté), la
 subdivision du texte sur laquelle il fut déposé (`depose_sur`)
@@ -274,9 +274,9 @@ mesurés contre leurs seuils :
 | Critère § 4.2 | Seuil | Mesuré | |
 |---|---:|---:|---|
 | couverture `produite_par` | > 95 % | 2 081 / 2 104 — **98,9 %** | atteint |
-| couverture `issu_de` | > 90 % | 66 / 74 lois et ordonnances utiles — **89,2 %** | **repassé sous le seuil** — huit textes entrés par les incréments quotidiens sans dossier DOLE, [`docs/20`](docs/20-dossiers-des-textes.md) |
+| couverture `issu_de` | > 90 % | 70 / 70 lois et ordonnances utiles — **100 %** | atteint — les incréments DOLE sont lus depuis [`docs/50`](docs/50-increments-doublons-legislatures.md) |
 | couverture `resulte_de` | > 60 % | 83 / 896 — **9,3 %** | **non atteint**, décision go du § 8 rendue dans [`docs/21`](docs/21-precision-resulte-de.md) § 7 : le grain de l'article est tenu par le commentaire de rapport et par le texte discuté, non par l'amendement |
-| précision `resulte_de` | > 95 % | 35 / 37 hors-échantillon — **94,6 %**, Wilson 0,8230 | **non atteint**, et re-mesuré le 21 septembre 2026 sur la population d'aujourd'hui, deux juges par arête ([`docs/49`](docs/49-les-dix-du-harnais.md) § 8) ; 168 / 179 sur la population d'avant |
+| précision `resulte_de` | > 95 % | 52 / 57 hors-échantillon — **91,2 %**, Wilson 0,8105 | **non atteint** ; re-mesuré le 24 septembre 2026 sur les 163 arêtes que les législatures XVI et XVII ont ajoutées, 17 / 20, deux juges par arête ([`docs/50`](docs/50-increments-doublons-legislatures.md) § 7) ; 35 / 37 sur la population du 21 septembre |
 
 ### Ce que la base contient
 
@@ -285,14 +285,14 @@ mesurés contre leurs seuils :
 | Articles — lignées (dont **2 104 en vigueur**) | 3 877 | `produite_par` — quel texte a produit la version | 8 145 |
 | Versions d'articles | 6 362 | `repris_de` — continuité d'un alinéa par-delà la recodification | 6 137 |
 | Segments (alinéas) | 28 294 | `renumerote_de` | 1 929 |
-| Documents (rapports, exposés, études d'impact, avis) | 785 | `motive` — un passage qui motive, avec offsets | 1 557 |
-| Amendements (31 027 Sénat, 11 115 Assemblée) | 42 142 | `renvoie_a` — le graphe de renvois | 12 534 |
-| Acteurs | 1 644 | `resulte_de` — l'amendement qui a écrit l'alinéa | 308 (confiance 0,89) |
+| Documents (rapports, exposés, études d'impact, avis) | 834 | `motive` — un passage qui motive, avec offsets | 1 721 |
+| Amendements (33 199 Sénat, 64 027 Assemblée, législatures XIV, XVI et XVII) | 97 226 | `renvoie_a` — le graphe de renvois | 12 534 |
+| Acteurs | 2 656 | `resulte_de` — l'amendement qui a écrit l'alinéa | 447 (confiance 0,81) |
 | Actes de l'Union | 284 | `cite_acte_ue` / `transpose` | 1 572 / 8 |
 | Considérants de l'Union | 7 674 | `article_acte_ue` — articles d'actes déclarés | 6 237 |
-| Textes en discussion | 854 | `porte_sur` — l'article du texte → l'article du code | 97 676 (6 847 internes, 0,90 ; 234 résolues par le contenu, 0,84) |
-| Sorts d'amendements, en huit familles | 42 142 | `vise` — l'amendement qui visait l'article, abouti ou non | 581 (0,87) |
-| Correspondances de texte entre les deux corpus | 163 | `depose_sur` — l'article du code que l'amendement touche, par l'alinéa du texte qu'il nomme | 1 093 (0,76 par l'alinéa) |
+| Textes en discussion | 925 | `porte_sur` — l'article du texte → l'article du code | 101 915 (6 967 internes, 0,90 ; 234 résolues par le contenu, 0,84) |
+| Sorts d'amendements, en huit familles | 97 226 | `vise` — l'amendement qui visait l'article, abouti ou non | 632 (622 par le numéro, 0,83 ; 10 par le contenu, 0,72) |
+| Correspondances de texte entre les deux corpus | 243 | `depose_sur` — l'article du code que l'amendement touche, par l'alinéa du texte qu'il nomme | 1 237 (0,76 par l'alinéa, non re-mesurée) |
 
 ### Le verdict
 
@@ -302,7 +302,7 @@ amendement.
 
 | partie | articles | un passage les motive | origine située | motivation du texte | **raison non documentée** |
 |---|---:|---:|---:|---:|---:|
-| **L** | 1 293 | 781 (60,4 %) | 127 | 307 | **78 (6,0 %)** |
+| **L** | 1 293 | 790 (61,1 %) | 123 | 310 | **70 (5,4 %)** |
 | **R** | 632 | 43 | 7 | 58 | **524 (82,9 %)** |
 | **D** | 179 | 1 | 0 | 11 | **167 (93,3 %)** |
 
@@ -311,7 +311,10 @@ Les parties R et D étaient exclues du périmètre initial pour un motif que
 trois parties et le silence réglementaire est mesuré sur un périmètre qui ne
 l'exclut plus.
 
-**Au grain de l'article** — « pourquoi *cet article* dit ceci » :
+**Au grain de l'article** — « pourquoi *cet article* dit ceci ». Les deux
+tableaux qui suivent sont ceux du 21 septembre 2026 : leurs requêtes ne sont
+écrites nulle part, et elles n'ont pas été recalculées après
+[`docs/50`](docs/50-increments-doublons-legislatures.md) :
 
 | | |
 |---|---:|
@@ -348,15 +351,23 @@ vérité terrain. L'outillage de l'annotateur est prêt
 ([`docs/36`](docs/36-jeu-d-annotation-prepare.md)). Après elle, l'évaluation
 humaine en aveugle de la note, critère de sortie de la phase 3.
 
-**Couverture.** Les huit textes récents sans dossier DOLE qui ont fait repasser
-`issu_de` sous son seuil. Les amendements de l'Assemblée pour les législatures
-XV à XVII (103 articles éligibles, mécanique). La XIIIe, jamais publiée en open
+**Couverture.** Les amendements de la XVe législature : le serveur de
+l'Assemblée coupe le transfert de son archive de 650 Mo, et le pipeline la
+prendra au premier passage où il la sert ; les constantes seront alors à
+re-mesurer ([`docs/50`](docs/50-increments-doublons-legislatures.md) § 8). Les
+textes des XVIe et XVIIe législatures que le corpus n'a pas : 79 jeux
+d'amendements de l'Assemblée sur 192 n'ont pas de texte discuté, donc pas de
+`depose_sur`. `depose_sur`, dont la population a grandi de 144 arêtes, n'est
+pas re-mesurée. La XIIIe, jamais publiée en open
 data, reconstructible page par page depuis Wayback — arbitrage à rendre entre
 le coût et un trou déclaré. Les tableaux de concordance annexés aux textes de
 transposition, seul chemin connu vers un lien européen au grain de l'article.
 
-**Cinq arêtes jugées fausses sont dans la base**, et le harnais
-(`tools/mesures/rejouer.py`) les nomme à chaque passage : L136-2 ← amendement
+**Huit arêtes jugées fausses sont dans la base**, et le harnais
+(`tools/mesures/rejouer.py`) les nomme à chaque passage. Trois sont les
+fausses `resulte_de` du tirage de [`docs/50`](docs/50-increments-doublons-legislatures.md)
+§ 7, dont aucune garde n'est sortie — et l'une, l'agrément « Mon
+Accompagnateur Rénov' », est peut-être juste. Cinq sont L136-2 ← amendement
 624 et quatre L121-91-1, jugées fausses à la main en
 [`docs/21`](docs/21-precision-resulte-de.md), alors que le texte adopté porte
 l'amendement mot pour mot sous ce numéro — des verdicts humains, contestés sur
@@ -425,6 +436,7 @@ d'aujourd'hui ; ceux des documents sont ceux de leur date.
 | 41. Le numéro glissé par le contenu | l'article que le texte écrit sous un numéro que la loi a donné à un autre : 358 contredits, 234 résolus vers la version qui les contient, jugés 20/20 ; `vise` suit sauf plan propre (3/14 avant la garde) | [`docs/47`](docs/47-le-numero-glisse-par-le-contenu.md) |
 | 42. Classement, harnais, accueil | le classement pèse par la rareté dans le fonds et sait se taire, mesuré 17/21 ; le harnais rejoue 700 verdicts contre la base et trouve dix fausses servies ; « signaler cette arête » sur chaque arête | [`docs/48`](docs/48-classement-harnais-accueil.md) |
 | 43. Les dix du harnais, et la re-mesure | neuf réparées à la source : le bloc guillemeté et la date du texte pour `vise`, l'en-tête de la petite loi pour `porte_sur` (2 837 en-têtes rendus), la destination du passage et l'hôte de l'alinéa pour `resulte_de` ; le harnais voit les lignées, les voies, et reconnaît une arête dont l'identifiant a glissé ; re-mesuré par dix juges Sonnet 5 : `vise` 47/50, `resulte_de` 35/37, `porte_sur` 20/20 ; cinq verdicts humains contestés | [`docs/49`](docs/49-les-dix-du-harnais.md) |
+| 44. Incréments DOLE, doublons, législatures XVI et XVII | les incréments DOLE et JORF enfin lus (`issu_de` 70/70) ; un même amendement de l'Assemblée publié deux fois, 6 112 copies fondues ; le projet de loi Hamon perdu par un saut de ligne ; 55 000 amendements de plus ; `vise` résolue par le contenu vers un article que la loi a créé, 10/10 ; re-mesuré : `vise` 64/70, `resulte_de` 52/57 | [`docs/50`](docs/50-increments-doublons-legislatures.md) |
 
 ## D'où ça vient
 

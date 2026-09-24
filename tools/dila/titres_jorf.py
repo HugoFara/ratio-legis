@@ -21,10 +21,12 @@ import csv
 import html
 import re
 import sqlite3
-import subprocess
 import sys
 import tempfile
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from fonds import deployer  # noqa: E402
 
 TITRE = re.compile(r"<TITREFULL>(.*?)</TITREFULL>", re.S)
 
@@ -32,14 +34,6 @@ TITRE = re.compile(r"<TITREFULL>(.*?)</TITREFULL>", re.S)
 def sans_balises(fragment: str) -> str:
     texte = html.unescape(re.sub(r"<[^>]+>", " ", fragment))
     return re.sub(r"\s+", " ", texte).strip()
-
-
-def extraire(archive: Path, motifs: list[str], destination: str) -> None:
-    """Une seule passe de tar par lot : l'archive JORF fait 1,6 Go."""
-    for depart in range(0, len(motifs), 200):     # limite de longueur de commande
-        subprocess.run(["tar", "xzf", str(archive), "-C", destination,
-                        "--wildcards"] + motifs[depart:depart + 200],
-                       stderr=subprocess.DEVNULL, check=False)
 
 
 def main() -> None:
@@ -50,13 +44,9 @@ def main() -> None:
     textes = [t for (t,) in base.execute("SELECT id_jorf FROM texte_normatif")]
     base.close()
 
-    jorf = sorted(miroir.glob("JORF/Freemium_jorf_global_*.tar.gz"))
-    if not jorf:
-        sys.exit("archive globale JORF absente du miroir")
-
     titres: dict[str, str] = {}
     with tempfile.TemporaryDirectory() as tmp:
-        extraire(jorf[-1], [f"*/{t}.xml" for t in textes], tmp)
+        deployer(miroir, "jorf", Path(tmp), [f"*/{t}.xml" for t in textes])
         for identifiant in textes:
             for fichier in Path(tmp).rglob(f"{identifiant}.xml"):
                 if "version" not in str(fichier):

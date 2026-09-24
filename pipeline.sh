@@ -151,24 +151,49 @@ done < "$AMELI"
 echo "   $(ls "$TRAVAIL/corpus/ameli" | wc -l) jeux présents"
 
 # -------------------------------------------------- 4. amendements Assemblée
-etape "4. Amendements de l'Assemblée, XIVe législature"
+etape "4. Amendements de l'Assemblée, XIVe à XVIIe législature"
 AN=https://data.assemblee-nationale.fr/static/openData/repository
 # Le chemin est `amendements_legis_XIV`, non `amendements_legis` : la page
 # d'archives de l'Assemblée publie une URL périmée, qui avait fait conclure à
-# tort que ces données n'existaient pas (docs/10 § 4).
+# tort que ces données n'existaient pas (docs/10 § 4). Depuis la XVe, le jeu
+# est en JSON, et son chemin change encore d'une législature à l'autre.
 for couple in \
   "14/loi/amendements_legis_XIV/Amendements_XIV.csv.zip|Amendements_XIV.csv.zip" \
+  "15/loi/amendements_legis/Amendements_XV.json.zip|Amendements_XV.json.zip" \
+  "16/loi/amendements_div_legis/Amendements.json.zip|Amendements_XVI.json.zip" \
+  "17/loi/amendements_div_legis/Amendements.json.zip|Amendements_XVII.json.zip" \
   "17/amo/tous_acteurs_mandats_organes_xi_legislature/AMO30_tous_acteurs_tous_mandats_tous_organes_historique.json.zip|acteurs_historique.json.zip"
 do
   chemin="${couple%%|*}"; nom="${couple##*|}"
   [ -s "$TRAVAIL/an/$nom" ] && { echo "   $nom déjà présent"; continue; }
-  # --http1.1 : le serveur coupe le flux HTTP/2 sur les gros fichiers.
-  curl -sSL --http1.1 --retry 3 -C - --max-time 1800 -o "$TRAVAIL/an/$nom" "$AN/$chemin" \
-    && echo "   $nom : $(du -h "$TRAVAIL/an/$nom" | cut -f1)"
+  # --http1.1 : le serveur coupe le flux HTTP/2 sur les gros fichiers. Il coupe
+  # aussi, par moments, le HTTP/1.1, sans accepter de reprise par plage : on
+  # recommence du début, et seule une archive dont `unzip -t` répond est gardée.
+  for essai in 1 2 3 4 5 6 7 8 9 10; do
+    curl -sSL --http1.1 --max-time 1800 -o "$TRAVAIL/an/$nom.part" "$AN/$chemin" \
+      && unzip -tqq "$TRAVAIL/an/$nom.part" 2>/dev/null \
+      && mv "$TRAVAIL/an/$nom.part" "$TRAVAIL/an/$nom" && break
+    sleep 20
+  done
+  rm -f "$TRAVAIL/an/$nom.part"
+  [ -s "$TRAVAIL/an/$nom" ] && echo "   $nom : $(du -h "$TRAVAIL/an/$nom" | cut -f1)"
 done
-python3 "$RACINE/tools/an/extraire_amendements_an.py" \
-        "$TRAVAIL/an/Amendements_XIV.csv.zip" \
-        "$RACINE/data/corpus/plan-textes-an-14.tsv" "$TRAVAIL/an/amendements_14.csv"
+# Le plan « dossier → numéros de texte » est dérivé des liens DOLE et des textes
+# déposés ; celui de la XIVe, écrit à la main, en est un sous-ensemble strict
+# (tools/an/plan_textes_an.py). Le plan des textes déposés se reconstruit à
+# l'étape 5, à partir des amendements : c'est sa version versionnée qu'on lit
+# ici, avec au pire une exécution de retard sur un dossier nouveau.
+for legislature in 14 15 16 17; do
+  case $legislature in 14) jeu=XIV.csv;; 15) jeu=XV.json;; 16) jeu=XVI.json;; 17) jeu=XVII.json;; esac
+  [ -s "$TRAVAIL/an/Amendements_$jeu.zip" ] || { echo "   $jeu absent"; continue; }
+  python3 "$RACINE/tools/an/plan_textes_an.py" "$legislature" \
+          "$RACINE/data/corpus/plan-textes-an-$legislature.tsv" "$RAPPORTS" "$TEXTES" \
+          "$RACINE/data/corpus/plan-textes-deposes-an.tsv"
+  python3 "$RACINE/tools/an/extraire_amendements_an.py" \
+          "$TRAVAIL/an/Amendements_$jeu.zip" \
+          "$RACINE/data/corpus/plan-textes-an-$legislature.tsv" \
+          "$TRAVAIL/an/amendements_$legislature.csv"
+done
 
 # ------------------------------------------------------------- 5. ingestion
 etape "5. Ingestion"
@@ -177,8 +202,10 @@ etape "5. Ingestion"
 ingere "$RACINE/ingestion/rapports_vers_motive.py" "$TRAVAIL/corpus/rapports" \
         "$PERIMETRE" "$RAPPORTS" "$BASE" "$IMPACTS"
 ingere "$RACINE/ingestion/renvois.py" "$BASE"
-ingere "$RACINE/ingestion/an_vers_amendements.py" "$TRAVAIL/an/amendements_14.csv" \
-        "$TRAVAIL/an/acteurs_historique.json.zip" "$BASE"
+for extrait in "$TRAVAIL"/an/amendements_1[4-7].csv; do
+  ingere "$RACINE/ingestion/an_vers_amendements.py" "$extrait" \
+          "$TRAVAIL/an/acteurs_historique.json.zip" "$BASE"
+done
 # Les nœuds seulement : l'arête `resulte_de` se construit plus bas, après
 # `porte_sur` et `depose_sur`, dont elle lit l'hôte de l'alinéa que
 # l'amendement nomme (docs/49).

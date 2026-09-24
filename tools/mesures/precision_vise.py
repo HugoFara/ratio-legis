@@ -20,8 +20,12 @@ nomme comme ancre, ou vise un homonyme d'un autre code.
 Tirage reproductible, clef SHA-256 du couple (amendement, article) ; `--sauf`
 écarte les arêtes d'une fiche déjà jugée.
 
+`--methode inferee` restreint le tirage aux arêtes posées par le contenu de
+l'article écrit (`docs/50`), qui ont leur constante à elles.
+
 Usage :
     precision_vise.py <base.sqlite> <fiche.tsv> [effectif] [--sauf <fiche.tsv>]
+                      [--methode declaree|inferee]
     precision_vise.py --bilan <fiche.tsv>
 """
 
@@ -56,7 +60,7 @@ def wilson(succes: int, total: int, z: float = 1.96) -> float:
 
 
 def echantillon(base: sqlite3.Connection, sauf: set[tuple[str, str]],
-                effectif: int) -> list[dict]:
+                effectif: int, methode: str | None = None) -> list[dict]:
     lignes = []
     for (amendement, numero, chambre, sort, auteur, article, formule, dossier,
          subdivision, dispositif, url, d0, texte_article) in base.execute("""
@@ -68,7 +72,8 @@ def echantillon(base: sqlite3.Connection, sauf: set[tuple[str, str]],
             FROM vise v
             JOIN amendement am ON am.id = v.amendement_id
             LEFT JOIN acteur ac ON ac.id = am.auteur_id
-            JOIN article a ON a.id = v.article_id"""):
+            JOIN article a ON a.id = v.article_id
+            WHERE ? IS NULL OR v.methode = ?""", (methode, methode)):
         if (str(amendement), article) in sauf:
             continue
         lignes.append({
@@ -101,7 +106,11 @@ def bilan(fiche: Path) -> None:
 def main() -> None:
     if len(sys.argv) == 3 and sys.argv[1] == "--bilan":
         return bilan(Path(sys.argv[2]))
-    arguments, sauf = sys.argv[1:], set()
+    arguments, sauf, methode = sys.argv[1:], set(), None
+    if "--methode" in arguments:
+        place = arguments.index("--methode")
+        methode = arguments[place + 1]
+        arguments = arguments[:place] + arguments[place + 2:]
     if "--sauf" in arguments:
         place = arguments.index("--sauf")
         deja = Path(arguments[place + 1])
@@ -112,7 +121,7 @@ def main() -> None:
         sys.exit(__doc__)
     chemin_base, fiche = Path(arguments[0]), Path(arguments[1])
     effectif = int(arguments[2]) if len(arguments) == 3 else EFFECTIF
-    lignes = echantillon(sqlite3.connect(chemin_base), sauf, effectif)
+    lignes = echantillon(sqlite3.connect(chemin_base), sauf, effectif, methode)
     with fiche.open("w", encoding="utf-8", newline="") as sortie:
         graveur = csv.DictWriter(sortie, COLONNES, delimiter="\t", lineterminator="\n")
         graveur.writeheader()

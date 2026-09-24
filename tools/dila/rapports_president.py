@@ -30,13 +30,13 @@ from __future__ import annotations
 
 import html
 import re
-import subprocess
 import sys
 import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from dossiers_du_perimetre import lire  # noqa: E402
+from fonds import deployer  # noqa: E402
 
 ID_TEXTE_2 = re.compile(r"<ID_TEXTE_2>(JORFTEXT\d+)</ID_TEXTE_2>")
 ARTICLE = re.compile(r"(JORFARTI\d+)")
@@ -51,14 +51,6 @@ def sans_balises(fragment: str) -> str:
                   "\n".join(re.sub(r"[ \t]+", " ", l).strip() for l in texte.split("\n")))
 
 
-def extraire(archive: Path, motifs: list[str], destination: str) -> None:
-    """Une seule passe de tar par lot : l'archive JORF fait 1,6 Go."""
-    for depart in range(0, len(motifs), 400):     # limite de longueur de commande
-        subprocess.run(["tar", "xzf", str(archive), "-C", destination, "--wildcards"]
-                       + motifs[depart:depart + 400],
-                       stderr=subprocess.DEVNULL, check=False)
-
-
 def main() -> None:
     if len(sys.argv) != 4:
         sys.exit(__doc__)
@@ -66,13 +58,8 @@ def main() -> None:
     destination.mkdir(parents=True, exist_ok=True)
 
     dossiers = sorted({l["id_dole"] for l in lire(liste) if l["nature"] == "ordonnance"})
-    dole = sorted(miroir.glob("DOLE/Freemium_dole_global_*.tar.gz"))
-    jorf = sorted(miroir.glob("JORF/Freemium_jorf_global_*.tar.gz"))
-    if not dole or not jorf:
-        sys.exit("archives globales DOLE ou JORF absentes du miroir")
-
     with tempfile.TemporaryDirectory() as tmp:
-        extraire(dole[-1], [f"*{d}.xml" for d in dossiers], tmp)
+        deployer(miroir, "dole", Path(tmp), [f"*{d}.xml" for d in dossiers])
         rapports: dict[str, str] = {}          # JORFTEXT -> dossier
         for dossier in dossiers:
             for fichier in Path(tmp).rglob(f"{dossier}.xml"):
@@ -81,7 +68,7 @@ def main() -> None:
                 if trouve:
                     rapports[trouve.group(1)] = dossier
 
-        extraire(jorf[-1], [f"*/{t}.xml" for t in rapports], tmp)
+        deployer(miroir, "jorf", Path(tmp), [f"*/{t}.xml" for t in rapports])
         articles: dict[str, list[str]] = {}
         for texte in rapports:
             struct = [p for p in Path(tmp).rglob(f"{texte}.xml") if "struct" in str(p)]
@@ -90,7 +77,7 @@ def main() -> None:
                     struct[0].read_text(encoding="utf-8", errors="replace"))))
 
         besoins = [f"*/{a}.xml" for ids in articles.values() for a in ids]
-        extraire(jorf[-1], besoins, tmp)
+        deployer(miroir, "jorf", Path(tmp), besoins)
 
         ecrits, vides, hors_rapport = 0, [], []
         for texte, dossier in sorted(rapports.items()):

@@ -5,10 +5,10 @@ verdict	partie D — origine située seulement	0	179	0.0
 verdict	partie D — motivation du texte seule	11	179	6.1	
 verdict	partie D — RAISON NON DOCUMENTÉE	167	179	93.3	
 verdict	partie L — articles en vigueur	1293			
-verdict	partie L — un passage les motive	781	1293	60.4	
-verdict	partie L — origine située seulement	127	1293	9.8	
-verdict	partie L — motivation du texte seule	307	1293	23.7	
-verdict	partie L — RAISON NON DOCUMENTÉE	78	1293	6.0	
+verdict	partie L — un passage les motive	790	1293	61.1	
+verdict	partie L — origine située seulement	123	1293	9.5	
+verdict	partie L — motivation du texte seule	310	1293	24.0	
+verdict	partie L — RAISON NON DOCUMENTÉE	70	1293	5.4	
 verdict	partie R — articles en vigueur	632			
 verdict	partie R — un passage les motive	43	632	6.8	
 verdict	partie R — origine située seulement	7	632	1.1	
@@ -17,67 +17,68 @@ verdict	partie R — RAISON NON DOCUMENTÉE	524	632	82.9
 origine	articles L dont la version en vigueur vient d'une ordonnance	1008	1293	78.0	origine apparente
 origine	articles L dont la version en vigueur vient d'une loi	276	1293	21.3	origine apparente
 origine	articles L ayant une loi dans leur ascendance	1043	1293	80.7	origine réelle, chaîne de renumérotation remontée
-amendements	assemblee — déposés	11115			
-amendements	assemblee — adoptés	2677	11115	24.1	
-amendements	assemblee — sans objet publié	0	11115	0.0	surtout des amendements retirés avant séance ou irrecevables
-amendements	assemblee — adoptés sans objet publié	0	2677	0.0	dispositif adopté sans justification publiée
-amendements	senat — déposés	31027			
-amendements	senat — adoptés	7270	31027	23.4	
-amendements	senat — sans objet publié	3526	31027	11.4	surtout des amendements retirés avant séance ou irrecevables
-amendements	senat — adoptés sans objet publié	18	7270	0.2	dispositif adopté sans justification publiée
-sort	assemblee — rejete	3280	11115	29.5	
-sort	assemblee — adopte	2677	11115	24.1	
-sort	assemblee — non_soutenu	2436	11115	21.9	
-sort	assemblee — retire	1885	11115	17.0	
-sort	assemblee — irrecevable	447	11115	4.0	sort lu dans l'état procédural, la chambre n'en publie pas
-sort	assemblee — tombe	382	11115	3.4	
-sort	assemblee — non_statue	8	11115	0.1	sort lu dans l'état procédural, la chambre n'en publie pas
-sort	senat — rejete	9271	31027	29.9	
-sort	senat — retire	7831	31027	25.2	
-sort	senat — adopte	7298	31027	23.5	
-sort	senat — irrecevable	2508	31027	8.1	
-sort	senat — non_soutenu	2401	31027	7.7	
-sort	senat — tombe	1717	31027	5.5	
-sort	senat — non_statue	1	31027	0.0	
-irrecevabilite	fondement — article 40	1269	2955	42.9	
-irrecevabilite	fondement — article 45	896	2955	30.3	
-irrecevabilite	fondement — (non précisé)	469	2955	15.9	
-irrecevabilite	fondement — article 41	170	2955	5.8	
-irrecevabilite	fondement — article 44 bis	135	2955	4.6	
-irrecevabilite	fondement — LOLF	10	2955	0.3	
-irrecevabilite	fondement — LOLFSS	6	2955	0.2	
-tentatives	articles en vigueur portant une tentative, les trois voies	195	2104	9.3	cible déclarée, alinéa écrit ou subdivision déposée
-tentatives	dont par la cible déclarée du dispositif	112	195	57.4	
-tentatives	dont par un alinéa écrit qui subsiste	83	195	42.6	
-tentatives	dont par la subdivision déposée	48	195	24.6	
-tentatives	tentatives déclarées sur un article en vigueur	262			voie de la cible déclarée seule ; le détail par sort suit
-depot	amendements positionnés sur un article en vigueur	232			
-depot	articles en vigueur atteints	48	2104	2.3	
-depot	assemblee — jeux d'amendements appariés à leur texte	39	39	100.0	
-depot	senat — jeux d'amendements appariés à leur texte	124	143	86.7	
-depot	subdivisions tombant dans la plage d'articles du texte	5540	5712	97.0	contrôle de l'appariement ; un texte faux s'y verrait en premier
-depot	amendements portant sur un article additionnel	9088			ils ne visent aucun article existant du code : c'est le plafond de la voie du dépôt
-tentatives	dont rejete	95	262	36.3	
-tentatives	dont retire	60	262	22.9	
-tentatives	dont adopte	50	262	19.1	
-tentatives	dont irrecevable	42	262	16.0	
-tentatives	dont non_soutenu	11	262	4.2	
-tentatives	dont tombe	4	262	1.5	
-navette	dossiers ayant au moins deux états datés	110			
-navette	durée médiane, en jours	131			
+amendements	assemblee — déposés	64027			
+amendements	assemblee — adoptés	13269	64027	20.7	
+amendements	assemblee — sans objet publié	7049	64027	11.0	surtout des amendements retirés avant séance ou irrecevables
+amendements	assemblee — adoptés sans objet publié	2	13269	0.0	dispositif adopté sans justification publiée
+amendements	senat — déposés	33199			
+amendements	senat — adoptés	7736	33199	23.3	
+amendements	senat — sans objet publié	3732	33199	11.2	surtout des amendements retirés avant séance ou irrecevables
+amendements	senat — adoptés sans objet publié	19	7736	0.2	dispositif adopté sans justification publiée
+sort	assemblee — rejete	14444	64027	22.6	
+sort	assemblee — adopte	13269	64027	20.7	
+sort	assemblee — non_soutenu	11065	64027	17.3	
+sort	assemblee — retire	8914	64027	13.9	
+sort	assemblee — irrecevable	8835	64027	13.8	sort lu dans l'état procédural, la chambre n'en publie pas
+sort	assemblee — tombe	4830	64027	7.5	
+sort	assemblee — inconnu	1980	64027	3.1	
+sort	assemblee — non_statue	690	64027	1.1	sort lu dans l'état procédural, la chambre n'en publie pas
+sort	senat — rejete	10048	33199	30.3	
+sort	senat — retire	8130	33199	24.5	
+sort	senat — adopte	7764	33199	23.4	
+sort	senat — irrecevable	2965	33199	8.9	
+sort	senat — non_soutenu	2530	33199	7.6	
+sort	senat — tombe	1761	33199	5.3	
+sort	senat — non_statue	1	33199	0.0	
+irrecevabilite	fondement — (non précisé)	7147	11800	60.6	
+irrecevabilite	fondement — article 40	3097	11800	26.2	
+irrecevabilite	fondement — article 45	1218	11800	10.3	
+irrecevabilite	fondement — article 41	182	11800	1.5	
+irrecevabilite	fondement — article 44 bis	135	11800	1.1	
+irrecevabilite	fondement — LOLF	15	11800	0.1	
+irrecevabilite	fondement — LOLFSS	6	11800	0.1	
+tentatives	articles en vigueur portant une tentative, les trois voies	248	2104	11.8	cible déclarée, alinéa écrit ou subdivision déposée
+tentatives	dont par la cible déclarée du dispositif	139	248	56.0	
+tentatives	dont par un alinéa écrit qui subsiste	119	248	48.0	
+tentatives	dont par la subdivision déposée	54	248	21.8	
+tentatives	tentatives déclarées sur un article en vigueur	341			voie de la cible déclarée seule ; le détail par sort suit
+depot	amendements positionnés sur un article en vigueur	276			
+depot	articles en vigueur atteints	54	2104	2.6	
+depot	assemblee — jeux d'amendements appariés à leur texte	113	192	58.9	
+depot	senat — jeux d'amendements appariés à leur texte	130	150	86.7	
+depot	subdivisions tombant dans la plage d'articles du texte	7801	7983	97.7	contrôle de l'appariement ; un texte faux s'y verrait en premier
+depot	amendements portant sur un article additionnel	18390			ils ne visent aucun article existant du code : c'est le plafond de la voie du dépôt
+tentatives	dont rejete	102	341	29.9	
+tentatives	dont adopte	86	341	25.2	
+tentatives	dont retire	75	341	22.0	
+tentatives	dont irrecevable	48	341	14.1	
+tentatives	dont non_soutenu	23	341	6.7	
+tentatives	dont tombe	7	341	2.1	
+navette	dossiers ayant au moins deux états datés	116			
+navette	durée médiane, en jours	136			
 navette	durée la plus courte, en jours	1			
 navette	durée la plus longue, en jours	897			
-chambres	segments écrits par un amendement — assemblee	100			dénominateur faible : voir docs/09
-chambres	segments écrits par un amendement — senat	148			dénominateur faible : voir docs/09
-chambres	articles dont un alinéa est tracé jusqu'à un amendement	117			sans remonter la chaîne des segments
-sources	documents — avis_conseil_etat	27			
-sources	documents — etude_impact	46			
-sources	documents — expose_des_motifs	77			
-sources	documents — rapport_commission	572			
-sources	documents — rapport_president_republique	63			
+chambres	segments écrits par un amendement — assemblee	215			dénominateur faible : voir docs/09
+chambres	segments écrits par un amendement — senat	152			dénominateur faible : voir docs/09
+chambres	articles dont un alinéa est tracé jusqu'à un amendement	166			sans remonter la chaîne des segments
+sources	documents — avis_conseil_etat	30			
+sources	documents — etude_impact	49			
+sources	documents — expose_des_motifs	81			
+sources	documents — rapport_commission	606			
+sources	documents — rapport_president_republique	68			
 sources	actes de l'Union	284			
 sources	considérants	7674			
-sources	textes en discussion	854			
+sources	textes en discussion	925			
 renvois	articles citant L733-1	37			
 renvois	articles citant L412-1	37			
 renvois	articles citant L733-4	35			

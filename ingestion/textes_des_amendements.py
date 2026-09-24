@@ -595,7 +595,12 @@ def construire(base: sqlite3.Connection, schema: Path, corpus_textes: Path) -> d
         SELECT origine, courant FROM c"""):
         chaine[origine].add(courant)
     visees: dict[int, set[int]] = defaultdict(set)
-    for amendement_id, article_id in base.execute("SELECT amendement_id, article_id FROM vise"):
+    # Les seules arêtes déclarées par le numéro : celles que le contenu désigne
+    # (`inferee`, docs/50) sont mesurées pour `vise`, non pour la voie `visee`
+    # de `depose_sur`, et les y admettre retirait une `alinea` jugée juste
+    # (L311-17 ← 210 du Sénat).
+    for amendement_id, article_id in base.execute(
+            "SELECT amendement_id, article_id FROM vise WHERE methode = 'declaree'"):
         visees[amendement_id].add(article_id)
     textes = Textes(base, corpus_textes)
 

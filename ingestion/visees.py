@@ -90,7 +90,10 @@ DIVISION_ECRITE = re.compile(r"«\s*(?:section|sous-section|chapitre|titre)\s+\d
 # deux-points. La formule y est, la modification non : deux juges l'ont dite
 # fausse (docs/49 § 8). La formule suivie du deux-points et de la fin du
 # dispositif n'est pas une cible.
-CHAPEAU_VIDE = re.compile(r"\s*:\s*[»\"]?\s*$")
+# Le point final après le guillemet (« … est ainsi modifié : ». ) est encore un
+# chapeau vide : la garde l'ignorait, et 020e9a44 de `docs/50` est passée.
+CHAPEAU_VIDE = re.compile(r"\s*:\s*[»\"]?\s*\.?\s*$")
+DEVIENT = re.compile(r"devient\s+l['’]article\s*$", re.I)
 TIRETS = str.maketrans({"\u2011": "-", "\u2010": "-", "\u00a0": " ", "\u202f": " "})
 
 # Le numéro seul ne dit pas le code : L. 152-1 existe au code de l'environnement,
@@ -199,6 +202,11 @@ class Instruction:
                 and (bloc is None or bloc[0] < position < bloc[1])]
 
 
+# « Le présent code », « ce code », « le même code » ne nomment pas un code :
+# ils renvoient à celui qui les gouverne.
+ANAPHORE = re.compile(r"^(?:\S+\s+)?(?:(?:présent|même)\s+)?code$", re.I)
+
+
 def vise_un_autre_code(texte: str, debut: int, fin: int, instruction: Instruction) -> bool:
     """Vrai si la clause nomme un code, et que ce n'est pas celui-ci."""
     noms = [nom for _, nom in instruction.visibles(debut, *bornes(texte, debut, fin))]
@@ -207,10 +215,17 @@ def vise_un_autre_code(texte: str, debut: int, fin: int, instruction: Instructio
         # « Le code de l'énergie est ainsi modifié : 1° … "Art. L. 241-2-…" ». La
         # clause ne le contient pas, mais il gouverne tout ce qui suit. Même
         # convention que « du même code » dans la tranche des renvois.
+        #
+        # Le dernier **nom** de code, non la dernière anaphore : l'amendement
+        # 47111 modifie « le code de l'action sociale », et le « du présent
+        # code » écrit dans l'alinéa qu'il y insère faisait passer ses L. 314-7
+        # et L. 315-14 pour les nôtres (`docs/50` § 7). Faute de nom, l'anaphore
+        # garde son sens d'avant.
         amont = instruction.visibles(debut, 0, debut)
         if not amont:
             return False
-        noms = [amont[-1][1]]
+        nommes = [nom for _, nom in amont if not ANAPHORE.match(nom.strip())]
+        noms = [(nommes or [amont[-1][1]])[-1]]
     return not any("consommation" in n or "présent code" in n for n in noms)
 
 
@@ -237,7 +252,22 @@ def vise_un_autre_code(texte: str, debut: int, fin: int, instruction: Instructio
 # dictées (lignée mort-née, division écrite, chapeau vide) — **47 justes sur
 # 50**, réunis et dédoublonnés, Wilson 0,8378. Les trois fausses sont chacune
 # la cause d'une garde ; la population d'après n'a pas de tirage à elle.
-CONFIANCE = 0.8378
+# Le 24 septembre 2026 (docs/50), 164 arêtes nouvelles — législatures XVI et
+# XVII, loi Hamon complète, onze dossiers de plus. Vingt d'entre elles, deux
+# juges Sonnet 5 d'accord partout : **17 sur 20**. Les trois fausses ont dicté
+# deux gardes : le chapeau vide suivi d'un point, et l'anaphore — « du présent
+# code » écrit dans l'alinéa inséré au code de l'action sociale n'est pas le
+# nôtre. Réunies aux 50 d'avant : **64 sur 70**, Wilson 0,8253.
+CONFIANCE = 0.8253
+# L'article que le contenu désigne quand le numéro écrit n'est pas le bon
+# (`docs/50`). Mesurée à part, sur cette seule population, le 24 septembre
+# 2026 : les treize arêtes d'avant la garde des articles créés, deux juges
+# Sonnet 5 et un arbitre Opus 5 sur l'unique désaccord — 10 justes sur 13,
+# et les trois fausses sont les seules à viser un article que la loi n'a pas
+# créé. Après la garde, 10 sur 10 : Wilson 0,7225. La garde est choisie sur
+# l'échantillon qui la mesure ; la population n'a pas d'autre membre à tirer.
+CONFIANCE_CONTENU = 0.7225
+MOTS_MINI_RESOLUTION = 20
 
 
 def code_nomme(texte: str, debut: int, fin: int, instruction: Instruction) -> bool:
@@ -246,17 +276,19 @@ def code_nomme(texte: str, debut: int, fin: int, instruction: Instruction) -> bo
                 or instruction.visibles(debut, 0, debut))
 
 
-def alinea_ecrit(texte: str, position: int) -> list[str]:
+def alinea_ecrit(texte: str, position: int, en_tete: int) -> tuple[list[str], str]:
     """Les mots du premier alinéa qu'un amendement écrit sous l'en-tête dont
     le numéro finit à `position` : jusqu'au guillemet suivant, qui ouvre
-    l'alinéa d'après ou ferme le bloc."""
+    l'alinéa d'après ou ferme le bloc. Avec la fenêtre du dispositif, depuis
+    l'en-tête, qui sert de preuve quand le contenu désigne l'article."""
     debut = TETE.match(texte, position).end()
     fin = min((i for i in (texte.find("«", debut), texte.find("»", debut)) if i >= 0),
               default=len(texte))
-    return mots(texte[debut:fin])
+    return mots(texte[debut:fin]), texte[en_tete:fin].strip()
 
 
-def cibles(dispositif: str) -> list[tuple[str, tuple[str, bool, list[str] | None]]]:
+def cibles(dispositif: str
+           ) -> list[tuple[str, tuple[str, bool, tuple[list[str], str] | None]]]:
     """Articles visés par une formule de modification :
     (numéro, (formule, code nommé, alinéa écrit)).
 
@@ -274,7 +306,7 @@ def cibles(dispositif: str) -> list[tuple[str, tuple[str, bool, list[str] | None
     # n'était pas lu.
     texte = sans_balises(dispositif).translate(TIRETS)
     instruction = Instruction(texte)
-    trouves: dict[str, tuple[str, bool, list[str] | None]] = {}
+    trouves: dict[str, tuple[str, bool, tuple[list[str], str] | None]] = {}
     for m in ARTICLE.finditer(texte):
         cle = f"{m.group(1)}{m.group(2)}-{m.group(3)}" + (f"-{m.group(4)}" if m.group(4) else "")
         if vise_un_autre_code(texte, m.start(), m.end(), instruction):
@@ -284,7 +316,11 @@ def cibles(dispositif: str) -> list[tuple[str, tuple[str, bool, list[str] | None
         nomme = code_nomme(texte, m.start(), m.end(), instruction)
         suite = APRES.match(texte[m.end():m.end() + 80])
         if suite:
-            if CHAPEAU_VIDE.match(texte, m.end() + suite.end()):
+            # Le chapeau qui renumérote n'est pas vide pour le numéro qu'il donne :
+            # « L'article L. 121-20-13 […] devient l'article L. 121-30 et le I est
+            # ainsi modifié : » vise L. 121-30, jugée juste (docs/46).
+            if CHAPEAU_VIDE.match(texte, m.end() + suite.end()) \
+                    and not DEVIENT.search(texte[max(0, m.start() - 30):m.start()]):
                 continue
             trouves.setdefault(cle, (suite.group(1).lower(), nomme, None))
             continue
@@ -293,7 +329,7 @@ def cibles(dispositif: str) -> list[tuple[str, tuple[str, bool, list[str] | None
             trouves.setdefault(cle, (amont.group(1).lower(), nomme, None))
             continue
         if CREATION.search(texte[max(0, m.start() - 20):m.start()]):
-            trouves.setdefault(cle, ("rédigé", nomme, alinea_ecrit(texte, m.end())))
+            trouves.setdefault(cle, ("rédigé", nomme, alinea_ecrit(texte, m.end(), m.start())))
     return list(trouves.items())
 
 
@@ -391,6 +427,15 @@ def main() -> None:
             "JOIN produite_par p ON p.texte_id = i.texte_id "
             "JOIN version_article v ON v.id_legi = p.version_id ORDER BY v.date_debut"):
         versions_produites.setdefault((dossier_id, article_id), texte_version)
+    # Les lignées dont la première version vient d'un texte du dossier.
+    crees_par_le_dossier: dict[str, set[int]] = defaultdict(set)
+    for dossier_id, article_id in base.execute("""
+            SELECT i.dossier_id, v.article_id FROM issu_de i
+            JOIN produite_par p ON p.texte_id = i.texte_id
+            JOIN version_article v ON v.id_legi = p.version_id
+            WHERE v.date_debut = (SELECT min(date_debut) FROM version_article
+                                  WHERE article_id = v.article_id)"""):
+        crees_par_le_dossier[dossier_id].add(article_id)
     trigrammes_produits: dict[str, dict[int, set[tuple[str, ...]]]] = defaultdict(dict)
     for (dossier_id, article_id), texte_version in versions_produites.items():
         trigrammes_produits[dossier_id][article_id] = trigrammes(mots(texte_version))
@@ -413,6 +458,7 @@ def main() -> None:
     # n'est le nôtre que si la loi du dossier a bien écrit ce numéro : la
     # numérotation proposée par un projet glisse en navette (docs/41 § 2).
     aretes, sans_cible, hors_dossier, hote_etranger, numero_glisse = [], 0, 0, 0, 0
+    resolues: list[tuple[int, int, str, str]] = []
     par_l_instruction, glisse_dans_le_texte, suivi_par_le_contenu = 0, 0, 0
     plan_propre, corrobore, glisse_par_le_contenu, plan_propre_non_corrobore = 0, 0, 0, 0
     for amendement_id, dossier, dispositif, chambre, corpus, subdivision in base.execute(
@@ -427,7 +473,8 @@ def main() -> None:
         if texte_id and numero:
             codes_de_l_hote = hote.get((texte_id, numero))
         retenues = []
-        for n, (formule, nomme, ecrit) in cibles(dispositif):
+        for n, (formule, nomme, redaction) in cibles(dispositif):
+            ecrit, fenetre = redaction if redaction else (None, "")
             # Sans code nommé, le numéro ne vaut que par son hôte ; hôte étranger,
             # hôte multi-codes, ou hôte inconnu — jeu d'amendements non apparié à
             # un texte — : on ne rattache pas. Dix amendements y perdent leur
@@ -477,6 +524,26 @@ def main() -> None:
                     autre = resolu_par_le_contenu(ecrit, trigrammes_produits[dossier])
                     if autre is not None and autre != article_id:
                         glisse_par_le_contenu += 1
+                        # Le numéro ne vaut rien ; le contenu, seul au-dessus du
+                        # seuil, désigne l'article. Posé en `inferee`, avec sa
+                        # fenêtre et sa constante propre, à partir d'un alinéa
+                        # assez long pour que la concordance ne soit pas celle
+                        # d'une formule : 3532 (« Art. L. 121-104 », treize
+                        # mots) tombait à 0,64 sur L121-87, qui n'a rien à voir.
+                        #
+                        # Et vers un article que la loi du dossier a **créé** :
+                        # l'amendement qui écrit « Art. L. X. – … » crée un
+                        # article, et si son alinéa se retrouve dans un article
+                        # que la loi n'a fait que modifier, c'est une formule
+                        # qu'il recopie — la définition du crédit renouvelable
+                        # de L. 311-16 pour l'interdire, la sanction de L. 121-82
+                        # pour la boulangerie appliquée à la pâtisserie, la
+                        # reconduction tacite de L. 136-1 collée sous le gaz de
+                        # pétrole liquéfié. Jugées fausses toutes trois, et les
+                        # seules du tirage à viser un article préexistant.
+                        if len(ecrit) >= MOTS_MINI_RESOLUTION and len(fenetre) >= 60 \
+                                and autre in crees_par_le_dossier[dossier]:
+                            resolues.append((amendement_id, autre, formule, fenetre))
                         continue
                     if ARTICLE_ENTIER.search(dispositif) or DIVISION_ECRITE.search(dispositif):
                         plan_propre_non_corrobore += 1
@@ -491,6 +558,21 @@ def main() -> None:
     base.executemany(
         "INSERT OR IGNORE INTO vise (amendement_id, article_id, formule, confiance)"
         " VALUES (?, ?, ?, ?)", aretes)
+    # Une arête déclarée par le numéro prime : l'amendement qui vise déjà
+    # l'article désigné par le contenu n'en reçoit pas une seconde.
+    suivante = base.execute("SELECT coalesce(max(id), 0) + 1 FROM preuve").fetchone()[0]
+    posees_par_le_contenu = 0
+    for amendement_id, article_id, formule, fenetre in resolues:
+        if base.execute("SELECT 1 FROM vise WHERE amendement_id = ? AND article_id = ?",
+                        (amendement_id, article_id)).fetchone():
+            continue
+        base.execute("INSERT INTO preuve (id, methode, fenetre) VALUES (?, ?, ?)",
+                     (suivante, "contenu_de_l_article_ecrit", fenetre))
+        base.execute("INSERT INTO vise (amendement_id, article_id, formule, methode, "
+                     "confiance, preuve_id) VALUES (?, ?, ?, 'inferee', ?, ?)",
+                     (amendement_id, article_id, formule, CONFIANCE_CONTENU, suivante))
+        suivante += 1
+        posees_par_le_contenu += 1
     base.commit()
 
     total = base.execute("SELECT count(*) FROM amendement").fetchone()[0]
@@ -523,6 +605,8 @@ def main() -> None:
           f"de la loi ; {glisse_par_le_contenu} dont le contenu désigne un autre article "
           f"de la loi, {plan_propre_non_corrobore} sous un plan propre que rien ne "
           f"corrobore — non rattachés")
+    print(f"  dont posés vers l'article que le contenu désigne (inferee) : "
+          f"{posees_par_le_contenu}")
     print(f"articles du code visés     : {touches}")
     print(f"  dont en vigueur          : {en_vigueur}")
     print("\npar sort :")

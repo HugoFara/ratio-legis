@@ -29,7 +29,6 @@ from __future__ import annotations
 import csv
 import html
 import re
-import subprocess
 import sys
 import tempfile
 import unicodedata
@@ -37,6 +36,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from dossiers_du_perimetre import lire  # noqa: E402
+from fonds import deployer  # noqa: E402
 
 LIEN = re.compile(r"<LIEN\b([^>]*?)/?>", re.S)
 ATTR = re.compile(r'(\w+)="([^"]*)"')
@@ -49,25 +49,14 @@ def sans_accents(texte: str) -> str:
                    if unicodedata.category(c) != "Mn").lower().strip()
 
 
-def extraire(archive: Path, motifs: list[str], destination: str) -> None:
-    for depart in range(0, len(motifs), 200):
-        subprocess.run(["tar", "xzf", str(archive), "-C", destination,
-                        "--wildcards"] + motifs[depart:depart + 200],
-                       stderr=subprocess.DEVNULL, check=False)
-
-
 def main() -> None:
     if len(sys.argv) != 4:
         sys.exit(__doc__)
     miroir, liste, sortie = (Path(a) for a in sys.argv[1:])
     dossiers = sorted({l["id_dole"] for l in lire(liste)})
-    archives = sorted(miroir.glob("DOLE/Freemium_dole_global_*.tar.gz"))
-    if not archives:
-        sys.exit("archive globale DOLE absente du miroir")
-
     lignes, compte = [], {"etude_impact": 0, "avis_conseil_etat": 0}
     with tempfile.TemporaryDirectory() as tmp:
-        extraire(archives[-1], [f"*{d}.xml" for d in dossiers], tmp)
+        deployer(miroir, "dole", Path(tmp), [f"*{d}.xml" for d in dossiers])
         for dossier in dossiers:
             for fichier in Path(tmp).rglob(f"{dossier}.xml"):
                 brut = fichier.read_text(encoding="utf-8", errors="replace")
