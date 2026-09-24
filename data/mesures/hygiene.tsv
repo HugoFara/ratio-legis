@@ -5,9 +5,9 @@ verdict	partie D — origine située seulement	0	179	0.0
 verdict	partie D — motivation du texte seule	11	179	6.1	
 verdict	partie D — RAISON NON DOCUMENTÉE	167	179	93.3	
 verdict	partie L — articles en vigueur	1293			
-verdict	partie L — un passage les motive	790	1293	61.1	
-verdict	partie L — origine située seulement	123	1293	9.5	
-verdict	partie L — motivation du texte seule	310	1293	24.0	
+verdict	partie L — un passage les motive	788	1293	60.9	
+verdict	partie L — origine située seulement	128	1293	9.9	
+verdict	partie L — motivation du texte seule	307	1293	23.7	
 verdict	partie L — RAISON NON DOCUMENTÉE	70	1293	5.4	
 verdict	partie R — articles en vigueur	632			
 verdict	partie R — un passage les motive	43	632	6.8	
@@ -47,30 +47,30 @@ irrecevabilite	fondement — article 41	182	11800	1.5
 irrecevabilite	fondement — article 44 bis	135	11800	1.1	
 irrecevabilite	fondement — LOLF	15	11800	0.1	
 irrecevabilite	fondement — LOLFSS	6	11800	0.1	
-tentatives	articles en vigueur portant une tentative, les trois voies	248	2104	11.8	cible déclarée, alinéa écrit ou subdivision déposée
-tentatives	dont par la cible déclarée du dispositif	139	248	56.0	
-tentatives	dont par un alinéa écrit qui subsiste	120	248	48.4	
-tentatives	dont par la subdivision déposée	52	248	21.0	
-tentatives	tentatives déclarées sur un article en vigueur	341			voie de la cible déclarée seule ; le détail par sort suit
-depot	amendements positionnés sur un article en vigueur	260			
-depot	articles en vigueur atteints	52	2104	2.5	
-depot	assemblee — jeux d'amendements appariés à leur texte	113	192	58.9	
+tentatives	articles en vigueur portant une tentative, les trois voies	257	2104	12.2	cible déclarée, alinéa écrit ou subdivision déposée
+tentatives	dont par la cible déclarée du dispositif	145	257	56.4	
+tentatives	dont par un alinéa écrit qui subsiste	119	257	46.3	
+tentatives	dont par la subdivision déposée	64	257	24.9	
+tentatives	tentatives déclarées sur un article en vigueur	357			voie de la cible déclarée seule ; le détail par sort suit
+depot	amendements positionnés sur un article en vigueur	360			
+depot	articles en vigueur atteints	64	2104	3.0	
+depot	assemblee — jeux d'amendements appariés à leur texte	192	192	100.0	
 depot	senat — jeux d'amendements appariés à leur texte	130	150	86.7	
-depot	subdivisions tombant dans la plage d'articles du texte	7801	7983	97.7	contrôle de l'appariement ; un texte faux s'y verrait en premier
-depot	amendements portant sur un article additionnel	18390			ils ne visent aucun article existant du code : c'est le plafond de la voie du dépôt
-tentatives	dont rejete	102	341	29.9	
-tentatives	dont adopte	86	341	25.2	
-tentatives	dont retire	75	341	22.0	
-tentatives	dont irrecevable	48	341	14.1	
-tentatives	dont non_soutenu	23	341	6.7	
-tentatives	dont tombe	7	341	2.1	
+depot	subdivisions tombant dans la plage d'articles du texte	10250	10432	98.3	contrôle de l'appariement ; un texte faux s'y verrait en premier
+depot	amendements portant sur un article additionnel	22875			ils ne visent aucun article existant du code : c'est le plafond de la voie du dépôt
+tentatives	dont rejete	107	357	30.0	
+tentatives	dont adopte	95	357	26.6	
+tentatives	dont retire	78	357	21.8	
+tentatives	dont irrecevable	48	357	13.4	
+tentatives	dont non_soutenu	22	357	6.2	
+tentatives	dont tombe	7	357	2.0	
 navette	dossiers ayant au moins deux états datés	116			
 navette	durée médiane, en jours	136			
 navette	durée la plus courte, en jours	1			
 navette	durée la plus longue, en jours	897			
-chambres	segments écrits par un amendement — assemblee	215			dénominateur faible : voir docs/09
+chambres	segments écrits par un amendement — assemblee	212			dénominateur faible : voir docs/09
 chambres	segments écrits par un amendement — senat	153			dénominateur faible : voir docs/09
-chambres	articles dont un alinéa est tracé jusqu'à un amendement	167			sans remonter la chaîne des segments
+chambres	articles dont un alinéa est tracé jusqu'à un amendement	166			sans remonter la chaîne des segments
 sources	documents — avis_conseil_etat	30			
 sources	documents — etude_impact	49			
 sources	documents — expose_des_motifs	81			

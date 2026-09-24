@@ -73,6 +73,11 @@ SENAT_DEPOSE = re.compile(r"leg-(?:pjl|ppl)(\d{2})-(\d+)")
 # commission, seule comparable à la référence des amendements.
 ASSEMBLEE = (re.compile(r"dyn-\d+-textes-l\d+b0*(\d+)_"),
              re.compile(r"/\d+-propositions-pion0*(\d+)"),
+             # Le projet de loi déposé, que `plan_textes_deposes.py` charge
+             # depuis `docs/32` : sans cette forme, les amendements de
+             # commission — déposés sur lui, `B1015` — restaient sans texte,
+             # 50 jeux de la XIVe et 29 des suivantes (`docs/52`).
+             re.compile(r"/\d+-projets-pl0*(\d+)"),
              re.compile(r"/\d+-ta-commission-r0*(\d+)-"),
              re.compile(r"/\d+-rapports-r0*(\d+)-"))
 # `B(?:TC)?`, non `BTC?` : le second se lit « B, puis T, puis C facultatif »,
@@ -188,7 +193,23 @@ CONFIANCE = 0.2481            # composition seule, population d'avant les voies,
 #                   un amendement d'un autre texte rangé sous le même numéro par
 #                   la source. Réunie aux 6 / 7 d'avant : 18 / 22, Wilson 0,6148.
 #   visee            8 / 8 ; réunie aux 13 / 15 d'avant : 21 / 23, Wilson 0,7320.
-CONFIANCE_PAR_VOIE = {"visee": 0.7320, "alinea": 0.8712, "article_entier": 0.6148}
+#
+# Re-mesurée le même jour (docs/52) sur les arêtes des 79 jeux de l'Assemblée
+# que le projet de loi déposé rendait enfin appariables. Chaque tirage y compte
+# ses fausses **d'avant** les réparations qu'il a dictées — un biais vers le
+# bas, non vers le haut, et c'est pourquoi il est réuni aux autres.
+#   alinea          19 / 20 — « L. 121-84-10-1 » lu « L121-84-1 » ; réunie :
+#                   58 / 60, Wilson 0,8864.
+#   article_entier  13 / 15 — un « I. – (Non modifié) » qui cachait L. 334-5,
+#                   et un amendement qui écrit dans L. 621-6 ; réunie : 31 / 37,
+#                   Wilson 0,6886.
+#   visee           18 / 19 — un « Art. L. 423-2 » nouveau qui renumérote
+#                   l'ancien ; réunie : 39 / 42, Wilson 0,8099.
+# Puis 20 arêtes que le trait d'union insécable cachait : 18 / 18 par
+# l'alinéa, 2 / 2 par la visée, dont quatre arbitrées — l'article que le texte
+# de commission écrit sous « L. 224-114 » est l'actuel L. 224-115 (docs/47).
+#   alinea          76 / 78, Wilson 0,9112 ; visee 41 / 44, Wilson 0,8177.
+CONFIANCE_PAR_VOIE = {"visee": 0.8177, "alinea": 0.9112, "article_entier": 0.6886}
 
 # La mention de navette entre le numéro et le point — « VI (nouveau). – »,
 # « II bis (nouveau). – », « III (Supprimé). – » — est encore une borne. Elle ne
@@ -282,6 +303,21 @@ AUTRE_NORME = re.compile(
     re.I)
 
 
+# Un paragraphe que le texte ne reproduit pas — « I. – (Non modifié) » en
+# deuxième lecture — cache ce qu'il réécrit : l'article 22 quinquies du projet
+# n° 1357 n'y montrait que L. 334-9, et son I, lu dans le texte de première
+# lecture, modifie aussi L. 334-5 (docs/52). « Ne réécrit que A » ne se lit pas.
+PARAGRAPHE_CACHE = re.compile(
+    r"(?m)^[ \t]*(?:[IVXL]{1,6}|\d{1,2}°|[a-z]\))(?:\s*(?:bis|ter|quater|quinquies|sexies|[A-Z]))?"
+    r"(?:\s*\([^)\n]{1,20}\))?\s*\.?\s*[–-]?\s*\(\s*non\s+modifi", re.I)
+
+
+def paragraphe_cache(charge, numero: str) -> bool:
+    if not charge or numero not in charge[1]:
+        return False
+    return bool(PARAGRAPHE_CACHE.search(charge[0][slice(*charge[1][numero])]))
+
+
 def autre_norme_dans_l_article(charge, numero: str) -> bool:
     """L'article du texte nomme-t-il, hors citation, une autre norme que notre
     code ? Illisible vaut oui : la voie ne tient que si l'on a lu l'article."""
@@ -293,6 +329,24 @@ def autre_norme_dans_l_article(charge, numero: str) -> bool:
     debuts = index_des_lignes(segment)
     return any(not dans_une_citation(segment, debuts, m.start())
                for m in AUTRE_NORME.finditer(segment))
+
+
+# Les articles de code qu'un dispositif nomme lui-même : hors citation, ou en
+# tête de l'article qu'il écrit (« « Art. L. 311-9-… »). Deux « Rédiger ainsi
+# cet article » sous l'article 18, qui réécrit L. 311-8-1, écrivaient en fait
+# un article L. 311-9-… sur le démarchage : la réécriture entière porte sur N,
+# mais ce qu'elle met à la place peut dire qu'elle vise un voisin (docs/51).
+NOMME_HORS_CITATION = re.compile(r"\b(?:articles?\s+|art\.\s*)([LRD])\.?\s*(\d+(?:\s*[-‑]\s*\d+)*)",
+                                 re.I)
+ECRIT_EN_TETE = re.compile(r"[«“]\s*Art\.?\s*([LRD])\.?\s*(\d+(?:\s*[-‑]\s*\d+)*)")
+
+
+def articles_nommes_par(dispositif: str) -> set[str]:
+    def cle(m: re.Match) -> str:
+        return m.group(1).upper() + re.sub(r"\s", "", m.group(2)).replace("‑", "-")
+    hors_citation = re.sub(r"[«“][^»”]*[»”]", " ", dispositif)
+    return ({cle(m) for m in NOMME_HORS_CITATION.finditer(hors_citation)}
+            | {cle(m) for m in ECRIT_EN_TETE.finditer(dispositif)})
 
 
 def numero_de_subdivision(subdivision: str | None) -> str | None:
@@ -481,9 +535,9 @@ class Textes:
             if dans_une_citation(segment, debuts, m.start()):
                 continue
             if est_une_cible(segment, m.start(), m.end()):
-                trouvees.append((debut + m.start(), numero_de(m)))
+                trouvees.append((debut + m.start(), numero_de(m).replace(" ", "")))
         for m in ARTICLE_CREE.finditer(segment):
-            trouvees.append((debut + m.start(), numero_de(m)))
+            trouvees.append((debut + m.start(), numero_de(m).replace(" ", "")))
         # Un paragraphe de tête — « III. – L'article 1er de la loi du 29 mars
         # 1944 est abrogé » — ouvre une instruction même quand elle ne vise aucun
         # article de code ; sans cette borne, le II sur L. 113-3 gouvernait
@@ -647,6 +701,7 @@ def construire(base: sqlite3.Connection, schema: Path, corpus_textes: Path) -> d
             UNION SELECT c.origine, r.article_id FROM renumerote_de r JOIN c ON r.ancien_id = c.courant)
         SELECT origine, courant FROM c"""):
         chaine[origine].add(courant)
+    numeros = dict(base.execute("SELECT id, numero FROM article"))
     visees: dict[int, set[int]] = defaultdict(set)
     # Les seules arêtes déclarées par le numéro : celles que le contenu désigne
     # (`inferee`, docs/50) sont mesurées pour `vise`, non pour la voie `visee`
@@ -767,7 +822,18 @@ def construire(base: sqlite3.Connection, schema: Path, corpus_textes: Path) -> d
                         and AUTRE_NORME.search(re.sub(r"«[^»]*»", " ", dispositif))):
                 compte["article_touchant_une_autre_norme"] += 1
                 continue
-            aretes.append((amendement_id, next(iter(vises)), texte_id, numero,
+            if paragraphe_cache(charge, numero):
+                compte["paragraphe_non_reproduit"] += 1
+                continue
+            # La réécriture entière qui nomme des articles du code, et pas A :
+            # elle écrit un voisin. Qui ne nomme rien garde la composition.
+            cible = next(iter(vises))
+            if ARTICLE_ENTIER.search(dispositif):
+                nommes = articles_nommes_par(dispositif)
+                if nommes and not nommes & {numeros[c] for c in chaine[cible] | {cible}}:
+                    compte["reecriture_d_un_voisin"] += 1
+                    continue
+            aretes.append((amendement_id, cible, texte_id, numero,
                            "article_entier", "derivee", CONFIANCE_PAR_VOIE["article_entier"]))
             compte["voie_article_entier" if ARTICLE_ENTIER.search(dispositif)
                    else "voie_article_entier_par_defaut"] += 1
@@ -836,6 +902,10 @@ def main() -> None:
     print(f"  alinea — l'instruction gouvernant l'alinéa           : {compte['voie_alinea']}")
     print(f"  article_entier — écarté, l'article touche une autre norme : "
           f"{compte['article_touchant_une_autre_norme']}")
+    print(f"  article_entier — écarté, un paragraphe non reproduit : "
+          f"{compte['paragraphe_non_reproduit']}")
+    print(f"  article_entier — écarté, la réécriture écrit un voisin : "
+          f"{compte['reecriture_d_un_voisin']}")
     print(f"  article_entier — supprimer / rédiger cet article     : {compte['voie_article_entier']}")
     print(f"  article_entier — dispositif non lu, cible unique     : "
           f"{compte['voie_article_entier_par_defaut']}")

@@ -122,7 +122,13 @@ ALINEA_CITE = re.compile(r"^\s*(?:[0-9]+[°)]\s*|[a-z][)]\s*|[IVX]+\.\s*[–-]?\
 # n'étaient pas même vues — ni internes, ni externes —, et un article de texte
 # qui modifiait deux articles de la santé publique et un du nôtre passait pour
 # n'en réécrire qu'un (docs/42, `article_entier`).
-REFERENCE = re.compile(r"\b([LRD])\.?\s?(\d{3,4})-(\d{1,3})(?:-(\d{1,3}))?(?!\s?-\s?\S)")
+# Jusqu'à quatre nombres, et jamais coupé dans un nombre : « L. 121-84-10-1 »,
+# refusé en entier par la garde de fin, se relisait « L121-84-1 » en coupant
+# « 10 » — un voisin réel, et une cible fausse (docs/52). La lettre qui suit
+# appartient au numéro : « L. 132-1 A » n'est pas L. 132-1.
+REFERENCE = re.compile(
+    r"\b([LRD])\.?\s?(\d{3,4})[-‑–](\d{1,3})(?:[-‑–](\d{1,3}))?(?:[-‑–](\d{1,3}))?(?![\d‑–-])"
+    r"(?:\s([A-Z])\b(?!['’])(?!\.?\s?\d))?(?!\s?-\s?\S)")
 # **L'article écrit dans la citation.** Un article de projet de loi qui réécrit une
 # section entière ne nomme aucune cible dans son instruction : il dit « la section
 # 2 du même code sont remplacées par les dispositions suivantes : », puis écrit le
@@ -140,7 +146,8 @@ REFERENCE = re.compile(r"\b([LRD])\.?\s?(\d{3,4})-(\d{1,3})(?:-(\d{1,3}))?(?!\s?
 # La forme est exacte et vérifiable : un guillemet ouvrant, puis « Art. », puis le
 # numéro. `visees.py` retient la même depuis la cinquième tranche.
 ARTICLE_CREE = re.compile(
-    r"[«“\"]\s*Art\.?\s*([LRD])\.?\s?(\d{3,4})-(\d{1,3})(?:-(\d{1,3}))?(?!\s?-\s?\S)", re.I)
+    r"[«“\"]\s*Art\.?\s*([LRD])\.?\s?(\d{3,4})[-‑–](\d{1,3})(?:[-‑–](\d{1,3}))?(?:[-‑–](\d{1,3}))?"
+    r"(?![\d‑–-])(?:\s([A-Z])\b(?!['’])(?!\.?\s?\d))?(?!\s?-\s?\S)", re.I)
 CODE_NOMME = re.compile(r"\b(?:du|le|au|dans le|de ce)\s+(code\s+[^,;.:)]{3,45})", re.I)
 MEME_CODE = re.compile(r"\b(?:du|le|au|dans le)\s+même\s+code\b", re.I)
 BORNE = re.compile(r"(?<![LRD])(?<!art)(?<!n°)[.;:]")
@@ -163,14 +170,19 @@ AVAL = 140                    # portée du regard en aval, dans la même phrase
 # 21 septembre 2026, 20 arêtes tirées parmi les 161 internes que les en-têtes
 # de la petite loi ont rendues (`docs/49` § 3 et § 8) : 20 sur 20, deux juges
 # Sonnet 5 d'accord sur chacune. Les quatre tirages réunis, 74 sur 75 ; borne
-# inférieure de Wilson à 95 %.
-CONFIANCE = 0.9283
+# inférieure de Wilson à 95 %. Puis, le 24 septembre 2026, 18 arêtes parmi les
+# 874 internes que le trait d'union insécable des textes de l'Assemblée
+# cachait (`docs/52`) : 16 sur 18, deux juges d'accord — un « L. 132-1 A » lu
+# L. 132-1, réparé depuis, et une ancre d'insertion, laissée (voir
+# `est_une_cible`). Réunis, 90 sur 93.
+CONFIANCE = 0.9094
 # La voie de la citation est mesurée à part, parce qu'elle ne vaut pas la même
 # chose : 15 arêtes justes sur 15 vérifiées à la main **après** la garde de
 # corroboration (`docs/33` § 4), puis 3 sur 5 le 19 septembre 2026 — dont une
 # fausse par glissement de numérotation en navette : le texte adopté écrit
 # « Art. L. 423-5 », promulgué L. 423-6. Réunis, 18 sur 20 ; Wilson à 95 %.
-CONFIANCE_CREE = 0.6996
+# Puis 2 sur 2 parmi les arêtes du trait insécable (`docs/52`) : 20 sur 22.
+CONFIANCE_CREE = 0.7218
 
 # **Corroborer par le contenu, pas seulement par le numéro.** La garde
 # ci-dessous demande à LEGI si la loi du dossier a produit une version de
@@ -298,8 +310,8 @@ def texte_brut(chemin: Path) -> str:
 
 
 def numero(m: re.Match) -> str:
-    return f"{m.group(1)}{m.group(2)}-{m.group(3)}" + (f"-{m.group(4)}" if m.group(4)
-                                                       else "")
+    return f"{m.group(1)}{m.group(2)}-{m.group(3)}" + "".join(
+        f"-{g}" for g in m.groups()[3:5] if g) + (f" {m.group(6)}" if m.group(6) else "")
 
 
 def mentions_de_code(texte: str, debuts: list[int]) -> list[tuple[int, str]]:
@@ -431,6 +443,12 @@ def phrase_hors_incises(texte: str, fin: int, limite: int) -> list[tuple[int, in
     return morceaux
 
 
+# « Après l'article L. 224-54, il est inséré un article L. 224-54-2 » : le verbe
+# suit L. 224-54, qui n'est qu'une ancre, et deux juges sur deux l'ont dit
+# faux (docs/52). La garde qui l'écartait a été retirée : elle ôtait 337
+# arêtes internes, dont six ancres que des tirages antérieurs avaient jugées
+# justes. Le désaccord est de définition — l'ancre est-elle « portée » par
+# l'article du texte ? — et il revient à la relecture humaine.
 def est_une_cible(texte: str, debut: int, fin: int) -> bool:
     """Vrai si un verbe modificatif suit la référence, dans la même phrase."""
     return any(ACTION.search(texte, a, b)

@@ -285,14 +285,14 @@ mesurés contre leurs seuils :
 | Articles — lignées (dont **2 104 en vigueur**) | 3 877 | `produite_par` — quel texte a produit la version | 8 145 |
 | Versions d'articles | 6 362 | `repris_de` — continuité d'un alinéa par-delà la recodification | 6 137 |
 | Segments (alinéas) | 28 294 | `renumerote_de` | 1 929 |
-| Documents (rapports, exposés, études d'impact, avis) | 834 | `motive` — un passage qui motive, avec offsets | 1 721 |
-| Amendements (33 199 Sénat, 64 027 Assemblée, législatures XIV, XVI et XVII) | 97 226 | `renvoie_a` — le graphe de renvois | 12 534 |
-| Acteurs | 2 656 | `resulte_de` — l'amendement qui a écrit l'alinéa | 448 (confiance 0,81) |
+| Documents (rapports, exposés, études d'impact, avis) | 834 | `motive` — un passage qui motive, avec offsets | 1 732 |
+| Amendements (33 199 Sénat, 64 027 Assemblée, législatures XIV, XVI et XVII) | 97 226 | `renvoie_a` — le graphe de renvois | 12 535 |
+| Acteurs | 2 656 | `resulte_de` — l'amendement qui a écrit l'alinéa | 446 (confiance 0,81) |
 | Actes de l'Union | 284 | `cite_acte_ue` / `transpose` | 1 572 / 8 |
 | Considérants de l'Union | 7 674 | `article_acte_ue` — articles d'actes déclarés | 6 237 |
-| Textes en discussion | 925 | `porte_sur` — l'article du texte → l'article du code | 101 915 (6 967 internes, 0,90 ; 234 résolues par le contenu, 0,84) |
-| Sorts d'amendements, en huit familles | 97 226 | `vise` — l'amendement qui visait l'article, abouti ou non | 632 (622 par le numéro, 0,83 ; 10 par le contenu, 0,72) |
-| Correspondances de texte entre les deux corpus | 243 | `depose_sur` — l'article du code que l'amendement touche, par l'alinéa du texte qu'il nomme | 1 156 (0,87 par l'alinéa, 0,73 par l'article nommé, 0,61 par l'article entier) |
+| Textes en discussion | 925 | `porte_sur` — l'article du texte → l'article du code | 128 723 (7 833 internes, 0,91 ; 236 résolues par le contenu, 0,84) |
+| Sorts d'amendements, en huit familles | 97 226 | `vise` — l'amendement qui visait l'article, abouti ou non | 663 (652 par le numéro, 0,83 ; 11 par le contenu, 0,72) |
+| Correspondances de texte entre les deux corpus | 322 | `depose_sur` — l'article du code que l'amendement touche, par l'alinéa du texte qu'il nomme | 1 836 (0,91 par l'alinéa, 0,82 par l'article nommé, 0,69 par l'article entier) |
 
 ### Le verdict
 
@@ -302,7 +302,7 @@ amendement.
 
 | partie | articles | un passage les motive | origine située | motivation du texte | **raison non documentée** |
 |---|---:|---:|---:|---:|---:|
-| **L** | 1 293 | 790 (61,1 %) | 123 | 310 | **70 (5,4 %)** |
+| **L** | 1 293 | 788 (60,9 %) | 128 | 307 | **70 (5,4 %)** |
 | **R** | 632 | 43 | 7 | 58 | **524 (82,9 %)** |
 | **D** | 179 | 1 | 0 | 11 | **167 (93,3 %)** |
 
@@ -318,10 +318,10 @@ verdict, dans [`data/mesures/grain.tsv`](data/mesures/grain.tsv) :
 
 | | |
 |---|---:|
-| Articles remontant à un passage qui les motive | **801 (38,1 %)** |
-| Articles reliés à un article de texte en discussion | 960 (45,6 %) |
+| Articles remontant à un passage qui les motive | **799 (38,0 %)** |
+| Articles reliés à un article de texte en discussion | 964 (45,8 %) |
 | Articles nommant un acte de l'Union | 117 |
-| Articles remontant à un amendement identifié | 143 |
+| Articles remontant à un amendement identifié | 142 |
 | Articles cités par un autre article du fonds | 1 031 (49,0 %) |
 
 **Au grain du texte** — « pourquoi ce *texte* existe ». Un rapport au Président
@@ -361,19 +361,23 @@ humaine en aveugle de la note, critère de sortie de la phase 3.
 l'Assemblée coupe le transfert de son archive de 650 Mo, et le pipeline la
 prendra au premier passage où il la sert ; les constantes seront alors à
 re-mesurer ([`docs/50`](docs/50-increments-doublons-legislatures.md) § 8). Les
-textes des XVIe et XVIIe législatures que le corpus n'a pas : 79 jeux
-d'amendements de l'Assemblée sur 192 n'ont pas de texte discuté, donc pas de
-`depose_sur`. La XIIIe, jamais publiée en open
+192 jeux d'amendements de l'Assemblée trouvent tous leur texte discuté
+([`docs/52`](docs/52-projets-deposes-et-trait-insecable.md)). La XIIIe, jamais publiée en open
 data, reconstructible page par page depuis Wayback — arbitrage à rendre entre
 le coût et un trou déclaré. Les tableaux de concordance annexés aux textes de
 transposition, seul chemin connu vers un lien européen au grain de l'article.
 
-**Douze arêtes jugées fausses sont dans la base**, et le harnais
+**Treize arêtes jugées fausses sont dans la base**, et le harnais
 (`tools/mesures/rejouer.py`) les nomme à chaque passage. Quatre sont des
-`depose_sur` des tirages de [`docs/51`](docs/51-depose-sur-re-mesuree.md), sans
-garde : un amendement que la source range sous un autre texte, deux
-réécritures entières qui écrivent un article voisin, un alinéa mal cité.
-Trois sont les fausses `resulte_de` du tirage de
+`depose_sur` sans garde : un amendement que la source range sous un autre
+texte et un alinéa mal cité ([`docs/51`](docs/51-depose-sur-re-mesuree.md)),
+un amendement qui écrit dans un autre article que celui du texte et un
+« Art. L. 423-2 » nouveau qui renumérote l'ancien
+([`docs/52`](docs/52-projets-deposes-et-trait-insecable.md)). Une est une
+`porte_sur` sur l'ancre d'une insertion — « après l'article L. 224-54, il est
+inséré… » —, que deux juges disent fausse quand six verdicts plus anciens
+disent justes les mêmes : un désaccord de définition, pour la relecture
+humaine (`docs/52` § 5). Trois sont les fausses `resulte_de` du tirage de
 [`docs/50`](docs/50-increments-doublons-legislatures.md) § 7, dont aucune garde
 n'est sortie — et l'une, l'agrément « Mon Accompagnateur Rénov' », est
 peut-être juste. Cinq sont L136-2 ← amendement
@@ -381,8 +385,7 @@ peut-être juste. Cinq sont L136-2 ← amendement
 [`docs/21`](docs/21-precision-resulte-de.md), alors que le texte adopté porte
 l'amendement mot pour mot sous ce numéro — des verdicts humains, contestés sur
 pièces, qu'un humain doit relire ([`docs/49`](docs/49-les-dix-du-harnais.md)
-§ 6). Les neuf autres du premier passage ont été réparées à la source, et les
-tirages de re-mesure en ont trouvé cinq de plus, réparées de même.
+§ 6). Les autres ont été réparées à la source.
 
 **Les arêtes récentes ont chacune leur maille nommée**, dans la section « ce
 qui n'est pas fait » de leur document — les dernières : le plan propre d'un
@@ -447,6 +450,7 @@ d'aujourd'hui ; ceux des documents sont ceux de leur date.
 | 43. Les dix du harnais, et la re-mesure | neuf réparées à la source : le bloc guillemeté et la date du texte pour `vise`, l'en-tête de la petite loi pour `porte_sur` (2 837 en-têtes rendus), la destination du passage et l'hôte de l'alinéa pour `resulte_de` ; le harnais voit les lignées, les voies, et reconnaît une arête dont l'identifiant a glissé ; re-mesuré par dix juges Sonnet 5 : `vise` 47/50, `resulte_de` 35/37, `porte_sur` 20/20 ; cinq verdicts humains contestés | [`docs/49`](docs/49-les-dix-du-harnais.md) |
 | 44. Incréments DOLE, doublons, législatures XVI et XVII | les incréments DOLE et JORF enfin lus (`issu_de` 70/70) ; un même amendement de l'Assemblée publié deux fois, 6 112 copies fondues ; le projet de loi Hamon perdu par un saut de ligne ; 55 000 amendements de plus ; `vise` résolue par le contenu vers un article que la loi a créé, 10/10 ; re-mesuré : `vise` 64/70, `resulte_de` 52/57 | [`docs/50`](docs/50-increments-doublons-legislatures.md) |
 | 45. `depose_sur` re-mesurée | sur les arêtes nouvelles : `alinea` 10/20, « VI (nouveau). – » n'était pas une borne ; `article_entier` 3/20, l'article qui réécrit une autre loi passait pour mono-cible ; réparées, 20/20 et 12/15 sur un second tirage disjoint ; la reconstruction reprend 15 minutes | [`docs/51`](docs/51-depose-sur-re-mesuree.md) |
+| 46. Projets déposés et trait insécable | les 79 jeux de l'Assemblée sans texte l'étaient faute de lire `projets-pl` : 192 sur 192 ; les textes de l'Assemblée depuis 2017 écrivent « L. 123‑9 » avec un trait insécable, que `porte_sur` ne lisait pas — 866 arêtes internes de plus ; « L. 121-84-10-1 » lu « L121-84-1 » ; deux gardes `article_entier` ; `depose_sur` 1 156 → 1 836, mesurée 19/20, 13/15, 18/19, 20/20 | [`docs/52`](docs/52-projets-deposes-et-trait-insecable.md) |
 
 ## D'où ça vient
 

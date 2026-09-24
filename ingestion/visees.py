@@ -52,7 +52,7 @@ def corpus_vers_texte(base: sqlite3.Connection) -> dict[tuple[str, str], str]:
 # « L. 312-9-… » — l'article nouveau dont le numéro n'est pas fixé — n'est pas
 # L. 312-9 : le tiret suivi de n'importe quoi d'autre qu'un blanc ferme la lecture.
 ARTICLE = re.compile(
-    r"\b([LRD])\.?\s?(\d{3,4})-(\d{1,3})(?:-(\d{1,3}))?(?!\s?-\s?\S)(?!\s[A-Z]\b)")
+    r"\b([LRD])\.?\s?(\d{3,4})-(\d{1,3})(?:-(\d{1,3}))?(?:-(\d{1,3}))?(?![\d-])(?!\s?-\s?\S)(?!\s[A-Z]\b)")
 
 # Formules de modification de la légistique française. Relevées après le numéro,
 # dans la fenêtre qui suit immédiatement : « L'article L. 121-36 est ainsi rédigé ».
@@ -308,7 +308,7 @@ def cibles(dispositif: str
     instruction = Instruction(texte)
     trouves: dict[str, tuple[str, bool, tuple[list[str], str] | None]] = {}
     for m in ARTICLE.finditer(texte):
-        cle = f"{m.group(1)}{m.group(2)}-{m.group(3)}" + (f"-{m.group(4)}" if m.group(4) else "")
+        cle = f"{m.group(1)}{m.group(2)}-{m.group(3)}" + "".join(f"-{g}" for g in m.groups()[3:5] if g)
         if vise_un_autre_code(texte, m.start(), m.end(), instruction):
             continue
         if ANCRE.search(texte[max(0, m.start() - 40):m.start()]):

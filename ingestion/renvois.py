@@ -45,7 +45,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from legi_vers_graphe import decouper_en_alineas  # noqa: E402
 
-REFERENCE = re.compile(r"\b([LRD])\.?\s?(\d{3})-(\d{1,3})(?:-(\d{1,3}))?")
+REFERENCE = re.compile(r"\b([LRD])\.?\s?(\d{3})-(\d{1,3})(?:-(\d{1,3}))?(?:-(\d{1,3}))?(?!\d)")
 # Le code cité suit le numéro, avant toute ponctuation forte.
 CODE_SUIVANT = re.compile(r"[^.]{0,40}?du (présent code|code [^,;.)]{3,45})")
 # La convention légistique nomme le code une seule fois par énumération, et
@@ -73,7 +73,7 @@ CONFIANCE = 0.8389
 
 
 def numero(m: re.Match) -> str:
-    return f"{m.group(1)}{m.group(2)}-{m.group(3)}" + (f"-{m.group(4)}" if m.group(4) else "")
+    return f"{m.group(1)}{m.group(2)}-{m.group(3)}" + "".join(f"-{g}" for g in m.groups()[3:5] if g)
 
 
 def fenetre(texte: str, debut: int, fin: int) -> str | None:

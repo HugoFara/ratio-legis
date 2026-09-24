@@ -77,7 +77,7 @@ from textes_des_amendements import (ALINEA, Textes, alineas_nommes,  # noqa: E40
 # venaient de là. Le sens se lit dans ce qui suit le guillemet fermant, jamais
 # dans ce qui le précède : « les mots : X sont remplacés par les mots : Y »
 # introduit l'ancien et le nouveau de la même façon.
-ARTICLE_CITE = re.compile(r"\b([LRD])\.?\s?(\d{3})-(\d{1,3})(?:-(\d{1,3}))?")
+ARTICLE_CITE = re.compile(r"\b([LRD])\.?\s?(\d{3})-(\d{1,3})(?:-(\d{1,3}))?(?:-(\d{1,3}))?(?!\d)")
 # Les dispositifs de l'Assemblée écrivent « L. 116‑1 » avec le trait d'union
 # insécable : sans cette table, aucun numéro n'y était lu, et `articles_nommes`
 # rendait vide — donc sans contrainte — sur tout amendement de l'Assemblée.
@@ -150,7 +150,7 @@ LOI_CITEE = re.compile(r"(?:r[ée]daction\s+(?:issue|r[ée]sultant)\s+d[eu]\s+la
 # numéro cité — L. 115-16 l'est, comme article adapté. La destination est
 # une déclaration du rédacteur ; elle prime l'appariement.
 TETE_DU_PASSAGE = re.compile(
-    r"^\s*(?:[^«»]{0,160}«\s*)?art\.?\s*([LRD])\.?\s?(\d{3})-(\d{1,3})(?:-(\d{1,3}))?", re.I)
+    r"^\s*(?:[^«»]{0,160}«\s*)?art\.?\s*([LRD])\.?\s?(\d{3})-(\d{1,3})(?:-(\d{1,3}))?(?:-(\d{1,3}))?(?!\d)", re.I)
 # Le verbe de l'instruction, quelque part après la référence : « À la dernière
 # phrase du premier alinéa de l'article L. 330-1, après le mot : « principale »
 # sont insérés les mots : « … » » — la formule ne suit pas le numéro, elle suit
@@ -167,7 +167,7 @@ PORTEE_DESTINATION = 250
 
 
 def numero_de(m: re.Match) -> str:
-    return f"{m.group(1).upper()}{m.group(2)}-{m.group(3)}" + (f"-{m.group(4)}" if m.group(4) else "")
+    return f"{m.group(1).upper()}{m.group(2)}-{m.group(3)}" + "".join(f"-{g}" for g in m.groups()[3:5] if g)
 
 
 def destination_d_instruction(instruction: str) -> str | None:
