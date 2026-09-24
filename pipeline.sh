@@ -267,6 +267,8 @@ etape "7. Verdict et métriques d'hygiène"
 ingere "$RACINE/ingestion/verdict.py" "$BASE"
 ingere "$RACINE/tools/mesures/hygiene.py" "$BASE" "$PERIMETRE" \
         "$RACINE/data/mesures/hygiene.tsv"
+# Les deux tableaux « au grain » du README, avec les définitions du verdict.
+ingere "$RACINE/tools/mesures/grain.py" "$BASE" "$RACINE/data/mesures/grain.tsv"
 
 # ------------------------------------------- 8. préparation de la lecture
 etape "8. Index de lecture"

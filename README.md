@@ -312,32 +312,38 @@ trois parties et le silence réglementaire est mesuré sur un périmètre qui ne
 l'exclut plus.
 
 **Au grain de l'article** — « pourquoi *cet article* dit ceci ». Les deux
-tableaux qui suivent sont ceux du 21 septembre 2026 : leurs requêtes ne sont
-écrites nulle part, et elles n'ont pas été recalculées après
-[`docs/50`](docs/50-increments-doublons-legislatures.md) :
+tableaux sont recalculés à chaque reconstruction par
+[`tools/mesures/grain.py`](tools/mesures/grain.py), avec les définitions du
+verdict, dans [`data/mesures/grain.tsv`](data/mesures/grain.tsv) :
 
 | | |
 |---|---:|
-| Articles remontant à un passage qui les motive | **783 (37,2 %)** |
-| Articles reliés à un article de texte en discussion | 983 (46,7 %) |
+| Articles remontant à un passage qui les motive | **801 (38,1 %)** |
+| Articles reliés à un article de texte en discussion | 960 (45,6 %) |
 | Articles nommant un acte de l'Union | 117 |
-| Articles remontant à un amendement identifié | 104 |
-| Articles cités par un autre article du fonds | 1 039 (49,4 %) |
+| Articles remontant à un amendement identifié | 143 |
+| Articles cités par un autre article du fonds | 1 031 (49,0 %) |
 
 **Au grain du texte** — « pourquoi ce *texte* existe ». Un rapport au Président
 motive une ordonnance de plusieurs centaines d'articles, pas l'alinéa qu'on
 lit ; la restitution affiche l'avertissement chaque fois qu'elle sert l'un
-faute de l'autre :
+faute de l'autre. Un texte qui n'a fait que recodifier l'article ne le motive
+pas ([`docs/39`](docs/39-cent-verdicts-d-agents.md) § 3) :
 
 | | |
 |---|---:|
-| Articles atteignant un document motivant le texte | **1 258 (59,8 %)** |
-| dont par un rapport au Président | 994 |
-| dont par un exposé des motifs | 206 |
-| dont par une étude d'impact | 181 |
-| dont par un avis du Conseil d'État | 178 |
+| Articles atteignant un document motivant le texte | **1 282 (60,9 %)** |
+| dont par un rapport au Président | 799 |
+| dont par un exposé des motifs | 938 |
+| dont par une étude d'impact | 701 |
+| dont par un avis du Conseil d'État | 245 |
 | Articles atteignant un considérant européen | 117 |
-| Articles atteignant une transposition déclarée | 60 |
+| Articles atteignant une transposition déclarée | 75 |
+
+Les chiffres publiés jusqu'au 24 septembre 2026 avaient été recopiés à la main,
+par des requêtes perdues ; la ventilation par type de document, en
+particulier, ne suivait pas la réserve de la recodification (994 rapports au
+Président, 206 exposés des motifs). Ceux-ci se recalculent.
 
 Tous ces comptes suivent la chaîne de renumérotation ; un compteur qui ne le
 dit pas est ininterprétable sur ce corpus.

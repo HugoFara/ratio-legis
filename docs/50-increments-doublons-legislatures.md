@@ -268,4 +268,5 @@ leur auteur, sans `depose_sur`.
 **Les tableaux « au grain de l'article » du README** ne sont pas recalculés :
 leurs requêtes ne sont écrites nulle part, et celle que cette tranche a
 reconstituée ne redonne pas les chiffres publiés. Ils restent ceux du
-21 septembre, et le README le dit.
+21 septembre, et le README le dit. *Fait depuis :* `tools/mesures/grain.py`,
+avec les définitions du verdict, appelé par le pipeline.
