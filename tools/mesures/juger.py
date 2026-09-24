@@ -49,6 +49,26 @@ Ce que chaque arête affirme, et donc ce que « juste » veut dire :
   l'article A du code de la consommation.** Faux s'il ne fait que le citer,
   le nomme comme ancre (« après l'article A, il est inséré… »), ou vise un
   homonyme d'un autre code. La `formule` dit ce qui a été relevé.
+- `resulte_de` : **l'alinéa de l'article A résulte de l'amendement** — il
+  descend du passage que l'amendement a inséré ou réécrit. Juste même si la
+  navette l'a retouché ensuite (un accord grammatical, une durée ajoutée, un
+  renvoi précisé), tant que c'est ce passage qui est devenu l'alinéa. Faux si
+  l'alinéa vient d'une autre rédaction — le texte initial, un autre
+  amendement, un autre article — qui ne partage avec l'amendement que des
+  mots, ou si la rédaction de l'amendement n'a pas été retenue.
+
+L'ancre d'une insertion (« après l'article A, il est inséré un article… »)
+n'est jamais la cible : ni `porte_sur`, ni `depose_sur`, ni `vise`.
+
+**Contre quel numéro juger.** L'arête désigne un article **du fonds** — une
+lignée —, non un numéro écrit. Quand le texte en discussion, l'amendement ou
+le tableau écrivent un autre numéro que celui de l'article du fonds
+(renumérotation en séance, en navette ou par la recodification de 2016), on
+juge contre l'article du fonds : juste si le passage écrit sous l'autre numéro
+est celui que la loi a rangé sous cet article — la fiche montre la version que
+la loi du dossier a produite —, faux si le contenu de l'article du fonds est
+sans rapport avec ce passage. Le numéro écrit est une pièce, non la chose
+jugée ; l'écart se note dans le commentaire.
 """
 
 from __future__ import annotations

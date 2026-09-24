@@ -285,7 +285,12 @@ def passages_inseres(dispositif: str) -> list[tuple[tuple[str | None, str | None
 # fausses : un alinéa attribué à l'amendement 405, écrit par le 269 du même
 # dossier ; et la formule d'injonction administrative, partagée par un VII
 # de L. 141-1 et un alinéa de L. 218-5-5. Réunis : **70 sur 77**, Wilson 0,8240.
-CONFIANCE = 0.8240
+#
+# Le même jour (docs/55 § 3), l'une des fausses de docs/50 est arbitrée juste :
+# l'agrément « Mon Accompagnateur Rénov' » est celui de l'article L. 232-3 du
+# code de l'énergie, et l'alinéa descend du paragraphe que l'amendement 18 a
+# inséré, retouché par le Sénat. Réunis : **71 sur 77**, Wilson 0,8402.
+CONFIANCE = 0.8402
 
 
 def charger_amendements(base: sqlite3.Connection, racine: Path) -> dict:

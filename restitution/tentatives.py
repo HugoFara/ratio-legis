@@ -17,7 +17,7 @@ voie par laquelle la tentative est rattachée.
 l'écran, comme l'exige la règle § 5.4 :
 
 - `alinéa écrit` — l'amendement a écrit un alinéa qui subsiste dans la version en
-  vigueur, la chaîne `resulte_de` puis `repris_de` le porte. Confiance 0,8240.
+  vigueur, la chaîne `resulte_de` puis `repris_de` le porte. Confiance 0,8402.
 - `cible déclarée` — le dispositif de l'amendement nomme cet article et la
   formule qui le modifie. C'est la seule voie ouverte à un amendement rejeté, qui
   par construction n'a écrit aucun texte. Confiance 0,8621 par le numéro,

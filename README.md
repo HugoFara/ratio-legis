@@ -276,7 +276,7 @@ mesurés contre leurs seuils :
 | couverture `produite_par` | > 95 % | 2 081 / 2 104 — **98,9 %** | atteint |
 | couverture `issu_de` | > 90 % | 70 / 70 lois et ordonnances utiles — **100 %** | atteint — les incréments DOLE sont lus depuis [`docs/50`](docs/50-increments-doublons-legislatures.md) |
 | couverture `resulte_de` | > 60 % | 83 / 896 — **9,3 %** | **non atteint**, décision go du § 8 rendue dans [`docs/21`](docs/21-precision-resulte-de.md) § 7 : le grain de l'article est tenu par le commentaire de rapport et par le texte discuté, non par l'amendement |
-| précision `resulte_de` | > 95 % | 70 / 77 hors-échantillon — **90,9 %**, Wilson 0,8240 | **non atteint** ; re-mesuré le 24 septembre 2026 sur la population d'après `docs/52`, 18 / 20, deux juges et un arbitre ([`docs/53`](docs/53-trait-insecable-a-la-lecture.md)) ; 17 / 20 sur les arêtes des législatures XVI et XVII ([`docs/50`](docs/50-increments-doublons-legislatures.md) § 7), 35 / 37 sur la population du 21 septembre |
+| précision `resulte_de` | > 95 % | 71 / 77 hors-échantillon — **92,2 %**, Wilson 0,8402 | **non atteint** ; re-mesuré le 24 septembre 2026 sur la population d'après `docs/52`, 18 / 20, deux juges et un arbitre ([`docs/53`](docs/53-trait-insecable-a-la-lecture.md)) ; 18 / 20 sur les arêtes des législatures XVI et XVII ([`docs/50`](docs/50-increments-doublons-legislatures.md) § 7, une fausse arbitrée juste en [`docs/55`](docs/55-trois-arbitrages.md)), 35 / 37 sur la population du 21 septembre |
 
 ### Ce que la base contient
 
@@ -285,14 +285,14 @@ mesurés contre leurs seuils :
 | Articles — lignées (dont **2 104 en vigueur**) | 3 877 | `produite_par` — quel texte a produit la version | 8 145 |
 | Versions d'articles | 6 362 | `repris_de` — continuité d'un alinéa par-delà la recodification | 6 137 |
 | Segments (alinéas) | 28 294 | `renumerote_de` | 1 929 |
-| Documents (rapports, exposés, études d'impact, avis) | 834 | `motive` — un passage qui motive, avec offsets | 1 733 |
+| Documents (rapports, exposés, études d'impact, avis) | 834 | `motive` — un passage qui motive, avec offsets | 1 727 |
 | Amendements (33 199 Sénat, 64 027 Assemblée, législatures XIV, XVI et XVII) | 97 226 | `renvoie_a` — le graphe de renvois | 12 535 |
 | Acteurs | 2 656 | `resulte_de` — l'amendement qui a écrit l'alinéa | 446 (confiance 0,82) |
 | Actes de l'Union | 284 | `cite_acte_ue` / `transpose` / `transpose_article` — l'article de la directive que l'article du code transpose, lu dans les tableaux de concordance | 1 572 / 8 / 33 (0,90) |
 | Considérants de l'Union | 7 674 | `article_acte_ue` — articles d'actes déclarés | 6 237 |
-| Textes en discussion | 925 | `porte_sur` — l'article du texte → l'article du code | 128 723 (7 833 internes, 0,91 ; 236 résolues par le contenu, 0,84) |
+| Textes en discussion | 925 | `porte_sur` — l'article du texte → l'article du code | 123 862 (7 494 internes, 0,91 ; 236 résolues par le contenu, 0,84) |
 | Sorts d'amendements, en huit familles | 97 226 | `vise` — l'amendement qui visait l'article, abouti ou non | 663 (652 par le numéro, 0,86 ; 11 par le contenu, 0,74) |
-| Correspondances de texte entre les deux corpus | 322 | `depose_sur` — l'article du code que l'amendement touche, par l'alinéa du texte qu'il nomme | 1 836 (0,91 par l'alinéa, 0,82 par l'article nommé, 0,69 par l'article entier) |
+| Correspondances de texte entre les deux corpus | 322 | `depose_sur` — l'article du code que l'amendement touche, par l'alinéa du texte qu'il nomme | 1 835 (0,91 par l'alinéa, 0,82 par l'article nommé, 0,69 par l'article entier) |
 
 ### Le verdict
 
@@ -302,7 +302,7 @@ amendement.
 
 | partie | articles | un passage les motive | origine située | motivation du texte | **raison non documentée** |
 |---|---:|---:|---:|---:|---:|
-| **L** | 1 293 | 788 (60,9 %) | 128 | 307 | **70 (5,4 %)** |
+| **L** | 1 293 | 787 (60,9 %) | 129 | 307 | **70 (5,4 %)** |
 | **R** | 632 | 43 | 7 | 58 | **524 (82,9 %)** |
 | **D** | 179 | 1 | 0 | 11 | **167 (93,3 %)** |
 
@@ -318,7 +318,7 @@ verdict, dans [`data/mesures/grain.tsv`](data/mesures/grain.tsv) :
 
 | | |
 |---|---:|
-| Articles remontant à un passage qui les motive | **800 (38,0 %)** |
+| Articles remontant à un passage qui les motive | **799 (38,0 %)** |
 | Articles reliés à un article de texte en discussion | 964 (45,8 %) |
 | Articles nommant un acte de l'Union | 117 |
 | Articles reliés à un article d'acte de l'Union par un tableau de concordance | 35 |
@@ -369,27 +369,24 @@ le coût et un trou déclaré. Les tableaux de concordance sont lus dans deux
 études d'impact ([`docs/54`](docs/54-tableaux-de-concordance.md)) ; les autres
 ne transposent vers notre code aucune disposition.
 
-**Quinze arêtes jugées fausses sont dans la base**, et le harnais
+**Huit arêtes jugées fausses sont dans la base**, et le harnais
 (`tools/mesures/rejouer.py`) les nomme à chaque passage. Quatre sont des
 `depose_sur` sans garde : un amendement que la source range sous un autre
 texte et un alinéa mal cité ([`docs/51`](docs/51-depose-sur-re-mesuree.md)),
 un amendement qui écrit dans un autre article que celui du texte et un
 « Art. L. 423-2 » nouveau qui renumérote l'ancien
-([`docs/52`](docs/52-projets-deposes-et-trait-insecable.md)). Une est une
-`porte_sur` sur l'ancre d'une insertion — « après l'article L. 224-54, il est
-inséré… » —, que deux juges disent fausse quand six verdicts plus anciens
-disent justes les mêmes : un désaccord de définition, pour la relecture
-humaine (`docs/52` § 5). Cinq sont des `resulte_de` sans garde, des tirages
-de [`docs/50`](docs/50-increments-doublons-legislatures.md) § 7 et de
-[`docs/53`](docs/53-trait-insecable-a-la-lecture.md) : trois formules
+([`docs/52`](docs/52-projets-deposes-et-trait-insecable.md)). Quatre sont des
+`resulte_de` sans garde, des tirages de
+[`docs/50`](docs/50-increments-doublons-legislatures.md) § 7 et de
+[`docs/53`](docs/53-trait-insecable-a-la-lecture.md) : deux formules
 administratives partagées par un passage destiné ailleurs, une rédaction non
-retenue, un alinéa attribué au mauvais amendement du dossier — et l'une,
-l'agrément « Mon Accompagnateur Rénov' », est peut-être juste. Cinq sont L136-2 ← amendement
-624 et quatre L121-91-1, jugées fausses à la main en
-[`docs/21`](docs/21-precision-resulte-de.md), alors que le texte adopté porte
-l'amendement mot pour mot sous ce numéro — des verdicts humains, contestés sur
-pièces, qu'un humain doit relire ([`docs/49`](docs/49-les-dix-du-harnais.md)
-§ 6). Les autres ont été réparées à la source.
+retenue, un alinéa attribué au mauvais amendement du dossier. Les autres ont
+été réparées à la source, ou arbitrées sur pièces
+([`docs/55`](docs/55-trois-arbitrages.md)) : l'ancre d'une insertion n'est
+pas une cible, et la garde qui l'écarte est posée ; les cinq verdicts humains
+de [`docs/21`](docs/21-precision-resulte-de.md) contestés en
+[`docs/49`](docs/49-les-dix-du-harnais.md) § 6 et l'agrément « Mon
+Accompagnateur Rénov' » sont justes.
 
 **Les arêtes récentes ont chacune leur maille nommée**, dans la section « ce
 qui n'est pas fait » de leur document — les dernières : le plan propre d'un
@@ -460,6 +457,7 @@ d'aujourd'hui ; ceux des documents sont ceux de leur date.
 | 46. Projets déposés et trait insécable | les 79 jeux de l'Assemblée sans texte l'étaient faute de lire `projets-pl` : 192 sur 192 ; les textes de l'Assemblée depuis 2017 écrivent « L. 123‑9 » avec un trait insécable, que `porte_sur` ne lisait pas — 866 arêtes internes de plus ; « L. 121-84-10-1 » lu « L121-84-1 » ; deux gardes `article_entier` ; `depose_sur` 1 156 → 1 836, mesurée 19/20, 13/15, 18/19, 20/20 | [`docs/52`](docs/52-projets-deposes-et-trait-insecable.md) |
 | 47. Le trait insécable à la lecture | U+2011 ramené à « - » par les deux `texte_brut`, textes et rapports — 37 490 numéros lus dans les rapports au lieu de 34 988, `motive` +2 / −1 ; `vise` re-mesurée 20/20 et 1/1, `resulte_de` 18/20 : 0,8621, 0,7412, 0,8240 | [`docs/53`](docs/53-trait-insecable-a-la-lecture.md) |
 | 48. Tableaux de concordance | l'article de la directive que l'article du code transpose, lu dans les annexes des études d'impact avec la position des blocs du PDF : 33 arêtes, 33/33, 35 articles en vigueur ; deux gardes `resulte_de` mesurées et abandonnées ; les fiches montrent la version écrite par la loi du dossier | [`docs/54`](docs/54-tableaux-de-concordance.md) |
+| 49. Trois arbitrages | l'ancre d'une insertion n'est pas une cible de `porte_sur` — garde posée, 339 arêtes internes retirées, six anciens « justes » rendus sur le code hôte arbitrés faux ; on juge contre l'article du fonds, non le numéro écrit ; cinq verdicts humains contestés et « Mon Accompagnateur Rénov' » arbitrés justes, `resulte_de` 71/77, Wilson 0,8402 ; le harnais échoue de 8 arêtes au lieu de 15 | [`docs/55`](docs/55-trois-arbitrages.md) |
 
 ## D'où ça vient
 

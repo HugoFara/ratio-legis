@@ -173,8 +173,8 @@ AVAL = 140                    # portée du regard en aval, dans la même phrase
 # inférieure de Wilson à 95 %. Puis, le 24 septembre 2026, 18 arêtes parmi les
 # 874 internes que le trait d'union insécable des textes de l'Assemblée
 # cachait (`docs/52`) : 16 sur 18, deux juges d'accord — un « L. 132-1 A » lu
-# L. 132-1, réparé depuis, et une ancre d'insertion, laissée (voir
-# `est_une_cible`). Réunis, 90 sur 93.
+# L. 132-1, et une ancre d'insertion, réparés depuis (`est_une_cible`,
+# `docs/55` § 1). Réunis, 90 sur 93.
 CONFIANCE = 0.9094
 # La voie de la citation est mesurée à part, parce qu'elle ne vaut pas la même
 # chose : 15 arêtes justes sur 15 vérifiées à la main **après** la garde de
@@ -452,13 +452,19 @@ def phrase_hors_incises(texte: str, fin: int, limite: int) -> list[tuple[int, in
 
 
 # « Après l'article L. 224-54, il est inséré un article L. 224-54-2 » : le verbe
-# suit L. 224-54, qui n'est qu'une ancre, et deux juges sur deux l'ont dit
-# faux (docs/52). La garde qui l'écartait a été retirée : elle ôtait 337
-# arêtes internes, dont six ancres que des tirages antérieurs avaient jugées
-# justes. Le désaccord est de définition — l'ancre est-elle « portée » par
-# l'article du texte ? — et il revient à la relecture humaine.
+# suit L. 224-54, qui n'est qu'une ancre. `porte_sur` dit que l'article du texte
+# **modifie** l'article du code, et l'ancre n'est pas modifiée : elle est
+# fausse, comme pour `vise` depuis `docs/42`. Six verdicts anciens la disaient
+# juste ; ils répondaient à une autre question — le code hôte (`docs/34`) — et
+# sont arbitrés en `docs/55` § 1.
+ANCRE = re.compile(r"\b(?:apr[èe]s|avant|à la suite de)\s+(?:le|la|l['’])?\s*article\s*$", re.I)
+
+
 def est_une_cible(texte: str, debut: int, fin: int) -> bool:
-    """Vrai si un verbe modificatif suit la référence, dans la même phrase."""
+    """Vrai si un verbe modificatif suit la référence, dans la même phrase, et
+    que la référence n'est pas l'ancre d'une insertion."""
+    if ANCRE.search(texte[max(0, debut - 40):debut]):
+        return False
     return any(ACTION.search(texte, a, b)
                for a, b in phrase_hors_incises(texte, fin, min(len(texte), fin + 300)))
 
