@@ -77,7 +77,9 @@ ENTETE = re.compile(
     r")"
     r"[ \t]*(?:\n[ \t]*" + ORDINAL + r")?[ \t]*$", re.M)
 
-ARTICLE = re.compile(r"\bL\.?\s?(\d{3})-(\d{1,3})(?:-(\d{1,3}))?")
+# Jusqu'à quatre nombres, jamais coupé dans un nombre : « L. 121-84-10-1 » se
+# lisait L121-84-10, un autre article (docs/52).
+ARTICLE = re.compile(r"\bL\.?\s?(\d{3})-(\d{1,3})(?:-(\d{1,3}))?(?:-(\d{1,3}))?(?!\d)")
 PLAGE = re.compile(r"L\.?\s?(\d{3})-(\d{1,3})\s+(?:à|au)\s+L\.?\s?(\d{3})-(\d{1,3})")
 
 
@@ -88,13 +90,16 @@ def texte_brut(chemin: Path) -> str:
     page = re.sub(r"<script.*?</script>", " ", page, flags=re.S)
     page = re.sub(r"<[^>]+>", "\n", page)
     page = html.unescape(page)
+    # Le trait d'union insécable de l'Assemblée, en entité `&#8209;` : sans
+    # cela, aucun « L. 123‑9 » d'un rapport récent n'était lu (docs/53).
+    page = page.translate({0x2011: "-", 0x2010: "-"})
     return re.sub(r"\n+", "\n", re.sub(r"[ \t\xa0]+", " ", page))
 
 
 def numeros_cites(fragment: str) -> set[str]:
     """Numéros d'articles du code, plages « L. 111-1 à L. 111-5 » comprises."""
-    trouves = {f"L{a}-{b}" + (f"-{c}" if c else "")
-               for a, b, c in ARTICLE.findall(fragment)}
+    trouves = {f"L{a}-{b}" + "".join(f"-{x}" for x in (c, d) if x)
+               for a, b, c, d in ARTICLE.findall(fragment)}
     for livre_d, debut, livre_f, fin in PLAGE.findall(fragment):
         if livre_d == livre_f and int(fin) - int(debut) < 40:
             trouves |= {f"L{livre_d}-{n}" for n in range(int(debut), int(fin) + 1)}

@@ -275,6 +275,14 @@ def sans_controles(texte: str) -> str:
     return re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", " ", texte)
 
 
+# Le trait d'union insécable (U+2011) et le trait d'union typographique (U+2010)
+# sont des traits d'union : l'Assemblée écrit ainsi tous ses numéros depuis
+# 2017, souvent en entité `&#8209;`. Les ramener à « - » à la lecture sert
+# toutes les expressions à la fois, et un caractère pour un caractère ne
+# déplace aucun offset (docs/53).
+TIRETS = str.maketrans({"\u2011": "-", "\u2010": "-"})
+
+
 def texte_brut(chemin: Path) -> str:
     """Texte du fichier, qu'il soit HTML ou PDF — le contenu décide, pas le nom.
 
@@ -292,7 +300,7 @@ def texte_brut(chemin: Path) -> str:
             pages = [page.get_text() for page in document]
         lignes = [re.sub(r"[ \t\xa0]+", " ", l).strip()
                   for l in sans_controles("\n".join(pages)).split("\n")]
-        return re.sub(r"\n{3,}", "\n\n", "\n".join(lignes))
+        return re.sub(r"\n{3,}", "\n\n", "\n".join(lignes)).translate(TIRETS)
     # L'encodage se lit dans l'octet, pas dans la déclaration : plusieurs pages de
     # l'Assemblée annoncent un charset qu'elles ne respectent pas, et le
     # remplacement silencieux rendait « code mon\ufffdtaire et financier ».
@@ -306,7 +314,7 @@ def texte_brut(chemin: Path) -> str:
                   "\n", page)
     page = html.unescape(re.sub(r"<[^>]+>", "", page))
     lignes = [re.sub(r"[ \t\xa0]+", " ", l).strip() for l in page.split("\n")]
-    return re.sub(r"\n{3,}", "\n\n", "\n".join(lignes))
+    return re.sub(r"\n{3,}", "\n\n", "\n".join(lignes)).translate(TIRETS)
 
 
 def numero(m: re.Match) -> str:

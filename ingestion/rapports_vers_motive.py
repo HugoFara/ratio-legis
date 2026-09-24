@@ -74,8 +74,9 @@ def mentions(fragment: str) -> list[tuple[str, int, int]]:
             for n in range(int(debut), int(fin) + 1):
                 trouves.setdefault(f"L{livre_d}-{n}", (m.start(), m.end()))
     for m in ARTICLE.finditer(fragment):
-        a, b, c = m.groups()
-        trouves.setdefault(f"L{a}-{b}" + (f"-{c}" if c else ""), (m.start(), m.end()))
+        a, b, c, d = m.groups()
+        trouves.setdefault(f"L{a}-{b}" + "".join(f"-{x}" for x in (c, d) if x),
+                           (m.start(), m.end()))
     return [(numero, d, f) for numero, (d, f) in trouves.items()]
 
 

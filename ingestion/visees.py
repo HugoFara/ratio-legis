@@ -258,15 +258,20 @@ def vise_un_autre_code(texte: str, debut: int, fin: int, instruction: Instructio
 # deux gardes : le chapeau vide suivi d'un point, et l'anaphore — « du présent
 # code » écrit dans l'alinéa inséré au code de l'action sociale n'est pas le
 # nôtre. Réunies aux 50 d'avant : **64 sur 70**, Wilson 0,8253.
-CONFIANCE = 0.8253
+# Le même jour (docs/53), après les correctifs de docs/52 — trait d'union
+# insécable, numéro à quatre nombres, projets déposés appariés —, 20 arêtes
+# tirées parmi les 489 déclarées qu'aucune fiche n'avait jugées : **20 sur
+# 20**, deux juges d'accord partout. Réunies : **84 sur 90**, Wilson 0,8621.
+CONFIANCE = 0.8621
 # L'article que le contenu désigne quand le numéro écrit n'est pas le bon
 # (`docs/50`). Mesurée à part, sur cette seule population, le 24 septembre
 # 2026 : les treize arêtes d'avant la garde des articles créés, deux juges
 # Sonnet 5 et un arbitre Opus 5 sur l'unique désaccord — 10 justes sur 13,
 # et les trois fausses sont les seules à viser un article que la loi n'a pas
 # créé. Après la garde, 10 sur 10 : Wilson 0,7225. La garde est choisie sur
-# l'échantillon qui la mesure ; la population n'a pas d'autre membre à tirer.
-CONFIANCE_CONTENU = 0.7225
+# l'échantillon qui la mesure. Elle a depuis gagné un onzième membre, jugé
+# juste par les deux juges (docs/53) : 11 sur 11, Wilson 0,7412.
+CONFIANCE_CONTENU = 0.7412
 MOTS_MINI_RESOLUTION = 20
 
 

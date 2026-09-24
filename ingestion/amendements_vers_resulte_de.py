@@ -279,7 +279,13 @@ def passages_inseres(dispositif: str) -> list[tuple[tuple[str | None, str | None
 # l'énergie, le plafond en chiffre d'affaires mondial d'une sanction de
 # l'Arcom —, la troisième une rédaction dont le barème n'a pas été retenu.
 # Aucune garde n'en sort ici. Réunis : **52 sur 57**, Wilson 0,8105.
-CONFIANCE = 0.8105
+#
+# Le même jour (docs/53), 20 arêtes parmi les 120 qu'aucune fiche n'avait
+# jugées : **18 sur 20**, un arbitre Opus 5 sur deux désaccords. Les deux
+# fausses : un alinéa attribué à l'amendement 405, écrit par le 269 du même
+# dossier ; et la formule d'injonction administrative, partagée par un VII
+# de L. 141-1 et un alinéa de L. 218-5-5. Réunis : **70 sur 77**, Wilson 0,8240.
+CONFIANCE = 0.8240
 
 
 def charger_amendements(base: sqlite3.Connection, racine: Path) -> dict:
