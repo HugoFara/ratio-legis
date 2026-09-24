@@ -308,6 +308,26 @@ def interroger(base: sqlite3.Connection, numero: str) -> dict:
         LEFT JOIN preuve p      ON p.id = tr.preuve_id
         WHERE a.numero = ? ORDER BY u.celex""", numero)
 
+    # L'article de l'acte que cet article transpose, selon le tableau de
+    # concordance de l'étude d'impact (docs/54). Le numéro du tableau est celui
+    # du projet de loi : on remonte la renumérotation depuis l'article courant.
+    d["concordances"] = q("""
+        WITH RECURSIVE ascendance(id) AS (
+            SELECT id FROM article_courant WHERE numero = ?
+            UNION SELECT r.ancien_id FROM renumerote_de r
+                  JOIN ascendance s ON r.article_id = s.id)
+        SELECT u.denomination, u.type_acte, u.url, t.article_acte, t.paragraphe,
+               aa.intitule, aa.url AS article_url, t.numero_ecrit, t.page,
+               t.methode, t.confiance, p.fenetre, doc.url AS etude
+        FROM transpose_article t
+        JOIN ascendance s       ON s.id = t.article_id
+        JOIN acte_ue u          ON u.celex = t.celex
+        LEFT JOIN article_acte_ue aa ON aa.celex = t.celex AND aa.numero = t.article_acte
+        JOIN preuve p           ON p.id = t.preuve_id
+        JOIN document doc       ON doc.id = t.document_id
+        ORDER BY u.celex, CAST(t.article_acte AS INTEGER), t.paragraphe""", numero) \
+        if q("SELECT 1 FROM sqlite_master WHERE name = 'transpose_article'") else []
+
     # Les considérants motivent l'acte, jamais l'article français : rien ne les
     # relie l'un à l'autre, et deux tentatives de sélection ont été mesurées puis
     # abandonnées (docs/14 § 5). Le nombre et le lien sont donc rendus au grain de
@@ -446,6 +466,15 @@ def en_texte(d: dict) -> str:
         L.append(f"  confiance {tr['confiance']:.3f} sur la proposition « ce texte "
                  "transpose cet acte » ; aucune mesure ne porte sur le lien entre "
                  "cet article-ci et l'acte")
+
+    for c in d["concordances"]:
+        disposition = c["article_acte"] + (f"({c['paragraphe']})" if c["paragraphe"] else "")
+        L.append(f"\n  [concordance] transpose l'article {disposition} de {nommer(c)}"
+                 + (f" — {c['intitule']}" if c["intitule"] else ""))
+        L.append(f"  {c['article_url'] or c['url']}")
+        L.append(f"  tableau de concordance de l'étude d'impact, page {c['page']}, "
+                 f"sous le numéro {c['numero_ecrit']} du projet de loi · "
+                 f"confiance {c['confiance']:.3f}")
 
     L.append(f"\nALINÉAS ({len(d['alineas'])})")
     for a in d["alineas"]:
@@ -673,6 +702,24 @@ padding:.9rem 1rem;margin:.8rem 0}}
                  f'<b class="conf">Confiance {tr["confiance"]:.3f}</b> sur la seule '
                  "proposition « ce texte transpose cet acte » : aucune mesure ne "
                  "porte sur le lien entre cet article-ci et l\'acte.</p></div>")
+
+    for c in d["concordances"]:
+        disposition = c["article_acte"] + (f"({c['paragraphe']})" if c["paragraphe"] else "")
+        p.append(f'<div class="raison"><div class="meta">'
+                 f'<span>tableau de concordance</span>'
+                 f'<span>{e(c["methode"])}</span>'
+                 f'<span class="conf">confiance {c["confiance"]:.3f}</span>'
+                 f'<a href="{e(c["article_url"] or c["url"])}">article de l\'acte</a>'
+                 f'<a href="{e(c["etude"])}">étude d\'impact, p. {c["page"]}</a>'
+                 + signaler("transpose_article", d["numero"],
+                            f"article {disposition} de {nommer(c)}", c["fenetre"] or "")
+                 + '</div>'
+                 f'<div>transpose l\'<b>article {e(disposition)}</b> de {e(nommer(c))}'
+                 + (f' — {e(c["intitule"])}' if c["intitule"] else "") + '</div>'
+                 f'<p class="silence">Le tableau de concordance de l\'étude d\'impact '
+                 f'met cette disposition en face de l\'article {e(c["numero_ecrit"])} '
+                 "du projet de loi ; la numérotation suivie jusqu'à l'article "
+                 "d'aujourd'hui.</p></div>")
 
     p.append(f"<h2>Alinéas et provenance ({len(d['alineas'])})</h2>")
     for a in d["alineas"]:

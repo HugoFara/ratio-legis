@@ -100,14 +100,17 @@ qui nomment un acte eux-mêmes ; ce sont d'autres articles, et le lien est
 plus fin : non « cet article cite la directive », mais « cet article est
 l'article 6 de la directive ».
 
+La fiche d'un article la montre (`restitution/graphe.py`) : « transpose
+l'article 6 de la directive 2011/83/UE », la page de l'étude d'impact, le
+numéro du projet de loi, la confiance, et le lien de signalement. L. 221-5,
+l'ancien L. 121-17, en est l'exemple.
+
 ## 4. Ce qui n'est pas fait
 
 **Les autres tableaux.** Sept études d'impact portent des tableaux pour des
 actes absents de `acte_ue` ou pour d'autres codes ; les rapports de
 commission en reproduisent parfois. Les actes de l'Union ne sont chargés que
 s'ils sont cités par un article du fonds.
-
-**La restitution** ne montre pas encore l'arête.
 
 **Les mailles de `porte_sur` (`docs/47` § 5)** : le plan propre hors
 glissement ne touche que `vise`, mesurée 20 sur 20 en `docs/53` ; les 124
