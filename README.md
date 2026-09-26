@@ -493,6 +493,50 @@ minuteur systemd plutôt que Dagster, des expressions régulières plutôt que l
 — sont écrits au § 6 bis de la feuille de route, pour qu'ils soient des
 décisions et non des dérives.
 
+## Projets voisins
+
+Aucun ne pose la même question. Chacun en tient un morceau. État vérifié le
+26/09/2026 : dates des derniers commits et contenu des pages.
+
+**En France, sur les mêmes sources.**
+
+- **Tricoteuses** : « La loi sous git » publie les codes consolidés avec leur
+  historique, et `tricoteuses-legifrance` lit LEGI, JORF, DOLE et KALI, dossiers
+  législatifs compris (TypeScript, PostgreSQL, AGPL). Son module **Tisseuse**
+  trouve les liens entre textes et extrait les instructions modificatives
+  (`insert_after`, `replace`, `delete`, avec le rang d'occurrence). Il fait donc
+  ce que DuraLex faisait, et il est maintenu. Personne ne l'a mesuré contre le
+  résolveur de ce dépôt ; [`docs/01`](docs/01-rapport-verification-sources.md)
+  § 6, écrit avant qu'on le connaisse, concluait que tout était à réécrire.
+- **legi.py** (Legilibre) : parse LEGI vers SQLite, commits en septembre 2026.
+- **La Fabrique de la loi** (Regards Citoyens, médialab) : la navette jusqu'à la
+  promulgation, et le premier surlignage par étape. Le parser n'a pas de commit
+  depuis mars 2022, le corpus s'arrête au 29/07/2024, et le certificat TLS du site
+  est expiré.
+- **Archéo Lex, DuraLex, SedLex** (Legilibre) : arrêtés en 2019, antérieurs au
+  format LEGI d'octobre 2023. Ils servent de références de conception, pas de
+  dépendances.
+
+**Ailleurs, la même chaîne sous d'autres formes.**
+
+- **legislation.gov.uk** rattache les *Explanatory Notes* du gouvernement à
+  chaque section d'une loi en vigueur, avec ses versions. C'est le chaînage
+  officiel le plus proche, sans les amendements et sans les renumérotations.
+- **buzer.de** donne, pour chaque paragraphe d'une loi fédérale allemande, la
+  loi qui l'a modifié en dernier. Il ne lie la *Begründung* du Bundestag qu'au
+  niveau de la loi entière.
+- **Legislative Influence Detector** (DSSG Chicago, KDD 2016) et **LobbyPlag**
+  (RGPD, 2013) demandent qui a écrit le passage, par similarité de texte
+  (Smith-Waterman) avec des lois-types ou des notes de lobbies, et non par le
+  chaînage documentaire. Les deux sont arrêtés.
+- **Parltrack** suit les procédures et les amendements du Parlement européen. Il
+  est maintenu. C'est la couche en amont de la directive, que les considérants ne
+  couvrent pas.
+
+Ce qu'aucun ne fait : franchir une recodification à droit constant, tenir
+l'amendement rejeté comme une provenance, et ne rien affirmer sans citation
+résoluble au passage.
+
 ## Licence et attribution
 
 Code sous [AGPL-3.0](LICENSE). Les données amont sont sous Licence Ouverte /
