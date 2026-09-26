@@ -263,7 +263,12 @@ def vise_un_autre_code(texte: str, debut: int, fin: int, instruction: Instructio
 # insécable, numéro à quatre nombres, projets déposés appariés —, 20 arêtes
 # tirées parmi les 489 déclarées qu'aucune fiche n'avait jugées : **20 sur
 # 20**, deux juges d'accord partout. Réunies : **84 sur 90**, Wilson 0,8621.
-CONFIANCE = 0.8621
+# Le 26 septembre 2026 (docs/59 § 3), la constante est re-mesurée sur un tirage
+# unique de la base finale — XIIIe à XVIIe législature et Sénat, après les gardes
+# de docs/57 et docs/58 —, 40 arêtes qu'aucune fiche n'avait jugées : **40 sur
+# 40**, deux juges d'accord partout, Wilson 0,9124. Elle remplace la réunion
+# des tirages d'avant, pris chacun sur une population réparée à un autre moment.
+CONFIANCE = 0.9124
 # L'article que le contenu désigne quand le numéro écrit n'est pas le bon
 # (`docs/50`). Mesurée à part, sur cette seule population, le 24 septembre
 # 2026 : les treize arêtes d'avant la garde des articles créés, deux juges
@@ -291,6 +296,21 @@ def alinea_ecrit(texte: str, position: int, en_tete: int) -> tuple[list[str], st
     fin = min((i for i in (texte.find("«", debut), texte.find("»", debut)) if i >= 0),
               default=len(texte))
     return mots(texte[debut:fin]), texte[en_tete:fin].strip()
+
+
+def cree_par(texte: str, n: str) -> bool:
+    """Le dispositif crée-t-il l'article `n` — « il est inséré un article
+    L. 121-84-4 », « Art. L. 121-84-4. – » — au lieu de nommer l'existant ?
+    C'est ce qui dit au résolveur quelle lignée le numéro désigne quand la loi
+    du dossier en a fait arriver une autre sous lui (docs/59 § 2)."""
+    m = re.match(r"([LRD])(\d.*)", n)
+    if not m:
+        return False
+    motif = m.group(1) + r"\.?\s*" + r"\s*[-‑]\s*".join(
+        re.escape(p) for p in m.group(2).split("-"))
+    return bool(re.search(
+        r"(?:(?:un|des)\s+articles?\s+|[«\"]\s*art(?:icle)?\.?\s*)" + motif + r"(?![\d-])",
+        sans_balises(texte).translate(TIRETS), re.I))
 
 
 def cibles(dispositif: str
@@ -498,7 +518,8 @@ def main() -> None:
             # dossier ; à défaut, de la loi. Sans cela « L. 141-3 » de 2015
             # se résolvait vers la lignée de 2024 (`docs/48` § 3).
             article_id = resolveur.du_dossier(
-                n, dossier, date_du_texte.get(texte_id or "") or date_du_dossier.get(dossier))
+                n, dossier, date_du_texte.get(texte_id or "") or date_du_dossier.get(dossier),
+                existant=not cree_par(dispositif, n))
             if article_id is None:
                 continue
             if formule == "rédigé" and article_id not in resolveur.ecrits.get(dossier, ()):

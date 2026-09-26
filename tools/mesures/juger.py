@@ -56,6 +56,11 @@ Ce que chaque arête affirme, et donc ce que « juste » veut dire :
   l'alinéa vient d'une autre rédaction — le texte initial, un autre
   amendement, un autre article — qui ne partage avec l'amendement que des
   mots, ou si la rédaction de l'amendement n'a pas été retenue.
+  Juste aussi quand l'amendement n'a fait que **retoucher** l'alinéa — des
+  mots insérés, supprimés ou substitués — et que la retouche est dans
+  l'alinéa en vigueur : une incise ajoutée, un plafond retiré. Faux si la
+  retouche n'y est pas. (Définition fixée le 26 septembre 2026, `docs/59`
+  § 1 ; les juges l'appliquaient déjà à 31 amendements de mots sur 37.)
 
 L'ancre d'une insertion (« après l'article A, il est inséré un article… »)
 n'est jamais la cible : ni `porte_sur`, ni `depose_sur`, ni `vise`.

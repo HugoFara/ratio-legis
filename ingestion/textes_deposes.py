@@ -574,7 +574,13 @@ def main() -> None:
                 if code is None:
                     portee, article_id = "non_resolue", None
                 elif NOTRE_CODE.search(code):
-                    article_id = resolveur.du_dossier(cle, ligne["dossier"])
+                    # « l'article L. 311-14 devient… » nomme l'existant ; « il est
+                    # inséré un article L. 311-14 » le crée (docs/59 § 2).
+                    existant = not re.search(r"\b(?:un|des)\s+articles?\s*$",
+                                             contenu[max(0, reference.start() - 30):
+                                                     reference.start()], re.I)
+                    article_id = resolveur.du_dossier(cle, ligne["dossier"],
+                                                      existant=existant)
                     portee = "interne" if article_id else "non_resolue"
                 else:
                     portee, article_id = "externe", None

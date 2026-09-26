@@ -211,7 +211,15 @@ CONFIANCE = 0.2481            # composition seule, population d'avant les voies,
 # l'alinéa, 2 / 2 par la visée, dont quatre arbitrées — l'article que le texte
 # de commission écrit sous « L. 224-114 » est l'actuel L. 224-115 (docs/47).
 #   alinea          76 / 78, Wilson 0,9112 ; visee 41 / 44, Wilson 0,8177.
-CONFIANCE_PAR_VOIE = {"visee": 0.8177, "alinea": 0.9112, "article_entier": 0.6886}
+# Le 26 septembre 2026 (docs/59 § 3), re-mesurées sur un tirage unique de la base
+# finale, 40 arêtes non jugées par voie, deux juges et un arbitre :
+#   visee           40 / 40, Wilson 0,9124 ;
+#   alinea          39 / 40, Wilson 0,8712 — l'insertion d'une section, gardée
+#                   depuis (`insere_une_instruction`) ;
+#   article_entier  37 / 40, Wilson 0,8014 — une instruction ajoutée sur un
+#                   autre article, une réécriture qui insère des voisins, un jeu
+#                   rattaché au mauvais texte.
+CONFIANCE_PAR_VOIE = {"visee": 0.9124, "alinea": 0.8712, "article_entier": 0.8014}
 
 # La mention de navette entre le numéro et le point — « VI (nouveau). – »,
 # « II bis (nouveau). – », « III (Supprimé). – » — est encore une borne. Elle ne
@@ -269,6 +277,7 @@ PARAGRAPHE_NUMERO_OU_LETTRE = re.compile(
     r"|(?:\d{1,2}|\.\.\.|…)\s*°(?:\s*(?:bis|ter|quater))?|(?:[a-z]{1,2}|\.\.\.|…)\)"
     r"|(?:\.\.\.|…)\s*[–‑-])\s", re.I)
 NOMME_UN_ARTICLE = re.compile(r"\barticles?\s+(?:[LRD]\.?\s?)?\d", re.I)
+NOMME_UNE_DIVISION = re.compile(r"\b(?:sous-)?(?:section|chapitre|titre)s?\s+(?:[IVXL]+|\d)", re.I)
 VERBE_MODIFICATIF = re.compile(
     r"\b(?:est|sont)\s+(?:ainsi\s+(?:modifiée?s?|rédigée?s?|complétée?s?)|abrogée?s?"
     r"|supprimée?s?|remplacée?s?|complétée?s?|insérée?s?|rétablie?s?|ajoutée?s?)"
@@ -287,7 +296,12 @@ def insere_une_instruction(dispositif: str) -> bool:
     if not PARAGRAPHE_NUMERO_OU_LETTRE.match(tete):
         return False
     hors_incises = re.sub(r"[«“][^»”]*[»”]", " ", tete[1:])
-    return bool(VERBE_MODIFICATIF.search(hors_incises) and NOMME_UN_ARTICLE.search(hors_incises))
+    # Une division aussi : « I bis. – … il est inséré une section 2 bis ainsi
+    # rédigée » ouvre une instruction qui écrit L121-25-1, non L121-33 que
+    # gouvernait l'alinéa 142 (docs/59).
+    return bool(VERBE_MODIFICATIF.search(hors_incises)
+                and (NOMME_UN_ARTICLE.search(hors_incises)
+                     or NOMME_UNE_DIVISION.search(hors_incises)))
 ARTICLE_ENTIER = re.compile(r"^\s*(?:I\.\s*[–-]\s*)?(supprimer|r[ée]diger ainsi|r[ée]tablir)\s+cet\s+article",
                             re.I)
 # « Compléter l'article 5 par l'alinéa suivant » aussi : l'amendement 63 de la

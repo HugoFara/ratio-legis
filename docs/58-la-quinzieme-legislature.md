@@ -176,7 +176,7 @@ toutes législatures ensemble. C'est la prochaine mesure.
 
 ## 8. Ce qui n'est pas fait
 
-- la famille « incise dans un alinéa écrit ailleurs » de `resulte_de`, trois
+- *(tranché en `docs/59` § 1 : la retouche compte, les trois sont justes)* la famille « incise dans un alinéa écrit ailleurs » de `resulte_de`, trois
   fausses en base, sans garde ;
 - les constantes, sur un tirage unique de la base finale (§ 7) ;
 - la scission des lignées arrivées d'un autre numéro (`docs/57` § 6) ;

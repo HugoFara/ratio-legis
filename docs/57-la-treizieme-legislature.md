@@ -112,7 +112,7 @@ l'alinéa 11, qui est L311-10. `PARAGRAPHE` la reconnaissait depuis
 `docs/51` pour les chiffres romains ; `MARQUE_DE_TETE`, qui décide du
 recollage, ni pour les romains ni pour les lettres.
 
-**`resulte_de`, deux fausses, sans garde.** 349 rect. n'insère qu'une incise
+**`resulte_de`, deux fausses, sans garde** — *rejugées justes : un amendement qui retouche l'alinéa en est tenu pour l'origine, `docs/59` § 1*. 349 rect. n'insère qu'une incise
 dans un alinéa du texte initial ; 236 supprime un plafond dans l'alinéa de
 l'amendement 42, que la fiche fait résulter de 236. Ce sont les familles
 « alinéa attribué au mauvais amendement du dossier » de `docs/55` § 4, dont

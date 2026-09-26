@@ -203,6 +203,24 @@ def rattachements_legi(base: sqlite3.Connection) -> tuple[dict[int, set[str]], d
         JOIN produite_par p    ON p.version_id = v.id_legi
         JOIN issu_de i         ON i.texte_id = p.texte_id"""):
         articles[article_id].add(dossier)
+    # Une lignée close par une arrivée — « l'article L. 311-14 devient l'article
+    # L. 311-20 », que LEGI écrit comme une modification — est touchée par la loi
+    # qui la renumérote, bien que cette loi n'en produise aucune version : elle
+    # produit ce qu'elle devient. Sans cela, la section du rapport qui commente
+    # la renumérotation n'était plus corroborée depuis la scission (docs/59 § 2).
+    for article_id, dossier in base.execute("""
+        SELECT r.ancien_id, i.dossier_id FROM renumerote_de r
+        JOIN article a ON a.id = r.ancien_id
+        JOIN version_article v ON v.article_id = r.article_id
+        JOIN produite_par p    ON p.version_id = v.id_legi
+        JOIN issu_de i         ON i.texte_id = p.texte_id
+        WHERE v.date_debut = (SELECT min(date_debut) FROM version_article
+                              WHERE article_id = r.article_id)
+          AND EXISTS (SELECT 1 FROM article b
+                      WHERE b.numero = a.numero AND b.lignee = a.lignee + 1)
+          AND (SELECT etat FROM version_article WHERE article_id = a.id
+               ORDER BY date_debut DESC LIMIT 1) = 'MODIFIE'"""):
+        articles[article_id].add(dossier)
     titres: dict[str, str] = {}
     legislatures: dict[str, int | None] = {}
     for dossier, titre, legislature in base.execute(

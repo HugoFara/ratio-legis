@@ -197,6 +197,20 @@ def anterieurs(version: Version, versions: dict[str, Version]) -> list[Version]:
 # de 0,5, aucun entre les deux — le seuil ne tranche rien de discutable.
 SEUIL_MEME_DISPOSITION = 0.5
 MOT = re.compile(r"\w{4,}")
+# **La disposition qui arrive d'un autre numéro sous une « modification ».** LEGI
+# enregistre « L'article L. 311-17 devient l'article L. 311-14 » comme une
+# version MODIFIE de L311-14 : la version de 1993 (« Aucun vendeur… ») et celle
+# de 2011 (« Pendant un délai de sept jours… », l'ancien L311-17) faisaient une
+# seule lignée. Une réécriture sur place (« est ainsi rédigé ») est aussi une
+# modification, et reste le même article : ce qui les sépare est que le texte
+# nouveau **vient d'ailleurs** — d'un autre numéro dont une version se ferme le
+# jour où celle-ci s'ouvre. Mesuré sur les 490 modifications à moins de 0,5 de la
+# version d'avant : la similarité à la source se regroupe à 0,7 et plus, la
+# similarité à la version d'avant sous 0,2 ; 75 versions sont dans les deux
+# (docs/57 § 6). Le résolveur sait quelle lignée un numéro désigne selon qu'il
+# nomme l'article existant ou l'article créé (`lignees.py`, docs/59).
+SEUIL_ARRIVEE_AVANT = 0.2
+SEUIL_ARRIVEE_SOURCE = 0.7
 
 
 def similarite(a: str, b: str) -> float:
@@ -205,7 +219,8 @@ def similarite(a: str, b: str) -> float:
     return len(ma & mb) / len(ma | mb) if ma | mb else 1.0
 
 
-def lignees(chronologie: list[Version]) -> list[int]:
+def lignees(chronologie: list[Version],
+            arrivees: dict[str, tuple[str, float]] | None = None) -> list[int]:
     """Rang de lignée de chaque version d'un même numéro, dans l'ordre chronologique.
 
     Un numéro change de disposition quand sa version en cours est **abrogée** et
@@ -221,8 +236,11 @@ def lignees(chronologie: list[Version]) -> list[int]:
     rang_vivante: dict[str, int] = {}
     rang, derniere = 1, None
     for version in vivantes:
-        if derniere is not None and derniere.etat in ABROGATION \
-                and similarite(derniere.texte, version.texte) < SEUIL_MEME_DISPOSITION:
+        if derniere is not None and (
+                (derniere.etat in ABROGATION
+                 and similarite(derniere.texte, version.texte) < SEUIL_MEME_DISPOSITION)
+                or (version.id_legi in (arrivees or {})
+                    and similarite(derniere.texte, version.texte) < SEUIL_ARRIVEE_AVANT)):
             rang += 1
         rang_vivante[version.id_legi] = rang
         derniere = version
@@ -252,6 +270,34 @@ def lignees(chronologie: list[Version]) -> list[int]:
     return rangs
 
 
+def arrivees_d_un_autre_numero(par_numero: dict[tuple[str, str], list[Version]]
+                               ) -> dict[str, tuple[str, float]]:
+    """Les versions qui succèdent par modification à une version sans rapport, et
+    dont le texte est celui d'un autre numéro fermé le jour où elles s'ouvrent :
+    identifiant → (version source, similarité)."""
+    vivantes = {cle: sorted((v for v in groupe
+                             if v.etat not in ("MODIFIE_MORT_NE", "ANNULE")),
+                            key=lambda v: (v.date_debut, v.id_legi))
+                for cle, groupe in par_numero.items()}
+    fermees: dict[tuple[str, str], list[Version]] = defaultdict(list)
+    for (code, _), groupe in vivantes.items():
+        for v in groupe:
+            if v.date_fin:
+                fermees[(code, v.date_fin)].append(v)
+    arrivees: dict[str, tuple[str, float]] = {}
+    for (code, numero), groupe in vivantes.items():
+        for avant, version in zip(groupe, groupe[1:]):
+            if avant.etat in ABROGATION \
+                    or similarite(avant.texte, version.texte) >= SEUIL_ARRIVEE_AVANT:
+                continue
+            sources = sorted(((similarite(source.texte, version.texte), source.id_legi)
+                              for source in fermees[(code, version.date_debut)]
+                              if source.numero != numero), reverse=True)
+            if sources and sources[0][0] >= SEUIL_ARRIVEE_SOURCE:
+                arrivees[version.id_legi] = (sources[0][1], sources[0][0])
+    return arrivees
+
+
 def inserer_noeuds(base: sqlite3.Connection, versions: dict[str, Version]) -> dict:
     """Un nœud `article` par lignée ; `articles` rend l'identifiant de chaque version."""
     par_numero: dict[tuple[str, str], list[Version]] = defaultdict(list)
@@ -260,10 +306,11 @@ def inserer_noeuds(base: sqlite3.Connection, versions: dict[str, Version]) -> di
 
     articles: dict[str, int] = {}          # id_legi → article.id
     noeuds: list[tuple[int, str, str, int]] = []
+    arrivees = arrivees_d_un_autre_numero(par_numero)
     for (code, numero), groupe in sorted(par_numero.items()):
         chronologie = sorted(groupe, key=lambda v: (v.date_debut, v.id_legi))
         ids: dict[int, int] = {}
-        for version, rang in zip(chronologie, lignees(chronologie)):
+        for version, rang in zip(chronologie, lignees(chronologie, arrivees)):
             if rang not in ids:
                 ids[rang] = len(noeuds) + 1
                 noeuds.append((ids[rang], code, numero, rang))
@@ -296,6 +343,7 @@ def inserer_noeuds(base: sqlite3.Connection, versions: dict[str, Version]) -> di
     base.executemany("INSERT INTO segment VALUES (?, ?, ?, ?, ?, ?, ?)", lignes_segments)
     base.execute("INSERT INTO segment_fts (rowid, texte) SELECT rowid, texte FROM segment")
     return {"articles": articles, "noeuds": len(noeuds), "scindes": scindes,
+            "arrivees": arrivees,
             "textes": textes, "segments": len(lignes_segments)}
 
 
@@ -319,6 +367,24 @@ def inserer_aretes_declarees(base: sqlite3.Connection, versions: dict[str, Versi
         "INSERT INTO renumerote_de (article_id, ancien_id) VALUES (?, ?)",
         sorted(renumerote))
     return {"produite_par": len(produite_par), "renumerote_de": len(renumerote)}
+
+
+def inserer_arrivees(base: sqlite3.Connection, arrivees: dict[str, tuple[str, float]],
+                     articles: dict[str, int]) -> int:
+    """La lignée arrivée d'un autre numéro descend de lui. LEGI ne le déclare
+    pas — il écrit une modification —, et la coupe laissait la lignée nouvelle
+    sans ancêtre : le L733-7 de 2018, qui reprend un autre article du livre VII
+    de 2016, perdait le rapport au Président de l'ordonnance qui l'avait motivé
+    (22 articles, docs/59 § 2). `inferee`, la similarité pour confiance."""
+    lignes = []
+    for version, (source, score) in arrivees.items():
+        cible, ancien = articles[version], articles[source]
+        if cible != ancien:
+            lignes.append((cible, ancien, "inferee", round(score, 4)))
+    base.executemany(
+        "INSERT OR IGNORE INTO renumerote_de (article_id, ancien_id, methode, confiance) "
+        "VALUES (?, ?, ?, ?)", lignes)
+    return len(lignes)
 
 
 def construire_repris_de(base: sqlite3.Connection, versions: dict[str, Version]) -> dict:
@@ -392,6 +458,7 @@ def main() -> None:
     versions = charger_versions(racine)
     noeuds = inserer_noeuds(base, versions)
     aretes = inserer_aretes_declarees(base, versions, noeuds["articles"])
+    aretes["arrivees"] = inserer_arrivees(base, noeuds["arrivees"], noeuds["articles"])
     reprises = construire_repris_de(base, versions)
     base.commit()
 
@@ -410,7 +477,8 @@ def main() -> None:
           f"{base.execute('SELECT count(*) FROM segment_non_appariable').fetchone()[0]}")
     print(f"textes normatifs          : {len(noeuds['textes'])}")
     print(f"arêtes produite_par       : {aretes['produite_par']}")
-    print(f"arêtes renumerote_de      : {aretes['renumerote_de']}")
+    print(f"arêtes renumerote_de      : {aretes['renumerote_de']}"
+          f" (+ {aretes['arrivees']} inférées d'une arrivée)")
     print(f"arêtes repris_de          : {reprises['repris_de']}")
     print(f"  reprises intégrales     : {reprises['integrales']}")
     print(f"  retouchées              : {reprises['retouchees']}")

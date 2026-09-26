@@ -62,6 +62,19 @@ class Resolveur:
             WHERE p.type_lien NOT IN ('ABROGE', 'ABROGATION')
               AND v.etat NOT IN ('MODIFIE_MORT_NE', 'ANNULE')"""):
             self.ecrits[dossier].add(article_id)
+        # Les lignées closes par une **modification** qu'une autre lignée du même
+        # numéro suit : la disposition d'un autre numéro y est arrivée
+        # (`legi_vers_graphe.arrivees_d_un_autre_numero`). La recodification de
+        # 2016 clôt par abrogation, et n'en est pas.
+        self.closes_par_arrivee: set[int] = {id_ for (id_,) in base.execute("""
+            SELECT a.id FROM article a
+            JOIN version_article v ON v.article_id = a.id
+            WHERE v.date_debut = (SELECT max(date_debut) FROM version_article
+                                  WHERE article_id = a.id
+                                    AND etat NOT IN ('MODIFIE_MORT_NE', 'ANNULE'))
+              AND v.etat = 'MODIFIE'
+              AND EXISTS (SELECT 1 FROM article b
+                          WHERE b.numero = a.numero AND b.lignee = a.lignee + 1)""")}
 
     def courant(self, numero: str) -> int | None:
         lignees = self.lignees.get(numero.replace(" ", ""))
@@ -79,15 +92,26 @@ class Resolveur:
         return lignees[-1][1]
 
     def du_dossier(self, numero: str, dossier: str | None,
-                   date: str | None = None) -> int | None:
+                   date: str | None = None, existant: bool = False) -> int | None:
+        """`existant` : le numéro nomme l'article tel qu'il est au jour du texte
+        (« l'article L. 311-14 devient l'article L. 311-20 », « … est abrogé »),
+        non l'article que le texte crée (« Art. L. 311-14. – … »). Il ne change
+        rien, sauf quand la loi du dossier a fait arriver sous ce numéro la
+        disposition d'un autre : la lignée en vigueur au jour du texte, qu'elle
+        clôt, est alors celle que l'article existant désigne (docs/59 § 2)."""
         lignees = self.lignees.get(numero.replace(" ", ""))
         if not lignees:
             return None
+        quand = date or self.dates.get(dossier or "")
         if len(lignees) > 1 and dossier:
             ecrites = [id_ for _, id_, _, _ in lignees if id_ in self.ecrits.get(dossier, ())]
             if len(ecrites) == 1:
+                if existant:
+                    en_vigueur = self.a_la_date(numero, quand)
+                    if en_vigueur != ecrites[0] and en_vigueur in self.closes_par_arrivee:
+                        return en_vigueur
                 return ecrites[0]
-        return self.a_la_date(numero, date or self.dates.get(dossier or ""))
+        return self.a_la_date(numero, quand)
 
     def courants(self) -> dict[str, int]:
         """numero → identifiant de la lignée la plus haute, pour les boucles."""

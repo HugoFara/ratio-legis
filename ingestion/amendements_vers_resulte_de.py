@@ -290,7 +290,13 @@ def passages_inseres(dispositif: str) -> list[tuple[tuple[str | None, str | None
 # l'agrément « Mon Accompagnateur Rénov' » est celui de l'article L. 232-3 du
 # code de l'énergie, et l'alinéa descend du paragraphe que l'amendement 18 a
 # inséré, retouché par le Sénat. Réunis : **71 sur 77**, Wilson 0,8402.
-CONFIANCE = 0.8402
+#
+# Le 26 septembre 2026 (docs/59 § 3), re-mesurée sur un tirage unique de la base
+# finale, 40 arêtes non jugées, la retouche comptée (docs/59 § 1) : **36 sur
+# 40**, deux juges d'accord partout, Wilson 0,7695. Les quatre fausses : deux
+# formules partagées (un taux de chiffre d'affaires, un règlement « précité »),
+# un segment voisin de celui que l'amendement a écrit, une rédaction non retenue.
+CONFIANCE = 0.7695
 
 
 def charger_amendements(base: sqlite3.Connection, racine: Path) -> dict:
