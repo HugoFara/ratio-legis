@@ -290,7 +290,12 @@ def insere_une_instruction(dispositif: str) -> bool:
     return bool(VERBE_MODIFICATIF.search(hors_incises) and NOMME_UN_ARTICLE.search(hors_incises))
 ARTICLE_ENTIER = re.compile(r"^\s*(?:I\.\s*[–-]\s*)?(supprimer|r[ée]diger ainsi|r[ée]tablir)\s+cet\s+article",
                             re.I)
-AJOUT_EN_FIN = re.compile(r"^\s*(?:I\.\s*[–-]\s*)?compl[ée]ter\s+cet\s+article", re.I)
+# « Compléter l'article 5 par l'alinéa suivant » aussi : l'amendement 63 de la
+# XVe y ajoutait un 2° sur L221-17, L224-30 et L224-54 à un article qui ne
+# touchait que L131-4 (docs/58).
+AJOUT_EN_FIN = re.compile(
+    r"^\s*(?:I\.\s*[–-]\s*)?compl[ée]ter\s+(?:cet\s+article|l['’]\s*article\s+(?:\d|premier|unique))",
+    re.I)
 # Un autre texte normatif nommé par l'article du texte, hors citation : une loi,
 # une ordonnance, un décret, ou un code qui n'est pas le nôtre. `porte_sur` ne
 # relève que des articles de code ; l'article 13 du projet Macron réécrit la
@@ -343,12 +348,24 @@ NOMME_HORS_CITATION = re.compile(r"\b(?:articles?\s+|art\.\s*)([LRD])\.?\s*(\d+(
 ECRIT_EN_TETE = re.compile(r"[«“]\s*Art\.?\s*([LRD])\.?\s*(\d+(?:\s*[-‑]\s*\d+)*)")
 
 
+# Dans la réécriture elle-même, l'article du code qu'elle désigne en le
+# nommant avec son code : « Rédiger ainsi cet article : « Au début du deuxième
+# alinéa de l'article L. 413‑8 du code de la consommation… » » écrit dans
+# L413-8, et l'article du texte ne créait que L412-8 (docs/58). Le nom seul,
+# sans le code, peut être un renvoi du texte récrit ; avec le code, c'est une
+# instruction.
+NOMME_AVEC_LE_CODE = re.compile(
+    r"\barticles?\s+([LRD])\.?\s*(\d+(?:\s*[-‑]\s*\d+)*)\s+du\s+code\s+de\s+la\s+consommation",
+    re.I)
+
+
 def articles_nommes_par(dispositif: str) -> set[str]:
     def cle(m: re.Match) -> str:
         return m.group(1).upper() + re.sub(r"\s", "", m.group(2)).replace("‑", "-")
     hors_citation = re.sub(r"[«“][^»”]*[»”]", " ", dispositif)
     return ({cle(m) for m in NOMME_HORS_CITATION.finditer(hors_citation)}
-            | {cle(m) for m in ECRIT_EN_TETE.finditer(dispositif)})
+            | {cle(m) for m in ECRIT_EN_TETE.finditer(dispositif)}
+            | {cle(m) for m in NOMME_AVEC_LE_CODE.finditer(dispositif)})
 
 
 def numero_de_subdivision(subdivision: str | None) -> str | None:
@@ -699,14 +716,23 @@ def construire(base: sqlite3.Connection, schema: Path, corpus_textes: Path) -> d
             "FROM porte_sur"):
         mentions[(texte_id, article_du_texte)][cle.replace(" ", "")] = (
             article_id if portee == "interne" else None)
-    # Ce que l'amendement déclare viser lui-même, chaîne de renumérotation comprise.
+    # Ce que l'amendement déclare viser lui-même, chaîne de renumérotation comprise :
+    # les numéros d'avant et ceux d'après, **pas les frères**. Monter puis
+    # redescendre dans la même fermeture reliait L313-31 à L313-30 par L312-9,
+    # que la recodification de 2016 a éclaté en L313-30 à L313-33 : deux
+    # amendements qui insèrent une instruction sur L313-31 étaient déposés sur
+    # L313-30, que l'article du texte réécrit (docs/58).
     chaine: dict[int, set[int]] = defaultdict(set)
     for origine, courant in base.execute("""
-        WITH RECURSIVE c(origine, courant) AS (
+        WITH RECURSIVE avant(origine, courant) AS (
             SELECT id, id FROM article
-            UNION SELECT c.origine, r.ancien_id FROM renumerote_de r JOIN c ON r.article_id = c.courant
-            UNION SELECT c.origine, r.article_id FROM renumerote_de r JOIN c ON r.ancien_id = c.courant)
-        SELECT origine, courant FROM c"""):
+            UNION SELECT a.origine, r.ancien_id FROM renumerote_de r
+                  JOIN avant a ON r.article_id = a.courant),
+        apres(origine, courant) AS (
+            SELECT id, id FROM article
+            UNION SELECT a.origine, r.article_id FROM renumerote_de r
+                  JOIN apres a ON r.ancien_id = a.courant)
+        SELECT origine, courant FROM avant UNION SELECT origine, courant FROM apres"""):
         chaine[origine].add(courant)
     numeros = dict(base.execute("SELECT id, numero FROM article"))
     visees: dict[int, set[int]] = defaultdict(set)

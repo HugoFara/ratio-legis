@@ -71,7 +71,7 @@ adresse le dit. Le tirage garde l'ordre de la clef SHA-256 des outils
 | `vise` · déclarée | 145 | 20 | 15 (+1 douteuse) | 16 | 1 → juste | **16 / 20** | 0,5840 |
 | `vise` · par le contenu | 2 | 2 | 2 | 2 | — | 2 / 2 | 0,3424 |
 | `resulte_de` | 109 | 20 | 16 | 17 (+1 douteuse) | 2 → juste | **18 / 20** | 0,6990 |
-| `depose_sur` · `alinea` | 303 | 20 | 19 | 19 | — | **19 / 20** | 0,7639 |
+| `depose_sur` · `alinea` | 303 | 20 | 19 | 19 | — | **19 / 20** — 16 / 20 contre le fonds, `docs/58` § 5 | 0,7639 |
 | `depose_sur` · `visee` | 17 | 17 | 16 (+1 douteuse) | 17 | 1 → juste | **17 / 17** | 0,8157 |
 | `depose_sur` · `article_entier` | 6 | 6 | 6 | 6 | — | 6 / 6 | 0,6097 |
 

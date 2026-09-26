@@ -536,7 +536,8 @@ def main() -> None:
               "hors_perimetre": 0, "sans_preuve": 0, "cite": 0,
               "citee_sans_action": 0, "cree": 0, "cree_deja_declare": 0,
               "cree_non_corrobore": 0, "cree_contredit": 0, "cree_corrobore": 0,
-              "cree_resolu_par_le_contenu": 0}
+              "cree_resolu_par_le_contenu": 0, "declare_contredit": 0,
+              "declare_resolu_par_le_contenu": 0}
 
     lues = [ligne for chemin in plans
             for ligne in csv.DictReader(chemin.open(encoding="utf-8"),
@@ -557,6 +558,7 @@ def main() -> None:
         textes.append((identifiant, ligne["dossier"], ligne["chambre"],
                        ligne["stade"], ligne["url"], len(decoupe)))
         vus = set()
+        declares: dict[tuple[str, str], int] = {}   # (article du texte, numéro) → rang dans `liens`
         for article_du_texte, debut, fin in decoupe:
             for reference in REFERENCE.finditer(contenu, debut, fin):
                 cle = numero(reference)
@@ -581,6 +583,7 @@ def main() -> None:
                     compte["sans_preuve"] += 1
                     continue
                 vus.add((article_du_texte, cle))
+                declares[(article_du_texte, cle)] = len(liens)
                 compte[portee] += 1
                 preuves.append((suivant, "texte_en_discussion", extrait,
                                 reference.start()))
@@ -606,6 +609,36 @@ def main() -> None:
                 cle = numero(creation) + (f" {lettre.group(1)}" if lettre else "")
                 if (article_du_texte, cle) in vus:
                     compte["cree_deja_declare"] += 1
+                    # **Déclaré par l'instruction, contredit par le contenu.**
+                    # « … est complétée par un article L. 412-10 ainsi rédigé :
+                    # « Art. L. 412-10. – Le nom et l'adresse du producteur de
+                    # bière… » » : la première passe a relevé L412-10 dans
+                    # l'instruction, et la comparaison du contenu ne jouait pas.
+                    # La loi a mis ce texte sous L412-12 ; son L412-10 est celui
+                    # des dénominations animales. Quatre `depose_sur` fausses de
+                    # la XVe en venaient (docs/58). Le contenu tranche ici quand
+                    # il désigne un autre article ; quand il n'est nulle part —
+                    # l'article a été réécrit en navette —, le numéro que
+                    # l'instruction déclare tient : le rendre non résolu perdait des
+                    # arêtes jugées justes (L113-7, L111-7-3, L313-11).
+                    rang = declares.get((article_du_texte, cle))
+                    if rang is not None and liens[rang][5] == "interne":
+                        ecrit = alinea_ecrit(contenu, creation.start())
+                        accord = contenu_corrobore(
+                            ecrit, versions_produites.get((ligne["dossier"], liens[rang][2])))
+                        if accord is False:
+                            compte["declare_contredit"] += 1
+                            autre = resolu_par_le_contenu(
+                                ecrit, trigrammes_produits[ligne["dossier"]])
+                            extrait = fenetre(contenu, creation.start(), creation.end())
+                            if autre is not None and extrait is not None:
+                                compte["declare_resolu_par_le_contenu"] += 1
+                                preuves.append((suivant, "article_cree", extrait,
+                                                creation.start()))
+                                liens[rang] = (liens[rang][0], liens[rang][1], autre,
+                                               liens[rang][3], liens[rang][4], "interne",
+                                               "inferee", CONFIANCE_CREE_CONTENU, suivant)
+                                suivant += 1
                     continue
                 code = code_de(contenu, reperes, creation.start(), creation.end())
                 if code is None:
@@ -676,7 +709,10 @@ def main() -> None:
     print(f"  dans un passage cité, donc non cibles : {compte['cite']}")
     print(f"  sans verbe modificatif, donc citées : {compte['citee_sans_action']}")
     print(f"\narticles écrits dans la citation, relevés : {compte['cree']}")
-    print(f"  déjà déclarés par l'instruction : {compte['cree_deja_declare']}")
+    print(f"  déjà déclarés par l'instruction : {compte['cree_deja_declare']}"
+          f" — dont contredits par le contenu : {compte['declare_contredit']},"
+          f" résolus vers l'article que le contenu désigne : "
+          f"{compte['declare_resolu_par_le_contenu']}")
     print(f"  écartés, non corroborés par LEGI : {compte['cree_non_corrobore']}")
     print(f"  contenu comparé à la version promulguée — concordant : "
           f"{compte['cree_corrobore']}, contredit (numéro glissé) : "

@@ -159,17 +159,6 @@ def echantillon(base: sqlite3.Connection, corpus: Path, filtres: dict,
         WHERE p.portee = 'interne'
         ORDER BY p.id""").fetchall()
 
-    # Le premier état connu de l'article dans le fonds. C'est lui qui tranche :
-    # si le texte dit réécrire L. 332-2 « Dans un délai fixé par voie
-    # réglementaire, le saisi… » et que L. 332-2 de ce code-ci traite du
-    # surendettement, l'hôte a dérivé — et cela se lit, au lieu de se supposer.
-    fonds = {}
-    for article_id, numero, date, texte in base.execute(
-            "SELECT v.article_id, a.numero, min(v.date_debut), v.texte "
-            "FROM version_article v JOIN article_courant a ON a.id = v.article_id "
-            "GROUP BY v.article_id"):
-        fonds[article_id] = (numero, date, texte)
-
     lignes, contenus = [], {}
     for (texte_id, article_du_texte, numero_cite, code_cite, article_id,
          methode, offset, dossier, url) in aretes:
@@ -200,9 +189,12 @@ def echantillon(base: sqlite3.Connection, corpus: Path, filtres: dict,
             "distance_hote": str(offset - place) if place >= 0 else "",
             "texte": texte_id, "article_du_texte": article_du_texte,
             "numero_cite": numero_cite, "code_cite": code_cite or "",
-            "article_du_fonds": coupe(
-                f"{fonds[article_id][0]} ({fonds[article_id][1]}) "
-                f"{fonds[article_id][2]}", 320) if article_id in fonds else "",
+            # La version que la loi du dossier a produite, non le premier état
+            # de la lignée : 7316ed03 montrait le L311-13 de 1993 pour un article
+            # que la loi Lagarde a écrit en 2011, et L111-5, sorti des articles
+            # courants, restait vide (docs/58). Le contenu qui trahit un hôte
+            # dérivé se lit aussi bien dans cette version.
+            "article_du_fonds": etat_pour_le_juge(base, article_id, dossier),
             "mention_hote": coupe(contenu[max(0, place - 120):place + 160], 280)
                             if place >= 0 else "",
             "contexte": coupe(contenu[max(0, offset - CONTEXTE):

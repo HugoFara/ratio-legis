@@ -6,8 +6,8 @@ verdict	partie D — motivation du texte seule	11	179	6.1
 verdict	partie D — RAISON NON DOCUMENTÉE	167	179	93.3	
 verdict	partie L — articles en vigueur	1293			
 verdict	partie L — un passage les motive	794	1293	61.4	
-verdict	partie L — origine située seulement	123	1293	9.5	
-verdict	partie L — motivation du texte seule	306	1293	23.7	
+verdict	partie L — origine située seulement	125	1293	9.7	
+verdict	partie L — motivation du texte seule	304	1293	23.5	
 verdict	partie L — RAISON NON DOCUMENTÉE	70	1293	5.4	
 verdict	partie R — articles en vigueur	632			
 verdict	partie R — un passage les motive	43	632	6.8	
@@ -47,13 +47,13 @@ irrecevabilite	fondement — article 41	182	16643	1.1
 irrecevabilite	fondement — article 44 bis	135	16643	0.8	
 irrecevabilite	fondement — LOLF	15	16643	0.1	
 irrecevabilite	fondement — LOLFSS	6	16643	0.0	
-tentatives	articles en vigueur portant une tentative, les trois voies	322	2104	15.3	cible déclarée, alinéa écrit ou subdivision déposée
-tentatives	dont par la cible déclarée du dispositif	194	322	60.2	
-tentatives	dont par un alinéa écrit qui subsiste	146	322	45.3	
-tentatives	dont par la subdivision déposée	92	322	28.6	
+tentatives	articles en vigueur portant une tentative, les trois voies	321	2104	15.3	cible déclarée, alinéa écrit ou subdivision déposée
+tentatives	dont par la cible déclarée du dispositif	194	321	60.4	
+tentatives	dont par un alinéa écrit qui subsiste	146	321	45.5	
+tentatives	dont par la subdivision déposée	90	321	28.0	
 tentatives	tentatives déclarées sur un article en vigueur	670			voie de la cible déclarée seule ; le détail par sort suit
-depot	amendements positionnés sur un article en vigueur	601			
-depot	articles en vigueur atteints	92	2104	4.4	
+depot	amendements positionnés sur un article en vigueur	596			
+depot	articles en vigueur atteints	90	2104	4.3	
 depot	assemblee — jeux d'amendements appariés à leur texte	299	302	99.0	
 depot	senat — jeux d'amendements appariés à leur texte	130	150	86.7	
 depot	subdivisions tombant dans la plage d'articles du texte	13824	14019	98.6	contrôle de l'appariement ; un texte faux s'y verrait en premier
