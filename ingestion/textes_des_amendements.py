@@ -324,6 +324,28 @@ AUTRE_NORME = re.compile(
     re.I)
 
 
+# Le dispositif qui n'agit que sur une autre norme — « L'article L. 631-1 du
+# code monétaire et financier est complété… », « Après l'article 8 de la loi
+# n° 81-766… » — et ne nomme aucun article de notre code. Ce qu'il écrit ne
+# peut être l'origine d'un alinéa du nôtre : sur 453 `resulte_de` jugées, cinq
+# fausses et aucune juste, les fenêtres ne partageant qu'une formule (docs/60).
+ARTICLE_NU = re.compile(r"\barticles?\s+[LRD]\.?\s*\d+(?:\s*[-–‑]\s*\d+)*", re.I)
+SUIVI_D_UNE_AUTRE_NORME = re.compile(
+    r"^\s*[,)]?\s*(?:du|de\s+la|de\s+l['’])\s+(?:code|loi|ordonnance|décret)", re.I)
+
+
+def agit_sur_une_autre_norme(dispositif: str) -> bool:
+    hors = re.sub(r"«[^»]*»", " ", dispositif)
+    if not AUTRE_NORME.search(hors) or re.search(r"code\s+de\s+la\s+consommation", hors, re.I):
+        return False
+    for m in ARTICLE_NU.finditer(hors):
+        suite = hors[m.end():m.end() + 80]
+        if not SUIVI_D_UNE_AUTRE_NORME.match(suite) \
+                and not re.match(r"^\s*du\s+même\s+code", suite, re.I):
+            return False
+    return True
+
+
 # Un paragraphe que le texte ne reproduit pas — « I. – (Non modifié) » en
 # deuxième lecture — cache ce qu'il réécrit : l'article 22 quinquies du projet
 # n° 1357 n'y montrait que L. 334-9, et son I, lu dans le texte de première
@@ -373,9 +395,18 @@ NOMME_AVEC_LE_CODE = re.compile(
     re.I)
 
 
+# L'ancre d'une insertion n'est pas nommée comme cible : « après l'article
+# L. 121-2, il sont insérés des articles L. 121-2-1 et L. 121-2-2 » écrit deux
+# voisins de L121-2, qui n'est que le repère (docs/60 § 1).
+ANCRE_NOMMEE = re.compile(
+    r"\b(?:apr[èe]s|avant|à la suite de)\s+(?:le|la|l['’])?\s*articles?\s+[LRD]\.?\s*\d+(?:\s*[-‑]\s*\d+)*"
+    r"(?:\s+du\s+code\s+de\s+la\s+consommation)?", re.I)
+
+
 def articles_nommes_par(dispositif: str) -> set[str]:
     def cle(m: re.Match) -> str:
         return m.group(1).upper() + re.sub(r"\s", "", m.group(2)).replace("‑", "-")
+    dispositif = ANCRE_NOMMEE.sub(" ", dispositif)
     hors_citation = re.sub(r"[«“][^»”]*[»”]", " ", dispositif)
     return ({cle(m) for m in NOMME_HORS_CITATION.finditer(hors_citation)}
             | {cle(m) for m in ECRIT_EN_TETE.finditer(dispositif)}

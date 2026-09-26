@@ -67,8 +67,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from resolveur import (FENETRE, fenetres, lire_ameli,  # noqa: E402
                        normalise, sans_balises)
 from sort_des_amendements import est_adopte  # noqa: E402
-from textes_des_amendements import (ALINEA, Textes, alineas_nommes,  # noqa: E402
-                                    correspondances, numero_de_subdivision)
+from textes_des_amendements import (ALINEA, Textes, agit_sur_une_autre_norme,  # noqa: E402
+                                    alineas_nommes, correspondances,
+                                    numero_de_subdivision)
 
 # Un dispositif d'amendement cite entre guillemets deux choses opposées : le texte
 # qu'il insère, et celui qu'il abroge ou remplace. `passages_cites` de la phase 0
@@ -552,6 +553,9 @@ def construire_resulte_de(base: sqlite3.Connection) -> dict:
             # ne peut pas expliquer un alinéa du nôtre — sauf à le dire, par
             # une destination que la loi a produite.
             hote_etranger = etranger(chambre, corpus, subdivision, dispositif or "")
+            if agit_sur_une_autre_norme(dispositif or ""):
+                compte["agit_sur_une_autre_norme"] += 1
+                continue
             touches: dict[str, tuple[str, int]] = {}
             declarees: set[str] = set()     # segments touchés par un passage qui leur est destiné
             for (destinataire, lecture), passage in passages_inseres(dispositif or ""):
@@ -683,6 +687,8 @@ def main() -> None:
           f"{aretes['fenetres_dans_un_titre']}")
     print(f"  passages écartés, alinéa du texte sous une instruction d'un autre code : "
           f"{aretes['alinea_sous_un_autre_code']}")
+    print(f"  amendements écartés, n'agissant que sur une autre norme : "
+          f"{aretes['agit_sur_une_autre_norme']}")
     print(f"  fenêtres écartées, passage destiné à un autre article : "
           f"{aretes['destination_autre']}")
     print(f"  fenêtres écartées, destination hors de la loi et formule déjà dans le fonds : "

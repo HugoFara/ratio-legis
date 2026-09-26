@@ -282,17 +282,17 @@ mesurés contre leurs seuils :
 
 | Nœuds | | Arêtes | |
 |---|---:|---|---:|
-| Articles — lignées (dont **2 104 en vigueur**) | 3 964 | `produite_par` — quel texte a produit la version | 8 145 |
+| Articles — lignées (dont **2 104 en vigueur**) | 4 058 | `produite_par` — quel texte a produit la version | 8 145 |
 | Versions d'articles | 6 362 | `repris_de` — continuité d'un alinéa par-delà la recodification | 6 137 |
-| Segments (alinéas) | 28 294 | `renumerote_de` | 2 008 (87 inférées d'une arrivée) |
-| Documents (rapports, exposés, études d'impact, avis) | 834 | `motive` — un passage qui motive, avec offsets | 1 721 |
+| Segments (alinéas) | 28 294 | `renumerote_de` | 2 095 (232 inférées d'une arrivée ou d'un départ) |
+| Documents (rapports, exposés, études d'impact, avis) | 834 | `motive` — un passage qui motive, avec offsets | 1 724 |
 | Amendements (33 199 Sénat, 115 671 Assemblée, législatures XIII à XVII) | 148 870 | `renvoie_a` — le graphe de renvois | 12 535 |
-| Acteurs | 2 656 | `resulte_de` — l'amendement qui a écrit ou retouché l'alinéa | 653 (confiance 0,77) |
+| Acteurs | 2 656 | `resulte_de` — l'amendement qui a écrit ou retouché l'alinéa | 693 (confiance 0,77) |
 | Actes de l'Union | 284 | `cite_acte_ue` / `transpose` / `transpose_article` — l'article de la directive que l'article du code transpose, lu dans les tableaux de concordance | 1 572 / 8 / 33 (0,90) |
 | Considérants de l'Union | 7 674 | `article_acte_ue` — articles d'actes déclarés | 6 237 |
-| Textes en discussion | 945 | `porte_sur` — l'article du texte → l'article du code | 126 164 (7 645 internes, 0,91 ; 268 résolues par le contenu, 0,84) |
-| Sorts d'amendements, en huit familles | 148 870 | `vise` — l'amendement qui visait l'article, abouti ou non | 1 105 (1 091 par le numéro, 0,91 ; 14 par le contenu, 0,74) |
-| Correspondances de texte entre les deux corpus | 322 | `depose_sur` — l'article du code que l'amendement touche, par l'alinéa du texte qu'il nomme | 2 403 (0,87 par l'alinéa, 0,91 par l'article nommé, 0,80 par l'article entier) |
+| Textes en discussion | 945 | `porte_sur` — l'article du texte → l'article du code | 126 164 (7 645 internes, 0,80 ; 268 résolues par le contenu, 0,91) |
+| Sorts d'amendements, en huit familles | 148 870 | `vise` — l'amendement qui visait l'article, abouti ou non | 1 105 (1 091 par le numéro, 0,91 ; 14 par le contenu, 0,78) |
+| Correspondances de texte entre les deux corpus | 322 | `depose_sur` — l'article du code que l'amendement touche, par l'alinéa du texte qu'il nomme | 2 401 (0,87 par l'alinéa, 0,91 par l'article nommé, 0,80 par l'article entier) |
 
 ### Le verdict
 
@@ -318,7 +318,7 @@ verdict, dans [`data/mesures/grain.tsv`](data/mesures/grain.tsv) :
 
 | | |
 |---|---:|
-| Articles remontant à un passage qui les motive | **791 (37,6 %)** |
+| Articles remontant à un passage qui les motive | **792 (37,6 %)** |
 | Articles reliés à un article de texte en discussion | 964 (45,8 %) |
 | Articles nommant un acte de l'Union | 117 |
 | Articles reliés à un article d'acte de l'Union par un tableau de concordance | 35 |
@@ -334,7 +334,7 @@ pas ([`docs/39`](docs/39-cent-verdicts-d-agents.md) § 3) :
 | | |
 |---|---:|
 | Articles atteignant un document motivant le texte | **1 282 (60,9 %)** |
-| dont par un rapport au Président | 781 |
+| dont par un rapport au Président | 771 |
 | dont par un exposé des motifs | 938 |
 | dont par une étude d'impact | 701 |
 | dont par un avis du Conseil d'État | 245 |
@@ -368,7 +368,7 @@ jeux d'amendements de l'Assemblée trouvent leur texte discuté. Les tableaux de
 études d'impact ([`docs/54`](docs/54-tableaux-de-concordance.md)) ; les autres
 ne transposent vers notre code aucune disposition.
 
-**Quinze arêtes jugées fausses sont dans la base**, et le harnais
+**Dix-neuf arêtes jugées fausses sont dans la base**, et le harnais
 (`tools/mesures/rejouer.py`) les nomme à chaque passage. Quatre sont des
 `depose_sur` sans garde : un amendement que la source range sous un autre
 texte et un alinéa mal cité ([`docs/51`](docs/51-depose-sur-re-mesuree.md)),
@@ -382,7 +382,12 @@ administratives partagées par un passage destiné ailleurs, une rédaction non
 retenue, un alinéa attribué au mauvais amendement du dossier. Sept viennent du tirage unique qui mesure les constantes
 ([`docs/59`](docs/59-retouche-lignees-constantes.md) § 3) : quatre `resulte_de`
 (deux formules partagées, un segment voisin, une rédaction non retenue) et
-trois `depose_sur` par l'article entier. Les trois « incises » de la XIIIe et
+trois `depose_sur` par l'article entier — dont une, L121-2, écartée depuis
+([`docs/60`](docs/60-restes-ouverts.md) § 1). Cinq `porte_sur` viennent des
+tirages de [`docs/60`](docs/60-restes-ouverts.md) § 4 : un numéro cité dans un
+tableau, une référence dans l'instruction d'un autre code, deux articles créés
+sous un numéro que le fonds donne à une autre disposition, un article abrogé
+puis réécrit sur place. Les trois « incises » de la XIIIe et
 de la XVe sont justes depuis que la retouche compte (§ 1). Les autres ont
 été réparées à la source, ou arbitrées sur pièces
 ([`docs/55`](docs/55-trois-arbitrages.md)) : l'ancre d'une insertion n'est
@@ -465,6 +470,7 @@ d'aujourd'hui ; ceux des documents sont ceux de leur date.
 | 51. La XIIIe législature | 9 244 amendements de séance lus page à page ; 256 → 281 articles portant une tentative ; `vise` 16/20, les quatre fausses d'articles additionnels qui numérotent eux-mêmes — gardée, re-mesurée 20/20 sur un tirage disjoint ; « E (nouveau). – » et l'apostrophe typographique ; la scission des lignées renumérotées essayée et retirée ; la XVe entrée en base | [`docs/57`](docs/57-la-treizieme-legislature.md) |
 | 52. La XVe législature | 42 400 amendements ; `vise` 20/20, `alinea` 20/20 ; le numéro que l'instruction déclare comparé au contenu (32 résolus, 20/20), la réécriture qui nomme un autre article, la chaîne sans les frères, « Compléter l'article 5 » ; `article_entier` 15/20 puis 19/20, `visee` 18/20 puis 13/13 ; trois verdicts de la XIIIe rendus contre le fonds | [`docs/58`](docs/58-la-quinzieme-legislature.md) |
 | 53. Retouche, lignées, constantes | la retouche d'un alinéa compte pour `resulte_de`, trois incises rejugées ; la lignée arrivée d'un autre numéro scindée, le numéro lu comme existant ou créé, 87 liens de renumérotation inférés ; constantes sur un tirage unique de 40 par arête : `vise` 0,91, `resulte_de` 0,77, `visee` 0,91, `alinea` 0,87, `article_entier` 0,80 | [`docs/59`](docs/59-retouche-lignees-constantes.md) |
+| 54. L'ancre, l'autre norme, le départ | l'ancre n'est plus une cible nommée ; l'amendement qui n'agit que sur une autre norme n'écrit pas notre alinéa (5 fausses, 0 juste) ; la lignée que « devient » vide est scindée, le numéro ne désigne l'ancienne que s'il la fait quitter ; `porte_sur` déclarée 32/40 puis 37/40 : constante 0,80, non 0,91 | [`docs/60`](docs/60-restes-ouverts.md) |
 
 ## D'où ça vient
 

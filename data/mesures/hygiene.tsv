@@ -5,18 +5,18 @@ verdict	partie D — origine située seulement	0	179	0.0
 verdict	partie D — motivation du texte seule	11	179	6.1	
 verdict	partie D — RAISON NON DOCUMENTÉE	167	179	93.3	
 verdict	partie L — articles en vigueur	1293			
-verdict	partie L — un passage les motive	784	1293	60.6	
-verdict	partie L — origine située seulement	129	1293	10.0	
-verdict	partie L — motivation du texte seule	310	1293	24.0	
+verdict	partie L — un passage les motive	787	1293	60.9	
+verdict	partie L — origine située seulement	127	1293	9.8	
+verdict	partie L — motivation du texte seule	309	1293	23.9	
 verdict	partie L — RAISON NON DOCUMENTÉE	70	1293	5.4	
 verdict	partie R — articles en vigueur	632			
-verdict	partie R — un passage les motive	44	632	7.0	
+verdict	partie R — un passage les motive	42	632	6.6	
 verdict	partie R — origine située seulement	7	632	1.1	
-verdict	partie R — motivation du texte seule	59	632	9.3	
-verdict	partie R — RAISON NON DOCUMENTÉE	522	632	82.6	
-origine	articles L dont la version en vigueur vient d'une ordonnance	1008	1293	78.0	origine apparente
+verdict	partie R — motivation du texte seule	60	632	9.5	
+verdict	partie R — RAISON NON DOCUMENTÉE	523	632	82.8	
+origine	articles L dont la version en vigueur vient d'une ordonnance	1003	1293	77.6	origine apparente
 origine	articles L dont la version en vigueur vient d'une loi	276	1293	21.3	origine apparente
-origine	articles L ayant une loi dans leur ascendance	1043	1293	80.7	origine réelle, chaîne de renumérotation remontée
+origine	articles L ayant une loi dans leur ascendance	1044	1293	80.7	origine réelle, chaîne de renumérotation remontée
 amendements	assemblee — déposés	115671			
 amendements	assemblee — adoptés	22254	115671	19.2	
 amendements	assemblee — sans objet publié	12083	115671	10.4	surtout des amendements retirés avant séance ou irrecevables
@@ -52,7 +52,7 @@ tentatives	dont par la cible déclarée du dispositif	194	321	60.4
 tentatives	dont par un alinéa écrit qui subsiste	147	321	45.8	
 tentatives	dont par la subdivision déposée	90	321	28.0	
 tentatives	tentatives déclarées sur un article en vigueur	670			voie de la cible déclarée seule ; le détail par sort suit
-depot	amendements positionnés sur un article en vigueur	596			
+depot	amendements positionnés sur un article en vigueur	595			
 depot	articles en vigueur atteints	90	2104	4.3	
 depot	assemblee — jeux d'amendements appariés à leur texte	299	302	99.0	
 depot	senat — jeux d'amendements appariés à leur texte	130	150	86.7	
@@ -68,9 +68,9 @@ navette	dossiers ayant au moins deux états datés	116
 navette	durée médiane, en jours	136			
 navette	durée la plus courte, en jours	1			
 navette	durée la plus longue, en jours	897			
-chambres	segments écrits par un amendement — assemblee	377			dénominateur faible : voir docs/09
-chambres	segments écrits par un amendement — senat	153			dénominateur faible : voir docs/09
-chambres	articles dont un alinéa est tracé jusqu'à un amendement	230			sans remonter la chaîne des segments
+chambres	segments écrits par un amendement — assemblee	396			dénominateur faible : voir docs/09
+chambres	segments écrits par un amendement — senat	154			dénominateur faible : voir docs/09
+chambres	articles dont un alinéa est tracé jusqu'à un amendement	232			sans remonter la chaîne des segments
 sources	documents — avis_conseil_etat	30			
 sources	documents — etude_impact	49			
 sources	documents — expose_des_motifs	81			
@@ -84,4 +84,4 @@ renvois	articles citant L412-1	37
 renvois	articles citant L733-4	35			
 renvois	articles citant L733-7	32			
 renvois	articles citant L313-1	25			
-perimetre	articles éligibles à resulte_de	888			
+perimetre	articles éligibles à resulte_de	887			

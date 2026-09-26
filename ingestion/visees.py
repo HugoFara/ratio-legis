@@ -31,7 +31,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools" / "prototype"))
 from resolveur import sans_balises  # noqa: E402
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from lignees import Resolveur  # noqa: E402
+from lignees import Resolveur, quitte  # noqa: E402
 from textes_des_amendements import (ALINEA, ARTICLE_ADDITIONNEL,  # noqa: E402
                                     ARTICLE_ENTIER, Textes,
                                     alineas_nommes, correspondances,
@@ -277,7 +277,11 @@ CONFIANCE = 0.9124
 # créé. Après la garde, 10 sur 10 : Wilson 0,7225. La garde est choisie sur
 # l'échantillon qui la mesure. Elle a depuis gagné un onzième membre, jugé
 # juste par les deux juges (docs/53) : 11 sur 11, Wilson 0,7412.
-CONFIANCE_CONTENU = 0.7412
+# Le 26 septembre 2026 (docs/60 § 4), la population entière, 14 arêtes, jugée par
+# deux juges : **14 sur 14** après arbitrage de six désaccords (le second juge
+# avait appliqué le critère de `resulte_de` : `vise` compte la tentative).
+# Wilson 0,7847.
+CONFIANCE_CONTENU = 0.7847
 MOTS_MINI_RESOLUTION = 20
 
 
@@ -311,6 +315,19 @@ def cree_par(texte: str, n: str) -> bool:
     return bool(re.search(
         r"(?:(?:un|des)\s+articles?\s+|[«\"]\s*art(?:icle)?\.?\s*)" + motif + r"(?![\d-])",
         sans_balises(texte).translate(TIRETS), re.I))
+
+
+def quitte_par(texte: str, n: str) -> bool:
+    """Le dispositif fait-il quitter l'article `n` — « devient l'article… »,
+    « est abrogé » — ? Le numéro désigne alors la lignée en vigueur au jour du
+    texte (`lignees.quitte`, docs/60 § 3)."""
+    m = re.match(r"([LRD])(\d.*)", n)
+    if not m:
+        return False
+    motif = m.group(1) + r"\.?\s*" + r"\s*[-‑]\s*".join(
+        re.escape(p) for p in m.group(2).split("-")) + r"(?![\d-])"
+    propre = sans_balises(texte).translate(TIRETS)
+    return any(quitte(propre[t.end():t.end() + 90]) for t in re.finditer(motif, propre))
 
 
 def cibles(dispositif: str
@@ -519,7 +536,7 @@ def main() -> None:
             # se résolvait vers la lignée de 2024 (`docs/48` § 3).
             article_id = resolveur.du_dossier(
                 n, dossier, date_du_texte.get(texte_id or "") or date_du_dossier.get(dossier),
-                existant=not cree_par(dispositif, n))
+                existant=quitte_par(dispositif, n))
             if article_id is None:
                 continue
             if formule == "rédigé" and article_id not in resolveur.ecrits.get(dossier, ()):

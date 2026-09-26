@@ -59,7 +59,7 @@ from pathlib import Path
 import fitz          # pymupdf
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from lignees import Resolveur  # noqa: E402
+from lignees import Resolveur, quitte  # noqa: E402
 
 # La série latine va plus loin que « duodecies », et un rang manquant ne se
 # rattrape pas : « Article 17 quindecies » n'est alors pas reconnu comme en-tête,
@@ -175,14 +175,26 @@ AVAL = 140                    # portée du regard en aval, dans la même phrase
 # cachait (`docs/52`) : 16 sur 18, deux juges d'accord — un « L. 132-1 A » lu
 # L. 132-1, et une ancre d'insertion, réparés depuis (`est_une_cible`,
 # `docs/55` § 1). Réunis, 90 sur 93.
-CONFIANCE = 0.9094
+# Le 26 septembre 2026 (docs/60 § 4), re-mesurée sur un tirage unique de la base
+# finale. Un premier tirage de 40 a donné 32 : cinq des fausses étaient des
+# renumérotations de la loi Lagarde (« l'article L. 311-7 devient l'article
+# L. 311-28 », puis un L311-7 neuf), que la coupe au départ a réparées. Un
+# second tirage, disjoint, sur la base réparée : **37 sur 40**, un arbitrage —
+# un numéro cité dans un tableau de concordance, une référence à notre code
+# dans une instruction d'un autre code, un article créé sous un numéro que le
+# fonds donne à une autre disposition. Wilson 0,8014.
+CONFIANCE = 0.8014
 # La voie de la citation est mesurée à part, parce qu'elle ne vaut pas la même
 # chose : 15 arêtes justes sur 15 vérifiées à la main **après** la garde de
 # corroboration (`docs/33` § 4), puis 3 sur 5 le 19 septembre 2026 — dont une
 # fausse par glissement de numérotation en navette : le texte adopté écrit
 # « Art. L. 423-5 », promulgué L. 423-6. Réunis, 18 sur 20 ; Wilson à 95 %.
 # Puis 2 sur 2 parmi les arêtes du trait insécable (`docs/52`) : 20 sur 22.
-CONFIANCE_CREE = 0.7218
+# Le 26 septembre 2026 (docs/60 § 4), re-mesurée sur un tirage unique de la base
+# finale, 40 articles écrits non jugés : **39 sur 40**, deux juges d'accord —
+# la fausse est un numéro glissé d'un cran dans un texte de la XVIIe, sous un
+# article que le fonds ne porte pas encore. Wilson 0,8712.
+CONFIANCE_CREE = 0.8712
 
 # **Corroborer par le contenu, pas seulement par le numéro.** La garde
 # ci-dessous demande à LEGI si la loi du dossier a produit une version de
@@ -217,7 +229,9 @@ SEUIL_RESOLUTION, SEUIL_SECOND = 0.6, 0.5
 # Vingt arêtes tirées parmi les 234 résolues, deux juges Sonnet 5 le
 # 20 septembre 2026 : 20 sur 20, d'accord sur chacune (docs/47 § 4). Borne
 # inférieure de Wilson à 95 %.
-CONFIANCE_CREE_CONTENU = 0.8389
+# Le 26 septembre 2026 (docs/60 § 4), 40 résolutions par le contenu non jugées,
+# les 32 du numéro déclaré comprises (docs/58) : **40 sur 40**, Wilson 0,9124.
+CONFIANCE_CREE_CONTENU = 0.9124
 TETE_ECRITE = re.compile(
     r"^[«“\"]\s*Art\.?\s*[LRD]\.?\s?[\d-]+(?:\s*[A-H]{1,2})?\s*(?:\((?:nouveau|non modifié)\))?"
     r"\s*[.\s]*[–‑-]?\s*", re.I)
@@ -574,11 +588,9 @@ def main() -> None:
                 if code is None:
                     portee, article_id = "non_resolue", None
                 elif NOTRE_CODE.search(code):
-                    # « l'article L. 311-14 devient… » nomme l'existant ; « il est
-                    # inséré un article L. 311-14 » le crée (docs/59 § 2).
-                    existant = not re.search(r"\b(?:un|des)\s+articles?\s*$",
-                                             contenu[max(0, reference.start() - 30):
-                                                     reference.start()], re.I)
+                    # « l'article L. 311-14 devient… », « … est abrogé » nomment
+                    # l'article qu'on quitte (docs/59 § 2, docs/60 § 3).
+                    existant = quitte(contenu[reference.end():reference.end() + 90])
                     article_id = resolveur.du_dossier(cle, ligne["dossier"],
                                                       existant=existant)
                     portee = "interne" if article_id else "non_resolue"

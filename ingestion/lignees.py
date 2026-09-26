@@ -32,8 +32,22 @@ celle du texte discuté quand l'appelant la connaît (`docs/49`).
 
 from __future__ import annotations
 
+import re
 import sqlite3
 from collections import defaultdict
+
+
+# Ce qui fait **quitter** l'article nommé : « l'article L. 311-7 devient
+# l'article L. 311-28 », « … est abrogé ». Le numéro désigne alors la lignée en
+# vigueur au jour du texte. « Est ainsi rédigé », « est modifié », « est
+# complété » écrivent la version qui en résulte : L121-79-4 « ainsi rédigé » sur
+# les personnes physiques est la lignée de 2014, non celle de 2010 (docs/60 § 3).
+QUITTE = re.compile(r"^(?:(?!\.\s+[A-ZÀ-Ý])[^;«]){0,70}?\b(?:devien(?:t|nent)|(?:est|sont)\s+abrog[ée]e?s?)\b")
+
+
+def quitte(suite: str) -> bool:
+    """`suite` : le texte qui suit la mention du numéro."""
+    return bool(QUITTE.match(suite))
 
 
 class Resolveur:

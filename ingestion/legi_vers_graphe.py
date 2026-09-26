@@ -220,7 +220,8 @@ def similarite(a: str, b: str) -> float:
 
 
 def lignees(chronologie: list[Version],
-            arrivees: dict[str, tuple[str, float]] | None = None) -> list[int]:
+            arrivees: dict[str, tuple[str, float]] | None = None,
+            departs: dict[str, tuple[str, float]] | None = None) -> list[int]:
     """Rang de lignée de chaque version d'un même numéro, dans l'ordre chronologique.
 
     Un numéro change de disposition quand sa version en cours est **abrogée** et
@@ -239,7 +240,8 @@ def lignees(chronologie: list[Version],
         if derniere is not None and (
                 (derniere.etat in ABROGATION
                  and similarite(derniere.texte, version.texte) < SEUIL_MEME_DISPOSITION)
-                or (version.id_legi in (arrivees or {})
+                or ((version.id_legi in (arrivees or {})
+                     or derniere.id_legi in (departs or {}))
                     and similarite(derniere.texte, version.texte) < SEUIL_ARRIVEE_AVANT)):
             rang += 1
         rang_vivante[version.id_legi] = rang
@@ -298,6 +300,45 @@ def arrivees_d_un_autre_numero(par_numero: dict[tuple[str, str], list[Version]]
     return arrivees
 
 
+def departs_vers_un_autre_numero(par_numero: dict[tuple[str, str], list[Version]]
+                                 ) -> dict[str, tuple[str, float]]:
+    """Le symétrique de l'arrivée : la version close par une modification sans
+    rapport, dont le texte **part** vers un autre numéro ouvert le jour où elle
+    se ferme. « L'article L. 311-7 devient l'article L. 311-28 », puis un L311-7
+    tout neuf : le texte nouveau ne vient d'aucun numéro, l'arrivée ne voyait
+    rien, et « l'article 1er B renumérote L311-7 » tombait sur le L311-7 que
+    1er B n'écrit pas — cinq `porte_sur` fausses sur quarante (docs/60 § 3).
+    identifiant de la version qui part → (version d'arrivée, similarité)."""
+    vivantes = {cle: sorted((v for v in groupe
+                             if v.etat not in ("MODIFIE_MORT_NE", "ANNULE")),
+                            key=lambda v: (v.date_debut, v.id_legi))
+                for cle, groupe in par_numero.items()}
+    # La destination est en vigueur au jour du départ — ouverte ce jour-là, ou
+    # avant : LEGI fait courir le texte de L311-7 sous L311-28 dès septembre 2010,
+    # et ne le retire de L311-7 qu'en mai 2011.
+    par_code: dict[str, list[Version]] = defaultdict(list)
+    for (code, _), groupe in vivantes.items():
+        par_code[code].extend(groupe)
+    departs: dict[str, tuple[str, float]] = {}
+    for (code, numero), groupe in vivantes.items():
+        for avant, version in zip(groupe, groupe[1:]):
+            if avant.etat in ABROGATION \
+                    or similarite(avant.texte, version.texte) >= SEUIL_ARRIVEE_AVANT:
+                continue
+            quand = avant.date_fin
+            cibles = sorted(((similarite(avant.texte, cible.texte), cible.id_legi)
+                             for cible in par_code[code]
+                             if cible.numero != numero and cible.date_debut <= quand
+                             and (not cible.date_fin or quand < cible.date_fin)),
+                            reverse=True)
+            # Le seuil de la même disposition (0,5), non celui de l'arrivée : le
+            # texte nouveau ne partage déjà presque rien avec l'ancien, et
+            # l'ancien, retouché au passage, n'est repris qu'à 0,65 sous L311-28.
+            if cibles and cibles[0][0] >= SEUIL_MEME_DISPOSITION:
+                departs[avant.id_legi] = (cibles[0][1], cibles[0][0])
+    return departs
+
+
 def inserer_noeuds(base: sqlite3.Connection, versions: dict[str, Version]) -> dict:
     """Un nœud `article` par lignée ; `articles` rend l'identifiant de chaque version."""
     par_numero: dict[tuple[str, str], list[Version]] = defaultdict(list)
@@ -307,10 +348,11 @@ def inserer_noeuds(base: sqlite3.Connection, versions: dict[str, Version]) -> di
     articles: dict[str, int] = {}          # id_legi → article.id
     noeuds: list[tuple[int, str, str, int]] = []
     arrivees = arrivees_d_un_autre_numero(par_numero)
+    departs = departs_vers_un_autre_numero(par_numero)
     for (code, numero), groupe in sorted(par_numero.items()):
         chronologie = sorted(groupe, key=lambda v: (v.date_debut, v.id_legi))
         ids: dict[int, int] = {}
-        for version, rang in zip(chronologie, lignees(chronologie, arrivees)):
+        for version, rang in zip(chronologie, lignees(chronologie, arrivees, departs)):
             if rang not in ids:
                 ids[rang] = len(noeuds) + 1
                 noeuds.append((ids[rang], code, numero, rang))
@@ -343,7 +385,7 @@ def inserer_noeuds(base: sqlite3.Connection, versions: dict[str, Version]) -> di
     base.executemany("INSERT INTO segment VALUES (?, ?, ?, ?, ?, ?, ?)", lignes_segments)
     base.execute("INSERT INTO segment_fts (rowid, texte) SELECT rowid, texte FROM segment")
     return {"articles": articles, "noeuds": len(noeuds), "scindes": scindes,
-            "arrivees": arrivees,
+            "arrivees": arrivees, "departs": departs,
             "textes": textes, "segments": len(lignes_segments)}
 
 
@@ -459,6 +501,10 @@ def main() -> None:
     noeuds = inserer_noeuds(base, versions)
     aretes = inserer_aretes_declarees(base, versions, noeuds["articles"])
     aretes["arrivees"] = inserer_arrivees(base, noeuds["arrivees"], noeuds["articles"])
+    # Le départ, lu de l'autre côté : la version d'arrivée descend de celle qui part.
+    aretes["arrivees"] += inserer_arrivees(
+        base, {cible: (source, score) for source, (cible, score) in noeuds["departs"].items()},
+        noeuds["articles"])
     reprises = construire_repris_de(base, versions)
     base.commit()
 
