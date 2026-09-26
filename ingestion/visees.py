@@ -32,7 +32,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools" / "proto
 from resolveur import sans_balises  # noqa: E402
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lignees import Resolveur  # noqa: E402
-from textes_des_amendements import (ALINEA, ARTICLE_ENTIER, Textes,  # noqa: E402
+from textes_des_amendements import (ALINEA, ARTICLE_ADDITIONNEL,  # noqa: E402
+                                    ARTICLE_ENTIER, Textes,
                                     alineas_nommes, correspondances,
                                     numero_de_subdivision)
 from textes_deposes import (contenu_corrobore, mots,  # noqa: E402
@@ -466,6 +467,7 @@ def main() -> None:
     resolues: list[tuple[int, int, str, str]] = []
     par_l_instruction, glisse_dans_le_texte, suivi_par_le_contenu = 0, 0, 0
     plan_propre, corrobore, glisse_par_le_contenu, plan_propre_non_corrobore = 0, 0, 0, 0
+    additionnel_non_corrobore = 0
     for amendement_id, dossier, dispositif, chambre, corpus, subdivision in base.execute(
             "SELECT id, dossier_id, dispositif, chambre, texte_discute, subdivision "
             "FROM amendement WHERE dispositif IS NOT NULL"):
@@ -553,6 +555,20 @@ def main() -> None:
                     if ARTICLE_ENTIER.search(dispositif) or DIVISION_ECRITE.search(dispositif):
                         plan_propre_non_corrobore += 1
                         continue
+                    # **L'article additionnel non corroboré.** « L'autre
+                    # rédaction » tient son numéro du plan du texte ; l'article
+                    # additionnel ne tient le sien que de lui-même. Trois
+                    # amendements de 2008 insèrent chacun « Art. L. 121-84-4 »
+                    # après l'article 7, avec trois contenus ; la loi a mis sous
+                    # ce numéro un quatrième, et les leurs sous L. 121-84-7,
+                    # L. 121-84-9 ou nulle part. Jugées fausses toutes trois,
+                    # comme « Art. L. 112-2-1 » de 2010, devenu le 7° de
+                    # L. 115-16 (docs/57). Sous vingt mots, l'alinéa écrit ne
+                    # suffit pas à contredire le numéro, qui tient.
+                    if accord is False and len(ecrit) >= MOTS_MINI_RESOLUTION \
+                            and ARTICLE_ADDITIONNEL.search(subdivision or ""):
+                        additionnel_non_corrobore += 1
+                        continue
             retenues.append((article_id, formule))
         if not retenues:
             sans_cible += 1
@@ -609,6 +625,7 @@ def main() -> None:
     print(f"  article rédigé sous un numéro que la loi a écrit : {corrobore} au contenu "
           f"de la loi ; {glisse_par_le_contenu} dont le contenu désigne un autre article "
           f"de la loi, {plan_propre_non_corrobore} sous un plan propre que rien ne "
+          f"corrobore, {additionnel_non_corrobore} articles additionnels que rien ne "
           f"corrobore — non rattachés")
     print(f"  dont posés vers l'article que le contenu désigne (inferee) : "
           f"{posees_par_le_contenu}")

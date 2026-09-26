@@ -77,7 +77,7 @@ plus ([`docs/25`](docs/25-surlignage.md)).
 python3 restitution/surlignage.py travail/ratio-legis.sqlite L111-1 --html sortie.html
 ```
 
-**Ce qu'on a voulu y écrire et qui n'y est pas.** Les 97 226 amendements des
+**Ce qu'on a voulu y écrire et qui n'y est pas.** Les 148 870 amendements des
 deux chambres avec leur sort en huit familles comparables, et l'irrecevabilité
 lue là où la chambre l'écrit — sur 11 800 irrecevabilités, 3 097 au titre de
 l'article 40, 1 218 cavaliers.
@@ -286,12 +286,12 @@ mesurés contre leurs seuils :
 | Versions d'articles | 6 362 | `repris_de` — continuité d'un alinéa par-delà la recodification | 6 137 |
 | Segments (alinéas) | 28 294 | `renumerote_de` | 1 929 |
 | Documents (rapports, exposés, études d'impact, avis) | 834 | `motive` — un passage qui motive, avec offsets | 1 727 |
-| Amendements (33 199 Sénat, 64 027 Assemblée, législatures XIV, XVI et XVII) | 97 226 | `renvoie_a` — le graphe de renvois | 12 535 |
+| Amendements (33 199 Sénat, 115 671 Assemblée, législatures XIII à XVII) | 148 870 | `renvoie_a` — le graphe de renvois | 12 535 |
 | Acteurs | 2 656 | `resulte_de` — l'amendement qui a écrit l'alinéa | 446 (confiance 0,82) |
 | Actes de l'Union | 284 | `cite_acte_ue` / `transpose` / `transpose_article` — l'article de la directive que l'article du code transpose, lu dans les tableaux de concordance | 1 572 / 8 / 33 (0,90) |
 | Considérants de l'Union | 7 674 | `article_acte_ue` — articles d'actes déclarés | 6 237 |
 | Textes en discussion | 925 | `porte_sur` — l'article du texte → l'article du code | 123 862 (7 494 internes, 0,91 ; 236 résolues par le contenu, 0,84) |
-| Sorts d'amendements, en huit familles | 97 226 | `vise` — l'amendement qui visait l'article, abouti ou non | 663 (652 par le numéro, 0,86 ; 11 par le contenu, 0,74) |
+| Sorts d'amendements, en huit familles | 148 870 | `vise` — l'amendement qui visait l'article, abouti ou non | 663 (652 par le numéro, 0,86 ; 11 par le contenu, 0,74) |
 | Correspondances de texte entre les deux corpus | 322 | `depose_sur` — l'article du code que l'amendement touche, par l'alinéa du texte qu'il nomme | 1 835 (0,91 par l'alinéa, 0,82 par l'article nommé, 0,69 par l'article entier) |
 
 ### Le verdict
@@ -358,18 +358,17 @@ vérité terrain. L'outillage de l'annotateur est prêt
 ([`docs/36`](docs/36-jeu-d-annotation-prepare.md)). Après elle, l'évaluation
 humaine en aveugle de la note, critère de sortie de la phase 3.
 
-**Couverture.** Les amendements de la XVe législature : le serveur de
-l'Assemblée coupe le transfert de son archive de 650 Mo, et le pipeline la
-prendra au premier passage où il la sert ; les constantes seront alors à
-re-mesurer ([`docs/50`](docs/50-increments-doublons-legislatures.md) § 8). Les
-192 jeux d'amendements de l'Assemblée trouvent tous leur texte discuté
-([`docs/52`](docs/52-projets-deposes-et-trait-insecable.md)). La XIIIe, jamais publiée en open
-data, reconstructible page par page depuis Wayback — arbitrage à rendre entre
-le coût et un trou déclaré. Les tableaux de concordance sont lus dans deux
+**Couverture.** Les amendements de la XVe législature sont en base depuis le
+26 septembre 2026 — le serveur de l'Assemblée a fini par servir l'archive —,
+mais leurs arêtes ne sont pas mesurées ; les constantes sont à re-mesurer sur
+la population qui les comprend ([`docs/57`](docs/57-la-treizieme-legislature.md) § 7).
+Ceux de la XIIIe, jamais publiés en open data, sont lus page à page sur le
+site de l'Assemblée : 9 244 amendements de séance sur 91 textes. 229 des 232
+jeux d'amendements de l'Assemblée trouvent leur texte discuté. Les tableaux de concordance sont lus dans deux
 études d'impact ([`docs/54`](docs/54-tableaux-de-concordance.md)) ; les autres
 ne transposent vers notre code aucune disposition.
 
-**Huit arêtes jugées fausses sont dans la base**, et le harnais
+**Dix arêtes jugées fausses sont dans la base**, et le harnais
 (`tools/mesures/rejouer.py`) les nomme à chaque passage. Quatre sont des
 `depose_sur` sans garde : un amendement que la source range sous un autre
 texte et un alinéa mal cité ([`docs/51`](docs/51-depose-sur-re-mesuree.md)),
@@ -380,7 +379,10 @@ un amendement qui écrit dans un autre article que celui du texte et un
 [`docs/50`](docs/50-increments-doublons-legislatures.md) § 7 et de
 [`docs/53`](docs/53-trait-insecable-a-la-lecture.md) : deux formules
 administratives partagées par un passage destiné ailleurs, une rédaction non
-retenue, un alinéa attribué au mauvais amendement du dossier. Les autres ont
+retenue, un alinéa attribué au mauvais amendement du dossier. Deux sont des
+`resulte_de` de la XIIIe, de la même famille : une incise insérée dans un alinéa
+du texte initial, un plafond supprimé dans l'alinéa d'un autre amendement
+([`docs/57`](docs/57-la-treizieme-legislature.md) § 4). Les autres ont
 été réparées à la source, ou arbitrées sur pièces
 ([`docs/55`](docs/55-trois-arbitrages.md)) : l'ancre d'une insertion n'est
 pas une cible, et la garde qui l'écarte est posée ; les cinq verdicts humains
@@ -459,6 +461,7 @@ d'aujourd'hui ; ceux des documents sont ceux de leur date.
 | 48. Tableaux de concordance | l'article de la directive que l'article du code transpose, lu dans les annexes des études d'impact avec la position des blocs du PDF : 33 arêtes, 33/33, 35 articles en vigueur ; deux gardes `resulte_de` mesurées et abandonnées ; les fiches montrent la version écrite par la loi du dossier | [`docs/54`](docs/54-tableaux-de-concordance.md) |
 | 49. Trois arbitrages | l'ancre d'une insertion n'est pas une cible de `porte_sur` — garde posée, 339 arêtes internes retirées, six anciens « justes » rendus sur le code hôte arbitrés faux ; on juge contre l'article du fonds, non le numéro écrit ; cinq verdicts humains contestés et « Mon Accompagnateur Rénov' » arbitrés justes, `resulte_de` 71/77, Wilson 0,8402 ; le harnais échoue de 8 arêtes au lieu de 15 | [`docs/55`](docs/55-trois-arbitrages.md) |
 | 50. Tisseuse contre `vise`, et legi.py | l'extracteur de Tricoteuses sur les 199 arêtes jugées : l'article retrouvé 47 fois sur 163 justes, muet sur « ainsi rédigé » et la création, 3 de nos 34 fausses commises aussi, toutes de version ; legi.py non retenu, la décision écrite | [`docs/56`](docs/56-tisseuse-contre-vise.md) |
+| 51. La XIIIe législature | 9 244 amendements de séance lus page à page ; 256 → 281 articles portant une tentative ; `vise` 16/20, les quatre fausses d'articles additionnels qui numérotent eux-mêmes — gardée, re-mesurée 20/20 sur un tirage disjoint ; « E (nouveau). – » et l'apostrophe typographique ; la scission des lignées renumérotées essayée et retirée ; la XVe entrée en base | [`docs/57`](docs/57-la-treizieme-legislature.md) |
 
 ## D'où ça vient
 

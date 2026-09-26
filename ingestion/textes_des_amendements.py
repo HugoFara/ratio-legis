@@ -116,8 +116,10 @@ SUBDIVISION = re.compile(
 # création d'un article qui n'existe pas encore, dont le numéro dans le code n'est
 # pas fixé et ne le sera qu'à la codification. La subdivision ne dit alors rien du
 # code, et la lire comme une cible serait le contresens le plus coûteux possible.
+# L'apostrophe typographique aussi : « Après l’article 7 », 45 subdivisions, se
+# lisait comme l'article 7 du texte (docs/57).
 ARTICLE_ADDITIONNEL = re.compile(
-    r"art\.?\s*add|article\s+additionnel|apr[èe]s\s+(?:l')?\s*art|avant\s+(?:l')?\s*art",
+    r"art\.?\s*add|article\s+additionnel|apr[èe]s\s+(?:l['’])?\s*art|avant\s+(?:l['’])?\s*art",
     re.I)
 
 # Borne inférieure de Wilson à 95 % pour 15 arêtes justes sur 15 vérifiées à la
@@ -400,9 +402,14 @@ STATUT = re.compile(r"^\s*\(?\s*(?:non modifiée?s?|supprimée?s?|conformes?|"
 PASTILLE = re.compile(r"^\s*([\ue000-\uf8ff]{1,3})\s*$")
 # Ce qui ouvre un alinéa : un guillemet, une numérotation — « 1° », « a) »,
 # « II. », « A. – » —, un tiret, une parenthèse ou un crochet.
+# La mention de navette y est admise comme dans `PARAGRAPHE` : « E (nouveau). – »
+# n'était pas une tête, et la ligne qu'il ouvre se recollait à l'alinéa d'avant —
+# l'alinéa 11 de l'article 4 du texte r2150 portait ainsi L. 311-10 et la tête
+# de l'instruction qui insère L. 311-10-1 (docs/57).
 MARQUE_DE_TETE = re.compile(
     r"^\s*(?:[«“]|\d+\s*[°)]|[a-z]{1,2}(?:\s+(?:bis|ter|quater))?\)"
-    r"|[IVXL]+(?:\s*(?:bis|ter|quater))?\s*[.)]|[A-H]\s*\.\s*[–-]|[–-]\s|[(\[])")
+    r"|[IVXL]+(?:\s*(?:bis|ter|quater|quinquies|sexies))?(?:\s*\([^)\n]{1,20}\))?\s*[.)]"
+    r"|[A-H](?:\s+(?:bis|ter|quater))?(?:\s*\([^)\n]{1,20}\))?\s*\.\s*[–-]|[–-]\s|[(\[])")
 # **L'amendement qui ancre lui-même le numéro.** « Alinéa 67 : Rédiger ainsi cet
 # alinéa : « Art. L. 121-20. – … » » dit quel alinéa porte quel article écrit,
 # et c'est une vérité déclarée sur la numérotation, gratuite. Elle sert de
