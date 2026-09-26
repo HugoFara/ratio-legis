@@ -16,7 +16,9 @@ de la promesse produit.
 (`/14/amendements/1015/AN/…asp`) rendent aujourd'hui 404 et le schéma `/dyn/` ne
 les sert pas. Écrire une URL plausible mais morte contreviendrait au § 4.3, qui
 exige une citation résoluble : le champ reste vide, et l'amendement est cité par
-son numéro et son texte.
+son numéro et son texte. La XIIIe législature fait exception : ses pages sont
+celles-là mêmes que `tools/an/moissonner_amendements_13.py` a lues, et elles
+répondent ; leur adresse est gardée.
 
 **Les deux colonnes de sort sont chargées, pas une.** `sort[1]/sortEnSeance[1]`
 est le sort, et c'est bien lui qu'il faut lire — `etat[1]` vaut « Discuté » sur
@@ -112,7 +114,7 @@ def main() -> None:
                        a["sort"] or None, a["etat"] or None,
                        sans_balises(a["division"]) or None,
                        sans_balises(a["expose"]) or None,
-                       sans_balises(a["dispositif"]) or None, None))
+                       sans_balises(a["dispositif"]) or None, a.get("url") or None))
 
     base.executemany("INSERT INTO acteur (id, nom, groupe) VALUES (?, ?, ?)", nouveaux)
     base.executemany(

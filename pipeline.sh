@@ -151,7 +151,7 @@ done < "$AMELI"
 echo "   $(ls "$TRAVAIL/corpus/ameli" | wc -l) jeux présents"
 
 # -------------------------------------------------- 4. amendements Assemblée
-etape "4. Amendements de l'Assemblée, XIVe à XVIIe législature"
+etape "4. Amendements de l'Assemblée, XIIIe à XVIIe législature"
 AN=https://data.assemblee-nationale.fr/static/openData/repository
 # Le chemin est `amendements_legis_XIV`, non `amendements_legis` : la page
 # d'archives de l'Assemblée publie une URL périmée, qui avait fait conclure à
@@ -183,6 +183,16 @@ done
 # (tools/an/plan_textes_an.py). Le plan des textes déposés se reconstruit à
 # l'étape 5, à partir des amendements : c'est sa version versionnée qu'on lit
 # ici, avec au pire une exécution de retard sur un dossier nouveau.
+# La XIIIe n'a pas de jeu open data : ses amendements de séance sont lus page
+# par page sur le site de l'Assemblée, qui les sert encore (docs/57). Les pages
+# sont gardées dans `travail/an/13/` ; une reconstruction ne les redemande pas.
+python3 "$RACINE/tools/an/plan_textes_an.py" 13 \
+        "$RACINE/data/corpus/plan-textes-an-13.tsv" "$RAPPORTS" "$TEXTES" \
+        "$RACINE/data/corpus/plan-textes-deposes-an.tsv"
+python3 "$RACINE/tools/an/moissonner_amendements_13.py" \
+        "$RACINE/data/corpus/plan-textes-an-13.tsv" "$RAPPORTS" \
+        "$TRAVAIL/an/acteurs_historique.json.zip" "$TRAVAIL/an/13" \
+        "$TRAVAIL/an/amendements_13.csv"
 for legislature in 14 15 16 17; do
   case $legislature in 14) jeu=XIV.csv;; 15) jeu=XV.json;; 16) jeu=XVI.json;; 17) jeu=XVII.json;; esac
   [ -s "$TRAVAIL/an/Amendements_$jeu.zip" ] || { echo "   $jeu absent"; continue; }
@@ -202,7 +212,7 @@ etape "5. Ingestion"
 ingere "$RACINE/ingestion/rapports_vers_motive.py" "$TRAVAIL/corpus/rapports" \
         "$PERIMETRE" "$RAPPORTS" "$BASE" "$IMPACTS"
 ingere "$RACINE/ingestion/renvois.py" "$BASE"
-for extrait in "$TRAVAIL"/an/amendements_1[4-7].csv; do
+for extrait in "$TRAVAIL"/an/amendements_1[3-7].csv; do
   ingere "$RACINE/ingestion/an_vers_amendements.py" "$extrait" \
           "$TRAVAIL/an/acteurs_historique.json.zip" "$BASE"
 done
