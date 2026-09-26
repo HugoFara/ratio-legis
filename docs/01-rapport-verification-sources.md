@@ -431,7 +431,7 @@ Le § 2.4 demande d'« évaluer et, si viable, intégrer plutôt que reconstruir
 
 | Projet | Dernier commit | Étoiles | Verdict |
 |---|---|---:|---|
-| `Legilibre/legi.py` | **18/08/2026** | 60 | ✅ **Vivant.** À utiliser |
+| `Legilibre/legi.py` | **18/08/2026** | 60 | ✅ **Vivant.** À utiliser — *finalement non retenu, `docs/56` § 4* |
 | `regardscitoyens/the-law-factory-parser` | 29/03/2022 | 46 | ⚠️ 4 ans sans commit |
 | `Legilibre/Archeo-Lex` | 10/03/2019 | 104 | ❌ 7 ans sans commit |
 | `Legilibre/DuraLex` | 14/02/2019 | 35 | ❌ 7 ans sans commit |

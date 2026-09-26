@@ -458,6 +458,7 @@ d'aujourd'hui ; ceux des documents sont ceux de leur date.
 | 47. Le trait insécable à la lecture | U+2011 ramené à « - » par les deux `texte_brut`, textes et rapports — 37 490 numéros lus dans les rapports au lieu de 34 988, `motive` +2 / −1 ; `vise` re-mesurée 20/20 et 1/1, `resulte_de` 18/20 : 0,8621, 0,7412, 0,8240 | [`docs/53`](docs/53-trait-insecable-a-la-lecture.md) |
 | 48. Tableaux de concordance | l'article de la directive que l'article du code transpose, lu dans les annexes des études d'impact avec la position des blocs du PDF : 33 arêtes, 33/33, 35 articles en vigueur ; deux gardes `resulte_de` mesurées et abandonnées ; les fiches montrent la version écrite par la loi du dossier | [`docs/54`](docs/54-tableaux-de-concordance.md) |
 | 49. Trois arbitrages | l'ancre d'une insertion n'est pas une cible de `porte_sur` — garde posée, 339 arêtes internes retirées, six anciens « justes » rendus sur le code hôte arbitrés faux ; on juge contre l'article du fonds, non le numéro écrit ; cinq verdicts humains contestés et « Mon Accompagnateur Rénov' » arbitrés justes, `resulte_de` 71/77, Wilson 0,8402 ; le harnais échoue de 8 arêtes au lieu de 15 | [`docs/55`](docs/55-trois-arbitrages.md) |
+| 50. Tisseuse contre `vise`, et legi.py | l'extracteur de Tricoteuses sur les 199 arêtes jugées : l'article retrouvé 47 fois sur 163 justes, muet sur « ainsi rédigé » et la création, 3 de nos 34 fausses commises aussi, toutes de version ; legi.py non retenu, la décision écrite | [`docs/56`](docs/56-tisseuse-contre-vise.md) |
 
 ## D'où ça vient
 
@@ -505,10 +506,14 @@ Aucun ne pose la même question. Chacun en tient un morceau. État vérifié le
   législatifs compris (TypeScript, PostgreSQL, AGPL). Son module **Tisseuse**
   trouve les liens entre textes et extrait les instructions modificatives
   (`insert_after`, `replace`, `delete`, avec le rang d'occurrence). Il fait donc
-  ce que DuraLex faisait, et il est maintenu. Personne ne l'a mesuré contre le
-  résolveur de ce dépôt ; [`docs/01`](docs/01-rapport-verification-sources.md)
-  § 6, écrit avant qu'on le connaisse, concluait que tout était à réécrire.
+  ce que DuraLex faisait, et il est maintenu. Passé sur les 199 arêtes `vise`
+  jugées, il retrouve l'article 47 fois sur 163 justes : il ne modélise ni
+  « est ainsi rédigé » ni la création d'un article, et ne choisit pas la
+  version ([`docs/56`](docs/56-tisseuse-contre-vise.md)). Son grain de retouche
+  et ses 538 tests unitaires sont à reprendre ; ce n'est pas un substitut.
 - **legi.py** (Legilibre) : parse LEGI vers SQLite, commits en septembre 2026.
+  Non retenu : il oriente les liens par l'attribut `sens`, qui n'est pas fiable,
+  et ne découpe pas l'alinéa ([`docs/56`](docs/56-tisseuse-contre-vise.md) § 4).
 - **La Fabrique de la loi** (Regards Citoyens, médialab) : la navette jusqu'à la
   promulgation, et le premier surlignage par étape. Le parser n'a pas de commit
   depuis mars 2022, le corpus s'arrête au 29/07/2024, et le certificat TLS du site

@@ -1,0 +1,200 @@
+fiche	cle	article	formule	verdict	issue	directives	cibles_tisseuse
+precision-vise-2.tsv	06f6da5ce0ae64d3	L141-1	complété	juste	aucune		
+precision-vise-2.tsv	071496f0bc6909bd	L122-23	modifié	juste	meme_article	insert_after insert_after insert_after	11I L122-23
+precision-vise-2.tsv	072a00b21166afd5	L121-107	rédigé	douteux	autre_cible	insert_after	L121-103
+precision-vise-2.tsv	07614d65e424401f	L131-4	complété	faux	meme_article	insert_after insert_after	L131-4
+precision-vise-2.tsv	088f7db6e1949b60	L311-8-1	rédigé	juste	aucune		
+precision-vise-2.tsv	089fc5b38104d932	L423-15	rédigé	juste	aucune		
+precision-vise-2.tsv	08bb2d9283343a61	L113-7	rédigé	juste	aucune		
+precision-vise-2.tsv	08ea939e098413cf	L217-9	complété	juste	meme_article	insert_after insert_after	4I L217-9
+precision-vise-2.tsv	0938d4d10e70b877	L223-1	rédigé	juste	aucune		
+precision-vise-2.tsv	094b23eb9819d82f	L116-1	rédigé	juste	autre_cible	insert_after	
+precision-vise-2.tsv	09adfa31bf54b5c1	L121-1-1	inséré	juste	meme_article	insert_after insert_after	24I L121-1-1
+precision-vise-2.tsv	0a7ca4be02ca0ce0	L331-3	inséré	juste	aucune		
+precision-vise-2.tsv	0b8d44066267868e	L224-3	complété	juste	autre_cible	insert_after insert_after	13I L224-12
+precision-vise-2.tsv	0e2fe1f774bd8804	L423-8	rédigé	douteux	aucune		
+precision-vise-2.tsv	0ea085f61e9e5d47	L121-84-4	complété	juste	meme_article	insert_after	L121-84-4
+precision-vise-2.tsv	0f33514c33b55b2a	L733-7	rédigé	juste	autre_cible	replace	
+precision-vise-2.tsv	0fcc9381f63a659f	L312-9	modifié	juste	meme_article	insert_after insert_after insert_after	L312-9
+precision-vise-2.tsv	102079adf0510528	L411-1	insérés	faux	aucune		
+precision-vise-2.tsv	1049cf409d00a8c8	L311-3	complété	juste	aucune		
+precision-vise-2.tsv	10573b6a323bd424	L113-7	rédigé	juste	aucune		
+precision-vise-3.tsv	1095ccb758a3202c	L733-10	rédigé	juste	autre_cible	replace replace replace	L711-5 L711-8
+precision-vise-3.tsv	10a89915f2289930	L341-4	rédigé	juste	aucune		
+precision-vise-3.tsv	10c71ae2ab462961	L423-5	rédigé	juste	aucune		
+precision-vise-3.tsv	1176f4e4775917a1	L217-23	complété	juste	meme_article	insert_after insert_after	13I L217-23
+precision-vise-3.tsv	11cbe53fbe887feb	L711-8	modifié	juste	meme_article	replace replace replace	L711-5 L711-8
+precision-vise-3.tsv	11d2cb52fcd14677	L122-3	rédigé	juste	autre_cible	delete delete delete insert_after	26 L115-30 L121-35 L121-8
+precision-vise-3.tsv	1212a202a47eb749	L534-6	abrogés	juste	autre_cible	delete delete delete delete delete	64BISI L221-3 L531-2 L531-3 L531-4 L534-10 L534-8 L534-9
+precision-vise-3.tsv	129278174c626ead	L412-9	complété	juste	meme_article	insert_after	L412-9
+precision-vise-3.tsv	14108d95db232f30	L121-1	complété	juste	meme_article	insert_after	L121-1
+precision-vise-3.tsv	1487784f6bb2bd27	L332-9	insérés	juste	aucune		
+precision-vise-3.tsv	153153818184ebd4	L421-3	complété	juste	meme_article	insert_after	L421-3
+precision-vise-3.tsv	161c7296c61ea9d7	L733-10	rédigé	juste	autre_cible	replace	
+precision-vise-3.tsv	16a81990cc994b22	L116-1	rédigé	juste	aucune		
+precision-vise-3.tsv	183d35ed84b9f3ba	L733-2	modifié	juste	autre_cible	replace replace replace	L711-5 L711-8
+precision-vise-3.tsv	18597dad1f79bed0	L741-2	modifié	juste	meme_article	delete delete delete delete delete delete delete delete delete delete delete delete delete_portion	1NONIESI L741-2 L742-22
+precision-vise-3.tsv	186af8e343f08000	L511-12	complété	juste	aucune		
+precision-vise-3.tsv	19458c115a88c139	L113-5	complété	juste	autre_cible	replace replace	78
+precision-vise-3.tsv	19a31a3278376bd1	L311-17	rédigé	juste	aucune		
+precision-vise-3.tsv	19a65b2eb6cc871f	L121-104	rédigé	juste	autre_cible	insert_after	L121-103
+precision-vise-3.tsv	1a7c3ab3a6599566	L733-4	rédigé	juste	autre_cible	replace	
+precision-vise-4.tsv	03792c0793293869	L313-32	modifié	juste	autre_cible	delete delete delete delete delete delete delete delete delete delete delete delete insert_after	L313-31
+precision-vise-4.tsv	1ceacd7009afa426	L311-17	rédigé	juste	aucune		
+precision-vise-4.tsv	1e38bcf84c6cd67b	L312-6-2	rédigé	juste	aucune		
+precision-vise-4.tsv	1eb2e74a993a624e	L311-17	rédigé	juste	aucune		
+precision-vise-4.tsv	20cc249b83d7e6ae	L217-9	complété	faux	meme_article	insert_after insert_after	4I L217-9
+precision-vise-4.tsv	210d6cc449c62b25	L312-8	inséré	juste	meme_article	insert_after	L312-8
+precision-vise-4.tsv	2152e541d2e9ef1d	L121-84-7	modifié	juste	meme_article	replace replace	L121-84-7
+precision-vise-4.tsv	2179512ae11a6308	L315-14	modifié	juste	aucune		
+precision-vise-4.tsv	22257f44ebcf503f	L331-5	modifié	juste	meme_article	insert_before insert_before insert_before	L331-5
+precision-vise-4.tsv	2289d13cf9131a25	L121-87	remplacé	juste	aucune		
+precision-vise-4.tsv	22f57e6f13bd43db	L311-17	rédigé	juste	aucune		
+precision-vise-4.tsv	22ffa1d33036ad29	L121-1-1	inséré	juste	meme_article	insert_after	L121-1-1
+precision-vise-4.tsv	2523350db4c70086	L121-117	rédigé	juste	autre_cible	delete_article delete_portion	L121-116 L121-119
+precision-vise-4.tsv	252dec29691f93eb	L722-14	à la fin de	juste	autre_cible	replace replace replace	L711-5 L711-8
+precision-vise-4.tsv	25919a10241ebf01	L221-10-1	complété	juste	aucune		
+precision-vise-4.tsv	25f50acba661769e	L215-2-4	rédigé	juste	aucune		
+precision-vise-4.tsv	26c829be7f3bf904	L331-3-1	complété	juste	aucune		
+precision-vise-4.tsv	26fee83a010f0574	L121-4	complété	juste	aucune		
+precision-vise-4.tsv	271ea87964b05a1d	L121-2	complété	juste	meme_article	insert_after insert_after	4I L121-2
+precision-vise-4.tsv	2753f78f3bfeb522	L313-30	rédigés	juste	aucune		
+precision-vise-5.tsv	27df91e73a1e20af	L331-1	modifié	juste	autre_cible	replace	
+precision-vise-5.tsv	2817366764bc1c7e	L121-79-4	rédigé	juste	autre_cible	replace	
+precision-vise-5.tsv	287a0b2a4e69fd7a	L121-37	rédigés	juste	aucune		
+precision-vise-5.tsv	28c9af6aa5bab884	L121-4	complété	juste	aucune		
+precision-vise-5.tsv	28ef363df6bea7f2	L313-1	complété	juste	aucune		
+precision-vise-5.tsv	2a241a5d2385ca5c	L722-14	à la fin de	juste	autre_cible	replace	
+precision-vise-5.tsv	2aa49a85a89b9ee5	L121-91	modifié	juste	autre_cible	delete delete delete delete delete delete delete delete delete delete delete delete delete delete delete delete delete_portion	L121-87 L121-88
+precision-vise-5.tsv	2aea8e6528709607	L732-4	abrogé	juste	autre_cible	replace replace replace insert_after	L731-1 L732-1
+precision-vise-5.tsv	2c0b9e4c3950c081	L217-12	complété	juste	aucune		
+precision-vise-5.tsv	2c31e9bf4ba88e1e	L315-9	modifié	juste	aucune		
+precision-vise-5.tsv	2d32c03bdd85a811	L111-4	inséré	juste	meme_article	insert_after insert_after	13I L111-4
+precision-vise-5.tsv	2e26fe87319fed40	L141-1-2	rédigé	juste	aucune		
+precision-vise-5.tsv	2fb06d42b59b86fd	L111-5-1	abrogé	juste	aucune		
+precision-vise-5.tsv	302fbf1f21922eab	L733-9	rédigé	juste	autre_cible	replace	
+precision-vise-5.tsv	30771ccbf331ba8b	L113-9	rédigé	juste	aucune		
+precision-vise-5.tsv	3081ed225258dddb	L111-3	rédigé	juste	aucune		
+precision-vise-5.tsv	30941ce7b7e89a2b	L332-10	inséré	juste	meme_article	replace	L331-6 L331-7 L332-10
+precision-vise-5.tsv	33f75d450fa8617d	L724-3	modifié	juste	autre_cible	replace replace replace	L711-5 L711-8
+precision-vise-5.tsv	3427fc424216a4f6	L115-16	modifié	faux	aucune		
+precision-vise-5.tsv	34edc52d9685330e	L134-1	modifié	juste	meme_article	insert_after insert_after	33I L134-1
+precision-vise-contenu.tsv	01e47f55d1e61b87	L423-24	rédigé	faux	aucune		
+precision-vise-contenu.tsv	05d016d55b94a03e	L423-17	rédigé	faux	aucune		
+precision-vise-contenu.tsv	24fe58d69e4e14b0	L423-22	rédigé	faux	aucune		
+precision-vise-contenu.tsv	4ec3cbeee38eafc1	L423-22	rédigé	faux	aucune		
+precision-vise-contenu.tsv	4fe33447b2dfa0fe	L423-21	rédigé	juste	aucune		
+precision-vise-contenu.tsv	6a225e8a13d28b9f	L423-23	rédigé	faux	aucune		
+precision-vise-contenu.tsv	808e88ee27bf680f	L423-18	rédigé	faux	aucune		
+precision-vise-contenu.tsv	81849b35424d80dc	L423-18	rédigé	faux	aucune		
+precision-vise-contenu.tsv	81f144f18df9b934	L423-17	rédigé	faux	aucune		
+precision-vise-contenu.tsv	a05a90aacdead51e	L423-17	rédigé	juste	aucune		
+precision-vise-contenu.tsv	aafc5057d70d7f46	L423-21	rédigé	faux	aucune		
+precision-vise-contenu.tsv	b228ad33dd9f0f57	L423-20	rédigé	faux	aucune		
+precision-vise-contenu.tsv	b37c623ba2b8e891	L423-23	rédigé	faux	aucune		
+precision-vise-contenu.tsv	e68520b89eae81e2	L423-15	rédigé	juste	aucune		
+precision-vise-instruction.tsv	026d32b6f5f7d507	L223-5	complété	juste	meme_article	insert_after insert_after	L223-5
+precision-vise-instruction.tsv	0621990c2a24b2f9	L223-5	complété	juste	meme_article	insert_after insert_after	L223-5
+precision-vise-instruction.tsv	0b44840e2bcf7081	L223-5	complété	juste	meme_article	insert_after insert_after	L223-5
+precision-vise-instruction.tsv	1487784f6bb2bd27	L332-9	insérés	juste	aucune		
+precision-vise-instruction.tsv	158b0c262ab42013	L121-34-1	rédigé	juste	aucune		
+precision-vise-instruction.tsv	179475b7ab6856f2	L121-106	rédigé	juste	aucune		
+precision-vise-instruction.tsv	198c559a79b3cbc9	L223-2	rédigé	juste	aucune		
+precision-vise-instruction.tsv	1ab3c930159e200f	L121-30	modifié	juste	aucune		
+precision-vise-instruction.tsv	1d8e719af8458857	L121-110	rédigé	juste	aucune		
+precision-vise-instruction.tsv	27bae21e3badcfc3	L121-16-1	modifié	juste	meme_article	delete delete delete delete_portion	L121-16-1
+precision-vise-instruction.tsv	33a974ea201fee11	L223-5	complété	juste	meme_article	insert_after insert_after	L223-5
+precision-vise-instruction.tsv	33d81f477ee2814f	L223-5	complété	juste	meme_article	insert_after insert_after	L223-5
+precision-vise-instruction.tsv	4d330b99533443cb	L423-8	rédigé	faux	aucune		
+precision-vise-instruction.tsv	53e0442973d067ad	L423-1	rédigé	juste	aucune		
+precision-vise-instruction.tsv	5c3abb9695df5f9e	L121-108	rédigé	juste	aucune		
+precision-vise-instruction.tsv	5e026d0dea556ae4	L621-7	rédigé	juste	aucune		
+precision-vise-instruction.tsv	627abeb89f040fe9	L223-5	complété	juste	meme_article	insert_after insert_after	L223-5
+precision-vise-instruction.tsv	779b91c140cb7a74	L223-5	complété	juste	meme_article	insert_after insert_after	L223-5
+precision-vise-instruction.tsv	7d09e161bc231bb3	L423-2	rédigé	juste	aucune		
+precision-vise-instruction.tsv	8f9127c727277f6c	L223-4	abrogés	juste	aucune		
+precision-vise-legislatures.tsv	00b0824cb0b68599	L314-1	modifié	juste	autre_cible	insert_after	
+precision-vise-legislatures.tsv	01ea0b8b8c753dea	L732-3	complété	juste	autre_cible	replace insert_after	L731-1 L732-1
+precision-vise-legislatures.tsv	020e9a443e16e72c	L111-5-1	modifié	faux	aucune		
+precision-vise-legislatures.tsv	03d881af7d753bd8	L113-3	inséré	juste	meme_article	insert_after	L113-3
+precision-vise-legislatures.tsv	04e6815c729633d5	L313-11	à la fin de	juste	aucune		
+precision-vise-legislatures.tsv	086ac4b4e4779803	L122-11-1	complété	juste	autre_cible	insert_after	
+precision-vise-legislatures.tsv	0b3d25c181998a65	L121-83	modifié	juste	meme_article	insert_after insert_after	L121-83
+precision-vise-legislatures.tsv	0c90fc73105e5a16	L313-30	rédigés	juste	aucune		
+precision-vise-legislatures.tsv	0f0c06da67f2c684	L314-7	modifié	faux	aucune		
+precision-vise-legislatures.tsv	0f6ec7645f5b7e58	L311-5	modifié	juste	meme_article	insert_after	L311-5
+precision-vise-legislatures.tsv	0f7c120a03f64563	L113-3	inséré	juste	aucune		
+precision-vise-legislatures.tsv	100edf72460cb6ef	L311-9	inséré	juste	autre_cible	insert_after insert_after	
+precision-vise-legislatures.tsv	1052c963b4261c60	L313-30	rédigés	juste	aucune		
+precision-vise-legislatures.tsv	10d196e887274fcc	L224-37-1	rédigé	juste	aucune		
+precision-vise-legislatures.tsv	13e1798d01a5f7c2	L121-1-1	inséré	juste	meme_article	insert_after	L121-1-1
+precision-vise-legislatures.tsv	16474895e03c5c89	L141-1-2	complété	juste	meme_article	insert_after	L141-1-2
+precision-vise-legislatures.tsv	170a2a0c6a9ad229	L315-14	inséré	faux	aucune		
+precision-vise-legislatures.tsv	18f6a747c75763ba	L242-16	modifié	juste	meme_article	replace	L242-16
+precision-vise-legislatures.tsv	1a72176eebbb09f6	L121-102	modifié	juste	meme_article	delete delete delete delete delete_portion	L121-102
+precision-vise-legislatures.tsv	1c9e66f3136abd20	L121-1	inséré	juste	meme_article	insert_after	L121-1
+precision-vise-nouvelles.tsv	03792c0793293869	L313-32	modifié	juste	autre_cible	delete delete delete delete delete delete delete delete delete delete delete delete insert_after	L313-31
+precision-vise-nouvelles.tsv	4f1010731b205963	L331-3-1	modifié	juste	autre_cible	insert_after	L330-1
+precision-vise-nouvelles.tsv	77e0cfbeec440bc2	L222-16-1	insérés	juste	aucune		
+precision-vise-nouvelles.tsv	883f425b8f54ffc4	L313-31	modifié	juste	aucune		
+precision-vise-nouvelles.tsv	b8150de4c703627e	L223-2	abrogé	juste	aucune		
+precision-vise-nouvelles.tsv	bd1e4d728ee3c1b4	L331-2	complété	juste	autre_cible	insert_after	L330-1
+precision-vise-nouvelles.tsv	cde4ea3fbd360080	L121-91-1	rédigé	juste	autre_cible	insert_after	L121-84-11
+precision-vise-nouvelles.tsv	ce48a45bc2daac66	L121-99	rédigé	faux	aucune		
+precision-vise-nouvelles.tsv	d388fef65cf798d8	L223-2	abrogé	juste	aucune		
+precision-vise-nouvelles.tsv	e3a82931b3a75cf5	L121-21	complété	juste	aucune		
+precision-vise-nouvelles.tsv	ee9d5a7ac120b6db	L121-91-1	rédigé	juste	autre_cible	insert_after	L121-84-11
+precision-vise-par-le-contenu-2.tsv	e6b3abd9cb195184	L121-99	rédigé	juste	aucune		
+precision-vise-par-le-contenu.tsv	0a896cacebfb4a6e	L121-109	rédigé	juste	aucune		
+precision-vise-par-le-contenu.tsv	0e6c7bbf5e73684b	L121-110	rédigé	juste	aucune		
+precision-vise-par-le-contenu.tsv	384c993a0f3b2ed6	L311-16	rédigé	faux	aucune		
+precision-vise-par-le-contenu.tsv	390c6bff6a04713f	L136-1	rédigé	faux	aucune		
+precision-vise-par-le-contenu.tsv	73c60898a5da2ffd	L121-109	rédigé	juste	autre_cible	insert_after	L121-103
+precision-vise-par-le-contenu.tsv	857c517a27fd28ce	L121-82	rédigé	faux	autre_cible	insert_after	L121-103
+precision-vise-par-le-contenu.tsv	88aa2d1e261b52ae	L121-107	rédigé	juste	aucune		
+precision-vise-par-le-contenu.tsv	97849dfc2054b7cc	L121-47	rédigé	juste	aucune		
+precision-vise-par-le-contenu.tsv	9c477818ea83a663	L121-106	rédigé	juste	aucune		
+precision-vise-par-le-contenu.tsv	9fb62dca69e277e6	L121-106	rédigé	juste	autre_cible	insert_after	L121-103
+precision-vise-par-le-contenu.tsv	b46822c19b9a99ff	L121-111	rédigé	juste	aucune		
+precision-vise-par-le-contenu.tsv	b58907bd98868793	L121-110	rédigé	juste	aucune		
+precision-vise-par-le-contenu.tsv	cb4955a54a7aa46d	L121-111	rédigé	juste	aucune		
+precision-vise-remesure.tsv	009dcb79da8fae8f	L113-8	rédigé	juste	aucune		
+precision-vise-remesure.tsv	0126e9f07c321181	L311-5	complété	juste	meme_article	insert_after insert_after	18I L311-5
+precision-vise-remesure.tsv	012af71064809fd7	L312-8	inséré	juste	meme_article	insert_after insert_after	25DECIESI L312-8
+precision-vise-remesure.tsv	025829ef3056b78e	L121-34	rédigé	juste	aucune		
+precision-vise-remesure.tsv	0317a161fcf46e0a	L223-1	modifié	juste	meme_article	delete delete delete delete	L223-1
+precision-vise-remesure.tsv	046410816381a11c	L312-8	rédigé	juste	aucune		
+precision-vise-remesure.tsv	04f14f94af035c74	L121-36	rédigé	juste	aucune		
+precision-vise-remesure.tsv	06f7934835446aff	L111-3	rédigé	juste	aucune		
+precision-vise-remesure.tsv	076850405e73b895	L141-1	complété	juste	aucune		
+precision-vise-remesure.tsv	0a9bb11e48ae0e75	L441-2	complété	juste	meme_article	insert_after insert_after	13I L441-2
+precision-vise-remesure.tsv	0ae5be8f03a87cbc	L330-1	rédigé	juste	autre_cible	insert_after	
+precision-vise-remesure.tsv	0c0ebcfa477abd48	L423-3	rédigé	juste	aucune		
+precision-vise-remesure.tsv	0c6d45a3c19ef46e	L312-9	complété	juste	meme_article	insert_after insert_after	19OCTIESI L312-9
+precision-vise-remesure.tsv	0cb78a19b3d32189	L121-35	rédigé	juste	aucune		
+precision-vise-remesure.tsv	0d44f59b09b14c19	L311-17	rédigé	juste	aucune		
+precision-vise-remesure.tsv	0d5cb2beb1c067dd	L223-1	rédigé	juste	aucune		
+precision-vise-remesure.tsv	0f485eab84724b39	L132-2	modifié	juste	autre_cible	replace	
+precision-vise-remesure.tsv	1054611b595baeea	L412-4	complété	juste	meme_article	insert_after insert_after	11DECIESI L412-4
+precision-vise-remesure.tsv	1148695939acdf73	L312-8	rédigé	juste	autre_cible	insert_after	
+precision-vise-remesure.tsv	1178350a84660e12	L313-1	inséré	juste	meme_article	insert_after insert_after	17BISBI L313-1
+precision-vise.tsv	00168d5cb493e972	L511-12	complété	juste	meme_article	insert_after insert_after	14I L511-12
+precision-vise.tsv	007311fc21fd74da	L122-3	abrogé	faux	meme_article	delete	L122-3
+precision-vise.tsv	011ec9a58c7c0f0c	L136-1	modifié	juste	meme_article	insert_after	L136-1
+precision-vise.tsv	016f6e0c17aa6fc9	L121-105	rédigé	faux	aucune		
+precision-vise.tsv	019e793b4a032ba1	L411-2	rédigé	faux	aucune		
+precision-vise.tsv	022c18452d02d252	L711-1	rédigé	faux	aucune		
+precision-vise.tsv	02602319e230957a	L732-3	complété	juste	autre_cible	replace replace replace insert_after	L731-1 L732-1
+precision-vise.tsv	026d32b6f5f7d507	L223-5	complété	juste	meme_article	insert_after insert_after	L223-5
+precision-vise.tsv	02c5db779ef4c26e	L141-3	complété	faux	aucune		
+precision-vise.tsv	0342c931c2f39c08	L213-4-1	rédigé	juste	aucune		
+precision-vise.tsv	035c56f0dca09b7d	L422-3	inséré	faux	autre_cible	insert_after	
+precision-vise.tsv	0390ba9f9bb867da	L521-1	complété	faux	aucune		
+precision-vise.tsv	0433f24eba530470	L433-2	remplacé	faux	aucune		
+precision-vise.tsv	0484d755086c1d2f	L331-3	complété	juste	meme_article	insert_after insert_after	22BISI L331-3
+precision-vise.tsv	055050dee56be8f4	L121-42	rédigé	juste	aucune		
+precision-vise.tsv	0587a726ad4ab816	L121-91	rédigé	faux	aucune		
+precision-vise.tsv	05a0dcc7fd408feb	L522-5	modifié	faux	autre_cible	replace replace replace insert_after insert_after	71I L112-2-1 L322-2
+precision-vise.tsv	05a83cac503ff2fe	L712-7	inséré	faux	autre_cible	insert_after	
+precision-vise.tsv	05ec23c58fa532ab	L732-4	abrogé	juste	autre_cible	replace replace replace insert_after	L731-1 L732-1
+precision-vise.tsv	0621990c2a24b2f9	L223-5	complété	juste	meme_article	insert_after insert_after	L223-5
