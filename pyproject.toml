@@ -28,7 +28,15 @@ requires-python = ">=3.14"
 # Seule dépendance hors bibliothèque standard, et une seule chose lui est
 # demandée : extraire le texte des études d'impact et des avis du Conseil d'État,
 # qui n'existent qu'en PDF, en conservant les offsets exigés par le § 4.3.
-dependencies = ["pymupdf>=1.24"]
+#
+# La version est épinglée : l'extraction change d'une version à l'autre. Sur les
+# 138 PDF du dépôt, comparés page à page à 1.27.2.3, 1.24.14 rend un autre texte
+# sur 2 210 pages et échoue sur 11 documents ; 1.28.2 et 2.0 en changent 121. Un
+# plancher `>=1.24` laissait donc le pipeline rejouer un autre texte, donc
+# d'autres offsets, que celui des données. Passer à 2.0 (et à `import pymupdf`,
+# le nom `fitz` y est déprécié) est une migration à part : re-extraire, puis
+# re-mesurer ce qui repose sur les offsets.
+dependencies = ["pymupdf==1.27.2.3"]
 
 # L'API n'est pas nécessaire pour construire le graphe, seulement pour le servir.
 # La séparer garde vraie la phrase « une seule dépendance hors bibliothèque

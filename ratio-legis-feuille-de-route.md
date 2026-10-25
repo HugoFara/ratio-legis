@@ -221,7 +221,7 @@ qu'ils soient des décisions et non des dérives.
 | PostgreSQL 16 | **SQLite**, en tables `STRICT` | portabilité : la base est un fichier, donc le dump open data du § 4.4 *est* la base. `pg_trgm` n'a pas servi — aucune arête ne repose sur une similarité floue (§ 5.5) |
 | Dagster ou Prefect | **`quotidien.sh` + minuteur systemd utilisateur** | le pipeline est une séquence linéaire de huit étapes, sans branchement ni parallélisme : il lui faut un déclencheur, un journal et l'idempotence, non un ordonnanceur distribué et sa centaine de paquets. La réincrémentation quotidienne du § 4.1 est faite (`docs/26`) |
 | lxml pour LEGI | expressions régulières sur le XML | les fonds DILA sont volumineux et de forme stable ; aucun besoin d'arbre |
-| pdfplumber | **pymupdf** | conserve les offsets exigés par le § 4.3, sans OCR sur ce corpus |
+| pdfplumber | **pymupdf**, épinglé en 1.27.2.3 | conserve les offsets exigés par le § 4.3, sans OCR sur ce corpus. Épinglé parce que l'extraction change entre versions (1.28 et 2.0 rendent un autre texte sur 121 pages des 138 PDF du dépôt) : la migration vers 2.0, disponible depuis octobre 2026, reste à faire, avec re-extraction et re-mesure des offsets |
 | legi.py (`docs/01` § 6 : « à utiliser ») | **lecteur propre**, `ingestion/legi_vers_graphe.py` | legi.py oriente les liens par `sens`, que `docs/01` § 2.3 bis a montré non fiable ; il ne découpe pas l'alinéa, que `repris_de` compare ; il charge tout LEGI quand le pipeline n'extrait que le code (`docs/56` § 4) |
 
 ---
